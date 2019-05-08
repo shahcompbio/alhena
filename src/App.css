@@ -22,7 +22,14 @@
 .App-link {
   color: #61dafb;
 }
+.squareInput {
+  margin: 0px 15px 0px 15px;
+}
+.squareInput > div > input{
+  height: 38px;
+  border-radius: 3px !important;
 
+}
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
