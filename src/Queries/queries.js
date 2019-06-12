@@ -1,18 +1,71 @@
 import gql from "graphql-tag";
-export const getAllDashboards = gql`
-  query GetIndices {
-    getAllDashboards {
-      index
-      title
-      description
-      quality
-      sampleIds {
-        sampleId
+
+export const analysesBySampleID = gql`
+  query Sunburst($sampleID: String!, $project: String!) {
+    analysesBySampleID(sampleID: $sampleID, project: $project) {
+      children {
+        ... on ParentType {
+          name
+          children {
+            ... on ParentType {
+              name
+              children {
+                ... on ParentType {
+                  name
+                  children {
+                    ... on ChildType {
+                      name
+                      value
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
-      tags {
-        sampleId
+    }
+  }
+`;
+
+export const getAllSunburstAnalyses = gql`
+  query Sunburst($filter: [Term]!) {
+    analysesStats(filters: $filter) {
+      label
+      value
+    }
+    analysesList(filters: $filter) {
+      label
+      values
+      type
+    }
+    analysesTree(filters: $filter) {
+      parent
+      children {
+        ... on ParentType {
+          parent
+          name
+          children {
+            ... on ParentType {
+              parent
+              name
+              children {
+                ... on ParentType {
+                  parent
+                  name
+                  children {
+                    ... on ChildType {
+                      parent
+                      name
+                      value
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
-      quality
     }
   }
 `;

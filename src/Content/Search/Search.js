@@ -1,10 +1,30 @@
-import React, {Component} from "react";
-import {Menu, Sidebar, Header} from "semantic-ui-react";
+import React, { Component } from "react";
+
 import Filters from "./Filters.js";
-import SearchField from "./SearchField";
 
 import _ from "lodash";
+import { graphql } from "react-apollo";
+import { getAllFilters } from "../../Queries/queries.js";
+import { withStyles } from "@material-ui/styles";
 
+import Paper from "@material-ui/core/Paper";
+import Typography from "@material-ui/core/Typography";
+import Grid from "@material-ui/core/Grid";
+
+const style = theme => ({
+  root: {
+    flexGrow: 1,
+    height: "100vh",
+    padding: "20px"
+  },
+  paper: {
+    width: "100%"
+  },
+  header: {
+    marginTop: "20px",
+    width: "100%"
+  }
+});
 const dropdownLabels = {
   index: "Jira ID",
   title: "Sample ID"
@@ -15,31 +35,28 @@ class Search extends Component {
     this.state = {};
   }
   render() {
-    const {innerRef, visible, allDashboards} = this.props;
-
-    var dashboards = allDashboards.map(dashboard => {
-      return _.pick(dashboard, Object.keys(dropdownLabels));
-    });
+    const {
+      classes,
+      filters,
+      handleFilterChange,
+      selectedOptions
+    } = this.props;
     return (
-      <Sidebar
-        animation="overlay"
-        as={Menu}
-        icon="labeled"
-        inverted
-        target={innerRef}
-        onHide={this.handleSidebarHide}
-        vertical
-        visible={visible}
-        width="very wide"
-      >
-        <Header as="h2" style={{marginTop: "20px"}}>
-          Select a library
-        </Header>
-        <Filters dashboards={dashboards} dropdownLabels={dropdownLabels} />
-
-        <SearchField />
-      </Sidebar>
+      <Grid container className={classes.root} spacing={2}>
+        <Paper className={classes.paper} elevation={0}>
+          <Typography variant="h5" className={classes.header}>
+            Select a library:
+          </Typography>
+          <Filters
+            selectedOptions={selectedOptions}
+            filters={filters}
+            handleFilterChange={(selection, type) =>
+              handleFilterChange(selection, type)
+            }
+          />
+        </Paper>
+      </Grid>
     );
   }
 }
-export default Search;
+export default withStyles(style)(Search);
