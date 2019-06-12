@@ -1,10 +1,12 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import Content from "./Content/Content.js";
-
-import "./semantic/dist/semantic.min.css";
+import Header from "@bit/viz.spectrum.header";
 import "./App.css";
 
 import styled from "@emotion/styled";
+const title = "Alhena";
+const description =
+  "Alhena is a single cell DNA (scDNA) dashboard for MSK SPECTRUM. It takes the CSV output from the single cell pipeline.";
 
 class App extends Component {
   constructor(props) {
@@ -15,6 +17,7 @@ class App extends Component {
   render() {
     return (
       <BodyWrapper>
+        <Header title={title} description={description} />
         <Content />
       </BodyWrapper>
     );

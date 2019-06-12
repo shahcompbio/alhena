@@ -1,6 +1,0 @@
-/*******************************
-         Site Overrides
-*******************************/
-.ui.inverted.menu {
-    background: #fffefe;
-}
