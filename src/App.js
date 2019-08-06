@@ -18,11 +18,16 @@ class App extends Component {
     return (
       <BodyWrapper>
         <Header title={title} description={description} />
-        <Content />
+        <ContentWrapper>
+          <Content />
+        </ContentWrapper>
       </BodyWrapper>
     );
   }
 }
 const BodyWrapper = styled("div")``;
 
+const ContentWrapper = styled("div")`
+  padding-top: 56px;
+`;
 export default App;

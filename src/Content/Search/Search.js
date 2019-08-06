@@ -14,21 +14,20 @@ import Grid from "@material-ui/core/Grid";
 const style = theme => ({
   root: {
     flexGrow: 1,
-    height: "100vh",
-    padding: "20px"
+    marginTop: "20vh",
+    height: "50vh",
+    padding: "30px"
   },
   paper: {
     width: "100%"
   },
   header: {
-    marginTop: "20px",
+    textAlign: "right",
+    paddingRight: "15px",
+    marginTop: "40px",
     width: "100%"
   }
 });
-const dropdownLabels = {
-  index: "Jira ID",
-  title: "Sample ID"
-};
 class Search extends Component {
   constructor(props) {
     super(props);
@@ -44,9 +43,6 @@ class Search extends Component {
     return (
       <Grid container className={classes.root} spacing={2}>
         <Paper className={classes.paper} elevation={0}>
-          <Typography variant="h5" className={classes.header}>
-            Select a library:
-          </Typography>
           <Filters
             selectedOptions={selectedOptions}
             filters={filters}

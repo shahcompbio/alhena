@@ -18,17 +18,25 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
-
+.sunburst {
+  float: right;
+}
 .App-link {
   color: #61dafb;
 }
 .squareInput {
   margin: 0px 15px 0px 15px;
 }
-.squareInput > div > input{
+.squareInput > div > input {
   height: 38px;
   border-radius: 3px !important;
-
+}
+.hideSvg {
+  display: none;
+}
+.bubbles {
+  display: inline-block;
+  position: absolute;
 }
 @keyframes App-logo-spin {
   from {
