@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { config } from "../../config/config";
+import { config } from "../../../config/config";
 import * as d3 from "d3";
 import * as d3Tip from "d3-tip";
 import { forceAttract } from "d3-force-attract";

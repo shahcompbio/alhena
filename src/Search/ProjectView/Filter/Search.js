@@ -4,7 +4,7 @@ import Filters from "./Filters.js";
 
 import _ from "lodash";
 import { graphql } from "react-apollo";
-import { getAllFilters } from "../../Queries/queries.js";
+import { getAllFilters } from "../../../Queries/queries.js";
 import { withStyles } from "@material-ui/styles";
 
 import Paper from "@material-ui/core/Paper";

@@ -1,5 +1,5 @@
 import React, { Component, createRef } from "react";
-import Search from "./Search/Search.js";
+import Search from "./Filter/Search.js";
 import Demographics from "./Viz/Demographics.js";
 import styled from "@emotion/styled";
 
@@ -7,9 +7,14 @@ import { withStyles } from "@material-ui/styles";
 
 import PackingCircles from "./Viz/PackingCircles";
 
+import Sunburst from "./Viz/Sunburst";
+
 import { Query } from "react-apollo";
 import { graphql } from "react-apollo";
-import { getAllSunburstAnalyses, getAllFilters } from "../Queries/queries.js";
+import {
+  getAllSunburstAnalyses,
+  getAllFilters
+} from "../../Queries/queries.js";
 
 import Drawer from "@material-ui/core/Drawer";
 import Grid from "@material-ui/core/Grid";
@@ -21,7 +26,7 @@ const styles = {
   }
 };
 
-class Content extends Component {
+class ProjectViewContent extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -73,8 +78,9 @@ class Content extends Component {
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, project } = this.props;
     const { filters, selectedOptions } = this.state;
+    console.log("no");
     return (
       <Query query={getAllSunburstAnalyses} variables={{ filter: filters }}>
         {({ loading, error, data }) => {
@@ -103,7 +109,7 @@ class Content extends Component {
                 </Grid>
                 <Grid item xs={18} sm={9} key={"grid-content"}>
                   <div>
-                    <PackingCircles
+                    <Sunburst
                       isLoading={true}
                       key={"packing-circles"}
                       filters={[]}
@@ -141,7 +147,7 @@ class Content extends Component {
                 </Grid>
                 <Grid item xs={18} sm={9} key={"grid-content"}>
                   <div>
-                    <PackingCircles
+                    <Sunburst
                       isLoading={false}
                       key={"packing-circles"}
                       filters={filters}
@@ -165,4 +171,4 @@ class Content extends Component {
   }
 }
 
-export default withStyles(styles)(Content);
+export default withStyles(styles)(ProjectViewContent);

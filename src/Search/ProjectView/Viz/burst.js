@@ -14,7 +14,7 @@ export const partition = data => {
   //.sort((a, b) => b.value - a.value);
 
   return d3.partition()(root);
-  //return d3.partition().size([2 * Math.PI, root.height + 1])(root);
+  //return d3.partition().padding(2)(root);
 };
 var rscale = d3
   .scaleLinear()

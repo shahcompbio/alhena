@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { config } from "../../config/config";
+import { config } from "../../../config/config";
 import { color, voronoi, voronoiFormat, centerScale } from "./circles.js";
 import { radius } from "./burst.js";
 const animationConfig = config.AnimationConfig;

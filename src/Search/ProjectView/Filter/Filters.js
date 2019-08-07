@@ -6,7 +6,7 @@ import { withStyles } from "@material-ui/styles";
 import InputLabel from "@material-ui/core/InputLabel";
 import Grid from "@material-ui/core/Grid";
 
-import { config } from "../../config/config.js";
+import { config } from "../../../config/config.js";
 const filterConfig = config.FilterConfig;
 const styles = theme => ({
   root: {

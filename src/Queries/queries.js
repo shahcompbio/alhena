@@ -1,5 +1,13 @@
 import gql from "graphql-tag";
 
+export const getProjects = gql`
+  query {
+    getProjects {
+      name
+      count
+    }
+  }
+`;
 export const analysesBySampleID = gql`
   query Sunburst($sampleID: String!, $project: String!) {
     analysesBySampleID(sampleID: $sampleID, project: $project) {
