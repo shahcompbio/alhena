@@ -1,12 +1,10 @@
-import React, { Component, createRef } from "react";
-
-import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
+import React from "react";
+import { Route, Switch } from "react-router-dom";
 
 import ProjectViewContent from "./ProjectView/ProjectViewContent.js";
 import OverviewContent from "./Overview/OverviewContent.js";
 import NoMatch from "./NoMatch.js";
 
-import Drawer from "@material-ui/core/Drawer";
 import Grid from "@material-ui/core/Grid";
 
 import { withStyles } from "@material-ui/styles";

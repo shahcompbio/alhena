@@ -1,8 +1,7 @@
-import React, { Component } from "react";
+import React from "react";
 import { withRouter } from "react-router";
 
 import Content from "./Search/Content.js";
-import Header from "@bit/viz.spectrum.header";
 
 import "./App.css";
 import { styled } from "@material-ui/styles";
@@ -19,7 +18,6 @@ const App = () => {
     <MuiThemeProvider theme={theme}>
       <CssBaseline />
       <BodyWrapper>
-        <Header title={title} description={description} />
         <ContentWrapper>
           <Content />
         </ContentWrapper>
@@ -30,7 +28,5 @@ const App = () => {
 
 const BodyWrapper = styled("div")``;
 
-const ContentWrapper = styled("div")`
-  padding-top: 56px;
-`;
+const ContentWrapper = styled("div")``;
 export default withRouter(App);

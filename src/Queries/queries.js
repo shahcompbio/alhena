@@ -13,16 +13,16 @@ export const analysesBySampleID = gql`
     analysesBySampleID(sampleID: $sampleID, project: $project) {
       children {
         ... on ParentType {
-          name
+          target
           children {
             ... on ParentType {
-              name
+              target
               children {
                 ... on ParentType {
-                  name
+                  target
                   children {
                     ... on ChildType {
-                      name
+                      target
                       value
                     }
                   }
@@ -48,23 +48,23 @@ export const getAllSunburstAnalyses = gql`
       type
     }
     analysesTree(filters: $filter) {
-      parent
+      source
       children {
         ... on ParentType {
-          parent
-          name
+          source
+          target
           children {
             ... on ParentType {
-              parent
-              name
+              source
+              target
               children {
                 ... on ParentType {
-                  parent
-                  name
+                  source
+                  target
                   children {
                     ... on ChildType {
-                      parent
-                      name
+                      source
+                      target
                       value
                     }
                   }

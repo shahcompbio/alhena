@@ -1,5 +1,5 @@
 import _ from "lodash";
-import React, { Component } from "react";
+import React from "react";
 import Select from "react-select";
 
 import { withStyles } from "@material-ui/styles";
@@ -11,9 +11,18 @@ const filterConfig = config.FilterConfig;
 const styles = theme => ({
   root: {
     flexGrow: 1,
-    padding: "15px"
+    padding: "55px",
+    paddingRight: "0px",
+    background: "#2b2a2a"
+  },
+  label: {
+    color: "white",
+    fontWeight: "normal",
+    paddingBottom: "10px"
   },
   item: {
+    padding: "15px",
+    paddingRight: "0px",
     width: "100%"
   }
 });
@@ -28,31 +37,25 @@ const reactSelectStyles = {
     return { ...base, display: "none" };
   }
 };
-class Filters extends Component {
-  constructor(props) {
-    super(props);
-  }
-  onChange = (value, action, type) => {
+const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
+  const onChange = (value, action, type) => {
     if (value) {
-      this.props.handleFilterChange(
-        { value: value.label, label: value.value },
-        action
-      );
+      handleFilterChange({ value: value.label, label: value.value }, action);
     } else {
-      this.props.handleFilterChange(type, action);
+      handleFilterChange(type, action);
     }
   };
-  getSelectValue = (selectedOptions, filterType, filters) => {
-    if (this.isUserSelectedOption(selectedOptions, filterType)) {
+  const getSelectValue = (selectedOptions, filterType, filters) => {
+    if (isUserSelectedOption(selectedOptions, filterType)) {
       return selectedOptions[filterType];
     } else {
       if (Object.keys(selectedOptions).length !== 0) {
-        const largestFilterIndex = this.getLargestFilterIndex(selectedOptions);
+        const largestFilterIndex = getLargestFilterIndex(selectedOptions);
         var currFilterType = filters.filter(
           filter => filter.type.localeCompare(filterType) === 0
         )[0];
         if (
-          this.isFilterSmallerThanLargestChoosen(
+          isFilterSmallerThanLargestChoosen(
             currFilterType.type,
             largestFilterIndex
           )
@@ -65,85 +68,76 @@ class Filters extends Component {
     }
     return null;
   };
-  isFilterSmallerThanLargestChoosen = (type, largestFilterIndex) =>
+  const isFilterSmallerThanLargestChoosen = (type, largestFilterIndex) =>
     filterConfig.filterHeirarchy.indexOf(type) < largestFilterIndex;
 
-  getLargestFilterIndex = selectedOptions =>
+  const getLargestFilterIndex = selectedOptions =>
     Object.keys(selectedOptions).map(optionName =>
       filterConfig.filterHeirarchy.indexOf(optionName)
     );
 
-  isUserSelectedOption = (selectedOptions, filterType) =>
+  const isUserSelectedOption = (selectedOptions, filterType) =>
     selectedOptions[filterType];
 
-  isDisabledOption = (selectedOptions, filterType) => {
-    var largestFilterIndex = this.getLargestFilterIndex(selectedOptions);
-    return this.isFilterSmallerThanLargestChoosen(
-      filterType,
-      largestFilterIndex
-    );
+  const isDisabledOption = (selectedOptions, filterType) => {
+    var largestFilterIndex = getLargestFilterIndex(selectedOptions);
+    return isFilterSmallerThanLargestChoosen(filterType, largestFilterIndex);
   };
-  render() {
-    const {
-      filters,
-      handleFilterChange,
-      classes,
-      selectedOptions
-    } = this.props;
-    if (filters) {
-      const filterTypes = filters.map(filter => filter.type);
+  if (filters) {
+    const filterTypes = filters.map(filter => filter.type);
 
-      var panels = _.times(filterTypes.length, i => {
-        return {
-          key: `panel-${i}`,
-          content: (
-            <Select
-              value={this.getSelectValue(
-                selectedOptions,
-                filterTypes[i],
-                filters
-              )}
-              styles={reactSelectStyles}
-              isMulti={this.isDisabledOption(selectedOptions, filterTypes[i])}
-              isClearable={
-                this.isUserSelectedOption(selectedOptions, filterTypes[i]) ||
-                !this.isDisabledOption(selectedOptions, filterTypes[i])
-              }
-              onChange={(option, { action }) =>
-                this.onChange(option, action, filterTypes[i])
-              }
-              options={filters[i].values.map(value => {
-                return {
-                  value: filterTypes[i],
-                  label: value,
-                  disabled: selectedOptions[filterTypes[i]] === value
-                };
-              })}
-            />
-          ),
-          title: <InputLabel>{filters[i].label}</InputLabel>
-        };
-      });
-    } else {
-      var panels = [];
-    }
-    return (
-      <Grid
-        container
-        direction="column"
-        justify="flex-start"
-        alignItems="flex-start"
-        spacing={3}
-        className={classes.root}
-      >
-        {panels.map(panel => (
-          <Grid item className={classes.item}>
-            {panel.title}
-            {panel.content}
-          </Grid>
-        ))}
-      </Grid>
-    );
+    var panels = _.times(filterTypes.length, i => {
+      return filterTypes[i] !== "project"
+        ? {
+            key: `panel-${i}`,
+            content: (
+              <Select
+                value={getSelectValue(selectedOptions, filterTypes[i], filters)}
+                styles={reactSelectStyles}
+                isMulti={isDisabledOption(selectedOptions, filterTypes[i])}
+                isClearable={
+                  isUserSelectedOption(selectedOptions, filterTypes[i]) ||
+                  !isDisabledOption(selectedOptions, filterTypes[i])
+                }
+                onChange={(option, { action }) =>
+                  onChange(option, action, filterTypes[i])
+                }
+                options={filters[i].values.map(value => {
+                  return {
+                    value: filterTypes[i],
+                    label: value,
+                    disabled: selectedOptions[filterTypes[i]] === value
+                  };
+                })}
+              />
+            ),
+            title: (
+              <InputLabel className={classes.label}>
+                {filters[i].label}
+              </InputLabel>
+            )
+          }
+        : "";
+    });
+  } else {
+    var panels = [];
   }
-}
+  return (
+    <Grid
+      container
+      direction="column"
+      justify="flex-start"
+      alignItems="flex-start"
+      spacing={3}
+      className={classes.root}
+    >
+      {panels.map(panel => (
+        <Grid item className={classes.item}>
+          {panel.title}
+          {panel.content}
+        </Grid>
+      ))}
+    </Grid>
+  );
+};
 export default withStyles(styles)(Filters);

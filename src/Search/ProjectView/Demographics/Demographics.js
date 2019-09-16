@@ -1,32 +1,26 @@
-import React, { Component } from "react";
+import React from "react";
 import Typography from "@material-ui/core/Typography";
 import styled from "@emotion/styled";
 
-class Demographics extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {};
-  }
-
-  render() {
-    var { stats } = this.props;
-    var newStat = stats ? stats : [];
-    return (
-      <SummaryDiv>
-        <Typography
-          style={{ color: "white", textAlign: "center", fontWeight: "bold" }}
-          variant="h4"
-        >
-          Analyses Statistics
-        </Typography>
-        {newStat.map(field => {
+const Demographics = ({ stats }) => {
+  var newStat = stats ? stats : [];
+  return (
+    <SummaryDiv>
+      <Typography
+        style={{ color: "white", textAlign: "center", fontWeight: "bold" }}
+        variant="h4"
+      >
+        Analyses Statistics
+      </Typography>
+      {newStat
+        .filter(field => field.label !== "Project")
+        .map(field => {
           return <AverageStats label={field.label} value={field.value} />;
         })}
-      </SummaryDiv>
-    );
-  }
-}
+    </SummaryDiv>
+  );
+};
+
 const AverageStats = ({ value, label }) => (
   <StatWrapperDiv>
     <Typography style={{ color: "white" }} variant="h3">
@@ -38,9 +32,6 @@ const AverageStats = ({ value, label }) => (
   </StatWrapperDiv>
 );
 
-const StatTypography = styled(Typography)`
-  color: white !important;
-`;
 const StatWrapperDiv = styled("div")`
   padding: 15px;
 `;
@@ -52,7 +43,7 @@ const SummaryDiv = styled("div")`
   position: fixed;
   right: 0;
   top: 50px;
-  background: #394a69;
+  background: #2b2a2a;
   flex-direction: column;
   padding: 25px;
 `;

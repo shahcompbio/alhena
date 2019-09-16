@@ -8,7 +8,8 @@ export const theme = createMuiTheme({
       main: "#1d83c6"
     },
     background: {
-      default: "#f7f7f5"
+      //default: "#405069fc"
+      default: "#2b2a2a"
     }
   },
   spacing: { unit: 4 }

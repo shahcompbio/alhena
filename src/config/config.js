@@ -1,13 +1,15 @@
 export const config = {
   DisplayConfig: {
-    viewBoxX: window.innerWidth * 0.6,
-    viewBoxY: window.innerHeight,
+    viewBoxX: window.innerWidth,
+    viewBoxY: window.innerHeight * 3,
+    XOffset: window.innerWidth / 10,
     yOffset: window.innerHeight / 4,
     sunburstXOffset: window.innerWidth / 4,
-    sunburstYOffset: window.innerHeight / 2
+    sunburstYOffset: window.innerHeight / 2,
+    filtersOffSet: 700
   },
   FilterConfig: {
-    filterHeirarchy: ["project", "sample_id", "library_id", "jira_id"]
+    filterHeirarchy: ["sample_id", "library_id", "jira_id"]
   },
   AnimationConfig: {
     filterHeirarchy: ["project", "sample_id", "library_id", "jira_id"],
