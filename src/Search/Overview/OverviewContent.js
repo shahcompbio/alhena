@@ -4,6 +4,7 @@ import { withRouter } from "react-router";
 import { Link } from "react-router-dom";
 
 import { withStyles } from "@material-ui/core/styles";
+import { useAppState } from "../../util/app-state";
 
 import { Query } from "react-apollo";
 import { getProjects } from "../../Queries/queries.js";
@@ -23,8 +24,14 @@ const styles = theme => ({
 });
 
 const OverviewContent = ({ classes, history }) => {
+  const [{ authKeyID, uid }, dispatch] = useAppState();
   return (
-    <Query query={getProjects}>
+    <Query
+      query={getProjects}
+      variables={{
+        user: { authKeyID: authKeyID, uid: uid }
+      }}
+    >
       {({ loading, error, data }) => {
         if (loading) return null;
         if (error) return null;
@@ -42,14 +49,20 @@ const OverviewContent = ({ classes, history }) => {
               <Grid item style={{ textAlign: "center" }}>
                 <ButtonGroup
                   fullWidth
+                  color="secondary"
                   size="large"
-                  aria-label="full width outlined button group"
+                  aria-label="full width secondary outlined button group"
                 >
                   {data.getProjects.map(project => {
                     return (
                       <Button value={project.name}>
                         {" "}
-                        <Link to={`/${project.name}`}>{project.name}</Link>
+                        <Link
+                          to={`/${project.name}`}
+                          style={{ color: "white", textDecoration: "none" }}
+                        >
+                          {project.name}
+                        </Link>
                       </Button>
                     );
                   })}

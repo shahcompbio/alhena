@@ -5,11 +5,17 @@ export const theme = createMuiTheme({
       main: "#d44d2f"
     },
     secondary: {
-      main: "#1d83c6"
+      main: "#e4f1fe"
     },
     background: {
       //default: "#405069fc"
       default: "#2b2a2a"
+    }
+  },
+  overrides: {
+    MuiButton: {
+      root: { fontStyle: " oblique" },
+      label: { color: "white" }
     }
   },
   spacing: { unit: 4 }

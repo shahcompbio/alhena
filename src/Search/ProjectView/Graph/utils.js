@@ -38,7 +38,6 @@ const createFilter = (svg, id, stDeviation, floodOpacity, colour) => {
 export const appendLegend = (svg, mainCircleDim) => {
   var legendSpacing = 600;
   var legendTitleSpacing = 500;
-  var sampleTextSpacing = 600;
   var radius = 30;
   var lineHeight = mainCircleDim.height / 8 - mainCircleDim.height / 6;
   var dotsContainer = svg.append("g").classed("indicationDots", true);

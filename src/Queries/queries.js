@@ -1,53 +1,34 @@
 import gql from "graphql-tag";
 
 export const getProjects = gql`
-  query {
-    getProjects {
+  query projects($user: ApiUser!) {
+    getProjects(auth: $user) {
       name
       count
     }
   }
 `;
-export const analysesBySampleID = gql`
-  query Sunburst($sampleID: String!, $project: String!) {
-    analysesBySampleID(sampleID: $sampleID, project: $project) {
-      children {
-        ... on ParentType {
-          target
-          children {
-            ... on ParentType {
-              target
-              children {
-                ... on ParentType {
-                  target
-                  children {
-                    ... on ChildType {
-                      target
-                      value
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+export const LOGIN = gql`
+  query Login($user: User!) {
+    login(user: $user) {
+      statusCode
+      authKeyID
     }
   }
 `;
 
-export const getAllSunburstAnalyses = gql`
-  query Sunburst($filter: [Term]!) {
-    analysesStats(filters: $filter) {
+export const getAllAnalyses = gql`
+  query Sunburst($filter: [Term]!, $user: ApiUser!) {
+    analysesStats(filters: $filter, auth: $user) {
       label
       value
     }
-    analysesList(filters: $filter) {
+    analysesList(filters: $filter, auth: $user) {
       label
       values
       type
     }
-    analysesTree(filters: $filter) {
+    analysesTree(filters: $filter, auth: $user) {
       source
       children {
         ... on ParentType {

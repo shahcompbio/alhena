@@ -8,18 +8,13 @@ import {
   appendGlowFilter,
   appendToolTip,
   initSvg,
-  appendSimulation,
   greyOutAllNodes,
-  raiseLabels,
-  removeAllPreviousContent,
   linkSelect,
   linkDeselect,
   nodeSelect,
   nodeDeselect,
-  greySelection,
   ungreySelection,
   appendLegend,
-  appendLegendGlowFilter,
   greyOutJiraLabels,
   ungreyOutJiraLabels
 } from "./utils";
@@ -95,18 +90,18 @@ class PackingCircles extends PureComponent {
     var dataHasLabelNodes =
       data[0].children.filter(child => child.__typename === "label").length !==
       0;
-
+    var cluster;
     if (isMainView && !dataHasLabelNodes) {
       var modifiedData = this.appendLegendNode(data[0], isMainView);
-      var cluster = d3.hierarchy(modifiedData);
+      cluster = d3.hierarchy(modifiedData);
     } else {
-      var cluster = d3.hierarchy(data[0]);
+      cluster = d3.hierarchy(data[0]);
     }
 
     var root = d3
       .cluster()
       .separation(function(a, b) {
-        return (a.parent == b.parent ? 2 : 1) / a.depth;
+        return (a.parent === b.parent ? 2 : 1) / a.depth;
       })
       .size([2 * Math.PI, 3000])(cluster);
 
@@ -174,7 +169,6 @@ class PackingCircles extends PureComponent {
   `;
       });
 
-      var initViz = this.props.handleVizChange;
       svgCircles
         .append("circle")
         .attr("fill", function(d) {
@@ -501,11 +495,6 @@ class PackingCircles extends PureComponent {
         .attr("class", function(d) {
           return "jiraTicketlabels jiraTicketFor-" + d.data.target;
         });
-
-      var lineUpdate = svgLines.merge(svgLinesEnter);
-      function radialPoint(x, y) {
-        return [(y = +y) * Math.cos((x -= Math.PI / 2)), y * Math.sin(x)];
-      }
 
       svgLinesEnter
         .select("path")

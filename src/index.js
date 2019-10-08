@@ -6,15 +6,24 @@ import * as serviceWorker from "./serviceWorker";
 
 import { BrowserRouter } from "react-router-dom";
 import { ApolloProvider } from "react-apollo";
+import { AppStateProvider } from "./util/app-state";
+
+import appStateReducer, { initialState } from "./util/appReducer";
+import { ApolloProvider as ApolloHooksProvider } from "react-apollo-hooks";
+
 import client from "./apollo.js";
 
 ReactDOM.render(
   <ApolloProvider client={client}>
-    <BrowserRouter
-      basename={process.env.NODE_ENV === "production" ? "/alhena" : ""}
-    >
-      <App />
-    </BrowserRouter>
+    <ApolloHooksProvider client={client}>
+      <BrowserRouter
+        basename={process.env.NODE_ENV === "production" ? "/alhena" : ""}
+      >
+        <AppStateProvider initialState={initialState} reducer={appStateReducer}>
+          <App />
+        </AppStateProvider>
+      </BrowserRouter>
+    </ApolloHooksProvider>
   </ApolloProvider>,
   document.getElementById("root")
 );

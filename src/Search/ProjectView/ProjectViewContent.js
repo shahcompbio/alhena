@@ -2,12 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import Search from "./Filter/Search.js";
 import Demographics from "./Demographics/Demographics.js";
 
+import { useAppState } from "../../util/app-state";
 import { withStyles } from "@material-ui/styles";
 
 import Graph from "./Graph/Graph.js";
 
 import { Query } from "react-apollo";
-import { getAllSunburstAnalyses } from "../../Queries/queries.js";
+import { getAllAnalyses } from "../../Queries/queries.js";
 
 import Grid from "@material-ui/core/Grid";
 const styles = {
@@ -18,6 +19,7 @@ const styles = {
 };
 
 const ProjectViewContent = ({ classes, match }) => {
+  const [{ authKeyID, uid }, dispatch] = useAppState();
   const [selectedOptions, setSelectedOptions] = useState({});
   const [filters, setFilters] = useState([]);
 
@@ -54,9 +56,10 @@ const ProjectViewContent = ({ classes, match }) => {
   };
   return (
     <Query
-      query={getAllSunburstAnalyses}
+      query={getAllAnalyses}
       variables={{
-        filter: [...filters, { label: "project", value: match.params.project }]
+        filter: [...filters, { label: "project", value: match.params.project }],
+        user: { authKeyID: authKeyID, uid: uid }
       }}
     >
       {({ loading, error, data }) => {
@@ -142,7 +145,6 @@ const ProjectViewContent = ({ classes, match }) => {
       }}
     </Query>
   );
-  //  }
 };
 
 export default withStyles(styles)(ProjectViewContent);
