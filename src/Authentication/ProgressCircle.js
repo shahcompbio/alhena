@@ -1,5 +1,6 @@
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import React from "react";
+const strokeWidth = 2;
 const percentageValues = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 const ProgressProvider = ({ values, children }) => {
   const [valueIndex, setValueIndex] = React.useState(0);
@@ -13,7 +14,7 @@ const ProgressProvider = ({ values, children }) => {
   }, []);
   return children(valueIndex);
 };
-const LoadingCircle = () => {
+const LoadingCircle = ({ overRideStroke, extraStyle }) => {
   return (
     <ProgressProvider values={percentageValues}>
       {valueIndex => (
@@ -26,16 +27,17 @@ const LoadingCircle = () => {
                 ? "none"
                 : "stroke-dashoffset 0.5s ease 0s"
           })}
+          strokeWidth={overRideStroke ? overRideStroke : strokeWidth}
         />
       )}
     </ProgressProvider>
   );
 };
 
-const Progressbar = ({ value }) => (
+const Progressbar = ({ value, strokeWidth }) => (
   <CircularProgressbar
     value={value}
-    strokeWidth={2}
+    strokeWidth={strokeWidth}
     styles={buildStyles({
       // Rotation of path and trail, in number of turns (0-1)
       rotation: 0,

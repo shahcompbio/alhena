@@ -1,14 +1,54 @@
-import { LOGIN } from "../Queries/queries.js";
-export async function login(uid, password, client, dispatch) {
+import {
+  LOGIN,
+  NEWUSER,
+  VERIFYNEWUSERAUTHKEY,
+  DELETEUSERBYUSERNAME
+} from "../Queries/queries.js";
+
+export const deleteUserByUsername = async (username, client) => {
+  const { data, loading, error } = await client.query({
+    query: DELETEUSERBYUSERNAME,
+    variables: {
+      username: username
+    }
+  });
+  return data;
+};
+
+export const verifyNewUserSecureUrl = async (key, client) => {
+  const { data, loading, error } = await client.query({
+    query: VERIFYNEWUSERAUTHKEY,
+    variables: {
+      key: key
+    }
+  });
+  return data;
+};
+export const queryCreateNewUser = async (user, client) => {
+  const { data, loading } = await client.query({
+    query: NEWUSER,
+    variables: {
+      user: {
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        password: user.password
+      }
+    }
+  });
+  return data.createNewUser.created;
+};
+export const login = async (uid, password, client, dispatch) => {
   const { data, loading } = await client.query({
     query: LOGIN,
     variables: {
-      user: { uid: "elastic", password: "JemYoDqYACLp8JPvD3dL" }
+      user: { uid: uid, password: password }
     }
   });
+
   if (loading) {
     dispatch({
-      type: "AUTH_CHANGE",
+      type: "LOADING",
       response: data.login.response,
       authKeyID: data.login.authKeyID,
       uid: uid
@@ -19,11 +59,8 @@ export async function login(uid, password, client, dispatch) {
       type: "AUTH_CHANGE",
       response: data.login.response,
       authKeyID: data.login.authKeyID,
-      uid: uid
+      uid: uid,
+      isSuperUser: data.login.role.filter(role => role === "superuser").length
     });
   }
-}
-
-export function onAuthStateChanged(callback) {
-  // dispatch({ type: "AUTH_CHANGE", callback });
-}
+};

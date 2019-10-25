@@ -12,6 +12,7 @@ import appStateReducer, { initialState } from "./util/appReducer";
 import { ApolloProvider as ApolloHooksProvider } from "react-apollo-hooks";
 
 import client from "./apollo.js";
+require("dotenv").config();
 
 ReactDOM.render(
   <ApolloProvider client={client}>

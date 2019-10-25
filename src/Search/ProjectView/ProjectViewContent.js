@@ -63,7 +63,12 @@ const ProjectViewContent = ({ classes, match }) => {
       }}
     >
       {({ loading, error, data }) => {
-        if (error) return null;
+        if (error) {
+          dispatch({
+            type: "LOGOUT"
+          });
+          return null;
+        }
         if (loading) {
           return (
             <Grid

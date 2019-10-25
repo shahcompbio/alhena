@@ -2,21 +2,21 @@ import { createMuiTheme } from "@material-ui/core/styles";
 export const theme = createMuiTheme({
   palette: {
     primary: {
-      main: "#d44d2f"
+      main: "#69B3CE"
     },
     secondary: {
-      main: "#e4f1fe"
+      main: "#FC544B"
     },
     background: {
       //default: "#405069fc"
       default: "#2b2a2a"
     }
   },
-  overrides: {
+  /*overrides: {
     MuiButton: {
       root: { fontStyle: " oblique" },
       label: { color: "white" }
     }
-  },
-  spacing: { unit: 4 }
+  },*/
+  spacing: 4
 });
