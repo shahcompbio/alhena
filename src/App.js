@@ -1,49 +1,55 @@
 import React from "react";
-import logo from "./logo.svg";
+import { useAppState } from "./util/app-state";
+import { ApolloConsumer } from "react-apollo";
+import { Route, Switch, Redirect } from "react-router-dom";
+
+import { withRouter } from "react-router";
+
+import AdminPanel from "./Authentication/AdminPanel.js";
+import Content from "./Search/Content.js";
+import Unauthenticated from "./Authentication/Unauthenticated.js";
+import NewUserUriVerification from "./Authentication/NewUser/NewUserUriVerification.js";
+
+import NewAccount from "./Authentication/NewUser/NewAccount.js";
+
 import "./App.css";
+import { theme } from "./theme/theme.js";
+import { MuiThemeProvider } from "@material-ui/core/styles";
+import CssBaseline from "@material-ui/core/CssBaseline";
 
-import { graphql } from "react-apollo";
-import gql from "graphql-tag";
+const title = "Alhena";
+const description =
+  "Alhena is a single cell DNA (scDNA) dashboard for MSK SPECTRUM. It takes the CSV output from the single cell pipeline.";
 
-const QUERY = gql`
-  query {
-    foo {
-      id
-      name
-      age
-    }
-  }
-`;
-
-const App = ({ data }) => {
-  if (data && data.loading) {
-    return null;
-  }
-
-  if (data && data.error) {
-    return null;
-  }
-
-  console.log(data.foo);
+const App = () => {
+  const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <MuiThemeProvider theme={theme}>
+      <CssBaseline />
+      <Switch>
+        <Route
+          path="/login"
+          exact={true}
+          component={() => (
+            <ApolloConsumer>
+              {client => <Unauthenticated client={client} />}
+            </ApolloConsumer>
+          )}
+        />
+        <Route
+          path="/NewAccount/:key"
+          component={({ match }) => (
+            <NewUserUriVerification uri={match} dispatch={dispatch} />
+          )}
+        />
+        {authKeyID && <Route path="/home" component={() => <Content />} />}
+        {authKeyID && isSuperUser && (
+          <Route path="/admin" component={() => <AdminPanel />} />
+        )}
+        <Redirect to="/login" />
+      </Switch>
+    </MuiThemeProvider>
   );
 };
-
-export default graphql(QUERY)(App);
+export default withRouter(App);
