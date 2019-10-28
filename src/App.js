@@ -47,9 +47,9 @@ const App = () => {
         {authKeyID && isSuperUser && (
           <Route path="/admin" component={() => <AdminPanel />} />
         )}
+        <Redirect to="/login" />
       </Switch>
     </MuiThemeProvider>
   );
 };
-//<Redirect to="/login" />
 export default withRouter(App);

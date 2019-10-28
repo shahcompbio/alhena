@@ -94,22 +94,16 @@ const UserTable = ({ classes, history }) => {
     try {
       var confirmed = await deleteUserByUsername(username, client);
     } catch (error) {
-      console.log(error);
     } finally {
       if (confirmed.deleteUser.isDeleted) {
-        console.log("deleted");
         setLoading(false);
         setActionComplete(true);
 
         setTimeout(() => {
           setActionComplete(null);
-          var use = modifiedUsers.filter(user => user.username !== selected);
-          console.log(use);
-          setUsers(use);
+          setUsers(modifiedUsers.filter(user => user.username !== selected));
           setSelected(null);
         }, 4000);
-        //window.location.reload();
-        //  setRefresh(true);
       } else {
         //error
       }

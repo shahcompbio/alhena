@@ -8,13 +8,36 @@ import { useAppState } from "../../util/app-state";
 
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
+import Paper from "@material-ui/core/Paper";
 
+import SnackbarContentWrapper from "../../Misc/SnackBarPopup.js";
 import VisuallyHidden from "@reach/visually-hidden";
 import styled from "styled-components";
+import { withStyles } from "@material-ui/styles";
 
 import UnauthenticatedApp from "./../Unauthenticated.js";
-
-const NewAccount = ({ email, dispatch }) => {
+const styles = theme => ({
+  paperTitle: {
+    paddingBottom: theme.spacing.unit * 5,
+    padding: theme.spacing.unit * 3,
+    height: 125,
+    borderRadius: 20,
+    overflowX: "auto",
+    color: "white",
+    background: "#69B3CE"
+  },
+  paperForm: {
+    marginTop: theme.spacing.unit,
+    overflowX: "auto",
+    margin: "auto",
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: theme.spacing.unit,
+    marginTop: "-70px",
+    display: "inline-block"
+  }
+});
+const NewAccount = ({ email, dispatch, classes }) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [userEmail] = useState(email);
@@ -72,6 +95,8 @@ const NewAccount = ({ email, dispatch }) => {
         dispatch({
           type: "LOGOUT"
         });
+      } else {
+        setError(10);
       }
     } catch (error) {
       setError(error);
@@ -82,7 +107,9 @@ const NewAccount = ({ email, dispatch }) => {
     <ApolloConsumer>
       {client => (
         <Grid container direction="row" justify="center" alignItems="center">
-          {" "}
+          {error && (
+            <SnackbarContentWrapper variant="error" errorNumber={error} />
+          )}{" "}
           <div
             style={{
               top: "20%",
@@ -94,38 +121,41 @@ const NewAccount = ({ email, dispatch }) => {
             style={{
               position: "absolute",
               top: "25%",
-              marginLeft: 10
+              marginLeft: 10,
+              textAlign: "center"
             }}
           >
-            <Typography variant="h4" color="primary">
-              New User
-            </Typography>
-            <form
-              onSubmit={ev => createNewUser(ev, client, dispatch)}
-              id="newUser"
-            >
-              {fields.map(field => (
+            <Paper rounded className={classes.paperTitle}>
+              <Typography variant="h4" color="white">
+                New User
+              </Typography>
+            </Paper>
+            <Paper rounded className={classes.paperForm}>
+              <form
+                onSubmit={ev => createNewUser(ev, client, dispatch)}
+                id="newUser"
+              >
+                {fields.map(field => (
+                  <ComponentWrapper>
+                    <VisuallyHidden style={{ color: "#ffffff" }}>
+                      <label htmlFor={field.id}>{field.label}</label>
+                    </VisuallyHidden>
+                    <input
+                      ref={field.ref}
+                      id={field.id}
+                      className="inputField"
+                      required
+                      value={field.value}
+                      placeholder={field.placeholder}
+                      type={field.type}
+                    />
+                  </ComponentWrapper>
+                ))}
                 <ComponentWrapper>
-                  <VisuallyHidden style={{ color: "#ffffff" }}>
-                    <label htmlFor={field.id}>{field.label}</label>
-                  </VisuallyHidden>
-                  <input
-                    ref={field.ref}
-                    id={field.id}
-                    className="inputField"
-                    required
-                    value={field.value}
-                    placeholder={field.placeholder}
-                    type={field.type}
-                  />
+                  <button type="submit">Submit</button>
                 </ComponentWrapper>
-              ))}
-              <ComponentWrapper>
-                <button style={{ marginLeft: 30 }} type="submit">
-                  Submit
-                </button>
-              </ComponentWrapper>
-            </form>
+              </form>
+            </Paper>
           </div>
         </Grid>
       )}
@@ -137,4 +167,4 @@ const ComponentWrapper = styled.div`
   margin: 10px;
 `;
 
-export default NewAccount;
+export default withStyles(styles)(NewAccount);

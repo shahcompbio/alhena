@@ -7,6 +7,7 @@ import Grid from "@material-ui/core/Grid";
 import VisuallyHidden from "@reach/visually-hidden";
 import styled from "styled-components";
 
+import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
 import LoadingCircle from "./ProgressCircle.js";
 
 const UnauthenticatedApp = ({ client }) => {
@@ -17,6 +18,7 @@ const UnauthenticatedApp = ({ client }) => {
   const passwordRef = useRef();
 
   const handleLogin = async (event, client, dispatch) => {
+    setError(null);
     event.preventDefault();
     try {
       await login(
@@ -26,7 +28,11 @@ const UnauthenticatedApp = ({ client }) => {
         dispatch
       );
     } catch (error) {
-      setError(error);
+      error.graphQLErrors.map(message => {
+        if (message.extensions.exception.meta.body.status) {
+          setError(message.extensions.exception.meta.body.status);
+        }
+      });
     }
   };
 
@@ -43,6 +49,9 @@ const UnauthenticatedApp = ({ client }) => {
         }}
       >
         <LoadingCircle />
+        {error && (
+          <SnackbarContentWrapper variant="error" errorNumber={error} />
+        )}
       </div>
       <img
         src={logo}
