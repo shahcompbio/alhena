@@ -17,10 +17,21 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import Typography from "@material-ui/core/Typography";
 import LoadingCircle from "./ProgressCircle.js";
 import CheckIcon from "@material-ui/icons/Check";
+import ClearIcon from "@material-ui/icons/Clear";
+import EditIcon from "@material-ui/icons/Edit";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
+import Input from "@material-ui/core/Input";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
 
 import { ApolloConsumer } from "react-apollo";
 import { getUsers } from "../Queries/queries.js";
-import { deleteUserByUsername } from "../util/utils.js";
+import {
+  deleteUserByUsername,
+  getProjectRoles,
+  updateUserRoles
+} from "../util/utils.js";
 
 import Grid from "@material-ui/core/Grid";
 
@@ -35,7 +46,9 @@ const styles = theme => ({
     flexGrow: 1,
     width: "100%",
     backgroundColor: "#62b2bf",
-    borderRadius: 20
+    borderRadius: 20,
+    zIndex: 20,
+    marginTop: 25
   },
   grid: {
     marginTop: "-60px"
@@ -49,15 +62,24 @@ const styles = theme => ({
   table: {
     width: "90%",
     margin: "auto",
-    minWidth: 650
+    minWidth: 650,
+    marginTop: 25
   },
   tableRow: {
-    backgroundColor: "#62b2bf"
+    backgroundColor: "#62b2bf",
+    "&$selected, &$selected:hover": {
+      backgroundColor: "rgba(232, 232, 232, 0.43)"
+    }
   },
+  selected: {},
   tableCell: {
     color: "#ffffff",
     whiteSpace: "normal",
-    wordWrap: "break-word"
+    wordWrap: "break-word",
+    maxWidth: "100px",
+    "$selected &": {
+      color: "#000000"
+    }
   },
   tableHeader: {
     fontWeight: "bold"
@@ -73,7 +95,7 @@ const styles = theme => ({
     display: "none"
   }
 });
-
+const editableRows = { roles: true };
 const UserTable = ({ classes, history }) => {
   const [{ authKeyID, uid }, dispatch] = useAppState();
   const [selected, setSelected] = useState(null);
@@ -82,28 +104,65 @@ const UserTable = ({ classes, history }) => {
   const [actionComplete, setActionComplete] = useState(null);
   const [users, setUsers] = useState([]);
 
+  const [selectedUserRoles, setSelectedUserRoles] = useState([]);
+  const [isEditing, setIsEditingUser] = useState(null);
+
   const rowsPerPage = 10;
 
   const isSelected = name => selected === name;
+  const isSelectedForEditing = (name, row) =>
+    selected === name && isEditing && editableRows.hasOwnProperty(row);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-  const deleteUser = async (username, client, modifiedUsers) => {
+  const clearAll = () => {
+    setIsEditingUser(null);
+    setSelectedUserRoles([]);
+    setSelected(null);
+  };
+  const actionCompleteReset = () => {
+    setLoading(false);
+    setActionComplete(true);
+    setIsEditingUser(null);
+    setTimeout(() => {
+      setActionComplete(null);
+      setSelected(null);
+    }, 3000);
+  };
+  const confirmEditUser = async (client, modifiedUsers) => {
     setLoading(true);
     try {
-      var confirmed = await deleteUserByUsername(username, client);
+      const confirmed = await updateUserRoles(
+        selected,
+        selectedUserRoles,
+        client
+      );
+      if (confirmed === false) {
+        //has updated
+        setUsers(
+          modifiedUsers.map(user => {
+            if (user.username === selected) {
+              user["roles"] = selectedUserRoles;
+            }
+            return user;
+          })
+        );
+        actionCompleteReset();
+      } else {
+        //error
+      }
+    } catch (error) {}
+  };
+  const deleteUser = async (client, modifiedUsers) => {
+    setLoading(true);
+    try {
+      var confirmed = await deleteUserByUsername(selected, client);
     } catch (error) {
     } finally {
-      if (confirmed.deleteUser.isDeleted) {
-        setLoading(false);
-        setActionComplete(true);
-
-        setTimeout(() => {
-          setActionComplete(null);
-          setUsers(modifiedUsers.filter(user => user.username !== selected));
-          setSelected(null);
-        }, 4000);
+      if (confirmed) {
+        actionCompleteReset(modifiedUsers);
+        setUsers(modifiedUsers.filter(user => user.username !== selected));
       } else {
         //error
       }
@@ -115,7 +174,7 @@ const UserTable = ({ classes, history }) => {
       setSelected(username);
     } else if (selected === username) {
       //unselect
-      setSelected(null);
+      clearAll();
     }
   };
 
@@ -156,9 +215,10 @@ const UserTable = ({ classes, history }) => {
                     {client => (
                       <TableToolbar
                         username={selected}
-                        deleteUser={username =>
-                          deleteUser(username, client, modifiedUsers)
-                        }
+                        deleteUser={() => deleteUser(client, modifiedUsers)}
+                        editUser={() => confirmEditUser(client, modifiedUsers)}
+                        clear={isCleared => clearAll()}
+                        setIsEditing={isEditing => setIsEditingUser(isEditing)}
                         isLoading={isLoading}
                         actionComplete={actionComplete}
                       />
@@ -198,16 +258,17 @@ const UserTable = ({ classes, history }) => {
                             className={classes.tableRow}
                             selected={isItemSelected}
                             aria-checked={isItemSelected}
-                            onClick={event =>
-                              handleRowClick(event, row.username)
-                            }
                             role="checkbox"
+                            classes={{ selected: classes.selected }}
                           >
                             <TableCell padding="checkbox">
                               <Checkbox
                                 color={"default"}
                                 checked={isItemSelected}
                                 className={classes.checkBox}
+                                onClick={event =>
+                                  handleRowClick(event, row.username)
+                                }
                                 inputProps={{ "aria-labelledby": labelId }}
                               />
                             </TableCell>
@@ -221,8 +282,22 @@ const UserTable = ({ classes, history }) => {
                                   scope="row"
                                   id={labelId}
                                   className={classes.tableCell}
+                                  key={labelId + heading + row.username}
                                 >
-                                  {row[heading]}
+                                  {isSelectedForEditing(
+                                    row.username,
+                                    heading
+                                  ) ? (
+                                    <DropDownEdit
+                                      setNewUserRoles={roles =>
+                                        setSelectedUserRoles([...roles])
+                                      }
+                                      currentSelection={row[heading]}
+                                      allRoles={data.getProjectRoles.roles}
+                                    />
+                                  ) : (
+                                    row[heading]
+                                  )}
                                 </TableCell>
                               );
                             })}
@@ -254,6 +329,29 @@ const UserTable = ({ classes, history }) => {
     </Query>
   );
 };
+const DropDownEdit = ({ currentSelection, allRoles, setNewUserRoles }) => {
+  const [selectedRoles, setSelectedRoles] = useState([...currentSelection]);
+  return (
+    <FormControl required style={{ width: "100%" }}>
+      <Select
+        multiple
+        value={selectedRoles}
+        onChange={event => {
+          setSelectedRoles(event.target.value);
+          setNewUserRoles(event.target.value);
+        }}
+        input={<Input id="select-multiple-placeholder" />}
+      >
+        {allRoles.map(role => (
+          <MenuItem value={role} key={role}>
+            {role}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
+};
+
 const useToolbarStyles = makeStyles(theme => ({
   root: {
     paddingLeft: theme.spacing(2),
@@ -261,8 +359,14 @@ const useToolbarStyles = makeStyles(theme => ({
     borderRadius: "10px 10px 0px 0px"
   },
   highlight: {
+    backgroundColor: "rgb(237, 241, 240)"
+  },
+  deleteHighlight: {
     color: theme.palette.secondary.main,
     backgroundColor: lighten(theme.palette.secondary.light, 0.85)
+  },
+  editHighlight: {
+    backgroundColor: "rgb(218, 255, 241)"
   },
   completeHighlight: {
     color: "#03a678",
@@ -272,39 +376,99 @@ const useToolbarStyles = makeStyles(theme => ({
     flex: "1 1 100%"
   }
 }));
-const TableToolbar = ({ username, deleteUser, actionComplete, isLoading }) => {
+const TableToolbar = ({
+  clear,
+  username,
+  deleteUser,
+  actionComplete,
+  isLoading,
+  editUser,
+  setIsEditing
+}) => {
   const classes = useToolbarStyles();
+  const [selectedAction, setSelectedAction] = useState(null);
+
   return (
     <Toolbar
-      className={clsx(
-        classes.root,
-        {
-          [classes.highlight]: !actionComplete
-        },
-        { [classes.completeHighlight]: actionComplete }
-      )}
+      className={clsx(classes.root, {
+        [classes.highlight]: selectedAction === null,
+        [classes.completeHighlight]: actionComplete,
+        [classes.deleteHighlight]: selectedAction === "Delete",
+        [classes.editHighlight]: selectedAction === "Edit"
+      })}
       dense
     >
-      {isLoading ? (
+      {selectedAction === null ? (
+        [
+          <Tooltip title="Delete">
+            <IconButton
+              aria-label="delete"
+              onClick={ev => setSelectedAction("Delete")}
+            >
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>,
+          <Tooltip title="Edit">
+            <IconButton
+              aria-label="edit"
+              onClick={ev => {
+                setIsEditing(true);
+                setSelectedAction("Edit");
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
+        ]
+      ) : isLoading ? (
         <Typography>Loading</Typography>
       ) : actionComplete ? (
-        ""
+        <CheckIcon />
       ) : (
-        <Typography
-          className={classes.title}
-          color="inherit"
-          variant="subtitle1"
-        >
-          Delete {username}?
-        </Typography>
+        [
+          <Tooltip title="Clear">
+            <IconButton aria-label="clear">
+              <ClearIcon onClick={ev => clear(true)} />
+            </IconButton>
+          </Tooltip>,
+          <Tooltip title="Confirm">
+            <IconButton aria-label="confirm">
+              <CheckIcon
+                onClick={ev =>
+                  selectedAction === "Edit"
+                    ? editUser(username)
+                    : deleteUser(username)
+                }
+              />
+            </IconButton>
+          </Tooltip>,
+          selectedAction === "Delete" && (
+            <Typography
+              className={classes.title}
+              color="inherit"
+              variant="subtitle1"
+            >
+              Delete {username}?
+            </Typography>
+          )
+        ]
       )}
-      <Tooltip title="Delete">
-        <IconButton aria-label="delete" onClick={ev => deleteUser(username)}>
-          {isLoading ? "" : actionComplete ? <CheckIcon /> : <DeleteIcon />}
-        </IconButton>
-      </Tooltip>
     </Toolbar>
   );
 };
-
+/*{" "}
+{isLoading ? (
+  <Typography>Loading</Typography>
+) : actionComplete ? (
+  ""
+) : (
+  <Typography
+    className={classes.title}
+    color="inherit"
+    variant="subtitle1"
+  >
+    Delete {username}?
+  </Typography>
+)}
+*/
 export default withStyles(styles)(withRouter(UserTable));

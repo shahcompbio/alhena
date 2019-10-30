@@ -1,5 +1,19 @@
 import gql from "graphql-tag";
 
+export const UPDATEUSERROLES = gql`
+  query updateUserRoles($username: String!, $newRoles: [String!]) {
+    updateUserRoles(username: $username, newRoles: $newRoles) {
+      created
+    }
+  }
+`;
+export const GETPROJECTROLES = gql`
+  query projectRoles {
+    getProjectRoles {
+      roles
+    }
+  }
+`;
 export const getProjects = gql`
   query projects($user: ApiUser!) {
     getProjects(auth: $user) {
@@ -56,6 +70,9 @@ export const getUsers = gql`
       roles
       full_name
       email
+    }
+    getProjectRoles {
+      roles
     }
   }
 `;
