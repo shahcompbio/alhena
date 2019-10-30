@@ -14,7 +14,10 @@ const ProgressProvider = ({ values, children }) => {
   }, []);
   return children(valueIndex);
 };
-const LoadingCircle = ({ overRideStroke, extraStyle }) => {
+const LoadingCircle = ({ overRideStroke, isStopped }) => {
+  const percentageValues = isStopped
+    ? [100]
+    : [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
   return (
     <ProgressProvider values={percentageValues}>
       {valueIndex => (

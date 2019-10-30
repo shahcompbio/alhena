@@ -8,7 +8,10 @@ import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import AddBoxIcon from "@material-ui/icons/AddBox";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
+import AppBar from "@material-ui/core/AppBar";
+import Toolbar from "@material-ui/core/Toolbar";
 
+import SeperatedTabs from "./SeperatedTabs.js";
 import UserTable from "./UserTable.js";
 import NewUserPopup from "./NewUser/NewUserPopup.js";
 
@@ -38,6 +41,7 @@ const AdminPanel = ({ classes }) => {
   const [{ authKeyID, uid }, dispatch] = useAppState();
 
   const [openPopup, setOpenPopup] = useState(false);
+  const [tabIndex, setTabIndex] = useState(0);
 
   const handleClickAddUser = () => {
     setOpenPopup(true);
@@ -47,11 +51,11 @@ const AdminPanel = ({ classes }) => {
     setOpenPopup(false);
   };
 
-  const addUser = async (event, client, email, name) => {
+  const addUser = async (event, client, email, name, selectedRoles) => {
     var data = await client.query({
       query: createUserEmail,
       variables: {
-        recipient: { email: email, name }
+        recipient: { email: email, name, roles: selectedRoles.join(",") }
       }
     });
     return data.data.sendMail.accepted;
@@ -61,11 +65,16 @@ const AdminPanel = ({ classes }) => {
     <div className={classes.root}>
       <Paper rounded className={classes.paper}>
         {" "}
-        <Grid container direction="row" alignItems="space-evenly" spacing={3}>
-          <Grid item xs={6}>
+        <Grid
+          container
+          direction="row"
+          spacing={3}
+          key={"adminpanel-container"}
+        >
+          <Grid item xs={6} key={"admin-title"}>
             <Typography variant="h5">Admin Settings</Typography>
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={6} key={"icon-container"}>
             <Grid
               container
               direction="row"
@@ -73,7 +82,7 @@ const AdminPanel = ({ classes }) => {
               alignItems="center"
               className={classes.actions}
             >
-              <ApolloConsumer>
+              <ApolloConsumer key={"adduser-consumer"}>
                 {client => [
                   <IconButton
                     variant="outlined"
@@ -84,12 +93,14 @@ const AdminPanel = ({ classes }) => {
                   >
                     <AddBoxIcon />
                   </IconButton>,
-                  <NewUserPopup
-                    isOpen={openPopup}
-                    handleClose={handleCloseAddUser}
-                    client={client}
-                    addUser={addUser}
-                  />
+                  openPopup && (
+                    <NewUserPopup
+                      isOpen={openPopup}
+                      handleClose={handleCloseAddUser}
+                      client={client}
+                      addUser={addUser}
+                    />
+                  )
                 ]}
               </ApolloConsumer>
               <IconButton
@@ -109,6 +120,31 @@ const AdminPanel = ({ classes }) => {
           </Grid>
         </Grid>
       </Paper>
+      <AppBar
+        position={"static"}
+        elevation={0}
+        style={{ backgroundColor: "#ffffff", marginTop: "-80px" }}
+      >
+        {" "}
+        <Toolbar
+          // you need to set override hidden in toolbar
+          style={{ overflow: "hidden" }}
+        >
+          <SeperatedTabs
+            style={{ alignSelf: "flex-end" }}
+            tabs={[{ label: "Users" }, { label: "Permissions" }]}
+            tabStyle={{
+              bgColor: "#4486a3",
+              selectedBgColor: "#62b2bf"
+            }}
+            tabProps={{
+              disableRipple: true
+            }}
+            value={tabIndex}
+            onChange={(e, i) => setTabIndex(i)}
+          />
+        </Toolbar>
+      </AppBar>
       <UserTable />
     </div>
   );

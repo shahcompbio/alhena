@@ -18,6 +18,7 @@ const UnauthenticatedApp = ({ client }) => {
   const passwordRef = useRef();
 
   const handleLogin = async (event, client, dispatch) => {
+    setLoading(true);
     setError(null);
     event.preventDefault();
     try {
@@ -28,6 +29,7 @@ const UnauthenticatedApp = ({ client }) => {
         dispatch
       );
     } catch (error) {
+      setLoading(false);
       error.graphQLErrors.map(message => {
         if (message.extensions.exception.meta.body.status) {
           setError(message.extensions.exception.meta.body.status);
@@ -48,7 +50,7 @@ const UnauthenticatedApp = ({ client }) => {
           position: "absolute"
         }}
       >
-        <LoadingCircle />
+        <LoadingCircle isStopped={!loading} />
         {error && (
           <SnackbarContentWrapper variant="error" errorNumber={error} />
         )}

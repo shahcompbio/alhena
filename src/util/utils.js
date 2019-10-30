@@ -2,9 +2,27 @@ import {
   LOGIN,
   NEWUSER,
   VERIFYNEWUSERAUTHKEY,
-  DELETEUSERBYUSERNAME
+  DELETEUSERBYUSERNAME,
+  GETPROJECTROLES,
+  UPDATEUSERROLES
 } from "../Queries/queries.js";
 
+export const updateUserRoles = async (username, roles, client) => {
+  const { data, loading, error } = await client.query({
+    query: UPDATEUSERROLES,
+    variables: {
+      username: username,
+      newRoles: [...roles]
+    }
+  });
+  return data.updateUserRoles.created;
+};
+export const getProjectRoles = async client => {
+  const { data, loading, error } = await client.query({
+    query: GETPROJECTROLES
+  });
+  return data.getProjectRoles.roles;
+};
 export const deleteUserByUsername = async (username, client) => {
   const { data, loading, error } = await client.query({
     query: DELETEUSERBYUSERNAME,
@@ -12,7 +30,7 @@ export const deleteUserByUsername = async (username, client) => {
       username: username
     }
   });
-  return data;
+  return data.deleteUser.isDeleted;
 };
 
 export const verifyNewUserSecureUrl = async (key, client) => {
