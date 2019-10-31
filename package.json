@@ -36,6 +36,8 @@
     "react-router-dom": "^5.0.1",
     "react-scripts": "2.1.8",
     "react-select": "^3.0.4",
+    "react-virtualized-auto-sizer": "^1.0.2",
+    "react-window": "^1.8.5",
     "semantic-ui-react": "^0.87.1",
     "sha1": "^1.1.1",
     "styled-components": "^4.4.0",

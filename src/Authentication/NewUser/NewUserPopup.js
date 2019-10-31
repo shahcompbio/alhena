@@ -1,18 +1,14 @@
-import React, { useState, useRef, useEffect } from "react";
-
-import clsx from "clsx";
+import React, { useState, useEffect } from "react";
 
 import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
 
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
-import ListItemText from "@material-ui/core/ListItemText";
 import Input from "@material-ui/core/Input";
 import Chip from "@material-ui/core/Chip";
 
 import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -58,8 +54,6 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
   const handleRoleDelete = (event, value) =>
     setSelectedRoles(roles => roles.filter(role => role !== value));
 
-  const emailRef = useRef();
-  const nameRef = useRef();
   return (
     <Query query={GETPROJECTROLES}>
       {({ loading, error, data }) => {

@@ -1,5 +1,11 @@
 import gql from "graphql-tag";
-
+export const GETALLDASHBOARDOPTIONS = gql`
+  query getIndices {
+    getAllIndices {
+      name
+    }
+  }
+`;
 export const UPDATEUSERROLES = gql`
   query updateUserRoles($username: String!, $newRoles: [String!]) {
     updateUserRoles(username: $username, newRoles: $newRoles) {

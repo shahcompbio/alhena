@@ -1,5 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Route, Switch } from "react-router-dom";
+import React, { useState } from "react";
 import { Query } from "react-apollo";
 
 import Table from "@material-ui/core/Table";
@@ -15,7 +14,6 @@ import IconButton from "@material-ui/core/IconButton";
 import Checkbox from "@material-ui/core/Checkbox";
 import DeleteIcon from "@material-ui/icons/Delete";
 import Typography from "@material-ui/core/Typography";
-import LoadingCircle from "./ProgressCircle.js";
 import CheckIcon from "@material-ui/icons/Check";
 import ClearIcon from "@material-ui/icons/Clear";
 import EditIcon from "@material-ui/icons/Edit";
@@ -23,15 +21,10 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import Input from "@material-ui/core/Input";
 import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
 
 import { ApolloConsumer } from "react-apollo";
 import { getUsers } from "../Queries/queries.js";
-import {
-  deleteUserByUsername,
-  getProjectRoles,
-  updateUserRoles
-} from "../util/utils.js";
+import { deleteUserByUsername, updateUserRoles } from "../util/utils.js";
 
 import Grid from "@material-ui/core/Grid";
 
@@ -56,8 +49,7 @@ const styles = theme => ({
   paper: {
     marginTop: theme.spacing.unit,
     width: "100%",
-    overflowX: "auto",
-    marginBottom: theme.spacing.unit
+    overflowX: "auto"
   },
   table: {
     width: "90%",
@@ -195,7 +187,7 @@ const UserTable = ({ classes, history }) => {
         }
         const modifiedUsers = users.length > 0 ? users : data.getUsers;
         const headings = Object.keys(data.getUsers[0]).filter(
-          heading => heading != "__typename"
+          heading => heading !== "__typename"
         );
 
         return (
@@ -456,19 +448,5 @@ const TableToolbar = ({
     </Toolbar>
   );
 };
-/*{" "}
-{isLoading ? (
-  <Typography>Loading</Typography>
-) : actionComplete ? (
-  ""
-) : (
-  <Typography
-    className={classes.title}
-    color="inherit"
-    variant="subtitle1"
-  >
-    Delete {username}?
-  </Typography>
-)}
-*/
+
 export default withStyles(styles)(withRouter(UserTable));

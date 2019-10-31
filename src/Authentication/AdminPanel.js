@@ -1,10 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useAppState } from "../util/app-state";
 
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
-import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import AddBoxIcon from "@material-ui/icons/AddBox";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
@@ -14,6 +13,9 @@ import Toolbar from "@material-ui/core/Toolbar";
 import SeperatedTabs from "./SeperatedTabs.js";
 import UserTable from "./UserTable.js";
 import NewUserPopup from "./NewUser/NewUserPopup.js";
+
+import NewDashboardPopup from "./NewDashboardPopup.js";
+import DashboardPermissions from "./DashboardPermissions.js";
 
 import { createUserEmail } from "../Queries/queries.js";
 import { ApolloConsumer } from "react-apollo";
@@ -31,7 +33,7 @@ const styles = theme => ({
     overflowX: "auto"
   },
   buttons: {
-    //  margin: theme.spacing.unit
+    zIndex: 50
   },
   actions: {
     float: "right"
@@ -41,16 +43,16 @@ const AdminPanel = ({ classes }) => {
   const [{ authKeyID, uid }, dispatch] = useAppState();
 
   const [openPopup, setOpenPopup] = useState(false);
-  const [tabIndex, setTabIndex] = useState(0);
+  const [tabIndex, setTabIndex] = useState(1);
 
-  const handleClickAddUser = () => {
+  const handleClickAdd = () => {
     setOpenPopup(true);
   };
 
-  const handleCloseAddUser = () => {
+  const handleCloseAdd = () => {
     setOpenPopup(false);
   };
-
+  const addDashboard = async (event, client, dashboardName) => {};
   const addUser = async (event, client, email, name, selectedRoles) => {
     var data = await client.query({
       query: createUserEmail,
@@ -63,7 +65,7 @@ const AdminPanel = ({ classes }) => {
 
   return (
     <div className={classes.root}>
-      <Paper rounded className={classes.paper}>
+      <Paper rounded={"true"} className={classes.paper}>
         {" "}
         <Grid
           container
@@ -82,23 +84,36 @@ const AdminPanel = ({ classes }) => {
               alignItems="center"
               className={classes.actions}
             >
-              <ApolloConsumer key={"adduser-consumer"}>
+              <ApolloConsumer key={"add-consumer"}>
                 {client => [
                   <IconButton
+                    key={"add-button"}
                     variant="outlined"
                     size="medium"
                     color="primary"
                     className={classes.buttons}
-                    onClick={handleClickAddUser}
+                    onClick={handleClickAdd}
                   >
                     <AddBoxIcon />
                   </IconButton>,
-                  openPopup && (
+                  openPopup && tabIndex === 0 && (
                     <NewUserPopup
+                      key={"newUserPopup"}
                       isOpen={openPopup}
-                      handleClose={handleCloseAddUser}
+                      handleClose={handleCloseAdd}
                       client={client}
                       addUser={addUser}
+                      addDashboard={addDashboard}
+                    />
+                  ),
+                  openPopup && tabIndex === 1 && (
+                    <NewDashboardPopup
+                      key={"newDashboardPopup"}
+                      isOpen={openPopup}
+                      handleClose={handleCloseAdd}
+                      client={client}
+                      addUser={addUser}
+                      addDashboard={addDashboard}
                     />
                   )
                 ]}
@@ -134,8 +149,8 @@ const AdminPanel = ({ classes }) => {
             style={{ alignSelf: "flex-end" }}
             tabs={[{ label: "Users" }, { label: "Permissions" }]}
             tabStyle={{
-              bgColor: "#4486a3",
-              selectedBgColor: "#62b2bf"
+              bgColor: tabIndex === 0 ? "#4486a3" : "#62b2bf",
+              selectedBgColor: tabIndex === 0 ? "#62b2bf" : "#4486a3"
             }}
             tabProps={{
               disableRipple: true
@@ -145,7 +160,7 @@ const AdminPanel = ({ classes }) => {
           />
         </Toolbar>
       </AppBar>
-      <UserTable />
+      {tabIndex === 1 ? <DashboardPermissions /> : <UserTable />}
     </div>
   );
 };

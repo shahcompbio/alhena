@@ -1,5 +1,4 @@
 import React from "react";
-import Color from "color";
 import { makeStyles } from "@material-ui/styles";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";

@@ -1,10 +1,8 @@
 import React, { useState, useRef } from "react";
 
 import { ApolloConsumer } from "react-apollo";
-import { Route } from "react-router-dom";
 
 import { queryCreateNewUser } from "../../util/utils.js";
-import { useAppState } from "../../util/app-state";
 
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
@@ -15,7 +13,6 @@ import VisuallyHidden from "@reach/visually-hidden";
 import styled from "styled-components";
 import { withStyles } from "@material-ui/styles";
 
-import UnauthenticatedApp from "./../Unauthenticated.js";
 const styles = theme => ({
   paperTitle: {
     paddingBottom: theme.spacing.unit * 5,
@@ -27,7 +24,6 @@ const styles = theme => ({
     background: "#69B3CE"
   },
   paperForm: {
-    marginTop: theme.spacing.unit,
     overflowX: "auto",
     margin: "auto",
     borderRadius: 20,
@@ -39,7 +35,6 @@ const styles = theme => ({
 });
 const NewAccount = ({ email, dispatch, classes }) => {
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [userEmail] = useState(email);
   const [newUser, setSuccessfullyCreated] = useState(false);
 

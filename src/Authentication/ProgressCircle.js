@@ -1,7 +1,6 @@
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import React from "react";
 const strokeWidth = 2;
-const percentageValues = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 const ProgressProvider = ({ values, children }) => {
   const [valueIndex, setValueIndex] = React.useState(0);
   React.useEffect(() => {
