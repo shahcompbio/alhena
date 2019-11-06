@@ -4,13 +4,50 @@ import {
   VERIFYNEWUSERAUTHKEY,
   DELETEUSERBYUSERNAME,
   GETPROJECTROLES,
-  UPDATEUSERROLES
+  UPDATEUSERROLES,
+  DELETEDASHBOARD,
+  CREATENEWDASHBOARD,
+  UPDATEDASHBOARD
 } from "../Queries/queries.js";
-
-export const updateUserRoles = async (username, roles, client) => {
+export const updateDashboard = async (client, name, selectedIndices) => {
+  const { data, loading, error } = await client.query({
+    query: UPDATEDASHBOARD,
+    variables: {
+      dashboard: { name: name, indices: selectedIndices }
+    }
+  });
+  return data.created;
+};
+export const createNewDashboard = async (client, name, selectedIndices) => {
+  const { data, loading, error } = await client.query({
+    query: CREATENEWDASHBOARD,
+    variables: {
+      dashboard: { name: name, indices: selectedIndices }
+    }
+  });
+  return data.created;
+};
+export const deleteDashboard = async (name, client) => {
+  const { data, loading, error } = await client.query({
+    query: DELETEDASHBOARD,
+    variables: {
+      name: name
+    }
+  });
+  return data.deleteDashboard.allDeleted;
+};
+export const updateUserRoles = async (
+  username,
+  roles,
+  email,
+  full_name,
+  client
+) => {
   const { data, loading, error } = await client.query({
     query: UPDATEUSERROLES,
     variables: {
+      email: email,
+      name: full_name,
       username: username,
       newRoles: [...roles]
     }

@@ -15,33 +15,47 @@ import CheckIcon from "@material-ui/icons/Check";
 import TransferList from "./TransferList.js";
 import { withRouter } from "react-router";
 import { Query } from "react-apollo";
-import { GETALLDASHBOARDOPTIONS } from "../Queries/queries.js";
+import { GETINDICESBYDASHBOARD } from "../Queries/queries.js";
 
-const NewDashboardPopup = ({ isOpen, handleClose, addUser, client }) => {
+const EditDashboardPopup = ({
+  isOpen,
+  handleClose,
+  dashboardAction,
+  dashboardName,
+  editing
+}) => {
+  console.log("hello");
   const [isLoading, setLoading] = useState(false);
   const [isSent, setIsSent] = useState(null);
-  const [isCreateDisabled, setIsDisabled] = useState(true);
-
+  const [isActionDisabled, setIsDisabled] = useState(true);
+  const [isEdit, setIsEdit] = useState(editing);
   const [selectedIndices, setSelectedIndices] = useState([]);
-  const [name, setName] = useState(null);
+  const [name, setName] = useState(dashboardName);
 
   const handleNameChange = event => {
     setName(event.target.value);
   };
+
   useEffect(() => {
-    if (name && selectedIndices && !isCreateDisabled) {
+    if (name && selectedIndices.length > 0) {
       setIsDisabled(false);
+    }
+    if (!name || selectedIndices.length === 0) {
+      setIsDisabled(true);
     }
   }, [name, selectedIndices]);
 
   return (
-    <Query query={GETALLDASHBOARDOPTIONS}>
+    <Query
+      query={GETINDICESBYDASHBOARD}
+      variables={{ dashboard: dashboardName }}
+    >
       {({ loading, error, data }) => {
         if (loading) return null;
         if (error) return null;
         return (
           <Dialog
-            open={isOpen}
+            open={true}
             onClose={handleClose}
             aria-labelledby="form-dialog-title"
           >
@@ -74,15 +88,17 @@ const NewDashboardPopup = ({ isOpen, handleClose, addUser, client }) => {
               </DialogContent>
             ) : (
               [
-                <ValidatorForm ref="form">
+                <ValidatorForm ref="form" key={"validForm"}>
                   <DialogTitle
                     id="form-dialog-title"
                     style={{ paddinBottom: 0 }}
+                    key={"dialogTitle"}
                   >
-                    Create New Dashboard
+                    {isEdit ? "Edit Dashboard" : "Create New Dashboard"}
                   </DialogTitle>
                   <DialogContent>
                     <TextValidator
+                      key={"dialogName"}
                       autoFocus
                       margin="dense"
                       id="name"
@@ -97,10 +113,14 @@ const NewDashboardPopup = ({ isOpen, handleClose, addUser, client }) => {
                       style={{ paddingBottom: 20 }}
                     />
                     <TransferList
+                      key={"transferList"}
                       options={data.getAllIndices.map(option => option.name)}
                       setSelectedIndices={indices =>
                         setSelectedIndices(indices)
                       }
+                      alreadyChoosen={data.getIndicesByDashboard.map(
+                        option => option.name
+                      )}
                     />
                   </DialogContent>
                   ,
@@ -113,12 +133,24 @@ const NewDashboardPopup = ({ isOpen, handleClose, addUser, client }) => {
                       Cancel
                     </Button>
                     <Button
-                      onClick={async ev => {}}
+                      onClick={async ev => {
+                        setLoading(true);
+                        var accepted = await dashboardAction(
+                          name,
+                          selectedIndices
+                        );
+                        setIsSent(true);
+                        setTimeout(() => {
+                          setIsSent(false);
+                          setLoading(false);
+                          handleClose();
+                        }, 2000);
+                      }}
                       color="primary"
                       variant="contained"
-                      disabled={isCreateDisabled}
+                      disabled={isActionDisabled}
                     >
-                      Create
+                      {isEdit ? "Submit" : "Create"}
                     </Button>
                   </DialogActions>
                 </ValidatorForm>
@@ -131,4 +163,4 @@ const NewDashboardPopup = ({ isOpen, handleClose, addUser, client }) => {
   );
 };
 
-export default withRouter(NewDashboardPopup);
+export default withRouter(EditDashboardPopup);

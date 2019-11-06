@@ -43,13 +43,15 @@ const App = () => {
             <NewUserUriVerification uri={match} dispatch={dispatch} />
           )}
         />
-        {authKeyID && <Route path="/home" component={() => <Content />} />}
+        {authKeyID && (
+          <Route path="/dashboards" component={() => <Content />} />
+        )}
         {authKeyID && isSuperUser && (
           <Route path="/admin" component={() => <AdminPanel />} />
         )}
-        <Redirect to="/login" />
       </Switch>
     </MuiThemeProvider>
   );
 };
+//        // <Redirect to="/login" />
 export default withRouter(App);

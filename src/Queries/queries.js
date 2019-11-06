@@ -1,4 +1,36 @@
 import gql from "graphql-tag";
+export const DELETEDASHBOARD = gql`
+  query deleteDashboard($name: String!) {
+    deleteDashboard(name: $name) {
+      allDeleted
+    }
+  }
+`;
+export const UPDATEDASHBOARD = gql`
+  query updateDashboard($dashboard: DashboardInput) {
+    updateDashboard(dashboard: $dashboard) {
+      hasUpdated
+    }
+  }
+`;
+export const CREATENEWDASHBOARD = gql`
+  query createNewDashboard($dashboard: DashboardInput!) {
+    createNewDashboard(dashboard: $dashboard) {
+      roleCreated
+      newAliasesHadErrors
+    }
+  }
+`;
+export const GETINDICESBYDASHBOARD = gql`
+  query getIndex($dashboard: String!) {
+    getAllIndices {
+      name
+    }
+    getIndicesByDashboard(dashboard: $dashboard) {
+      name
+    }
+  }
+`;
 export const GETALLDASHBOARDOPTIONS = gql`
   query getIndices {
     getAllIndices {
@@ -7,8 +39,18 @@ export const GETALLDASHBOARDOPTIONS = gql`
   }
 `;
 export const UPDATEUSERROLES = gql`
-  query updateUserRoles($username: String!, $newRoles: [String!]) {
-    updateUserRoles(username: $username, newRoles: $newRoles) {
+  query updateUserRoles(
+    $username: String!
+    $newRoles: [String!]
+    $email: String!
+    $name: String!
+  ) {
+    updateUserRoles(
+      username: $username
+      newRoles: $newRoles
+      email: $email
+      name: $name
+    ) {
       created
     }
   }
@@ -17,6 +59,14 @@ export const GETPROJECTROLES = gql`
   query projectRoles {
     getProjectRoles {
       roles
+    }
+  }
+`;
+export const getAllProjects = gql`
+  query getAllProjects {
+    getAllProjects {
+      name
+      count
     }
   }
 `;

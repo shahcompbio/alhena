@@ -64,9 +64,9 @@ const ProjectViewContent = ({ classes, match }) => {
     >
       {({ loading, error, data }) => {
         if (error) {
-          dispatch({
+          /*  dispatch({
             type: "LOGOUT"
-          });
+          });*/
           return null;
         }
         if (loading) {

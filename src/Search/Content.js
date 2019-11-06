@@ -16,12 +16,12 @@ const styles = ({ theme }) => ({
   }
 });
 
-const Content = ({ classes }) => {
+const Content = ({ classes, history }) => {
   return (
     <Grid>
       <Switch>
-        <Route exact path="/" render={() => <OverviewContent />} />
-        <Route path={`/:project`} component={ProjectViewContent} />
+        <Route exact path="/dashboards" render={() => <OverviewContent />} />
+        <Route path={`/dashboards/:project`} component={ProjectViewContent} />
         <Route component={NoMatch} />
       </Switch>
     </Grid>

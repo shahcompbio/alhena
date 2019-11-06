@@ -11,14 +11,15 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 
 import SeperatedTabs from "./SeperatedTabs.js";
-import UserTable from "./UserTable.js";
-import NewUserPopup from "./NewUser/NewUserPopup.js";
 
-import NewDashboardPopup from "./NewDashboardPopup.js";
-import DashboardPermissions from "./DashboardPermissions.js";
+import NewUserPopup from "./NewUser/NewUserPopup.js";
+import DashboardPopup from "./DashboardPopup.js";
+
+import { ApolloConsumer } from "react-apollo";
+import TabContentWrapper from "./TabContentWrapper.js";
 
 import { createUserEmail } from "../Queries/queries.js";
-import { ApolloConsumer } from "react-apollo";
+import { createNewDashboard } from "../util/utils.js";
 
 import { withStyles } from "@material-ui/styles";
 
@@ -45,6 +46,8 @@ const AdminPanel = ({ classes }) => {
   const [openPopup, setOpenPopup] = useState(false);
   const [tabIndex, setTabIndex] = useState(1);
 
+  const [isEditing, setIsEditing] = useState(false);
+
   const handleClickAdd = () => {
     setOpenPopup(true);
   };
@@ -52,7 +55,12 @@ const AdminPanel = ({ classes }) => {
   const handleCloseAdd = () => {
     setOpenPopup(false);
   };
-  const addDashboard = async (event, client, dashboardName) => {};
+  const addDashboard = async (client, name, selectedIndices) => {
+    const creacted = createNewDashboard(client, name, selectedIndices);
+    if (creacted) {
+      window.location.reload();
+    }
+  };
   const addUser = async (event, client, email, name, selectedRoles) => {
     var data = await client.query({
       query: createUserEmail,
@@ -103,17 +111,15 @@ const AdminPanel = ({ classes }) => {
                       handleClose={handleCloseAdd}
                       client={client}
                       addUser={addUser}
-                      addDashboard={addDashboard}
                     />
                   ),
                   openPopup && tabIndex === 1 && (
-                    <NewDashboardPopup
+                    <DashboardPopup
                       key={"newDashboardPopup"}
                       isOpen={openPopup}
                       handleClose={handleCloseAdd}
                       client={client}
-                      addUser={addUser}
-                      addDashboard={addDashboard}
+                      dashboardAction={addDashboard}
                     />
                   )
                 ]}
@@ -147,7 +153,7 @@ const AdminPanel = ({ classes }) => {
         >
           <SeperatedTabs
             style={{ alignSelf: "flex-end" }}
-            tabs={[{ label: "Users" }, { label: "Permissions" }]}
+            tabs={[{ label: "Users" }, { label: "Dashboards" }]}
             tabStyle={{
               bgColor: tabIndex === 0 ? "#4486a3" : "#62b2bf",
               selectedBgColor: tabIndex === 0 ? "#62b2bf" : "#4486a3"
@@ -160,7 +166,7 @@ const AdminPanel = ({ classes }) => {
           />
         </Toolbar>
       </AppBar>
-      {tabIndex === 1 ? <DashboardPermissions /> : <UserTable />}
+      <TabContentWrapper tabIndex={tabIndex} />
     </div>
   );
 };

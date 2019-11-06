@@ -101,10 +101,9 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
                   ,
                   <DialogContent>
                     <DialogContentText>
-                      To create a new user please enter their name and email. A
-                      confirmation email will be sent to them. Please tell the
-                      new user to also check their spam for an email from
-                      admin@shahcomponc.com
+                      To create a new user please enter their name and email and
+                      select what dashboards they are allowed to view. A
+                      confirmation email will be sent to them.
                     </DialogContentText>
                     <TextValidator
                       autoFocus

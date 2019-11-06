@@ -12,6 +12,7 @@ import { getProjects } from "../../Queries/queries.js";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
+import Typography from "@material-ui/core/Typography";
 
 const styles = theme => ({
   content: {
@@ -25,6 +26,7 @@ const styles = theme => ({
 
 const OverviewContent = ({ classes, history }) => {
   const [{ authKeyID, uid }, dispatch] = useAppState();
+
   return (
     <Query
       query={getProjects}
@@ -35,6 +37,9 @@ const OverviewContent = ({ classes, history }) => {
       {({ loading, error, data }) => {
         if (loading) return null;
         if (error) return null;
+        if (data.getProjects.length === 1) {
+          history.push("/dashboards/" + data.getProjects[0].name);
+        }
         return (
           <div className={classes.content}>
             <Grid
@@ -47,6 +52,13 @@ const OverviewContent = ({ classes, history }) => {
               className={classes.container}
             >
               <Grid item style={{ textAlign: "center" }}>
+                <Typography
+                  variant="h5"
+                  color="secondary"
+                  style={{ marginBottom: 50 }}
+                >
+                  Select a dashboard
+                </Typography>
                 <ButtonGroup
                   fullWidth
                   color="secondary"
@@ -55,14 +67,14 @@ const OverviewContent = ({ classes, history }) => {
                 >
                   {data.getProjects.map(project => {
                     return (
-                      <Button value={project.name}>
-                        {" "}
-                        <Link
-                          to={`/${project.name}`}
-                          style={{ color: "white", textDecoration: "none" }}
-                        >
-                          {project.name}
-                        </Link>
+                      <Button
+                        key={"button" + project.name}
+                        value={project.name}
+                        onClick={() => {
+                          history.push("/dashboards/" + project.name);
+                        }}
+                      >
+                        {project.name}
                       </Button>
                     );
                   })}
@@ -76,4 +88,8 @@ const OverviewContent = ({ classes, history }) => {
   );
 };
 
+//<Link
+//    to={`/${project.name}`}
+//    style={{ color: "white", textDecoration: "none" }}
+//  ></Link>
 export default withStyles(styles)(withRouter(OverviewContent));

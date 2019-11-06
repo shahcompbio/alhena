@@ -6,21 +6,14 @@ import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import Toolbar from "@material-ui/core/Toolbar";
-import Tooltip from "@material-ui/core/Tooltip";
 import TablePagination from "@material-ui/core/TablePagination";
 import Paper from "@material-ui/core/Paper";
-import IconButton from "@material-ui/core/IconButton";
 import Checkbox from "@material-ui/core/Checkbox";
-import DeleteIcon from "@material-ui/icons/Delete";
-import Typography from "@material-ui/core/Typography";
-import CheckIcon from "@material-ui/icons/Check";
-import ClearIcon from "@material-ui/icons/Clear";
-import EditIcon from "@material-ui/icons/Edit";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import Input from "@material-ui/core/Input";
 import FormControl from "@material-ui/core/FormControl";
+import TableToolbar from "./TableToolBar.js";
 
 import { ApolloConsumer } from "react-apollo";
 import { getUsers } from "../Queries/queries.js";
@@ -28,8 +21,6 @@ import { deleteUserByUsername, updateUserRoles } from "../util/utils.js";
 
 import Grid from "@material-ui/core/Grid";
 
-import clsx from "clsx";
-import { lighten, makeStyles } from "@material-ui/core/styles";
 import { withStyles } from "@material-ui/styles";
 import { withRouter } from "react-router";
 import { useAppState } from "../util/app-state";
@@ -87,6 +78,12 @@ const styles = theme => ({
     display: "none"
   }
 });
+const rowLabels = {
+  username: "Username",
+  roles: "Readable Dashboards",
+  full_name: "Name",
+  email: "Email"
+};
 const editableRows = { roles: true };
 const UserTable = ({ classes, history }) => {
   const [{ authKeyID, uid }, dispatch] = useAppState();
@@ -124,10 +121,18 @@ const UserTable = ({ classes, history }) => {
   };
   const confirmEditUser = async (client, modifiedUsers) => {
     setLoading(true);
+    const selectedUserObj = modifiedUsers.reduce((final, user) => {
+      if (user.username.indexOf(selected) !== -1) {
+        final = user;
+      }
+      return final;
+    });
     try {
       const confirmed = await updateUserRoles(
         selected,
         selectedUserRoles,
+        selectedUserObj.email,
+        selectedUserObj.full_name,
         client
       );
       if (confirmed === false) {
@@ -186,9 +191,12 @@ const UserTable = ({ classes, history }) => {
           return null;
         }
         const modifiedUsers = users.length > 0 ? users : data.getUsers;
-        const headings = Object.keys(data.getUsers[0]).filter(
-          heading => heading !== "__typename"
-        );
+        const headings =
+          modifiedUsers.length > 0
+            ? Object.keys(data.getUsers[0]).filter(
+                heading => heading !== "__typename"
+              )
+            : [];
 
         return (
           <div className={classes.root}>
@@ -206,9 +214,9 @@ const UserTable = ({ classes, history }) => {
                   <ApolloConsumer>
                     {client => (
                       <TableToolbar
-                        username={selected}
-                        deleteUser={() => deleteUser(client, modifiedUsers)}
-                        editUser={() => confirmEditUser(client, modifiedUsers)}
+                        name={selected}
+                        deleteName={() => deleteUser(client, modifiedUsers)}
+                        edit={() => confirmEditUser(client, modifiedUsers)}
                         clear={isCleared => clearAll()}
                         setIsEditing={isEditing => setIsEditingUser(isEditing)}
                         isLoading={isLoading}
@@ -228,74 +236,80 @@ const UserTable = ({ classes, history }) => {
                             className={[classes.tableCell, classes.tableHeader]}
                             align={aligned}
                           >
-                            {heading}
+                            {rowLabels[heading]}
                           </TableCell>
                         );
                       })}
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {modifiedUsers
-                      .slice(
-                        page * rowsPerPage,
-                        page * rowsPerPage + rowsPerPage
-                      )
-                      .map((row, index) => {
-                        const isItemSelected = isSelected(row.username);
-                        const labelId = `enhanced-table-checkbox-${index}`;
+                    {modifiedUsers.length === 0
+                      ? []
+                      : modifiedUsers
+                          .slice(
+                            page * rowsPerPage,
+                            page * rowsPerPage + rowsPerPage
+                          )
+                          .map((row, index) => {
+                            const isItemSelected = isSelected(row.username);
+                            const labelId = `enhanced-table-checkbox-${index}`;
 
-                        return (
-                          <TableRow
-                            key={row.username}
-                            className={classes.tableRow}
-                            selected={isItemSelected}
-                            aria-checked={isItemSelected}
-                            role="checkbox"
-                            classes={{ selected: classes.selected }}
-                          >
-                            <TableCell padding="checkbox">
-                              <Checkbox
-                                color={"default"}
-                                checked={isItemSelected}
-                                className={classes.checkBox}
-                                onClick={event =>
-                                  handleRowClick(event, row.username)
-                                }
-                                inputProps={{ "aria-labelledby": labelId }}
-                              />
-                            </TableCell>
-                            {headings.map((heading, headingIndex) => {
-                              var aligned =
-                                headingIndex === 0 ? "left" : "right";
-                              return (
-                                <TableCell
-                                  align={aligned}
-                                  component="th"
-                                  scope="row"
-                                  id={labelId}
-                                  className={classes.tableCell}
-                                  key={labelId + heading + row.username}
-                                >
-                                  {isSelectedForEditing(
-                                    row.username,
-                                    heading
-                                  ) ? (
-                                    <DropDownEdit
-                                      setNewUserRoles={roles =>
-                                        setSelectedUserRoles([...roles])
-                                      }
-                                      currentSelection={row[heading]}
-                                      allRoles={data.getProjectRoles.roles}
-                                    />
-                                  ) : (
-                                    row[heading]
-                                  )}
+                            return (
+                              <TableRow
+                                key={row.username}
+                                className={classes.tableRow}
+                                selected={isItemSelected}
+                                aria-checked={isItemSelected}
+                                role="checkbox"
+                                classes={{ selected: classes.selected }}
+                              >
+                                <TableCell padding="checkbox">
+                                  <Checkbox
+                                    style={{ color: "#ffffffc4" }}
+                                    color={"default"}
+                                    checked={isItemSelected}
+                                    className={classes.checkBox}
+                                    onClick={event =>
+                                      handleRowClick(event, row.username)
+                                    }
+                                    inputProps={{ "aria-labelledby": labelId }}
+                                  />
                                 </TableCell>
-                              );
-                            })}
-                          </TableRow>
-                        );
-                      })}
+                                {headings.map((heading, headingIndex) => {
+                                  var aligned =
+                                    headingIndex === 0 ? "left" : "right";
+                                  console.log(row[heading]);
+                                  return (
+                                    <TableCell
+                                      align={aligned}
+                                      component="th"
+                                      scope="row"
+                                      id={labelId}
+                                      className={classes.tableCell}
+                                      key={labelId + heading + row.username}
+                                    >
+                                      {isSelectedForEditing(
+                                        row.username,
+                                        heading
+                                      ) ? (
+                                        <DropDownEdit
+                                          setNewUserRoles={roles =>
+                                            setSelectedUserRoles([...roles])
+                                          }
+                                          currentSelection={row[heading]}
+                                          allRoles={data.getProjectRoles.roles}
+                                        />
+                                      ) : Array.isArray(row[heading]) ? (
+                                        row[heading].join(", ")
+                                      ) : (
+                                        row[heading]
+                                      )}
+                                    </TableCell>
+                                  );
+                                })}
+                              </TableRow>
+                            );
+                          })}
                   </TableBody>
                 </Table>
                 <TablePagination
@@ -319,133 +333,6 @@ const UserTable = ({ classes, history }) => {
         );
       }}
     </Query>
-  );
-};
-const DropDownEdit = ({ currentSelection, allRoles, setNewUserRoles }) => {
-  const [selectedRoles, setSelectedRoles] = useState([...currentSelection]);
-  return (
-    <FormControl required style={{ width: "100%" }}>
-      <Select
-        multiple
-        value={selectedRoles}
-        onChange={event => {
-          setSelectedRoles(event.target.value);
-          setNewUserRoles(event.target.value);
-        }}
-        input={<Input id="select-multiple-placeholder" />}
-      >
-        {allRoles.map(role => (
-          <MenuItem value={role} key={role}>
-            {role}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-  );
-};
-
-const useToolbarStyles = makeStyles(theme => ({
-  root: {
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(1),
-    borderRadius: "10px 10px 0px 0px"
-  },
-  highlight: {
-    backgroundColor: "rgb(237, 241, 240)"
-  },
-  deleteHighlight: {
-    color: theme.palette.secondary.main,
-    backgroundColor: lighten(theme.palette.secondary.light, 0.85)
-  },
-  editHighlight: {
-    backgroundColor: "rgb(218, 255, 241)"
-  },
-  completeHighlight: {
-    color: "#03a678",
-    backgroundColor: lighten("#03a678", 0.7)
-  },
-  title: {
-    flex: "1 1 100%"
-  }
-}));
-const TableToolbar = ({
-  clear,
-  username,
-  deleteUser,
-  actionComplete,
-  isLoading,
-  editUser,
-  setIsEditing
-}) => {
-  const classes = useToolbarStyles();
-  const [selectedAction, setSelectedAction] = useState(null);
-
-  return (
-    <Toolbar
-      className={clsx(classes.root, {
-        [classes.highlight]: selectedAction === null,
-        [classes.completeHighlight]: actionComplete,
-        [classes.deleteHighlight]: selectedAction === "Delete",
-        [classes.editHighlight]: selectedAction === "Edit"
-      })}
-      dense
-    >
-      {selectedAction === null ? (
-        [
-          <Tooltip title="Delete">
-            <IconButton
-              aria-label="delete"
-              onClick={ev => setSelectedAction("Delete")}
-            >
-              <DeleteIcon />
-            </IconButton>
-          </Tooltip>,
-          <Tooltip title="Edit">
-            <IconButton
-              aria-label="edit"
-              onClick={ev => {
-                setIsEditing(true);
-                setSelectedAction("Edit");
-              }}
-            >
-              <EditIcon />
-            </IconButton>
-          </Tooltip>
-        ]
-      ) : isLoading ? (
-        <Typography>Loading</Typography>
-      ) : actionComplete ? (
-        <CheckIcon />
-      ) : (
-        [
-          <Tooltip title="Clear">
-            <IconButton aria-label="clear">
-              <ClearIcon onClick={ev => clear(true)} />
-            </IconButton>
-          </Tooltip>,
-          <Tooltip title="Confirm">
-            <IconButton aria-label="confirm">
-              <CheckIcon
-                onClick={ev =>
-                  selectedAction === "Edit"
-                    ? editUser(username)
-                    : deleteUser(username)
-                }
-              />
-            </IconButton>
-          </Tooltip>,
-          selectedAction === "Delete" && (
-            <Typography
-              className={classes.title}
-              color="inherit"
-              variant="subtitle1"
-            >
-              Delete {username}?
-            </Typography>
-          )
-        ]
-      )}
-    </Toolbar>
   );
 };
 

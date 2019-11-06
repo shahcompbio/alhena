@@ -28,11 +28,17 @@ const useStyles = makeStyles(theme => ({
 const not = (a, b) => a.filter(value => b.indexOf(value) === -1);
 const intersection = (a, b) => a.filter(value => b.indexOf(value) !== -1);
 
-const TransferList = ({ options, setSelectedIndices }) => {
+const TransferList = ({ options, setSelectedIndices, alreadyChoosen }) => {
   const classes = useStyles();
   const [checked, setChecked] = React.useState([]);
-  const [left, setLeft] = React.useState([...options]);
-  const [right, setRight] = React.useState([]);
+  const [left, setLeft] = React.useState(
+    alreadyChoosen !== undefined
+      ? [...not(options, alreadyChoosen)]
+      : [...options]
+  );
+  const [right, setRight] = React.useState(
+    alreadyChoosen !== undefined ? [...alreadyChoosen] : []
+  );
 
   const leftChecked = intersection(checked, left);
   const rightChecked = intersection(checked, right);
@@ -66,18 +72,17 @@ const TransferList = ({ options, setSelectedIndices }) => {
   };
 
   const handleCheckedLeft = () => {
-    const newRight = [...left, ...rightChecked];
-    setLeft([...newRight]);
-    setRight(not(right, rightChecked));
+    const newRight = not(right, rightChecked);
+    setLeft([...left, ...rightChecked]);
+    setRight([...newRight]);
     setChecked(not(checked, rightChecked));
     setSelectedIndices([...newRight]);
   };
 
   const handleAllLeft = () => {
-    const newRight = [...left, ...right];
-    setLeft([...newRight]);
+    setLeft([...left, ...right]);
     setRight([]);
-    setSelectedIndices([...newRight]);
+    setSelectedIndices([]);
   };
 
   const Row = ({ data, index, style }) => {
