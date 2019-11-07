@@ -13,7 +13,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 import SeperatedTabs from "./SeperatedTabs.js";
 
 import NewUserPopup from "./NewUser/NewUserPopup.js";
-import DashboardPopup from "./DashboardPopup.js";
+import AddDashboardPopupWrapper from "./AddDashboardPopupWrapper.js";
 
 import { ApolloConsumer } from "react-apollo";
 import TabContentWrapper from "./TabContentWrapper.js";
@@ -56,8 +56,8 @@ const AdminPanel = ({ classes }) => {
     setOpenPopup(false);
   };
   const addDashboard = async (client, name, selectedIndices) => {
-    const creacted = createNewDashboard(client, name, selectedIndices);
-    if (creacted) {
+    const created = createNewDashboard(client, name, selectedIndices);
+    if (created) {
       window.location.reload();
     }
   };
@@ -114,11 +114,10 @@ const AdminPanel = ({ classes }) => {
                     />
                   ),
                   openPopup && tabIndex === 1 && (
-                    <DashboardPopup
+                    <AddDashboardPopupWrapper
                       key={"newDashboardPopup"}
                       isOpen={openPopup}
                       handleClose={handleCloseAdd}
-                      client={client}
                       dashboardAction={addDashboard}
                     />
                   )

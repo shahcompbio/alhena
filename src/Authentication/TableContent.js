@@ -14,8 +14,6 @@ import MenuItem from "@material-ui/core/MenuItem";
 import Input from "@material-ui/core/Input";
 import FormControl from "@material-ui/core/FormControl";
 
-import DashboardPopup from "./DashboardPopup.js";
-
 import clsx from "clsx";
 
 const rowLabels = {
@@ -48,8 +46,8 @@ const TableContent = ({
   };
   const tableConfig =
     tabIndex === 0
-      ? { rowType: "username" }
-      : { rowType: "name", colour: "#ffffffc4" };
+      ? { rowType: "username", colour: "#4486a3" }
+      : { rowType: "name", colour: "#62b2bf" };
 
   const isSelectedForEditing = (name, row) =>
     selected === name && isEditing && editableRows.hasOwnProperty(row);
@@ -58,6 +56,7 @@ const TableContent = ({
     modifiedData.length > 0
       ? Object.keys(modifiedData[0]).filter(heading => heading !== "__typename")
       : [];
+
   return [
     <Table className={classes.table} size="small">
       <TableHead>
@@ -72,7 +71,7 @@ const TableContent = ({
                 key={"permissions-heading" + heading}
                 className={clsx(classes.tableCell, classes.tableHeader)}
               >
-                {heading}
+                {rowLabels[heading]}
               </TableCell>
             );
           })}
@@ -91,13 +90,17 @@ const TableContent = ({
 
                 return (
                   <TableRow
-                    className={classes.tableRow}
+                    className={
+                      tabIndex === 0
+                        ? classes.tableRowIndex0
+                        : classes.tableRowIndex1
+                    }
                     classes={{ selected: classes.selected }}
                     key={"permissions-row-" + name}
                   >
                     <TableCell padding="checkbox">
                       <Checkbox
-                        style={{ color: tableConfig.colour }}
+                        style={{ color: "#ffffffc4" }}
                         color={"default"}
                         checked={isItemSelected}
                         className={classes.checkBox}

@@ -24,7 +24,7 @@ import CheckIcon from "@material-ui/icons/Check";
 
 import { withRouter } from "react-router";
 import { Query } from "react-apollo";
-import { GETPROJECTROLES } from "../../Queries/queries.js";
+import { GETDASHBOARDROLES } from "../../Queries/queries.js";
 
 const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
   const [isLoading, setLoading] = useState(false);
@@ -55,7 +55,7 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
     setSelectedRoles(roles => roles.filter(role => role !== value));
 
   return (
-    <Query query={GETPROJECTROLES}>
+    <Query query={GETDASHBOARDROLES}>
       {({ loading, error, data }) => {
         if (loading) return null;
         if (error) return null;
@@ -138,7 +138,7 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
                       handleRoleDelete={(event, value) =>
                         handleRoleDelete(event, value)
                       }
-                      roleNames={data.getProjectRoles.roles}
+                      roleNames={data.getDashboardRoles.roles}
                     />
                   </DialogContent>
                   ,

@@ -3,7 +3,7 @@ import {
   NEWUSER,
   VERIFYNEWUSERAUTHKEY,
   DELETEUSERBYUSERNAME,
-  GETPROJECTROLES,
+  GETDASHBOARDROLES,
   UPDATEUSERROLES,
   DELETEDASHBOARD,
   CREATENEWDASHBOARD,
@@ -56,7 +56,7 @@ export const updateUserRoles = async (
 };
 export const getProjectRoles = async client => {
   const { data, loading, error } = await client.query({
-    query: GETPROJECTROLES
+    query: GETDASHBOARDROLES
   });
   return data.getProjectRoles.roles;
 };

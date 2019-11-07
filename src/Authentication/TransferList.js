@@ -28,13 +28,13 @@ const useStyles = makeStyles(theme => ({
 const not = (a, b) => a.filter(value => b.indexOf(value) === -1);
 const intersection = (a, b) => a.filter(value => b.indexOf(value) !== -1);
 
-const TransferList = ({ options, setSelectedIndices, alreadyChoosen }) => {
+const TransferList = ({ allIndices, setSelectedIndices, alreadyChoosen }) => {
   const classes = useStyles();
   const [checked, setChecked] = React.useState([]);
   const [left, setLeft] = React.useState(
     alreadyChoosen !== undefined
-      ? [...not(options, alreadyChoosen)]
-      : [...options]
+      ? [...not(allIndices, alreadyChoosen)]
+      : [...allIndices]
   );
   const [right, setRight] = React.useState(
     alreadyChoosen !== undefined ? [...alreadyChoosen] : []

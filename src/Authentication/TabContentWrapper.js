@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAppState } from "../util/app-state";
 
 import { Query } from "react-apollo";
 import TableContent from "./TableContent.js";
-import EditDashboardPopup from "./EditDashboardPopup.js";
+import EditDashboardPopupWrapper from "./EditDashboardPopupWrapper.js";
 import Paper from "@material-ui/core/Paper";
 import TableToolbar from "./TableToolBar.js";
 
@@ -17,13 +17,12 @@ import {
   updateUserRoles
 } from "../util/utils.js";
 
-import { getAllProjects, getUsers } from "../Queries/queries.js";
+import { getAllDashboards, getUsers } from "../Queries/queries.js";
 import { withStyles } from "@material-ui/styles";
-const styles = theme => ({
+const styles = (theme, tabIndex) => ({
   root: {
     flexGrow: 1,
     width: "100%",
-    backgroundColor: "#4486a3",
     borderRadius: 20,
     zIndex: 20,
     marginTop: 25
@@ -42,7 +41,13 @@ const styles = theme => ({
     minWidth: 650,
     marginTop: 25
   },
-  tableRow: {
+  tableRowIndex0: {
+    backgroundColor: "#62b2bf",
+    "&$selected, &$selected:hover": {
+      backgroundColor: "rgba(232, 232, 232, 0.43)"
+    }
+  },
+  tableRowIndex1: {
     backgroundColor: "#4486a3",
     "&$selected, &$selected:hover": {
       backgroundColor: "rgba(232, 232, 232, 0.43)"
@@ -85,6 +90,10 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
 
   const [selectedUserRoles, setSelectedUserRoles] = useState([]);
 
+  useEffect(() => {
+    clearAll();
+  }, [tabIndex]);
+
   const clearAll = () => {
     setIsEditing(null);
     setSelected(null);
@@ -103,6 +112,10 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
   };
   const updateDashboards = async (client, name, selectedIndices) => {
     const updated = await updateDashboard(client, name, selectedIndices);
+    clearAll();
+    if (updated) {
+      window.location.reload();
+    }
   };
 
   const actionCompleteReset = () => {
@@ -173,8 +186,8 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
   };
   const config = {
     1: {
-      query: getAllProjects,
-      dataReturnName: "getAllProjects",
+      query: getAllDashboards,
+      dataReturnName: "getAllDashboards",
       tableKey: "dashboardsContentKey"
     },
     0: {
@@ -215,7 +228,12 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
             >
               <ApolloConsumer>
                 {client => (
-                  <Paper className={classes.root}>
+                  <Paper
+                    className={classes.root}
+                    style={{
+                      background: tabIndex === 1 ? "#4486a3" : "#62b2bf"
+                    }}
+                  >
                     {(selected || actionComplete) && (
                       <TableToolbar
                         name={selected}
@@ -236,7 +254,11 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
                       tabIndex={tabIndex}
                       isEditing={isEditing}
                       allRoles={
-                        tabIndex === 0 ? data.getProjectRoles.roles : []
+                        tabIndex === 0
+                          ? data.getAllDashboards.map(
+                              dashboard => dashboard.name
+                            )
+                          : []
                       }
                       setSelectedUserRoles={userRoles =>
                         setSelectedUserRoles(userRoles)
@@ -245,7 +267,7 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
                       handleRowClick={name => handleRowClick(name)}
                     />
                     {isEditing && tabIndex === 1 && (
-                      <EditDashboardPopup
+                      <EditDashboardPopupWrapper
                         key={"editDashboardPopup" + selected}
                         isOpen={true}
                         handleClose={handleClose}

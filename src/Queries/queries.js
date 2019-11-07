@@ -7,17 +7,16 @@ export const DELETEDASHBOARD = gql`
   }
 `;
 export const UPDATEDASHBOARD = gql`
-  query updateDashboard($dashboard: DashboardInput) {
+  query updateDashboard($dashboard: DashboardInput!) {
     updateDashboard(dashboard: $dashboard) {
-      hasUpdated
+      updated
     }
   }
 `;
 export const CREATENEWDASHBOARD = gql`
   query createNewDashboard($dashboard: DashboardInput!) {
     createNewDashboard(dashboard: $dashboard) {
-      roleCreated
-      newAliasesHadErrors
+      created
     }
   }
 `;
@@ -55,24 +54,24 @@ export const UPDATEUSERROLES = gql`
     }
   }
 `;
-export const GETPROJECTROLES = gql`
-  query projectRoles {
-    getProjectRoles {
+export const GETDASHBOARDROLES = gql`
+  query dashboardRoles {
+    getDashboardRoles {
       roles
     }
   }
 `;
-export const getAllProjects = gql`
-  query getAllProjects {
-    getAllProjects {
+export const getAllDashboards = gql`
+  query getAllDashboards($user: ApiUser!) {
+    getAllDashboards(auth: $user) {
       name
       count
     }
   }
 `;
-export const getProjects = gql`
-  query projects($user: ApiUser!) {
-    getProjects(auth: $user) {
+export const getDashboards = gql`
+  query dashboard($user: ApiUser!) {
+    getDashboards(auth: $user) {
       name
       count
     }
@@ -127,8 +126,8 @@ export const getUsers = gql`
       full_name
       email
     }
-    getProjectRoles {
-      roles
+    getAllDashboards(auth: $user) {
+      name
     }
   }
 `;

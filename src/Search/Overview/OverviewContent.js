@@ -7,7 +7,7 @@ import { withStyles } from "@material-ui/core/styles";
 import { useAppState } from "../../util/app-state";
 
 import { Query } from "react-apollo";
-import { getProjects } from "../../Queries/queries.js";
+import { getDashboards } from "../../Queries/queries.js";
 
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
@@ -29,7 +29,7 @@ const OverviewContent = ({ classes, history }) => {
 
   return (
     <Query
-      query={getProjects}
+      query={getDashboards}
       variables={{
         user: { authKeyID: authKeyID, uid: uid }
       }}
@@ -37,8 +37,8 @@ const OverviewContent = ({ classes, history }) => {
       {({ loading, error, data }) => {
         if (loading) return null;
         if (error) return null;
-        if (data.getProjects.length === 1) {
-          history.push("/dashboards/" + data.getProjects[0].name);
+        if (data.getDashboards.length === 1) {
+          history.push("/dashboards/" + data.getDashboards[0].name);
         }
         return (
           <div className={classes.content}>
@@ -65,7 +65,7 @@ const OverviewContent = ({ classes, history }) => {
                   size="large"
                   aria-label="full width secondary outlined button group"
                 >
-                  {data.getProjects.map(project => {
+                  {data.getDashboards.map(project => {
                     return (
                       <Button
                         key={"button" + project.name}
@@ -88,8 +88,4 @@ const OverviewContent = ({ classes, history }) => {
   );
 };
 
-//<Link
-//    to={`/${project.name}`}
-//    style={{ color: "white", textDecoration: "none" }}
-//  ></Link>
 export default withStyles(styles)(withRouter(OverviewContent));
