@@ -7,7 +7,7 @@ import { withStyles } from "@material-ui/core/styles";
 import { useAppState } from "../../util/app-state";
 
 import { Query } from "react-apollo";
-import { getDashboards } from "../../Queries/queries.js";
+import { getDashboardByUser } from "../../Queries/queries.js";
 
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
@@ -29,7 +29,7 @@ const OverviewContent = ({ classes, history }) => {
 
   return (
     <Query
-      query={getDashboards}
+      query={getDashboardByUser}
       variables={{
         user: { authKeyID: authKeyID, uid: uid }
       }}
@@ -37,8 +37,8 @@ const OverviewContent = ({ classes, history }) => {
       {({ loading, error, data }) => {
         if (loading) return null;
         if (error) return null;
-        if (data.getDashboards.length === 1) {
-          history.push("/dashboards/" + data.getDashboards[0].name);
+        if (data.getDashboardsByUser.length === 1) {
+          history.push("/dashboards/" + data.getDashboardsByUser[0].name);
         }
         return (
           <div className={classes.content}>
@@ -57,7 +57,7 @@ const OverviewContent = ({ classes, history }) => {
                   color="secondary"
                   style={{ marginBottom: 50 }}
                 >
-                  Select a dashboard
+                  Select from the following available dashboards:
                 </Typography>
                 <ButtonGroup
                   fullWidth
@@ -65,7 +65,7 @@ const OverviewContent = ({ classes, history }) => {
                   size="large"
                   aria-label="full width secondary outlined button group"
                 >
-                  {data.getDashboards.map(project => {
+                  {data.getDashboardsByUser.map(project => {
                     return (
                       <Button
                         key={"button" + project.name}

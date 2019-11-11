@@ -54,13 +54,7 @@ export const UPDATEUSERROLES = gql`
     }
   }
 `;
-export const GETDASHBOARDROLES = gql`
-  query dashboardRoles {
-    getDashboardRoles {
-      roles
-    }
-  }
-`;
+
 export const getAllDashboards = gql`
   query getAllDashboards($user: ApiUser!) {
     getAllDashboards(auth: $user) {
@@ -69,11 +63,10 @@ export const getAllDashboards = gql`
     }
   }
 `;
-export const getDashboards = gql`
-  query dashboard($user: ApiUser!) {
-    getDashboards(auth: $user) {
+export const getDashboardByUser = gql`
+  query UserDashboard($user: ApiUser!) {
+    getDashboardsByUser(auth: $user) {
       name
-      count
     }
   }
 `;
@@ -133,6 +126,50 @@ export const getUsers = gql`
 `;
 
 export const getAllAnalyses = gql`
+  query Sunburst($filter: [Term]!, $user: ApiUser!, $dashboardName: String!) {
+    analyses(filters: $filter, auth: $user, dashboardName: $dashboardName) {
+      analysesStats {
+        label
+        value
+      }
+      analysesList {
+        label
+        values
+        type
+      }
+      analysesTree {
+        source
+        children {
+          ... on ParentType {
+            source
+            target
+            children {
+              ... on ParentType {
+                source
+                target
+                children {
+                  ... on ParentType {
+                    source
+                    target
+                    children {
+                      ... on ChildType {
+                        source
+                        target
+                        value
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const getAllAnalyses2 = gql`
   query Sunburst($filter: [Term]!, $user: ApiUser!) {
     analysesStats(filters: $filter, auth: $user) {
       label

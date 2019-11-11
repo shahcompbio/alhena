@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import { useAppState } from "../../util/app-state";
 import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
 
 import InputLabel from "@material-ui/core/InputLabel";
@@ -24,9 +24,10 @@ import CheckIcon from "@material-ui/icons/Check";
 
 import { withRouter } from "react-router";
 import { Query } from "react-apollo";
-import { GETDASHBOARDROLES } from "../../Queries/queries.js";
+import { getAllDashboards } from "../../Queries/queries.js";
 
 const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
+  const [{ authKeyID, uid }, dispatch] = useAppState();
   const [isLoading, setLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [isSubmitDisabled, setIsDisabled] = useState(true);
@@ -55,10 +56,16 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
     setSelectedRoles(roles => roles.filter(role => role !== value));
 
   return (
-    <Query query={GETDASHBOARDROLES}>
+    <Query
+      query={getAllDashboards}
+      variables={{
+        user: { authKeyID: authKeyID, uid: uid }
+      }}
+    >
       {({ loading, error, data }) => {
         if (loading) return null;
         if (error) return null;
+
         return (
           <Dialog
             open={isOpen}
@@ -138,7 +145,9 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
                       handleRoleDelete={(event, value) =>
                         handleRoleDelete(event, value)
                       }
-                      roleNames={data.getDashboardRoles.roles}
+                      roleNames={data.getAllDashboards.map(
+                        dashboard => dashboard.name
+                      )}
                     />
                   </DialogContent>
                   ,

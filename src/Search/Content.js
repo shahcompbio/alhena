@@ -1,5 +1,6 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
+import Menu from "../Misc/Menu.js";
 
 import ProjectViewContent from "./ProjectView/ProjectViewContent.js";
 import OverviewContent from "./Overview/OverviewContent.js";
@@ -10,7 +11,7 @@ import Grid from "@material-ui/core/Grid";
 import { withStyles } from "@material-ui/styles";
 
 const styles = ({ theme }) => ({
-  root: { flexGrow: 1 },
+  root: { flexGrow: 1, height: "100vh" },
   hide: {
     display: "none"
   }
@@ -18,12 +19,13 @@ const styles = ({ theme }) => ({
 
 const Content = ({ classes, history }) => {
   return (
-    <Grid>
+    <Grid className={classes.root}>
       <Switch>
         <Route exact path="/dashboards" render={() => <OverviewContent />} />
         <Route path={`/dashboards/:project`} component={ProjectViewContent} />
         <Route component={NoMatch} />
       </Switch>
+      <Menu />
     </Grid>
   );
 };

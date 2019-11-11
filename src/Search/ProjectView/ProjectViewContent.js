@@ -58,7 +58,8 @@ const ProjectViewContent = ({ classes, match }) => {
     <Query
       query={getAllAnalyses}
       variables={{
-        filter: [...filters, { label: "project", value: match.params.project }],
+        filter: [...filters],
+        dashboardName: match.params.project,
         user: { authKeyID: authKeyID, uid: uid }
       }}
     >
@@ -123,7 +124,7 @@ const ProjectViewContent = ({ classes, match }) => {
                 <Search
                   key={"search"}
                   selectedOptions={selectedOptions}
-                  filters={data.analysesList}
+                  filters={data.analyses.analysesList}
                   handleFilterChange={(selection, type) =>
                     handleFilterChange(selection, type)
                   }
@@ -135,14 +136,17 @@ const ProjectViewContent = ({ classes, match }) => {
                   isLoading={false}
                   key={"packing-circles"}
                   filters={filters}
-                  analyses={data.analysesTree.children}
+                  analyses={data.analyses.analysesTree.children}
                   handleFilterChange={(filters, type) =>
                     handleFilterChange(filters, type)
                   }
                 />
               </Grid>
               <Grid item xs={6} sm={3} key={"demographics-content"}>
-                <Demographics stats={data.analysesStats} key={"demographics"} />
+                <Demographics
+                  stats={data.analyses.analysesStats}
+                  key={"demographics"}
+                />
               </Grid>
             </Grid>
           );

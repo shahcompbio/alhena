@@ -50,14 +50,17 @@ const useSnackBarStyles = makeStyles(theme => ({
 const SnackbarContentWrapper = props => {
   const [isOpen, setOpen] = useState(true);
   const classes = useSnackBarStyles();
-  const { className, errorNumber, variant, ...other } = props;
+  const { className, errorNumber, setError, variant, ...other } = props;
   const Icon = variantIcon[variant];
 
   return (
     <Snackbar
       autoHideDuration={2000}
       open={isOpen}
-      onClose={() => setOpen(false)}
+      onClose={() => {
+        //setError(null);
+        setOpen(false);
+      }}
       anchorOrigin={{
         vertical: "bottom",
         horizontal: "left"
