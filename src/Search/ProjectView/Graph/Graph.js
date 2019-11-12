@@ -4,9 +4,15 @@ import * as d3 from "d3";
 
 import Grid from "@material-ui/core/Grid";
 import { styled } from "@material-ui/styles";
+import { appendGlowFilter } from "./glowUtils.js";
 import {
-  appendGlowFilter,
+  appendSvgLines,
   appendToolTip,
+  appendLegendNode,
+  appendLegend,
+  createRoot
+} from "./appendUtils.js";
+import {
   initSvg,
   greyOutAllNodes,
   linkSelect,
@@ -14,7 +20,6 @@ import {
   nodeSelect,
   nodeDeselect,
   ungreySelection,
-  appendLegend,
   greyOutJiraLabels,
   ungreyOutJiraLabels
 } from "./utils";
@@ -31,58 +36,11 @@ class PackingCircles extends PureComponent {
     };
     this.graphChart = this.graphChart.bind(this);
   }
-  appendLegendNode = (data, isMainDraw) => {
-    var legendNode = !isMainDraw
-      ? {
-          source: data.children[0].target,
-          target: "Libraries",
-          __typename: "label",
-          children: [
-            {
-              source: "Libraries",
-              target: "JiraID",
-              value: 1,
-              __typename: "label"
-            }
-          ]
-        }
-      : {
-          source: data.target,
-          target: "Samples",
-          __typename: "label",
-          children: [
-            {
-              source: "Samples",
-              target: "Libraries",
-              __typename: "label",
-              children: [
-                {
-                  source: "Libraries",
-                  target: "JiraID",
-                  value: 1,
-                  __typename: "label"
-                }
-              ]
-            }
-          ]
-        };
-    var cutIndex = 0;
-    if (!isMainDraw) {
-      data.children[0].children = [...data.children[0].children, legendNode];
-    } else {
-      data.children.forEach((child, index) => {
-        if (child.children.length > 10) {
-          cutIndex = index;
-        }
-      });
-      data.children.splice(cutIndex, 0, legendNode);
-    }
-    return data;
-  };
+
   graphChart = (data, hasBeenUpdated) => {
     this.state.mainSvg
       .selectAll(
-        ".group-node, .lines, .directLabel, .node-label, path, .legendDescription"
+        ".level1-g-node, .lines, .directLabel, .node-label, path, .legendDescription"
       )
       .remove();
 
@@ -90,20 +48,13 @@ class PackingCircles extends PureComponent {
     var dataHasLabelNodes =
       data[0].children.filter(child => child.__typename === "label").length !==
       0;
-    var cluster;
-    if (isMainView && !dataHasLabelNodes) {
-      var modifiedData = this.appendLegendNode(data[0], isMainView);
-      cluster = d3.hierarchy(modifiedData);
-    } else {
-      cluster = d3.hierarchy(data[0]);
-    }
 
-    var root = d3
-      .cluster()
-      .separation(function(a, b) {
-        return (a.parent === b.parent ? 2 : 1) / a.depth;
-      })
-      .size([2 * Math.PI, 3000])(cluster);
+    const modifiedData =
+      isMainView && !dataHasLabelNodes
+        ? appendLegendNode(data[0], isMainView)
+        : data[0];
+
+    var root = createRoot(d3.hierarchy(modifiedData));
 
     if (isMainView) {
       var nodes = root.descendants().filter(function(d) {
@@ -113,41 +64,11 @@ class PackingCircles extends PureComponent {
       var links = root.links().filter(function(d) {
         return d.target.height !== 0;
       });
+
       d3.select(".sampleAfterFilterLabel").text("");
 
-      var svgLines = this.state.mainSvg
-        .append("g")
-        .attr("fill", "none")
-        .attr("stroke", "black")
-        .classed("lines", true)
-        .selectAll("path")
-        .data(links, d => d.id)
-        .enter()
-        .append("path")
-        .attr(
-          "d",
-          d3
-            .linkRadial()
-            .angle(d => d.x + displayConfig.filtersOffSet)
-            .radius(d => d.y + displayConfig.filtersOffSet)
-        )
-        .attr("stroke-width", function(d) {
-          if (d.target) {
-            if (d.target.depth === 1 || d.target.depth === 2) {
-              return 10;
-            } else {
-              return 0;
-            }
-          } else {
-            return;
-          }
-        })
-        .attr("class", function(d) {
-          if (d.target.height !== 0) {
-            return "visible link-" + d.target.data.target;
-          }
-        });
-      var toolTip = this.state.tip;
+      var svgLines = appendSvgLines(this.state.mainSvg, links);
+
       var vizChange = this.props.handleFilterChange;
 
       const svgCircles = this.state.mainSvg
@@ -156,16 +77,11 @@ class PackingCircles extends PureComponent {
         .enter()
         .append("g");
 
-      svgCircles.attr("class", "group-node").attr("transform", d => {
-        var xOffset = 0;
-        var yOffset = 0;
-        if (d.depth === 0 && isMainView) {
-          xOffset = 0;
-          yOffset = -800;
-        }
+      svgCircles.attr("class", "level1-g-node").attr("transform", d => {
+        const yOffset = d.depth === 0 && isMainView ? -800 : 0;
         return `
   rotate(${((d.x + displayConfig.filtersOffSet) * 180) / Math.PI - 90})
-    translate(${d.y + displayConfig.filtersOffSet + yOffset},${xOffset})
+    translate(${d.y + displayConfig.filtersOffSet + yOffset},0)
   `;
       });
 
@@ -206,6 +122,7 @@ class PackingCircles extends PureComponent {
             nodeSelect(element[index]);
             linkSelect("path.link-" + data.data.target);
             d3.selectAll(".legendDescription").remove();
+
             if (data.parent && data.parent.parent) {
               nodeSelect("circle.node-" + data.parent.data.target);
               linkSelect("path.link-" + data.parent.data.target);
@@ -239,9 +156,6 @@ class PackingCircles extends PureComponent {
               .classed("greyedNodes", false)
               .classed("parent-hover", true);
           }
-          if (data.depth !== 0) {
-            //  toolTip.show(data, element[index]);
-          }
         })
         .on("mouseout", (data, index, element) => {
           if (
@@ -267,7 +181,6 @@ class PackingCircles extends PureComponent {
               ".sampleIDLabel, .libraryInfoIDLabel, .jiraInfoIDLabel "
             ).text("");
           }
-          //  toolTip.hide();
         })
         .on(
           "mousedown",
@@ -310,7 +223,6 @@ class PackingCircles extends PureComponent {
         .text(function(d) {
           return d.data.target;
         })
-        //.classed("jiraLabelTitle", true)
         .classed("directLabel", true);
 
       var circleText = svgCircles.filter(function(d) {
@@ -332,7 +244,6 @@ class PackingCircles extends PureComponent {
           .attr("height", mainCircleDim.height)
           .attr("width", mainCircleDim.width / 2);
 
-        //appendLegendGlowFilter(labelSvg, true);
         appendLegend(labelSvg, mainCircleDim);
       } else {
         d3.select(".foreignObject").raise();
@@ -340,7 +251,12 @@ class PackingCircles extends PureComponent {
 
       function autoBox() {
         const { x, y, width, height } = this.getBBox();
-        return [x - 500, y - 500, width + 3000, height + 3000];
+        return [
+          x - displayConfig.filtersOffSet,
+          y - displayConfig.filtersOffSet,
+          width + displayConfig.rootSize,
+          height + displayConfig.rootSize
+        ];
       }
       this.state.mainSvg
         .attr("viewBox", autoBox)
@@ -361,7 +277,7 @@ class PackingCircles extends PureComponent {
       var svgEnter = svgCircles
         .enter()
         .append("g")
-        .attr("class", "group-node");
+        .attr("class", "level1-g-node");
 
       var svgLinesEnter = svgLines
         .enter()
@@ -536,11 +452,9 @@ class PackingCircles extends PureComponent {
     var svg = initSvg(this._rootNode);
 
     appendGlowFilter(svg);
-    var tip = appendToolTip(svg);
     var labelGroup = svg.append("g").classed("jiraLabelGroup", true);
     this.setState({
       mainSvg: svg,
-      tip: tip,
       labelGroup: labelGroup
     });
   }

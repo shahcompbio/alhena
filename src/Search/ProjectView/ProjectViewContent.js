@@ -70,6 +70,7 @@ const ProjectViewContent = ({ classes, match }) => {
           });*/
           return null;
         }
+        console.log(data);
         if (loading) {
           return (
             <Grid

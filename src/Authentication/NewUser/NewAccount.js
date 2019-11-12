@@ -10,7 +10,6 @@ import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import SnackbarContentWrapper from "../../Misc/SnackBarPopup.js";
-import Input from "@material-ui/core/Input";
 
 import styled from "styled-components";
 import { withStyles } from "@material-ui/styles";
@@ -94,7 +93,6 @@ const NewAccount = ({ email, dispatch, classes }) => {
   ];
 
   const createNewUser = async (event, client, dispatch) => {
-    console.log(verifyPasswordRef.current.value === passwordRef.current.value);
     if (verifyPasswordRef.current.value === passwordRef.current.value) {
       var user = {
         email: emailRef.current.value,
@@ -105,7 +103,6 @@ const NewAccount = ({ email, dispatch, classes }) => {
       event.preventDefault();
       try {
         var acknowledgement = await queryCreateNewUser(user, client);
-        console.log(acknowledgement);
         if (acknowledgement) {
           setSuccessfullyCreated(true);
           dispatch({
@@ -115,7 +112,6 @@ const NewAccount = ({ email, dispatch, classes }) => {
           setError(10);
         }
       } catch (error) {
-        console.log(error);
         setError(error);
       }
     } else {

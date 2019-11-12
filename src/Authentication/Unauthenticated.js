@@ -2,15 +2,37 @@ import React, { useState, useRef } from "react";
 import logo from "../config/LoginTitle.png";
 import { login } from "../util/utils.js";
 import { useAppState } from "../util/app-state";
+import { withStyles } from "@material-ui/styles";
 
 import Grid from "@material-ui/core/Grid";
 import VisuallyHidden from "@reach/visually-hidden";
 import styled from "styled-components";
+import { Typography } from "@material-ui/core";
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
 
 import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
 import LoadingCircle from "./ProgressCircle.js";
 
-const UnauthenticatedApp = ({ client }) => {
+const styles = theme => ({
+  textField: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    width: 300
+  },
+  floatingLabelFocusStyle: {
+    color: "white",
+    fontWeight: "500"
+  },
+  input: {
+    color: "white",
+    borderBottom: "1px solid #769bb5"
+  },
+  submitButton: {
+    marginLeft: 40
+  }
+});
+const UnauthenticatedApp = ({ client, classes }) => {
   const [data, dispatch] = useAppState();
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -59,49 +81,64 @@ const UnauthenticatedApp = ({ client }) => {
         src={logo}
         style={{
           position: "absolute",
-          top: "30%",
+          top: "30vh",
           margin: 10,
           marginLeft: 30
         }}
-      />{" "}
+      />
       <div
         style={{
           position: "absolute",
-          top: "55%",
+          top: "45vh",
           marginLeft: 10
         }}
       >
         <form onSubmit={ev => handleLogin(ev, client, dispatch)} id="loginForm">
           <ComponentWrapper>
-            <VisuallyHidden style={{ color: "#ffffff" }}>
-              <label htmlFor="login:username">Username:</label>
-            </VisuallyHidden>
-            <input
-              ref={usernameRef}
-              id="login:username"
+            <TextField
+              className={classes.textField}
+              margin="normal"
+              inputRef={usernameRef}
+              id={"login:username"}
               className="inputField"
-              placeholder=""
               required
-              type="text"
+              fullWidth
+              InputLabelProps={{
+                className: classes.floatingLabelFocusStyle
+              }}
+              InputProps={{ className: classes.input }}
+              value={usernameRef.value}
+              label={"Username"}
+              type={"text"}
             />
           </ComponentWrapper>
           <ComponentWrapper>
-            <VisuallyHidden style={{ color: "#ffffff" }}>
-              <label htmlFor="login:password">Password:</label>
-            </VisuallyHidden>
-            <input
-              ref={passwordRef}
-              id="login:password"
+            <TextField
+              className={classes.textField}
+              margin="normal"
+              inputRef={passwordRef}
+              id={"login:password"}
+              className="inputField"
+              required
+              fullWidth
+              InputLabelProps={{
+                className: classes.floatingLabelFocusStyle
+              }}
+              InputProps={{ className: classes.input, color: "primary" }}
+              value={passwordRef.value}
+              label={"Password"}
               type={"password"}
-              className="inputField"
-              required
-              placeholder="Password"
             />
           </ComponentWrapper>
           <ComponentWrapper>
-            <button style={{ marginLeft: 30 }} type="submit">
-              Submit
-            </button>
+            <Button
+              className={classes.submitButton}
+              color="primary"
+              variant="outlined"
+              type="submit"
+            >
+              Log In
+            </Button>
           </ComponentWrapper>
         </form>
       </div>
@@ -113,4 +150,4 @@ const ComponentWrapper = styled.div`
   margin: 10px;
 `;
 
-export default UnauthenticatedApp;
+export default withStyles(styles)(UnauthenticatedApp);

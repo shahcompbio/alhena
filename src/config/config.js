@@ -4,9 +4,8 @@ export const config = {
     viewBoxY: window.innerHeight * 3,
     XOffset: window.innerWidth / 10,
     yOffset: window.innerHeight / 4,
-    sunburstXOffset: window.innerWidth / 4,
-    sunburstYOffset: window.innerHeight / 2,
-    filtersOffSet: 700
+    filtersOffSet: 700,
+    rootSize: 3000
   },
   FilterConfig: {
     filterHeirarchy: ["sample_id", "library_id", "jira_id"]
