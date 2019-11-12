@@ -39,11 +39,8 @@ const reactSelectStyles = {
 };
 const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
   const onChange = (value, action, type) => {
-    if (value) {
-      handleFilterChange({ value: value.label, label: value.value }, action);
-    } else {
-      handleFilterChange(type, action);
-    }
+    const filter = value ? { value: value.label, label: value.value } : type;
+    handleFilterChange(filter, action);
   };
   const getSelectValue = (selectedOptions, filterType, filters) => {
     if (isUserSelectedOption(selectedOptions, filterType)) {
@@ -85,7 +82,10 @@ const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
   };
   if (filters) {
     const filterTypes = filters.map(filter => filter.type);
-
+    var collator = new Intl.Collator(undefined, {
+      numeric: true,
+      sensitivity: "base"
+    });
     var panels = _.times(filterTypes.length, i => {
       return filterTypes[i] !== "project"
         ? {
@@ -102,7 +102,7 @@ const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
                 onChange={(option, { action }) =>
                   onChange(option, action, filterTypes[i])
                 }
-                options={filters[i].values.map(value => {
+                options={filters[i].values.sort(collator.compare).map(value => {
                   return {
                     value: filterTypes[i],
                     label: value,
