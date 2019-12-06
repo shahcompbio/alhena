@@ -98,7 +98,10 @@ export const appendLegend = (svg, mainCircleDim) => {
       svg
         .append("svg:text")
         .attr("x", mainCircleDim.x + mainCircleDim.width / 2)
-        .attr("y", mainCircleDim.height / 2 - (lineHeight - 100) * index)
+        .attr(
+          "y",
+          mainCircleDim.height / 3 + (mainCircleDim.height / 6) * index
+        )
         .classed(className, true);
     }
   );
@@ -118,7 +121,10 @@ export const appendSvgLines = (svg, links) =>
     .attr("stroke", "black")
     .classed("lines", true)
     .selectAll("path")
-    .data(links, d => d.id)
+    .data(links, d => {
+      console.log(d);
+      return d.id;
+    })
     .enter()
     .append("path")
     .attr(

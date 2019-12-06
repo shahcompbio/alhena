@@ -1,7 +1,7 @@
 export const appendGlowFilter = svg => {
   createFilter(svg, "glow", "55", 0.2);
   createFilter(svg, "innerRingGlow", "55", 0.5);
-  createFilter(svg, "textGlow", "8.5", 0.5);
+  createFilter(svg, "textGlow", "2", 0.9);
 };
 const createFilter = (svg, id, stDeviation, floodOpacity, colour) => {
   var defs = svg.append("defs");

@@ -5,16 +5,24 @@ import Demographics from "./Demographics/Demographics.js";
 import { useAppState } from "../../util/app-state";
 import { withStyles } from "@material-ui/styles";
 
-import Graph from "./Graph/Graph.js";
+import Graph from "./Graph/Graph2.js";
 
 import { Query } from "react-apollo";
 import { getAllAnalyses } from "../../Queries/queries.js";
 
 import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
+
 const styles = {
   root: { flexGrow: 1 },
   hide: {
     display: "none"
+  },
+  title: {
+    color: "white",
+    filter: "url(#textGlow)",
+    paddingTop: 50,
+    paddingLeft: 50
   }
 };
 
@@ -70,7 +78,6 @@ const ProjectViewContent = ({ classes, match }) => {
           });*/
           return null;
         }
-        console.log(data);
         if (loading) {
           return (
             <Grid
@@ -122,6 +129,9 @@ const ProjectViewContent = ({ classes, match }) => {
                 style={{ height: "50vh" }}
                 key={"grid-search"}
               >
+                <Typography variant="h2" className={classes.title}>
+                  {match.params.project} Dashboards
+                </Typography>
                 <Search
                   key={"search"}
                   selectedOptions={selectedOptions}

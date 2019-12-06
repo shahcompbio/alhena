@@ -3,6 +3,11 @@ import * as d3 from "d3";
 import { config } from "../../../config/config";
 const displayConfig = config.DisplayConfig;
 
+export const removeLegendLabels = () => {
+  d3.selectAll(".indicationDots, .seperator, .legendTitles").remove();
+  d3.selectAll(".legendDescription").remove();
+};
+
 export const ungreySelection = selectionText =>
   d3.selectAll(selectionText).classed("greyedNodes", false);
 export const greySelection = selectionText =>

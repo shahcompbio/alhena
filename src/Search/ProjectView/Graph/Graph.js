@@ -21,7 +21,8 @@ import {
   nodeDeselect,
   ungreySelection,
   greyOutJiraLabels,
-  ungreyOutJiraLabels
+  ungreyOutJiraLabels,
+  removeLegendLabels
 } from "./utils";
 const displayConfig = config.DisplayConfig;
 
@@ -88,9 +89,7 @@ class PackingCircles extends PureComponent {
       svgCircles
         .append("circle")
         .attr("fill", function(d) {
-          if (d.depth === 0) {
-            return "#212121";
-          } else {
+          if (d.depth !== 0) {
             return "white";
           }
         })
@@ -121,33 +120,31 @@ class PackingCircles extends PureComponent {
             greyOutAllNodes(data.data.target);
             nodeSelect(element[index]);
             linkSelect("path.link-" + data.data.target);
-            d3.selectAll(".legendDescription").remove();
+            removeLegendLabels();
 
             if (data.parent && data.parent.parent) {
               nodeSelect("circle.node-" + data.parent.data.target);
               linkSelect("path.link-" + data.parent.data.target);
               d3.select(".sampleIDLabel").text(
-                "Sample - " + data.parent.data.target
+                "Sample | " + data.parent.data.target
               );
               d3.select(".libraryInfoIDLabel").text(
-                "Library   | " + data.data.target
+                "Library  | " + data.data.target
               );
               d3.select(".jiraInfoIDLabel").text(
-                "Jira Tickets | " + data.parent.data.target.length
+                "Analyses | " + data.parent.data.target.length
               );
             } else if (data.children) {
               data.children.map(child => {
                 nodeSelect("circle.node-" + child.data.target);
                 linkSelect("path.link-" + child.data.target);
               });
-              d3.select(".sampleIDLabel").text(
-                "Sample   - " + data.data.target
-              );
+              d3.select(".sampleIDLabel").text("Sample  | " + data.data.target);
               d3.select(".libraryInfoIDLabel").text(
-                "Libraries    | " + data.children.length
+                "Libraries | " + data.children.length
               );
               d3.select(".jiraInfoIDLabel").text(
-                "Jira Tickets | " + data.children.length
+                "Analyses  | " + data.children.length
               );
             }
 
@@ -310,7 +307,7 @@ class PackingCircles extends PureComponent {
       svgEnter
         .append("circle")
         .attr("fill", function(d) {
-          return d.depth === 0 ? "#2b2a2a" : "white";
+          if (d.depth !== 0) return "white";
         })
         .attr("r", function(d) {
           if (d.depth === 0) {

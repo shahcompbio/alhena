@@ -38,7 +38,8 @@ const App = () => {
           )}
         />
         <Route
-          path="/NewAccount/:key"
+          path="/NewAccount/:key/newUser"
+          //path="/secure/:key"
           component={({ match }) => (
             <NewUserUriVerification uri={match} dispatch={dispatch} />
           )}
