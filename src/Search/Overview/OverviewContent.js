@@ -1,7 +1,6 @@
 import React from "react";
 
 import { withRouter } from "react-router";
-import { Link } from "react-router-dom";
 
 import { withStyles } from "@material-ui/core/styles";
 import { useAppState } from "../../util/app-state";
@@ -25,7 +24,7 @@ const styles = theme => ({
 });
 
 const OverviewContent = ({ classes, history }) => {
-  const [{ authKeyID, uid }, dispatch] = useAppState();
+  const [{ authKeyID, uid }] = useAppState();
 
   return (
     <Query

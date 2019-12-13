@@ -46,8 +46,6 @@ const AdminPanel = ({ classes }) => {
   const [openPopup, setOpenPopup] = useState(false);
   const [tabIndex, setTabIndex] = useState(1);
 
-  const [isEditing, setIsEditing] = useState(false);
-
   const handleClickAdd = () => {
     setOpenPopup(true);
   };

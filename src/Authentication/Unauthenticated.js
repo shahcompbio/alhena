@@ -3,14 +3,11 @@ import logo from "../config/LoginTitle.png";
 import { login } from "../util/utils.js";
 import { useAppState } from "../util/app-state";
 import { withStyles } from "@material-ui/styles";
+import styled from "styled-components";
 
 import Grid from "@material-ui/core/Grid";
-import VisuallyHidden from "@reach/visually-hidden";
-import styled from "styled-components";
-import { Typography } from "@material-ui/core";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
-
 import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
 import LoadingCircle from "./ProgressCircle.js";
 
@@ -78,6 +75,7 @@ const UnauthenticatedApp = ({ client, classes }) => {
         )}
       </div>
       <img
+        alt="logo"
         src={logo}
         style={{
           position: "absolute",
@@ -100,7 +98,6 @@ const UnauthenticatedApp = ({ client, classes }) => {
               margin="normal"
               inputRef={usernameRef}
               id={"login:username"}
-              className="inputField"
               required
               fullWidth
               InputLabelProps={{
@@ -118,7 +115,6 @@ const UnauthenticatedApp = ({ client, classes }) => {
               margin="normal"
               inputRef={passwordRef}
               id={"login:password"}
-              className="inputField"
               required
               fullWidth
               InputLabelProps={{

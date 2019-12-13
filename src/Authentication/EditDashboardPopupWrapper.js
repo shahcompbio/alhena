@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from "react";
-
-import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
+import React from "react";
 
 import PopUpContent from "./PopUpContent.js";
 
-import { withRouter } from "react-router";
 import { Query } from "react-apollo";
 import { GETINDICESBYDASHBOARD } from "../Queries/queries.js";
 

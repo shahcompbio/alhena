@@ -167,7 +167,6 @@ const NewAccount = ({ email, dispatch, classes }) => {
                       margin="normal"
                       inputRef={field.ref}
                       id={field.id}
-                      className="inputField"
                       required
                       fullWidth
                       value={field.value}

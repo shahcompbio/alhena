@@ -27,7 +27,7 @@ import { Query } from "react-apollo";
 import { getAllDashboards } from "../../Queries/queries.js";
 
 const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
-  const [{ authKeyID, uid }, dispatch] = useAppState();
+  const [{ authKeyID, uid }] = useAppState();
   const [isLoading, setLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [isSubmitDisabled, setIsDisabled] = useState(true);

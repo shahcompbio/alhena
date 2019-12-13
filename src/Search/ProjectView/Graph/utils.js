@@ -3,6 +3,12 @@ import * as d3 from "d3";
 import { config } from "../../../config/config";
 const displayConfig = config.DisplayConfig;
 
+export const voronoid = d3
+  .voronoi()
+  .x(d => d.x)
+  .y(d => d.y)
+  .extent([[-4000, -4000], [4000, 4000]]);
+
 export const removeLegendLabels = () => {
   d3.selectAll(".indicationDots, .seperator, .legendTitles").remove();
   d3.selectAll(".legendDescription").remove();
@@ -13,11 +19,57 @@ export const ungreySelection = selectionText =>
 export const greySelection = selectionText =>
   d3.selectAll(selectionText).classed("greyedNodes", true);
 
-export const linkSelect = selectionText =>
-  d3
-    .selectAll(selectionText)
-    .classed("link-hover", true)
-    .classed("greyedNodes", false);
+export function getSelectionPath(data, type) {
+  var nodeSelections = traverseTree(data, type);
+  var parentSelections = traverseParentTree(data, type);
+
+  nodeSelections = nodeSelections.substring(0, nodeSelections.length - 1);
+  return parentSelections + nodeSelections;
+}
+function traverseParentTree(tree, type) {
+  if (!tree.hasOwnProperty("parent") || tree.parent === null) {
+    return "";
+  } else {
+    console.log(tree);
+    if (tree.data.source !== null) {
+      return (
+        type + tree.data.source + "," + traverseParentTree(tree.parent, type)
+      );
+    } else {
+      return "";
+    }
+  }
+}
+function traverseTree(tree, type) {
+  if (!tree.hasOwnProperty("children")) {
+    return type + tree.data.target + ",";
+  } else {
+    return tree["children"].reduce(
+      (str, child) => str + traverseTree(child, type),
+      type + tree.data.target + ","
+    );
+  }
+}
+export const linkSelect = selectionText => {
+  var selection = d3.selectAll(selectionText);
+
+  selection.classed("link-hover", true).classed("greyedNodes", false);
+
+  selection
+    .filter(function(d) {
+      return d.source.depth !== 0 && d.source.depth !== 1;
+    })
+    .transition()
+    .attr(
+      "d",
+      d3
+        .linkRadial()
+        .angle(d => d.x + displayConfig.filtersOffSet)
+        .radius(d => {
+          return d.y + displayConfig.filtersOffSet + 200;
+        })
+    );
+};
 
 export const ungreyOutJiraLabels = () =>
   d3.selectAll(".jiraTicketlabels").classed("greyedNodes", false);
@@ -30,15 +82,32 @@ export const greyOutJiraLabels = notSelection =>
 export const linkDeselect = selectionText =>
   d3.selectAll(selectionText).classed("link-hover", false);
 
-export const nodeSelect = selectionText =>
-  d3
-    .select(selectionText)
-    .classed("hover", true)
-    .classed("greyedNodes", false);
+export const nodeSelect = selectionText => {
+  var selection = d3.selectAll(selectionText).filter(d => d.depth !== 0);
+
+  selection.classed("hover", true);
+  selection.classed("greyedNodes", false);
+
+  selection
+    .transition()
+    .attr("transform", d => {
+      if (d.depth === 2) {
+        return `
+      translate(90,0)
+    `;
+      }
+      if (d.depth !== 1) {
+        return `
+        translate(700,0)
+      `;
+      }
+    })
+    .attr("r", 20);
+};
 
 export const nodeDeselect = selectionText =>
   d3
-    .select(selectionText)
+    .selectAll(selectionText)
     .classed("hover", true)
     .classed("greyedNodes", false);
 

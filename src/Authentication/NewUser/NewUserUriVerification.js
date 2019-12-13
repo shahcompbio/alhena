@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useAppState } from "react";
+import React from "react";
 import NewAccount from "./NewAccount.js";
-import Unauthenticated from "./../Unauthenticated.js";
+
 import LoadingCircle from "./../ProgressCircle.js";
 import { VERIFYNEWUSERAUTHKEY } from "./../../Queries/queries.js";
 
@@ -8,7 +8,7 @@ import { withRouter } from "react-router";
 import { Query } from "react-apollo";
 
 const NewUserUriVerification = ({ uri, dispatch }) => {
-  const [error, setError] = useState(false);
+  //const [error, setError] = useState(false);
 
   return (
     <Query

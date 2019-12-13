@@ -27,7 +27,7 @@ const styles = {
 };
 
 const ProjectViewContent = ({ classes, match }) => {
-  const [{ authKeyID, uid }, dispatch] = useAppState();
+  const [{ authKeyID, uid }] = useAppState();
   const [selectedOptions, setSelectedOptions] = useState({});
   const [filters, setFilters] = useState([]);
 

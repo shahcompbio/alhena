@@ -120,7 +120,7 @@ const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
         : "";
     });
   } else {
-    var panels = [];
+    panels = [];
   }
   return (
     <Grid

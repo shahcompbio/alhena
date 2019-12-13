@@ -40,7 +40,6 @@ const PopUpContent = ({
       setIsDisabled(true);
     }
   }, [name, selectedIndices]);
-  console.log(allIndices);
   return (
     <Dialog
       open={isOpen}
@@ -112,7 +111,7 @@ const PopUpContent = ({
             <Button
               onClick={async ev => {
                 setLoading(true);
-                var accepted = await dashboardAction(name, selectedIndices);
+                await dashboardAction(name, selectedIndices);
                 setIsSent(true);
                 setTimeout(() => {
                   setIsSent(false);

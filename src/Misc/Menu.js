@@ -1,22 +1,16 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import React, { useState } from "react";
+import { withStyles } from "@material-ui/core/styles";
 
 import { withRouter } from "react-router-dom";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormLabel from "@material-ui/core/FormLabel";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import Switch from "@material-ui/core/Switch";
+
 import SpeedDial from "@material-ui/lab/SpeedDial";
 import MenuIcon from "@material-ui/icons/Menu";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
-
 import HelpIcon from "@material-ui/icons/Help";
-import ShareIcon from "@material-ui/icons/Share";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 
-const useStyles = makeStyles(theme => ({
+const styles = theme => ({
   root: {
     transform: "translateZ(0px)",
     flexGrow: 1
@@ -40,7 +34,7 @@ const useStyles = makeStyles(theme => ({
       left: theme.spacing(2)
     }
   }
-}));
+});
 
 const actions = [
   { icon: <ArrowBackIcon />, name: "Back" },
@@ -51,10 +45,9 @@ const actions = [
   { icon: <ExitToAppIcon />, name: "Logout" }
 ];
 
-const Menu = ({ history }) => {
-  const classes = useStyles();
-  const [direction, setDirection] = React.useState("right");
-  const [open, setOpen] = React.useState(false);
+const Menu = ({ history, classes }) => {
+  const [direction] = useState("right");
+  const [open, setOpen] = useState(false);
 
   const handleClose = () => {
     setOpen(false);
@@ -66,11 +59,11 @@ const Menu = ({ history }) => {
   const handleAction = (name, history) => {
     switch (name) {
       case "Back":
-        history.goBack();
+        return history.goBack();
       case "Logout":
-        history.push("/login");
+        return history.push("/login");
       default:
-        setOpen(false);
+        return setOpen(false);
     }
   };
   return (
@@ -100,4 +93,4 @@ const Menu = ({ history }) => {
     </div>
   );
 };
-export default withRouter(Menu);
+export default withStyles(styles)(withRouter(Menu));
