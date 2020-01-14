@@ -31,6 +31,20 @@
 .greyedNodes {
   opacity: 0.2 !important;
 }
+#profileCanvas {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+.overlay {
+  pointer-events: none;
+}
+.gw-background-lines {
+  stroke-dasharray: 0.5, 2;
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+}
 .hover {
   stroke: white !important;
   fill: white;

@@ -9,7 +9,7 @@ import {
   UPDATEDASHBOARD
 } from "../Queries/queries.js";
 export const updateDashboard = async (client, name, selectedIndices) => {
-  const { data, loading, error } = await client.query({
+  const { data } = await client.query({
     query: UPDATEDASHBOARD,
     variables: {
       dashboard: { name: name, indices: selectedIndices }
@@ -18,7 +18,7 @@ export const updateDashboard = async (client, name, selectedIndices) => {
   return data.created;
 };
 export const createNewDashboard = async (client, name, selectedIndices) => {
-  const { data, loading, error } = await client.query({
+  const { data } = await client.query({
     query: CREATENEWDASHBOARD,
     variables: {
       dashboard: { name: name, indices: selectedIndices }
@@ -27,7 +27,7 @@ export const createNewDashboard = async (client, name, selectedIndices) => {
   return data.created;
 };
 export const deleteDashboard = async (name, client) => {
-  const { data, loading, error } = await client.query({
+  const { data } = await client.query({
     query: DELETEDASHBOARD,
     variables: {
       name: name
@@ -42,7 +42,7 @@ export const updateUserRoles = async (
   full_name,
   client
 ) => {
-  const { data, loading, error } = await client.query({
+  const { data } = await client.query({
     query: UPDATEUSERROLES,
     variables: {
       email: email,
@@ -55,7 +55,7 @@ export const updateUserRoles = async (
 };
 
 export const deleteUserByUsername = async (username, client) => {
-  const { data, loading, error } = await client.query({
+  const { data } = await client.query({
     query: DELETEUSERBYUSERNAME,
     variables: {
       username: username
@@ -65,7 +65,7 @@ export const deleteUserByUsername = async (username, client) => {
 };
 
 export const verifyNewUserSecureUrl = async (key, client) => {
-  const { data, loading, error } = await client.query({
+  const { data } = await client.query({
     query: VERIFYNEWUSERAUTHKEY,
     variables: {
       key: key
@@ -74,7 +74,7 @@ export const verifyNewUserSecureUrl = async (key, client) => {
   return data;
 };
 export const queryCreateNewUser = async (user, client) => {
-  const { data, loading } = await client.query({
+  const { data } = await client.query({
     query: NEWUSER,
     variables: {
       user: {

@@ -3,11 +3,20 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
 
-import IconButton from "@material-ui/core/IconButton";
-import Toolbar from "@material-ui/core/Toolbar";
-import AppBar from "@material-ui/core/AppBar";
-import Typography from "@material-ui/core/Typography";
+import QCDashboard from "./QCDashboard.js";
 import SideToolBar from "./SideToolBar.js";
+
+import {
+  AppBar,
+  Grid,
+  IconButton,
+  Paper,
+  Toolbar,
+  Typography
+} from "@material-ui/core";
+
+import statsStateReducer, { initialState } from "./DashboardState/statsReducer";
+import { StatsProvider } from "./DashboardState/statsState";
 
 const drawerWidth = 300;
 const styles = theme => ({
@@ -40,12 +49,19 @@ const styles = theme => ({
     width: drawerWidth,
     flexShrink: 0,
     whiteSpace: "nowrap"
+  },
+  content: {
+    marginTop: 100,
+    marginLeft: 50
+  },
+  paperContent: {
+    padding: 15,
+    height: 1000,
+    width: 1150
   }
 });
 
 const DashboardContent = ({ classes, history }) => {
-  //const [{ authKeyID, uid }] = useAppState();
-
   const [open, setOpen] = React.useState(false);
   const handleDrawerChange = () => setOpen(!open);
 
@@ -73,10 +89,18 @@ const DashboardContent = ({ classes, history }) => {
         </Toolbar>
       </AppBar>
       <SideToolBar open={open} handleDrawerChange={handleDrawerChange} />
-      <main className={classes.content}>
-        <div className={classes.toolbar} />
-        <Typography paragraph>heatmap</Typography>
-      </main>
+      <Grid container spacing={1} className={classes.content}>
+        <Grid container item xs={12} spacing={3}>
+          <Paper className={classes.paperContent}>
+            <StatsProvider
+              initialState={initialState}
+              reducer={statsStateReducer}
+            >
+              <QCDashboard analysis={"sc-884"} />
+            </StatsProvider>
+          </Paper>
+        </Grid>
+      </Grid>
     </div>
   );
 };

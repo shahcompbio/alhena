@@ -8,8 +8,8 @@ export const theme = createMuiTheme({
       main: "#FC544B"
     },
     background: {
-      //default: "#FFFFFF"
-      default: "#2b2a2a"
+      default: "#FFFFFF"
+      //  default: "#2b2a2a"
     }
   },
   /*overrides: {
