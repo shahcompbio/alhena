@@ -137,7 +137,10 @@ const ProfileWrapper = ({
       />
       <canvas
         id="profileCanvas"
-        style={{ marginLeft: heatmapConfig.profile.axisWidth }}
+        style={{
+          marginLeft: heatmapConfig.profile.axisWidth,
+          paddingTop: heatmapConfig.profile.axisTextYOffset
+        }}
         width={heatmapConfig.width}
         height={heatmapConfig.profile.height}
       >

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { withStyles } from "@material-ui/styles";
 
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -20,11 +21,17 @@ const rowLabels = {
   roles: "Readable Dashboards",
   full_name: "Name",
   email: "Email",
-  name: "Dashboard",
+  name: "Name",
   count: "Analyses Count"
 };
 const editableRows = { roles: true };
-
+const styles = theme => ({
+  select: {
+    "&:before": {
+      borderColor: "#ffffff"
+    }
+  }
+});
 const TableContent = ({
   classes,
   history,
@@ -44,9 +51,7 @@ const TableContent = ({
     setPage(newPage);
   };
   const tableConfig =
-    tabIndex === 0
-      ? { rowType: "username", colour: "#4486a3" }
-      : { rowType: "name", colour: "#62b2bf" };
+    tabIndex === 0 ? { rowType: "username" } : { rowType: "name" };
 
   const isSelectedForEditing = (name, row) =>
     selected === name && isEditing && editableRows.hasOwnProperty(row);
@@ -55,25 +60,18 @@ const TableContent = ({
     modifiedData.length > 0
       ? Object.keys(modifiedData[0]).filter(heading => heading !== "__typename")
       : [];
+  const colorClass = tabIndex === 0 ? classes.checkBox0 : classes.checkBox1;
 
   return [
     <Table className={classes.table} size="small">
       <TableHead>
-        <TableRow className={classes.tableRow}>
+        <TableRow>
           <TableCell padding="checkbox"></TableCell>
-          {tableHeadings.map((heading, headingIndex) => {
-            var aligned = headingIndex === 0 ? "left" : "right";
-
-            return (
-              <TableCell
-                align={aligned}
-                key={"permissions-heading" + heading}
-                className={clsx(classes.tableCell, classes.tableHeader)}
-              >
-                {rowLabels[heading]}
-              </TableCell>
-            );
-          })}
+          <TableHeadings
+            classes={classes}
+            tableHeadings={tableHeadings}
+            colorClass={colorClass}
+          />
         </TableRow>
       </TableHead>
       <TableBody>
@@ -89,20 +87,17 @@ const TableContent = ({
 
                 return (
                   <TableRow
-                    className={
-                      tabIndex === 0
-                        ? classes.tableRowIndex0
-                        : classes.tableRowIndex1
-                    }
+                    className={colorClass}
                     classes={{ selected: classes.selected }}
                     key={"permissions-row-" + name}
                   >
                     <TableCell padding="checkbox">
                       <Checkbox
-                        style={{ color: "#ffffffc4" }}
-                        color={"default"}
+                        className={
+                          tabIndex === 0 ? classes.checkBox0 : classes.checkBox1
+                        }
+                        id="check"
                         checked={isItemSelected}
-                        className={classes.checkBox}
                         onClick={event => handleRowClick(name)}
                         inputProps={{ "aria-labelledby": labelId }}
                       />
@@ -116,7 +111,7 @@ const TableContent = ({
                           component="th"
                           scope="row"
                           id={labelId}
-                          className={classes.tableCell}
+                          className={[classes.tableCell, colorClass]}
                           key={labelId + heading + row[tableConfig.rowType]}
                         >
                           {isSelectedForEditing(
@@ -129,6 +124,7 @@ const TableContent = ({
                               }
                               currentSelection={row[heading]}
                               allRoles={allRoles}
+                              classes={classes}
                             />
                           ) : Array.isArray(row[heading]) ? (
                             row[heading].join(", ")
@@ -155,12 +151,30 @@ const TableContent = ({
       nextIconButtonProps={{
         "aria-label": "next page"
       }}
-      className={classes.tablePagination}
+      className={[classes.tablePagination, colorClass]}
       onChangePage={handleChangePage}
     />
   ];
 };
-const DropDownEdit = ({ currentSelection, allRoles, setNewUserRoles }) => {
+const TableHeadings = ({ classes, tableHeadings, colorClass }) =>
+  tableHeadings.map((heading, headingIndex) => {
+    var aligned = headingIndex === 0 ? "left" : "right";
+    return (
+      <TableCell
+        align={aligned}
+        key={"permissions-heading" + heading}
+        className={clsx(classes.tableCell, classes.tableHeader, colorClass)}
+      >
+        {rowLabels[heading]}
+      </TableCell>
+    );
+  });
+const DropDownEdit = ({
+  currentSelection,
+  allRoles,
+  setNewUserRoles,
+  classes
+}) => {
   const [selectedRoles, setSelectedRoles] = useState([...currentSelection]);
   return (
     <FormControl required style={{ width: "100%" }}>
@@ -171,7 +185,13 @@ const DropDownEdit = ({ currentSelection, allRoles, setNewUserRoles }) => {
           setSelectedRoles(event.target.value);
           setNewUserRoles(event.target.value);
         }}
-        input={<Input id="select-multiple-placeholder" />}
+        className={classes.select}
+        input={
+          <Input
+            id="select-multiple-placeholder"
+            style={{ color: "#ffffff" }}
+          />
+        }
       >
         {allRoles.map(role => (
           <MenuItem value={role} key={role}>
@@ -182,4 +202,4 @@ const DropDownEdit = ({ currentSelection, allRoles, setNewUserRoles }) => {
     </FormControl>
   );
 };
-export default TableContent;
+export default withStyles(styles)(TableContent);

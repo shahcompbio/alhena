@@ -15,6 +15,9 @@ import styled from "styled-components";
 import { withStyles } from "@material-ui/styles";
 
 const styles = theme => ({
+  button: {
+    backgroundColor: theme.palette.primary.main
+  },
   paperTitle: {
     paddingBottom: theme.spacing.unit * 5,
     padding: theme.spacing.unit * 3,
@@ -24,7 +27,7 @@ const styles = theme => ({
     width: "25vw",
     color: "white",
     textAlign: "center",
-    background: "#69B3CE"
+    background: theme.palette.primary.main
   },
   paperForm: {
     overflowX: "auto",
@@ -123,24 +126,10 @@ const NewAccount = ({ email, dispatch, classes }) => {
     <ApolloConsumer>
       {client => (
         <Grid container direction="row" justify="center" alignItems="center">
-          <Typography
-            variant="h1"
-            color="primary"
-            style={{ marginTop: 50, fontWeight: "500" }}
-          >
-            Alhena
-          </Typography>
-          <div
-            style={{
-              top: "20%",
-              margin: 10,
-              position: "absolute"
-            }}
-          />
           <div
             style={{
               position: "absolute",
-              top: "25%"
+              top: "15%"
             }}
           >
             {error && (
@@ -152,7 +141,7 @@ const NewAccount = ({ email, dispatch, classes }) => {
             )}
             <Paper rounded className={classes.paperTitle}>
               <Typography variant="h4" color="white">
-                New User
+                Create Account
               </Typography>
             </Paper>
             <Paper rounded className={classes.paperForm}>
@@ -177,8 +166,8 @@ const NewAccount = ({ email, dispatch, classes }) => {
                 ))}
                 <ComponentWrapper style={{ textAlign: "center" }}>
                   <Button
-                    color="primary"
-                    variant="outlined"
+                    className={classes.button}
+                    variant="contianed"
                     onClick={ev => createNewUser(ev, client, dispatch)}
                   >
                     Create

@@ -5,6 +5,7 @@ import clsx from "clsx";
 
 import QCDashboard from "./QCDashboard.js";
 import SideToolBar from "./SideToolBar.js";
+import Menu from "../Misc/Menu.js";
 
 import {
   AppBar,
@@ -51,8 +52,11 @@ const styles = theme => ({
     whiteSpace: "nowrap"
   },
   content: {
-    marginTop: 100,
-    marginLeft: 50
+    //  margin: "auto"
+    marginLeft: "15vw",
+    marginTop: 50
+    //  marginTop: 70,
+    //  marginLeft: 100
   },
   paperContent: {
     padding: 15,
@@ -67,28 +71,6 @@ const DashboardContent = ({ classes, history }) => {
 
   return (
     <div className={classes.root}>
-      <AppBar
-        position="fixed"
-        className={clsx(classes.appBar, {
-          [classes.appBarShift]: open
-        })}
-      >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="Open drawer"
-            onClick={handleDrawerChange}
-            edge="start"
-            className={clsx(classes.menuButton, {
-              [classes.hide]: open
-            })}
-          ></IconButton>
-          <Typography variant="h6" noWrap>
-            Alhena
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <SideToolBar open={open} handleDrawerChange={handleDrawerChange} />
       <Grid container spacing={1} className={classes.content}>
         <Grid container item xs={12} spacing={3}>
           <Paper className={classes.paperContent}>
@@ -96,11 +78,12 @@ const DashboardContent = ({ classes, history }) => {
               initialState={initialState}
               reducer={statsStateReducer}
             >
-              <QCDashboard analysis={"sc-884"} />
+              <QCDashboard analysis={"sc-856"} />
             </StatsProvider>
           </Paper>
         </Grid>
       </Grid>
+      <Menu />
     </div>
   );
 };

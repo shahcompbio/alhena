@@ -12,21 +12,46 @@ import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
 import LoadingCircle from "./ProgressCircle.js";
 
 const styles = theme => ({
+  circleImg: {
+    height: 500,
+    width: 500,
+    top: "20%",
+    margin: 10,
+    position: "absolute"
+  },
+
+  floatingLabelFocusStyle: {
+    color: "black",
+    fontWeight: "500"
+  },
+  input: {
+    color: "black",
+    borderBottom: "1px solid #769bb5"
+  },
+  inputWrapper: {
+    position: "absolute",
+    top: "40vh",
+    marginLeft: 10
+  },
+  logo: {
+    position: "absolute",
+    top: "20vh",
+    margin: 10,
+    marginLeft: 30
+  },
+  submitButton: {
+    marginLeft: 110,
+    marginTop: 40,
+    backgroundColor: theme.palette.primary.dark,
+    color: theme.palette.background.default,
+    "&:hover": {
+      backgroundColor: theme.palette.primary.main
+    }
+  },
   textField: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
     width: 300
-  },
-  floatingLabelFocusStyle: {
-    color: "white",
-    fontWeight: "500"
-  },
-  input: {
-    color: "white",
-    borderBottom: "1px solid #769bb5"
-  },
-  submitButton: {
-    marginLeft: 40
   }
 });
 const UnauthenticatedApp = ({ client, classes }) => {
@@ -57,40 +82,17 @@ const UnauthenticatedApp = ({ client, classes }) => {
     }
   };
 
+  //<LoadingCircle isStopped={!loading} />
   return (
     <Grid container direction="row" justify="center" alignItems="center">
       {" "}
-      <div
-        style={{
-          height: 500,
-          width: 500,
-          top: "30%",
-          margin: 10,
-          position: "absolute"
-        }}
-      >
-        <LoadingCircle isStopped={!loading} />
+      <div className={classes.circleImg}>
         {error && (
           <SnackbarContentWrapper variant="error" errorNumber={error} />
         )}
       </div>
-      <img
-        alt="logo"
-        src={logo}
-        style={{
-          position: "absolute",
-          top: "30vh",
-          margin: 10,
-          marginLeft: 30
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          top: "45vh",
-          marginLeft: 10
-        }}
-      >
+      <img alt="logo" src={logo} className={classes.logo} />
+      <div className={classes.inputWrapper}>
         <form onSubmit={ev => handleLogin(ev, client, dispatch)} id="loginForm">
           <ComponentWrapper>
             <TextField
@@ -129,8 +131,7 @@ const UnauthenticatedApp = ({ client, classes }) => {
           <ComponentWrapper>
             <Button
               className={classes.submitButton}
-              color="primary"
-              variant="outlined"
+              variant="contained"
               type="submit"
             >
               Log In

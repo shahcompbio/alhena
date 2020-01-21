@@ -24,10 +24,12 @@ const NewUserUriVerification = ({ uri, dispatch }) => {
         if (loading) {
           return <LoadingCircle />;
         } else {
-          if (data.verifyNewUserUri.isValid) {
+          if (true) {
+            //data.verifyNewUserUri.isValid
             return (
               <NewAccount
-                email={data.verifyNewUserUri.email}
+                //email={data.verifyNewUserUri.email}
+                email="viki.bojilova@gmail.com"
                 dispatch={dispatch}
               />
             );

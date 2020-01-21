@@ -54,7 +54,7 @@ const Progressbar = ({ value, strokeWidth }) => (
       // pathTransition: 'none',
 
       // Colors
-      pathColor: `rgba(62, 152, 199, ${value / 100})`,
+      pathColor: `rgba(105, 179, 206, ${value / 100})`,
       textColor: "#f88",
       trailColor: "#d6d6d6",
       backgroundColor: "#3e98c7"

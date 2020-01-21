@@ -9,11 +9,12 @@ import AddBoxIcon from "@material-ui/icons/AddBox";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
-
 import SeperatedTabs from "./SeperatedTabs.js";
 
 import NewUserPopup from "./NewUser/NewUserPopup.js";
 import AddDashboardPopupWrapper from "./AddDashboardPopupWrapper.js";
+
+import Menu from "../Misc/Menu.js";
 
 import { ApolloConsumer } from "react-apollo";
 import TabContentWrapper from "./TabContentWrapper.js";
@@ -21,26 +22,37 @@ import TabContentWrapper from "./TabContentWrapper.js";
 import { createUserEmail } from "../Queries/queries.js";
 import { createNewDashboard } from "../util/utils.js";
 
-import { withStyles } from "@material-ui/styles";
-
+import { withStyles, useTheme } from "@material-ui/styles";
+const iconStyle = { largeIcon: { width: 60, height: 60 } };
 const styles = theme => ({
+  actions: {
+    float: "right"
+  },
+  appBar: {
+    backgroundColor: "#ffffff",
+    margin: "auto",
+    marginTop: "-80px",
+    width: "90%"
+  },
+  icons: {
+    zIndex: 5
+  },
+  iconSvg: { width: "1.5em", height: "1.5em" },
   root: { flexGrow: 1, width: "80vw", margin: "auto", paddingTop: 50 },
   paper: {
     paddingBottom: theme.spacing.unit * 5,
     padding: theme.spacing.unit * 3,
     height: 125,
-    width: "100%",
-    borderRadius: 20,
+    width: "90%",
+    borderRadius: 10,
+    margin: "auto",
     overflowX: "auto"
   },
-  buttons: {
-    zIndex: 50
-  },
-  actions: {
-    float: "right"
-  }
+  tabs: { alignSelf: "flex-end" },
+  toolbar: { overflow: "hidden" }
 });
 const AdminPanel = ({ classes }) => {
+  const theme = useTheme();
   const [{ authKeyID, uid }, dispatch] = useAppState();
 
   const [openPopup, setOpenPopup] = useState(false);
@@ -70,100 +82,88 @@ const AdminPanel = ({ classes }) => {
   };
 
   return (
-    <div className={classes.root}>
-      <Paper rounded={"true"} className={classes.paper}>
-        {" "}
-        <Grid
-          container
-          direction="row"
-          spacing={3}
-          key={"adminpanel-container"}
-        >
-          <Grid item xs={6} key={"admin-title"}>
-            <Typography variant="h5">Admin Settings</Typography>
-          </Grid>
-          <Grid item xs={6} key={"icon-container"}>
-            <Grid
-              container
-              direction="row"
-              justify="flex-end"
-              alignItems="center"
-              className={classes.actions}
-            >
-              <ApolloConsumer key={"add-consumer"}>
-                {client => [
-                  <IconButton
-                    key={"add-button"}
-                    variant="outlined"
-                    size="medium"
-                    color="primary"
-                    className={classes.buttons}
-                    onClick={handleClickAdd}
-                  >
-                    <AddBoxIcon />
-                  </IconButton>,
-                  openPopup && tabIndex === 0 && (
-                    <NewUserPopup
-                      key={"newUserPopup"}
-                      isOpen={openPopup}
-                      handleClose={handleCloseAdd}
-                      client={client}
-                      addUser={addUser}
-                    />
-                  ),
-                  openPopup && tabIndex === 1 && (
-                    <AddDashboardPopupWrapper
-                      key={"newDashboardPopup"}
-                      isOpen={openPopup}
-                      handleClose={handleCloseAdd}
-                      dashboardAction={addDashboard}
-                    />
-                  )
-                ]}
-              </ApolloConsumer>
-              <IconButton
-                variant="outlined"
-                size="medium"
-                color="primary"
-                className={classes.buttons}
-                onClick={ev =>
-                  dispatch({
-                    type: "LOGOUT"
-                  })
-                }
+    <div style={{ flexGrow: 1, height: "100vh" }}>
+      <div className={classes.root}>
+        <Paper rounded={"true"} className={classes.paper}>
+          <Grid
+            container
+            direction="row"
+            spacing={3}
+            key={"adminpanel-container"}
+          >
+            <Grid item xs={6} key={"admin-title"}>
+              <Typography variant="h5">Admin Settings</Typography>
+            </Grid>
+            <Grid item xs={6} key={"icon-container"}>
+              <Grid
+                container
+                direction="row"
+                justify="flex-end"
+                alignItems="center"
+                className={classes.actions}
               >
-                <ExitToAppIcon />
-              </IconButton>
+                <ApolloConsumer key={"add-consumer"}>
+                  {client => [
+                    <IconButton
+                      key={"add-button"}
+                      variant="outlined"
+                      color="secondary"
+                      className={classes.icons}
+                      onClick={handleClickAdd}
+                    >
+                      <AddBoxIcon className={classes.iconSvg} />
+                    </IconButton>,
+                    openPopup && tabIndex === 0 && (
+                      <NewUserPopup
+                        key={"newUserPopup"}
+                        isOpen={openPopup}
+                        handleClose={handleCloseAdd}
+                        client={client}
+                        addUser={addUser}
+                      />
+                    ),
+                    openPopup && tabIndex === 1 && (
+                      <AddDashboardPopupWrapper
+                        key={"newDashboardPopup"}
+                        isOpen={openPopup}
+                        handleClose={handleCloseAdd}
+                        dashboardAction={(name, selectedIndices) =>
+                          addDashboard(client, name, selectedIndices)
+                        }
+                      />
+                    )
+                  ]}
+                </ApolloConsumer>
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
-      </Paper>
-      <AppBar
-        position={"static"}
-        elevation={0}
-        style={{ backgroundColor: "#ffffff", marginTop: "-80px" }}
-      >
-        {" "}
-        <Toolbar
-          // you need to set override hidden in toolbar
-          style={{ overflow: "hidden" }}
-        >
-          <SeperatedTabs
-            style={{ alignSelf: "flex-end" }}
-            tabs={[{ label: "Users" }, { label: "Dashboards" }]}
-            tabStyle={{
-              bgColor: tabIndex === 0 ? "#4486a3" : "#62b2bf",
-              selectedBgColor: tabIndex === 0 ? "#62b2bf" : "#4486a3"
-            }}
-            tabProps={{
-              disableRipple: true
-            }}
-            value={tabIndex}
-            onChange={(e, i) => setTabIndex(i)}
-          />
-        </Toolbar>
-      </AppBar>
-      <TabContentWrapper tabIndex={tabIndex} />
+        </Paper>
+        <AppBar position={"static"} elevation={0} className={classes.appBar}>
+          <Toolbar className={classes.toolBar}>
+            <SeperatedTabs
+              className={classes.tabs}
+              tabs={[{ label: "Users" }, { label: "Dashboards" }]}
+              tabStyle={{
+                bgColor:
+                  tabIndex === 0
+                    ? theme.palette.primary.main
+                    : theme.palette.primary.dark,
+                selectedBgColor:
+                  tabIndex === 0
+                    ? theme.palette.primary.dark
+                    : theme.palette.primary.main
+              }}
+              tabProps={{
+                disableRipple: true
+              }}
+              value={tabIndex}
+              onChange={(e, i) => setTabIndex(i)}
+            />
+          </Toolbar>
+        </AppBar>
+        <TabContentWrapper tabIndex={tabIndex} />
+      </div>
+      <Menu />
     </div>
   );
 };

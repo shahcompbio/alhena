@@ -6,14 +6,16 @@ import { withStyles } from "@material-ui/styles";
 import InputLabel from "@material-ui/core/InputLabel";
 import Grid from "@material-ui/core/Grid";
 
+import { useDashboardState } from "../ProjectState/dashboardState";
+
 import { config } from "../../../config/config.js";
 const filterConfig = config.FilterConfig;
 const styles = theme => ({
   root: {
     flexGrow: 1,
     padding: "55px",
-    paddingRight: "0px",
-    background: "#2b2a2a"
+    paddingRight: "0px"
+    //  background: "#2b2a2a"
   },
   label: {
     color: "white",
@@ -38,6 +40,15 @@ const reactSelectStyles = {
   }
 };
 const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
+  const [{ selectedDashboard, dashboards }, dispatch] = useDashboardState();
+  const changeProject = (value, action, type) => {
+    dispatch({
+      type: "DASHBOARD_SELECT",
+      value: {
+        selectedDashboard: value.value
+      }
+    });
+  };
   const onChange = (value, action, type) => {
     const filter = value ? { value: value.label, label: value.value } : type;
     handleFilterChange(filter, action);
@@ -131,6 +142,23 @@ const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
       spacing={3}
       className={classes.root}
     >
+      <Grid item className={classes.item}>
+        <InputLabel className={classes.label}>Project</InputLabel>
+        <Select
+          value={{ value: selectedDashboard, label: selectedDashboard }}
+          isMulti={false}
+          isClearable={false}
+          onChange={(option, { action }) => {
+            changeProject(option);
+          }}
+          options={dashboards.map(value => {
+            return {
+              value: value,
+              label: value
+            };
+          })}
+        />
+      </Grid>
       {panels.map(panel => (
         <Grid item className={classes.item}>
           {panel.title}

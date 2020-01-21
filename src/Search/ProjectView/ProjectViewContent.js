@@ -10,6 +10,7 @@ import Graph from "./Graph/Graph2.js";
 import { Query } from "react-apollo";
 import { getAllAnalyses } from "../../Queries/queries.js";
 
+import { useDashboardState } from "./ProjectState/dashboardState";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 
@@ -26,11 +27,12 @@ const styles = {
   }
 };
 
-const ProjectViewContent = ({ classes, match }) => {
+const ProjectViewContent = ({ classes }) => {
+  const [{ selectedDashboard }] = useDashboardState();
   const [{ authKeyID, uid }] = useAppState();
   const [selectedOptions, setSelectedOptions] = useState({});
   const [filters, setFilters] = useState([]);
-
+  console.log(selectedDashboard);
   const [graphDim, setDim] = useState(0);
   const dimRef = useRef(0);
 
@@ -67,7 +69,7 @@ const ProjectViewContent = ({ classes, match }) => {
       query={getAllAnalyses}
       variables={{
         filter: [...filters],
-        dashboardName: match.params.project,
+        dashboardName: selectedDashboard,
         user: { authKeyID: authKeyID, uid: uid }
       }}
     >
@@ -97,6 +99,7 @@ const ProjectViewContent = ({ classes, match }) => {
                   key={"search"}
                   selectedOptions={null}
                   filters={null}
+                  dashboards={[]}
                   handleFilterChange={null}
                 />
               </Grid>
@@ -129,9 +132,6 @@ const ProjectViewContent = ({ classes, match }) => {
                 style={{ height: "50vh" }}
                 key={"grid-search"}
               >
-                <Typography variant="h2" className={classes.title}>
-                  {match.params.project} Dashboards
-                </Typography>
                 <Search
                   key={"search"}
                   selectedOptions={selectedOptions}

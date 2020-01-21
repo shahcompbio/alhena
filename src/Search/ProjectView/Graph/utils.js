@@ -30,7 +30,6 @@ function traverseParentTree(tree, type) {
   if (!tree.hasOwnProperty("parent") || tree.parent === null) {
     return "";
   } else {
-    console.log(tree);
     if (tree.data.source !== null) {
       return (
         type + tree.data.source + "," + traverseParentTree(tree.parent, type)

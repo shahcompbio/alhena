@@ -63,13 +63,7 @@ export const getAllDashboards = gql`
     }
   }
 `;
-export const getDashboardByUser = gql`
-  query UserDashboard($user: ApiUser!) {
-    getDashboardsByUser(auth: $user) {
-      name
-    }
-  }
-`;
+
 export const VERIFYNEWUSERAUTHKEY = gql`
   query verifyNewUserUri($key: String!) {
     verifyNewUserUri(key: $key) {

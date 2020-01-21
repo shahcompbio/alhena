@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
+import { makeStyles } from "@material-ui/core/styles";
 
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
@@ -13,6 +14,21 @@ import IconButton from "@material-ui/core/IconButton";
 import CheckIcon from "@material-ui/icons/Check";
 
 import TransferList from "./TransferList.js";
+const useStyles = makeStyles(theme => ({
+  button: { color: "black", backgroundColor: theme.palette.secondary.main },
+  dialogContent: { padding: "0px 24px" },
+  dialogTitle: { paddinBottom: 0 },
+  dialogWrapper: {
+    height: 200,
+    width: 250,
+    margin: "auto",
+    left: "25%",
+    position: "absolute"
+  },
+  icon: { fontSize: "6em", position: "absolute" },
+  iconButton: { top: "65%", left: "45%" },
+  textValidator: { paddingBottom: 20 }
+}));
 
 const PopUpContent = ({
   isOpen,
@@ -23,6 +39,7 @@ const PopUpContent = ({
   allIndices,
   alreadySelectedIndices
 }) => {
+  const classes = useStyles();
   const [selectedIndices, setSelectedIndices] = useState([]);
   const [name, setName] = useState(dashboardName);
   const [isLoading, setLoading] = useState(false);
@@ -54,33 +71,18 @@ const PopUpContent = ({
             paddingTop: isSent && isLoading ? 0 : 20
           }}
         >
-          <div
-            style={{
-              height: 200,
-              width: 250,
-              margin: "auto",
-              left: "25%",
-              position: "absolute"
-            }}
-          >
-            {isSent && (
-              <IconButton style={{ top: "65%", left: "45%" }}>
-                <CheckIcon style={{ fontSize: "6em", position: "absolute" }} />
-              </IconButton>
-            )}
-            <LoadingCircle overRideStroke={6} />
-          </div>
+          <LoadingContent classes={classes} isSent={isSent} />
         </DialogContent>
       ) : (
         <ValidatorForm key={"validForm"}>
           <DialogTitle
             id="form-dialog-title"
-            style={{ paddinBottom: 0 }}
+            className={classes.dialogTitle}
             key={"dialogTitle"}
           >
             {isEdit ? "Edit Dashboard" : "Create New Dashboard"}
           </DialogTitle>
-          <DialogContent>
+          <DialogContent className={classes.dialogContent}>
             <TextValidator
               key={"dialogName"}
               autoFocus
@@ -94,7 +96,7 @@ const PopUpContent = ({
               errorMessages={["This field is required"]}
               required
               fullWidth
-              style={{ paddingBottom: 20 }}
+              className={classes.textValidator}
             />
             <TransferList
               key={"transferList"}
@@ -103,9 +105,13 @@ const PopUpContent = ({
               alreadyChoosen={alreadySelectedIndices}
             />
           </DialogContent>
-          ,
           <DialogActions>
-            <Button onClick={handleClose} color="secondary" variant="outlined">
+            <Button
+              onClick={handleClose}
+              color="secondary"
+              variant="contained"
+              className={classes.button}
+            >
               Cancel
             </Button>
             <Button
@@ -131,4 +137,14 @@ const PopUpContent = ({
     </Dialog>
   );
 };
+const LoadingContent = (classes, isSent) => (
+  <div className={classes.dialogWrapper}>
+    {isSent && (
+      <IconButton className={classes.iconButton}>
+        <CheckIcon className={classes.icon} />
+      </IconButton>
+    )}
+    <LoadingCircle overRideStroke={6} />
+  </div>
+);
 export default PopUpContent;

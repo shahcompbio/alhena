@@ -420,7 +420,7 @@ const Graph = ({ isLoading, analyses, filters, handleFilterChange }) => {
         .attr("dy", "1em")
         .attr("width", d => d.data.target.length * 50)
         .attr("height", 150)
-        .attr("fill", "#2b2a2a")
+        .attr("fill", "rgb(121,121,121)")
         .attr("transform", function(d) {
           if (d.depth === 2 || d.depth === 3) {
             return (

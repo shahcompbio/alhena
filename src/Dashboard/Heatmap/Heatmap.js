@@ -114,7 +114,7 @@ const Heatmap = ({ analysis, heatmapOrder, categoryStats }) => {
 
         const categoryWidth =
           selectedCategories.length * heatmapConfig.categories.squareSize +
-          heatmapConfig.paddingLeft * 2;
+          selectedCategories.length * heatmapConfig.categories.squareSpacing;
 
         const yScale = getYScale(
           heatmapConfig.height / heatmapConfig.rowHeight

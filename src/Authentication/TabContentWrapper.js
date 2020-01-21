@@ -18,23 +18,22 @@ import {
 } from "../util/utils.js";
 
 import { getAllDashboards, getUsers } from "../Queries/queries.js";
-import { withStyles } from "@material-ui/styles";
+import { withStyles, useTheme } from "@material-ui/styles";
 const styles = (theme, tabIndex) => ({
   root: {
+    width: "95%",
+    margin: "auto",
     flexGrow: 1,
-    width: "100%",
     borderRadius: 20,
     zIndex: 20,
     marginTop: 25
+    //  boxShadow:
+    //  "0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 1px 4px 3px 0px rgba(0,0,0,0.12)"
   },
   grid: {
     marginTop: "-60px"
   },
-  paper: {
-    marginTop: theme.spacing.unit,
-    width: "100%",
-    overflowX: "auto"
-  },
+
   table: {
     width: "90%",
     margin: "auto",
@@ -42,35 +41,42 @@ const styles = (theme, tabIndex) => ({
     marginTop: 25
   },
   tableRowIndex0: {
-    backgroundColor: "#62b2bf",
+    backgroundColor: theme.palette.primary.dark,
+    color: "white",
     "&$selected, &$selected:hover": {
-      backgroundColor: "rgba(232, 232, 232, 0.43)"
+      backgroundColor: "#ffffff"
+    }
+  },
+  checkBox0: {
+    color: "white !important",
+    "$selected &": {
+      color: "white"
+    }
+  },
+  checkBox1: {
+    color: "#000000 !important",
+    "$selected &": {
+      color: "#000000"
     }
   },
   tableRowIndex1: {
-    backgroundColor: "#4486a3",
+    backgroundColor: theme.palette.primary.main,
+    color: "#000000",
     "&$selected, &$selected:hover": {
       backgroundColor: "rgba(232, 232, 232, 0.43)"
     }
   },
   selected: {},
   tableCell: {
-    color: "#ffffff",
     whiteSpace: "normal",
     wordWrap: "break-word",
-    maxWidth: "100px",
-    "$selected &": {
-      color: "#000000"
-    }
+    maxWidth: "100px"
   },
   tableHeader: {
     fontWeight: "bold"
   },
-  checkBox: {
-    color: "rgba(255, 255, 255,1)"
-  },
   tablePagination: {
-    color: "rgb(255, 255, 255)"
+    fontWeight: "bold"
   },
   toolbar: {},
   hide: {
@@ -79,6 +85,7 @@ const styles = (theme, tabIndex) => ({
 });
 
 const TabContentWrapper = ({ tabIndex, classes }) => {
+  const theme = useTheme();
   const [{ authKeyID, uid }, dispatch] = useAppState();
 
   const [isLoading, setLoading] = useState(false);
@@ -231,7 +238,10 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
                   <Paper
                     className={classes.root}
                     style={{
-                      background: tabIndex === 1 ? "#4486a3" : "#62b2bf"
+                      background:
+                        tabIndex === 1
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.dark
                     }}
                   >
                     {(selected || actionComplete) && (

@@ -75,7 +75,7 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
             {isLoading ? (
               <DialogContent
                 style={{
-                  width: 500,
+                  maxWidth: 450,
                   height: 300,
                   paddingTop: isSent && isLoading ? 0 : 20
                 }}
@@ -83,7 +83,6 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
                 <div
                   style={{
                     height: 200,
-                    width: 250,
                     margin: "auto",
                     left: "25%",
                     position: "absolute"
@@ -101,7 +100,7 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
               </DialogContent>
             ) : (
               [
-                <ValidatorForm ref="form">
+                <ValidatorForm ref="form" style={{ maxWidth: 450 }}>
                   <DialogTitle id="form-dialog-title">
                     Create New User
                   </DialogTitle>
@@ -240,6 +239,7 @@ const DropDownSelect = ({
           : theme.typography.fontWeightMedium
     };
   }
+
   return (
     <FormControl required className={classes.formControl}>
       <InputLabel htmlFor="select-multiple-checkbox">

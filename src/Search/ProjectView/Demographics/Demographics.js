@@ -41,9 +41,9 @@ const SummaryDiv = styled("div")`
   height: 100vh;
   float: right;
   position: fixed;
-  right: 0;
+  text-align: end;
+  right: 50px;
   top: 50px;
-  background: #2b2a2a;
   flex-direction: column;
   padding: 25px;
 `;

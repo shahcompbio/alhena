@@ -8,6 +8,7 @@ import { withRouter } from "react-router";
 import AdminPanel from "./Authentication/AdminPanel.js";
 import Content from "./Search/Content.js";
 
+import DashboardWrapper from "./Search/DashboardWrapper";
 import DashboardContent from "./Dashboard/DashboardContent.js";
 
 import Unauthenticated from "./Authentication/Unauthenticated.js";
@@ -46,7 +47,7 @@ const App = () => {
           )}
         />
         {authKeyID && [
-          <Route path="/dashboards" component={() => <Content />} />,
+          <Route path="/dashboards" component={() => <DashboardWrapper />} />,
           <Route exact path="/heatmap" render={() => <DashboardContent />} />
         ]}
         {authKeyID && isSuperUser && (
