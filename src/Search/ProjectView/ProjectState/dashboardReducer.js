@@ -3,7 +3,6 @@ const initialState = (dashboards, selectedDashboard) => {
 };
 
 const statsStateReducer = (state, action) => {
-  console.log(action);
   switch (action.type) {
     case "DASHBOARD_SELECT": {
       return {

@@ -10,10 +10,33 @@ export const voronoid = d3
   .extent([[-4000, -4000], [4000, 4000]]);
 
 export const removeLegendLabels = () => {
-  d3.selectAll(".indicationDots, .seperator, .legendTitles").remove();
+  d3.selectAll(
+    ".indicationDots, .seperator, .legendTitles, .directLabel, .node-label"
+  ).remove();
   d3.selectAll(".legendDescription").remove();
 };
 
+export const colourNodeSelections = (nodeSelection, heightOfDetail) =>
+  nodeSelection
+    .classed("highlight0", function(d) {
+      return d.height === 0;
+    })
+    .classed("highlight1", function(d) {
+      return d.height === 1;
+    })
+    .classed("highlight2", function(d) {
+      return d.height === 2;
+    })
+    .attr("r", function(d) {
+      return heightOfDetail === d.height ? 70 : 20;
+    });
+
+export const removeAllContent = mainSvg =>
+  mainSvg
+    .selectAll(
+      ".allCircleNodes, .lines, .directLabel, .node-label, path, .legendDescription"
+    )
+    .remove();
 export const ungreySelection = selectionText =>
   d3.selectAll(selectionText).classed("greyedNodes", false);
 export const greySelection = selectionText =>
@@ -65,7 +88,7 @@ export const linkSelect = selectionText => {
         .linkRadial()
         .angle(d => d.x + displayConfig.filtersOffSet)
         .radius(d => {
-          return d.y + displayConfig.filtersOffSet + 200;
+          return d.y + displayConfig.filtersOffSet + 125;
         })
     );
 };
@@ -81,27 +104,26 @@ export const greyOutJiraLabels = notSelection =>
 export const linkDeselect = selectionText =>
   d3.selectAll(selectionText).classed("link-hover", false);
 
-export const nodeSelect = selectionText => {
-  var selection = d3.selectAll(selectionText).filter(d => d.depth !== 0);
-
+export const nodeSelect = (selection, heightOfDetail) => {
   selection.classed("hover", true);
   selection.classed("greyedNodes", false);
 
-  selection
-    .transition()
-    .attr("transform", d => {
-      if (d.depth === 2) {
-        return `
-      translate(90,0)
+  selection.transition().attr("transform", d => {
+    if (d.depth === 2) {
+      return `
+      translate(65,0)
     `;
-      }
-      if (d.depth !== 1) {
-        return `
+    }
+    if (d.depth !== 1) {
+      return heightOfDetail === d.height
+        ? `
+          translate(500,0)
+        `
+        : `
         translate(700,0)
       `;
-      }
-    })
-    .attr("r", 20);
+    }
+  });
 };
 
 export const nodeDeselect = selectionText =>
@@ -144,6 +166,12 @@ export const removeAllPreviousContent = () => {
 };
 
 export const greyOutAllNodes = target => {
-  d3.selectAll("circle:not(.parent-project)").classed("greyedNodes", true);
-  d3.selectAll("path:not(.link-" + target + ")").classed("greyedNodes", true);
+  d3.selectAll(".allCircleNodes circle:not(.parent-project)").classed(
+    "greyedNodes",
+    true
+  );
+  d3.selectAll(".lines path:not(.link-" + target + ")").classed(
+    "greyedNodes",
+    true
+  );
 };

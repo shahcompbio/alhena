@@ -5,7 +5,7 @@ import { withRouter } from "react-router-dom";
 
 import { useAppState } from "../util/app-state";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
-
+import { shadows } from "@material-ui/system";
 import Fab from "@material-ui/core/Fab";
 import Backdrop from "@material-ui/core/Backdrop";
 import HelpIcon from "@material-ui/icons/Help";
@@ -24,8 +24,7 @@ import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
 const styles = theme => ({
   fab: {
     backgroundColor: theme.palette.primary.main,
-    boxShadow:
-      "0px 0px 0px 0px rgba(0,0,0,0), 0px 0px 0px 0px rgba(0,0,0,0), 0px 0px 0px 0px rgba(0,0,0,0) !important",
+    boxShadow: "none !important",
     borderRadius: "10%",
     "&:hover": {
       backgroundColor: theme.palette.primary.main
@@ -59,6 +58,7 @@ const styles = theme => ({
   speedDial: {
     boxShadow: "none",
     color: theme.palette.primary.dark,
+    boxShadow: "none !important",
     zIndex: 101,
     position: "absolute",
     "&.MuiSpeedDial-directionUp, &.MuiSpeedDial-directionLeft": {
@@ -128,25 +128,25 @@ const Menu = ({ history, classes }) => {
         return setOpen(false);
     }
   };
+  // <Backdrop open={open} />
   return (
     <div className={classes.root}>
       <div className={classes.wrapper}>
         <SpeedDial
+          enableMouseActions
           ariaLabel="Alhena Menu"
-          className={classes.speedDial}
+          classes={{ root: classes.speedDial, fab: classes.fab }}
           icon={
-            <Fab
-              classes={{ root: classes.fab, primary: { boxShadow: "none" } }}
-            >
+            <Fab classes={{ root: classes.fab }} boxShadow={0} elevation={0}>
               <MenuIcon className={classes.menu} />
             </Fab>
           }
           onClose={handleClose}
+          transitionDuration={{ exit: 100 }}
           onOpen={handleOpen}
           open={open}
           direction={direction}
         >
-          <Backdrop open={open} />
           {actions.map(action => (
             <SpeedDialAction
               key={action.name}

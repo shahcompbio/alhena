@@ -14,7 +14,7 @@ const style = theme => ({
     flexGrow: 1,
     marginTop: "10vh",
     height: "50vh",
-    padding: "30px"
+    padding: "50px"
   },
   paper: {
     width: "100%"

@@ -6,11 +6,14 @@ import DashboardWrapper from "./DashboardWrapper.js";
 import ProjectViewContent from "./ProjectView/ProjectViewContent.js";
 import Stepper from "./Stepper.js";
 import Slide from "@material-ui/core/Slide";
+import DashboardContent from "../Dashboard/DashboardContent.js";
 import OverviewContent from "./Overview/OverviewContent.js";
 import NoMatch from "./NoMatch.js";
 
 import Backdrop from "@material-ui/core/Backdrop";
 import Grid from "@material-ui/core/Grid";
+
+import { useDashboardState } from "./ProjectView/ProjectState/dashboardState";
 
 import { withStyles } from "@material-ui/styles";
 
@@ -21,21 +24,50 @@ const styles = ({ theme }) => ({
   },
   sliderContent: { position: "absolute", width: "95%" }
 });
-
+const defaultStepperText = [
+  "Dashboard Selection",
+  "Analysis Selection",
+  "View Dashbaord"
+];
+const slideTimeOut = 1500;
 const Content = ({ classes, history }) => {
+  const [{ selectedDashboard, selectedAnalysis }] = useDashboardState();
+
   const [activeStep, setActiveStep] = useState(0);
-  const [sliderContent, setSliderContent] = useState(
-    <OverviewContent activeStep={activeStep} setActiveStep={setActiveStep} />
-  );
+  const [stepTextValues, setStepTextValues] = useState(defaultStepperText);
+  const [hasBackdrop, setHasBackDrop] = useState(true);
   const [isBackwards, setIsBackwards] = useState(false);
+
   const handleBackStep = index => {
     setIsBackwards(true);
     setActiveStep(index);
+    const newStepperTextValues = stepTextValues.map((text, i) => {
+      return i <= index ? defaultStepperText[i] : text;
+    });
+    setStepTextValues([...newStepperTextValues]);
   };
   const handleForwardStep = index => {
     setIsBackwards(false);
     setActiveStep(index);
+    console.log(index);
+    const newStepperTextValues = stepTextValues.map((text, i) => {
+      console.log(index - 1 === i && i === 1);
+      return index - 1 === i && i === 0
+        ? selectedDashboard
+        : index - 1 === i && i === 1
+        ? "SC-123"
+        : text;
+    });
+    console.log(newStepperTextValues);
+    setStepTextValues([...newStepperTextValues]);
   };
+  useEffect(() => {
+    if (activeStep === 2) {
+      setHasBackDrop(false);
+    } else {
+      setHasBackDrop(true);
+    }
+  }, [activeStep]);
   const getDirection = index =>
     activeStep === index
       ? isBackwards
@@ -44,21 +76,22 @@ const Content = ({ classes, history }) => {
       : isBackwards
       ? "up"
       : "down";
+
   return (
     <Grid className={classes.root}>
       <Menu />
 
       <Slide
-        timeout={1500}
+        timeout={slideTimeOut}
         direction={getDirection(0)}
         in={activeStep === 0}
         mountOnEnter
         unmountOnExit
+        key={"slideOverviewContent"}
       >
         <div className={classes.sliderContent}>
           <OverviewContent
-            activeStep={activeStep}
-            setActiveStep={handleForwardStep}
+            handleForwardStep={() => handleForwardStep(activeStep + 1)}
           />
         </div>
       </Slide>
@@ -67,34 +100,42 @@ const Content = ({ classes, history }) => {
         in={activeStep === 1}
         mountOnEnter
         unmountOnExit
-        timeout={1500}
+        timeout={slideTimeOut}
+        key={"slideProjectViewContent"}
       >
         <div className={classes.sliderContent}>
           <ProjectViewContent
-            activeStep={activeStep}
-            setActiveStep={setActiveStep}
+            handleForwardStep={() => handleForwardStep(activeStep + 1)}
           />
         </div>
       </Slide>
       <Slide
-        direction={activeStep === 2 ? "up" : "down"}
+        direction={getDirection(2)}
         in={activeStep === 2}
         mountOnEnter
         unmountOnExit
-        timeout={1500}
+        timeout={slideTimeOut}
+        key={"slideDashboard"}
       >
-        <div className={classes.sliderContent}>hello</div>
+        <div className={classes.sliderContent}>
+          <DashboardContent />
+        </div>
       </Slide>
       <Slide
         direction={activeStep !== 2 ? "up" : "down"}
         in={activeStep !== 2}
         mountOnEnter
         unmountOnExit
-        timeout={100}
+        timeout={activeStep !== 2 ? 100 : 1000}
+        key={"slideBackdrop"}
       >
         <Backdrop open={true}></Backdrop>
       </Slide>
-      <Stepper activeStep={activeStep} setActiveStep={handleBackStep} />
+      <Stepper
+        activeStep={activeStep}
+        handleBackStep={handleBackStep}
+        stepTextValues={stepTextValues}
+      />
     </Grid>
   );
 };

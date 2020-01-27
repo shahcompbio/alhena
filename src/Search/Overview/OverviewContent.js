@@ -22,21 +22,18 @@ const getDashboardByUser = gql`
 `;
 const styles = theme => ({
   content: {
-    flexGrow: 1,
-    padding: theme.spacing.unit * 3
+    flexGrow: 1
   },
   container: {
     minHeight: "100vh"
   }
 });
-//                  onClick={() => {
-//          history.push("/dashboards/" + project.name);
-//      }}
-const OverviewContent = ({ classes, activeStep, setActiveStep }) => {
+
+const OverviewContent = ({ classes, handleForwardStep }) => {
   const [{ selectedDashboard, dashboards }, dispatch] = useDashboardState();
   const [{ authKeyID, uid }] = useAppState();
   const selectProject = project => {
-    setActiveStep(activeStep + 1);
+    handleForwardStep();
 
     dispatch({
       type: "DASHBOARD_SELECT",

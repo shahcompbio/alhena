@@ -2,10 +2,19 @@ import React from "react";
 import NewAccount from "./NewAccount.js";
 
 import LoadingCircle from "./../ProgressCircle.js";
-import { VERIFYNEWUSERAUTHKEY } from "./../../Queries/queries.js";
 
 import { withRouter } from "react-router";
 import { Query } from "react-apollo";
+import gql from "graphql-tag";
+
+const VERIFYNEWUSERAUTHKEY = gql`
+  query verifyNewUserUri($key: String!) {
+    verifyNewUserUri(key: $key) {
+      isValid
+      email
+    }
+  }
+`;
 
 const NewUserUriVerification = ({ uri, dispatch }) => {
   //const [error, setError] = useState(false);
@@ -14,7 +23,7 @@ const NewUserUriVerification = ({ uri, dispatch }) => {
     <Query
       query={VERIFYNEWUSERAUTHKEY}
       variables={{
-        key: uri.params.key
+        key: uri.params.redisKey
       }}
     >
       {({ loading, error, data }) => {
@@ -24,12 +33,11 @@ const NewUserUriVerification = ({ uri, dispatch }) => {
         if (loading) {
           return <LoadingCircle />;
         } else {
-          if (true) {
-            //data.verifyNewUserUri.isValid
+          if (data.verifyNewUserUri.isValid) {
+            //
             return (
               <NewAccount
-                //email={data.verifyNewUserUri.email}
-                email="viki.bojilova@gmail.com"
+                email={data.verifyNewUserUri.email}
                 dispatch={dispatch}
               />
             );

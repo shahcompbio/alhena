@@ -27,20 +27,23 @@ const styles = {
   }
 };
 
-const ProjectViewContent = ({ classes }) => {
-  const [{ selectedDashboard }] = useDashboardState();
+const ProjectViewContent = ({ classes, handleForwardStep }) => {
+  //const [{ selectedDashboard }] = useDashboardState();
+  const selectedDashboard = "DLP";
   const [{ authKeyID, uid }] = useAppState();
   const [selectedOptions, setSelectedOptions] = useState({});
   const [filters, setFilters] = useState([]);
-  console.log(selectedDashboard);
+
   const [graphDim, setDim] = useState(0);
   const dimRef = useRef(0);
 
   const updateDimensions = () => {
-    setDim({
-      width: dimRef.current.clientWidth,
-      height: dimRef.current.clientHeight
-    });
+    if (dimRef !== null) {
+      setDim({
+        width: dimRef.current.clientWidth,
+        height: dimRef.current.clientHeight
+      });
+    }
   };
 
   window.addEventListener("resize", updateDimensions);
@@ -109,11 +112,10 @@ const ProjectViewContent = ({ classes }) => {
                   key={"packing-circles"}
                   filters={[]}
                   analyses={{}}
+                  data={null}
                   handleFilterChange={null}
+                  handleForwardStep={null}
                 />
-              </Grid>
-              <Grid item xs={6} sm={3} key={"demographics-content"}>
-                <Demographics stats={null} key={"demographics"} />
               </Grid>
             </Grid>
           );
@@ -147,16 +149,11 @@ const ProjectViewContent = ({ classes }) => {
                   isLoading={false}
                   key={"packing-circles"}
                   filters={filters}
-                  analyses={data.analyses.analysesTree.children}
+                  data={data.analyses.analysesTree.children}
                   handleFilterChange={(filters, type) =>
                     handleFilterChange(filters, type)
                   }
-                />
-              </Grid>
-              <Grid item xs={6} sm={3} key={"demographics-content"}>
-                <Demographics
-                  stats={data.analyses.analysesStats}
-                  key={"demographics"}
+                  handleForwardStep={handleForwardStep}
                 />
               </Grid>
             </Grid>

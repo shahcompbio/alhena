@@ -4,8 +4,6 @@ import { withStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
 
 import QCDashboard from "./QCDashboard.js";
-import SideToolBar from "./SideToolBar.js";
-import Menu from "../Misc/Menu.js";
 
 import {
   AppBar,
@@ -83,7 +81,6 @@ const DashboardContent = ({ classes, history }) => {
           </Paper>
         </Grid>
       </Grid>
-      <Menu />
     </div>
   );
 };

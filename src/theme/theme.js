@@ -15,7 +15,7 @@ export const theme = createMuiTheme({
     },
     background: {
       default: "#F5F5F5"
-      //  default: "#2b2a2a"
+      //default: "#2b2a2a"
     },
     overrides: {
       MuiFab: {
