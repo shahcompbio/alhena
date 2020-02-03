@@ -3,6 +3,19 @@ import * as d3 from "d3";
 import { config } from "../../../config/config";
 const displayConfig = config.DisplayConfig;
 
+export function originalRadius(d, isSecondLevelInteraction) {
+  if (isSecondLevelInteraction) {
+    return d.depth === 0 ? 1400 : d.depth === 1 ? 0 : 40;
+  } else {
+    if (d.depth === 0) {
+      return 1400;
+    } else if (d.depth === 1 || d.depth === 2) {
+      return 20;
+    } else {
+      return 15;
+    }
+  }
+}
 export const voronoid = d3
   .voronoi()
   .x(d => d.x)
@@ -31,12 +44,15 @@ export const colourNodeSelections = (nodeSelection, heightOfDetail) =>
       return heightOfDetail === d.height ? 70 : 20;
     });
 
-export const removeAllContent = mainSvg =>
+export const removeAllContent = mainSvg => {
   mainSvg
     .selectAll(
       ".allCircleNodes, .lines, .directLabel, .node-label, path, .legendDescription"
     )
     .remove();
+
+  d3.select(".sampleAfterFilterLabel").text("");
+};
 export const ungreySelection = selectionText =>
   d3.selectAll(selectionText).classed("greyedNodes", false);
 export const greySelection = selectionText =>

@@ -28,8 +28,7 @@ const styles = {
 };
 
 const ProjectViewContent = ({ classes, handleForwardStep }) => {
-  //const [{ selectedDashboard }] = useDashboardState();
-  const selectedDashboard = "DLP";
+  const [{ selectedDashboard }] = useDashboardState();
   const [{ authKeyID, uid }] = useAppState();
   const [selectedOptions, setSelectedOptions] = useState({});
   const [filters, setFilters] = useState([]);

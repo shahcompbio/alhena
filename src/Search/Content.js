@@ -31,8 +31,10 @@ const defaultStepperText = [
 ];
 const slideTimeOut = 1500;
 const Content = ({ classes, history }) => {
-  const [{ selectedDashboard, selectedAnalysis }] = useDashboardState();
-
+  const [
+    { selectedDashboard, selectedAnalysis },
+    dispatch
+  ] = useDashboardState();
   const [activeStep, setActiveStep] = useState(0);
   const [stepTextValues, setStepTextValues] = useState(defaultStepperText);
   const [hasBackdrop, setHasBackDrop] = useState(true);
@@ -41,26 +43,42 @@ const Content = ({ classes, history }) => {
   const handleBackStep = index => {
     setIsBackwards(true);
     setActiveStep(index);
+    if (index === 0) {
+      dispatch({
+        type: "DASHBOARD_SELECT",
+        value: { selectedDashboard: null }
+      });
+    }
+    if (index === 1) {
+      dispatch({
+        type: "ANALYSIS_SELECT",
+        value: { selectedAnalysis: null }
+      });
+    }
     const newStepperTextValues = stepTextValues.map((text, i) => {
-      return i <= index ? defaultStepperText[i] : text;
+      return i < index ? defaultStepperText[i] : text;
     });
     setStepTextValues([...newStepperTextValues]);
   };
+
+  useEffect(() => {
+    const newStepperTextValues = stepTextValues.map((text, i) => {
+      if (selectedDashboard && i == 0) {
+        return selectedDashboard;
+      } else if (selectedAnalysis && i === 1) {
+        return "SC-123";
+      } else {
+        return defaultStepperText[i];
+      }
+    });
+    setStepTextValues([...newStepperTextValues]);
+  }, [selectedDashboard, selectedAnalysis]);
+
   const handleForwardStep = index => {
     setIsBackwards(false);
     setActiveStep(index);
-    console.log(index);
-    const newStepperTextValues = stepTextValues.map((text, i) => {
-      console.log(index - 1 === i && i === 1);
-      return index - 1 === i && i === 0
-        ? selectedDashboard
-        : index - 1 === i && i === 1
-        ? "SC-123"
-        : text;
-    });
-    console.log(newStepperTextValues);
-    setStepTextValues([...newStepperTextValues]);
   };
+
   useEffect(() => {
     if (activeStep === 2) {
       setHasBackDrop(false);
@@ -68,6 +86,7 @@ const Content = ({ classes, history }) => {
       setHasBackDrop(true);
     }
   }, [activeStep]);
+
   const getDirection = index =>
     activeStep === index
       ? isBackwards

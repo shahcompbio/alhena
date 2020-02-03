@@ -10,6 +10,12 @@ const statsStateReducer = (state, action) => {
         selectedDashboard: action.value.selectedDashboard
       };
     }
+    case "ANALYSIS_SELECT": {
+      return {
+        ...state,
+        selectedAnalysis: action.value.selectedAnalysis
+      };
+    }
     default:
       return state;
   }

@@ -28,6 +28,9 @@ const NewUserUriVerification = ({ uri, dispatch }) => {
     >
       {({ loading, error, data }) => {
         if (error) {
+          dispatch({
+            type: "LOGOUT"
+          });
           return null;
         }
         if (loading) {

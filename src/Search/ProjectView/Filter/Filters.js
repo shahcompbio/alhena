@@ -49,8 +49,7 @@ const reactSelectStyles = {
 };
 
 const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
-  //const [{ selectedDashboard }, dispatch] = useDashboardState();
-  const selectedDashboard = "DLP";
+  const [{ selectedDashboard }, dispatch] = useDashboardState();
 
   const onChange = (value, action, type) => {
     const filter = value ? { value: value.label, label: value.value } : type;

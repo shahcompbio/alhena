@@ -1,6 +1,8 @@
 import { config } from "../../../config/config";
 import * as d3 from "d3";
 import d3Tip from "d3-tip";
+import { originalRadius } from "./utils.js";
+
 export const smallDotRadius = 30;
 export const largeDotRadius = 45;
 
@@ -13,7 +15,25 @@ export const createRoot = cluster =>
       return (a.parent === b.parent ? 2 : 1) / a.depth;
     })
     .size([2 * Math.PI, displayConfig.rootSize])(cluster);
-export const appendPantelTextAfterFilter = (nodeData, mainSvg) => {};
+
+export const appendPanelTextAfterFilter = (filters, nodes, mainSvg) => {
+  const hierarchyToDepth = {
+    project: 0,
+    sample_id: 1,
+    library_id: 2,
+    jira_id: 3
+  };
+  const lowestFilterTypeToGraphDepth = Math.max.apply(
+    Math,
+    filters.map(filter => hierarchyToDepth[filter.label]).map(level => level)
+  );
+
+  const filterSelectionToGraphNode = nodes.filter(
+    node => node.depth === lowestFilterTypeToGraphDepth
+  )[0];
+  appendPanelText(filterSelectionToGraphNode, mainSvg);
+};
+
 export const appendPanelText = (nodeData, mainSvg) => {
   mainSvg
     .selectAll(".legendCircles circle")
@@ -126,6 +146,44 @@ export const originalLineEquation = d3
     const levelOffset = d.height === 0 ? -400 : 0;
     return d.y + displayConfig.filtersOffSet + levelOffset;
   });
+export const appendSvgCircles = (mainSvg, nodes) => {
+  const svgCircles = mainSvg
+    .append("g")
+    .attr("class", "allCircleNodes")
+    .selectAll("circle")
+    .data(nodes, function(d) {
+      return d.data.target;
+    })
+    .enter()
+    .append("g");
+
+  svgCircles
+    .attr("class", "g-node")
+    .attr("transform", d => {
+      const yOffset = d.depth === 0 ? -800 : d.height === 0 ? -400 : 0;
+      return `
+  rotate(${((d.x + displayConfig.filtersOffSet) * 180) / Math.PI - 90})
+    translate(${d.y + displayConfig.filtersOffSet + yOffset},0)
+  `;
+    })
+    .append("circle")
+    .attr("fill", function(d) {
+      if (d.depth !== 0) {
+        return "white";
+      }
+    })
+    .attr("r", d => originalRadius(d, false))
+    .attr("class", function(d) {
+      if (d.depth === 0) {
+        return "parent-project node-" + d.data.target;
+      } else if (d.data.__typename !== "label") {
+        return "node-" + d.data.target;
+      } else {
+        return "node-label";
+      }
+    });
+  return svgCircles;
+};
 export const appendSvgLines = (svg, links) =>
   svg
     .append("g")
