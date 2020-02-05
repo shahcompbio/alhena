@@ -44,6 +44,7 @@
     "react-window": "^1.8.5",
     "seedrandom": "^3.0.5",
     "semantic-ui-react": "^0.87.1",
+    "semiotic": "^1.20.5",
     "sha1": "^1.1.1",
     "styled-components": "^4.4.0",
     "textures": "^1.2.0",

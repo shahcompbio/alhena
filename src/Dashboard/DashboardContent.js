@@ -71,14 +71,12 @@ const DashboardContent = ({ classes, history }) => {
     <div className={classes.root}>
       <Grid container spacing={1} className={classes.content}>
         <Grid container item xs={12} spacing={3}>
-          <Paper className={classes.paperContent}>
-            <StatsProvider
-              initialState={initialState}
-              reducer={statsStateReducer}
-            >
-              <QCDashboard analysis={"sc-856"} />
-            </StatsProvider>
-          </Paper>
+          <StatsProvider
+            initialState={initialState}
+            reducer={statsStateReducer}
+          >
+            <QCDashboard analysis={"sc-856"} />
+          </StatsProvider>
         </Grid>
       </Grid>
     </div>
