@@ -4,7 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
-
+import { scalePoint } from "d3";
 import { heatmapConfig } from "./config.js";
 import {
   getYScale,
@@ -71,25 +71,43 @@ const CHROMOSOME_SEGS_QUERY = gql`
     }
   }
 `;
+const getIndicesFromAllHeatmapOrder = allHeatmapOrder =>
+  allHeatmapOrder.filter(
+    order =>
+      order >= allHeatmapOrder[0] &&
+      order <
+        allHeatmapOrder[heatmapConfig.height / heatmapConfig.rowHeight - 2]
+  );
 
-const Heatmap = ({ analysis, heatmapOrder, categoryStats }) => {
-  const [{ quality, categoryState }] = useStatisticsState();
+const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
+  const [{ quality, categoryState, selectedCells }] = useStatisticsState();
 
+  const [heatmapOrder, setHeatmapOrder] = useState([...allHeatmapOrder]);
   const [hoverCell, setHoverCell] = useState({});
   const [allCategories] = useState(categoryStats);
   const [selectedCategories, setSelectedCategories] = useState(categoryStats);
   const [indices, setIndices] = useState([
-    ...heatmapOrder.filter(
-      order =>
-        order >= heatmapOrder[0] &&
-        order < heatmapOrder[heatmapConfig.height / heatmapConfig.rowHeight - 2]
-    )
+    ...getIndicesFromAllHeatmapOrder(allHeatmapOrder)
   ]);
 
-  const heatmapOrderToIndex = heatmapOrderToCellIndex(
-    heatmapOrder,
-    heatmapOrder.length
-  );
+  const heatmapOrderToHeatmapIndex = scalePoint()
+    .domain([...heatmapOrder])
+    .range([0, heatmapOrder.length - 1]);
+
+  useEffect(() => {
+    if (selectedCells && selectedCells.length !== 0) {
+      const newIndices = selectedCells.filter(
+        (order, index) =>
+          index < heatmapConfig.height / heatmapConfig.rowHeight - 2
+      );
+
+      setHeatmapOrder([...selectedCells]);
+      setIndices([...newIndices]);
+    } else if (selectedCells && selectedCells.length === 0) {
+      setHeatmapOrder([...allHeatmapOrder]);
+      setIndices([...getIndicesFromAllHeatmapOrder(allHeatmapOrder)]);
+    }
+  }, [selectedCells]);
 
   useEffect(() => {
     if (categoryState) {
@@ -202,8 +220,8 @@ const Heatmap = ({ analysis, heatmapOrder, categoryStats }) => {
                   triggerHeatmapRequery={index => setIndices([...index])}
                   heatmapOrder={heatmapOrder}
                   rangeExtent={[
-                    heatmapOrderToIndex(indices[0]),
-                    heatmapOrderToIndex(indices[indices.length - 1])
+                    heatmapOrderToHeatmapIndex(indices[0]),
+                    heatmapOrderToHeatmapIndex(indices[indices.length - 1])
                   ]}
                   analysis={analysis}
                   chromosomes={chromosomes}

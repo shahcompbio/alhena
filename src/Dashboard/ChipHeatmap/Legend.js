@@ -9,7 +9,7 @@ const legendProps = (max, maxColour) => {
 
     /* --- Size --- */
     size: [60, legendHeight],
-    padding: 10,
+
     /* --- Layout --- */
     oAccessor: "legend",
     rAccessor: "max",

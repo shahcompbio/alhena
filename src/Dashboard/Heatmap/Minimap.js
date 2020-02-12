@@ -40,18 +40,25 @@ const Minimap = ({
   triggerHeatmapRequery
 }) => {
   const [{ quality }] = useStatisticsState();
-  const [cellCount] = useState(heatmapOrder.length);
+  const cellCount = heatmapOrder.length;
+
   const [range, setRange] = useState([...rangeExtent]);
+
   const numRows = Math.min(
     cellCount,
     Math.floor(heatmapConfig.height / heatmapConfig.minimap.rowHeight)
   );
-  const [ratio] = useState(Math.ceil(cellCount / numRows));
+  const ratio = Math.ceil(cellCount / numRows);
+
   const [paintReady, setPaintReady] = useState(false);
   const [data, setData] = useState(null);
 
   const indices = heatmapOrder.filter((key, index) => index % ratio === 0);
   const bpRatio = getMinimapBPRatio(chromosomes);
+
+  useEffect(() => {
+    setRange([...rangeExtent]);
+  }, [rangeExtent]);
 
   function refCallback() {
     const ref = useRef(null);

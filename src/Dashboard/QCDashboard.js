@@ -7,6 +7,8 @@ import { withStyles } from "@material-ui/core/styles";
 
 import Heatmap from "./Heatmap/Heatmap.js";
 import ChipHeatmap from "./ChipHeatmap/ChipHeatmap.js";
+import GCBias from "./GCBias/GCBias.js";
+
 import { Paper } from "@material-ui/core";
 import { useStatisticsState } from "./DashboardState/statsState";
 const HEATMAP_ORDER = gql`
@@ -24,13 +26,10 @@ const styles = theme => ({
   heatmapContent: {
     padding: 15,
     height: 1000,
-    width: 1150,
-    margin: 15
+    width: 1150
   },
-  chipHeatmapContent: {
-    padding: 15,
-    height: 800,
-    width: 800
+  paperContainer: {
+    margin: 15
   }
 });
 const QCDashboard = ({ analysis, classes }) => {
@@ -47,13 +46,16 @@ const QCDashboard = ({ analysis, classes }) => {
     const heatmapOrder = data.heatmapOrder.map(order => order.order);
 
     return [
-      <Paper className={classes.chipHeatmap}>
+      <Paper className={classes.paperContainer}>
+        <GCBias analysis={analysis} />
+      </Paper>,
+      <Paper className={classes.paperContainer}>
         <ChipHeatmap analysis={analysis} />
       </Paper>,
-      <Paper className={classes.heatmapContent}>
+      <Paper className={[classes.heatmapContent, classes.paperContainer]}>
         <Heatmap
           analysis={analysis}
-          heatmapOrder={heatmapOrder}
+          allHeatmapOrder={heatmapOrder}
           categoryStats={data.categoriesStats}
         />
       </Paper>

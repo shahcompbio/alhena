@@ -4,6 +4,7 @@ import { withStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
 
 import QCDashboard from "./QCDashboard.js";
+import SettingsPanel from "./SettingsPanel.js";
 
 import {
   AppBar,
@@ -51,7 +52,7 @@ const styles = theme => ({
   },
   content: {
     //  margin: "auto"
-    marginLeft: "15vw",
+    marginLeft: "20vw",
     marginTop: 50
     //  marginTop: 70,
     //  marginLeft: 100
@@ -75,6 +76,7 @@ const DashboardContent = ({ classes, history }) => {
             initialState={initialState}
             reducer={statsStateReducer}
           >
+            <SettingsPanel />
             <QCDashboard analysis={"sc-856"} />
           </StatsProvider>
         </Grid>

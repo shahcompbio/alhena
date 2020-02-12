@@ -109,6 +109,9 @@
   font-weight: bold !important;
   font-size: 175px !important;
 }
+#medianLine {
+  transform: translate(0px, 100px);
+}
 .highlight0 {
   stroke: #f1c023 !important;
   stroke-width: 5px;

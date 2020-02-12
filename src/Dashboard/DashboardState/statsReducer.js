@@ -1,8 +1,17 @@
 import { heatmapConfig } from "../Heatmap/config.js";
-const initialState = { quality: heatmapConfig.defaultQuality };
+const initialState = {
+  quality: heatmapConfig.defaultQuality,
+  selectedCells: []
+};
 
 const statsStateReducer = (state, action) => {
   switch (action.type) {
+    case "BRUSH": {
+      return {
+        ...state,
+        selectedCells: action.value
+      };
+    }
     case "QUALITY_UPDATE": {
       return {
         ...state,
