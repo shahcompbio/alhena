@@ -161,15 +161,6 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
         });
         return (
           <Grid container direction="column">
-            <Grid item>
-              <MenuToolBar
-                categoryOptions={{
-                  selected: selectedCategories,
-                  all: allCategories
-                }}
-                handleRequery={(quality, selectedCategories) => {}}
-              />
-            </Grid>
             <Grid
               item
               container

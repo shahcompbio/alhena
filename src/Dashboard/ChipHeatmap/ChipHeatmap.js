@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useCallback, useState } from "react";
 
 import * as d3 from "d3";
+import { brush } from "d3";
 
 import XYFrame from "semiotic/lib/XYFrame";
 import Legend from "./Legend.js";
@@ -114,17 +115,10 @@ const frameProp = (data, thresholds, extent, setExtent) => {
         strokeWidth: 0.8
       };
     },
-    foregroundGraphics: [<svg id="chipheatmapBrush" />],
-    /*  tooltipContent: d => {
-      return (
-        <div className="tooltip-content">
-          <p>Cell: {d.cellId}</p>
-          <p>Column: {d.columnIndex}</p>
-          <p>Row: {d.rowIndex}</p>
-          <p>Total Mapped Reads {d.totalMappedReads}</p>
-        </div>
-      );
-    },*/
+    //  foregroundGraphics: [
+
+    //  ],
+
     axes: [{ orient: "left", label: "" }, { orient: "bottom", label: "" }],
 
     /* --- Draw --- */
@@ -174,33 +168,24 @@ const Chip = ({ data }) => {
   useEffect(() => {
     if (paintReady) {
       const brushSvg = d3.select("#chipheatmapBrush");
-      console.log(brushSvg);
-      var brush = d3
+      const brush = d3
         .brush()
-        .extent([[margin.left, margin.top], [700, 700]])
-        .on("start brush", brushed)
+        .extent([[0, 0], [700, 700]])
         .on("end", brushEnd);
 
-      function brushed() {
-        console.log("brushing");
-        //  console.log(d3.event.selection);
-      }
       function brushEnd() {
         const selection = d3.event.selection;
         if (!d3.event.sourceEvent || !selection) return;
-
-        //  setExtent([...selection]);
-        //console.log(selection);
-        //  brush.move(gBrush, [...selection]);
       }
 
-      //.selectAll(".overlay")
-      //  .remove();
+      console.log(brush);
+      console.log(brushSvg);
 
-      var gBrush = brushSvg.append("g").attr("class", "brush");
+      const gBrush = brushSvg.append("g").attr("class", "brush");
 
       gBrush.call(brush);
-      brush.move(gBrush, [[0, 0], [0, 0]]);
+
+      brush.move(gBrush, [[60, 60], [100, 100]]);
     }
   }, [paintReady]);
 
@@ -215,11 +200,16 @@ const Chip = ({ data }) => {
   }, [extent]);
 
   const frameProps = frameProp(data.squares, colourScale);
-  return (
-    <div ref={ref}>
-      <XYFrame {...frameProps} />
+  return [
+    <div ref={ref} style={{ height: 700 }}>
+      <div style={{ width: 700, height: 700 }}>
+        <XYFrame {...frameProps} />
+      </div>
+      <div style={{}}>
+        <svg id="chipheatmapBrush" width="700px" height="700px" style={{}} />
+      </div>
     </div>
-  );
+  ];
 };
 
 export default withStyles(styles)(ChipHeatmap);
