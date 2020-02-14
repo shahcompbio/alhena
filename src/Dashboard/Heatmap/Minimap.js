@@ -127,13 +127,15 @@ const Minimap = ({
 
       gBrush.call(brush);
 
+      brushSvg.select(".brush>.overlay").remove();
+      brushSvg.select(".brush>.handle").remove();
+
       brush.move(gBrush, [
         heatmapToMinimap(range[0]),
         heatmapToMinimap(range[1])
       ]);
     }
   }, [data, paintReady]);
-
   return (
     <Query query={MINI_MAP_QUERY} variables={{ analysis, indices, quality }}>
       {({ loading, error, data }) => {

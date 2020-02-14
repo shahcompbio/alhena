@@ -11,12 +11,14 @@ import { withStyles } from "@material-ui/core/styles";
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
 
+import _ from "lodash";
+
 import Grid from "@material-ui/core/Grid";
 
 import { useStatisticsState } from "../DashboardState/statsState";
 import { scaleLinear } from "d3-scale";
 
-const chipHeatmapHeight = 700;
+const chipHeatmapDimension = 700;
 const maxColour = "#d91e18";
 const margin = {
   left: 60,
@@ -81,16 +83,16 @@ const ChipHeatmap = ({ analysis, classes }) => {
   );
 };
 
-const frameProp = (data, thresholds, extent, setExtent) => {
+const frameProp = (data, thresholds, highlightedCells) => {
   return {
     summaries: [...data],
     /* --- Size --- */
-    size: [chipHeatmapHeight, chipHeatmapHeight],
+    size: [chipHeatmapDimension, chipHeatmapDimension],
     margin: {
       left: margin.left,
       bottom: margin.bottom,
       right: margin.right,
-      top: margin.left
+      top: margin.top
     },
 
     /* --- Layout --- */
@@ -108,16 +110,40 @@ const frameProp = (data, thresholds, extent, setExtent) => {
     xExtent: [0, 72],
 
     /* --- Customize --- */
-    summaryStyle: function(e) {
+    summaryStyle: function(e, index) {
+      var fillColour, stroke;
+      if (highlightedCells) {
+        if (e.percent !== 0) {
+          fillColour = thresholds(e.percent);
+          if (highlightedCells.hasOwnProperty(e.binItems[0].heatmapOrder)) {
+            stroke = "blue";
+          } else {
+            stroke = "#e6e6e6";
+          }
+        } else {
+          stroke = "#e6e6e6";
+          fillColour = "#f3f3f3";
+        }
+      } else {
+        stroke = "#ccc";
+        fillColour = thresholds(e.percent);
+      }
+
+      if (thresholds(e.percent) === 0) {
+        if (highlightedCells.length > 0) {
+          stroke = "#e6e6e6";
+          fillColour = "#f3f3f3";
+        } else {
+          stroke = "#ccc";
+          fillColour = thresholds(e.percent);
+        }
+      }
       return {
-        fill: thresholds(e.percent),
-        stroke: "#ccc",
+        fill: fillColour,
+        stroke: stroke,
         strokeWidth: 0.8
       };
     },
-    //  foregroundGraphics: [
-
-    //  ],
 
     axes: [{ orient: "left", label: "" }, { orient: "bottom", label: "" }],
 
@@ -127,7 +153,6 @@ const frameProp = (data, thresholds, extent, setExtent) => {
     showSummaryPoints: false
   };
 };
-const round = number => Math.round(number);
 const getHeatmapOrderFromExtent = (extent, data) =>
   data
     .filter(
@@ -138,78 +163,76 @@ const getHeatmapOrderFromExtent = (extent, data) =>
         entry.rowIndex <= extent[1][1]
     )
     .map(entry => entry.heatmapOrder)
-    .filter(entry => entry !== null)
+    .filter(entry => entry !== null && entry.heatmapOrder !== null)
     .sort((a, b) => a - b);
 
 const Chip = ({ data }) => {
   const [paintReady, setPaintReady] = useState(false);
   const [{ selectedCells }, dispatch] = useStatisticsState();
+  const [extent, setExtent] = useState([[0, 0], [0, 0]]);
+  const [extentHighlight, setExtentHighlight] = useState(null);
+
   const colourScale = scaleLinear([0, data.stats.max]).range([
     "#fdfdfd",
     maxColour
   ]);
 
-  const [extent, setExtent] = useState([[0, 0], [0, 0]]);
-  const [extentHighlight, setExtentHighlight] = useState([]);
-
-  function refCallback() {
-    const ref = useRef(null);
-    const setRef = useCallback(node => {
-      if (node) {
-        setPaintReady(true);
-      }
-      ref.current = node;
-    }, []);
-
-    return [setRef];
-  }
-
-  const [ref] = refCallback();
   useEffect(() => {
-    if (paintReady) {
-      const brushSvg = d3.select("#chipheatmapBrush");
-      const brush = d3
-        .brush()
-        .extent([[0, 0], [700, 700]])
-        .on("end", brushEnd);
+    setExtent([[0, 0], [0, 0]]);
 
-      function brushEnd() {
-        const selection = d3.event.selection;
-        if (!d3.event.sourceEvent || !selection) return;
-      }
-
-      console.log(brush);
-      console.log(brushSvg);
-
-      const gBrush = brushSvg.append("g").attr("class", "brush");
-
-      gBrush.call(brush);
-
-      brush.move(gBrush, [[60, 60], [100, 100]]);
+    if (selectedCells.length === 0) {
+      setExtentHighlight(null);
     }
-  }, [paintReady]);
+  }, [selectedCells]);
 
   useEffect(() => {
-    if (extent[1][1] !== 0) {
-      const selection = getHeatmapOrderFromExtent(extent, data.squares);
+    if (extentHighlight !== null) {
       dispatch({
         type: "BRUSH",
-        value: selection
+        value: extentHighlight
       });
     }
-  }, [extent]);
+  }, [extentHighlight]);
 
-  const frameProps = frameProp(data.squares, colourScale);
+  const extentHighlightedObject = extentHighlight
+    ? extentHighlight.reduce((final, entry) => {
+        final[entry] = "selected";
+        return final;
+      }, {})
+    : null;
+
+  const frameProps = frameProp(
+    data.squares,
+    colourScale,
+    extentHighlightedObject
+  );
+
   return [
-    <div ref={ref} style={{ height: 700 }}>
-      <div style={{ width: 700, height: 700 }}>
-        <XYFrame {...frameProps} />
-      </div>
-      <div style={{}}>
-        <svg id="chipheatmapBrush" width="700px" height="700px" style={{}} />
-      </div>
+    <div
+      style={{
+        width: chipHeatmapDimension,
+        height: chipHeatmapDimension,
+        position: "relative"
+      }}
+    >
+      <XYFrame
+        {...frameProps}
+        interaction={{
+          end: e => {
+            if (e !== null && !_.isEqual(e, extent)) {
+              const highlightedCells = getHeatmapOrderFromExtent(
+                e,
+                data.squares
+              );
+              setExtent([...e]);
+              setExtentHighlight(highlightedCells);
+            }
+          },
+          brush: "xyBrush",
+          extent: extent
+        }}
+      />
     </div>
   ];
 };
-
 export default withStyles(styles)(ChipHeatmap);

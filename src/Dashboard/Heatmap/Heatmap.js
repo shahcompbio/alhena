@@ -95,7 +95,7 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
     .range([0, heatmapOrder.length - 1]);
 
   useEffect(() => {
-    if (selectedCells && selectedCells.length !== 0) {
+    if (selectedCells.length !== 0) {
       const newIndices = selectedCells.filter(
         (order, index) =>
           index < heatmapConfig.height / heatmapConfig.rowHeight - 2
@@ -103,7 +103,7 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
 
       setHeatmapOrder([...selectedCells]);
       setIndices([...newIndices]);
-    } else if (selectedCells && selectedCells.length === 0) {
+    } else {
       setHeatmapOrder([...allHeatmapOrder]);
       setIndices([...getIndicesFromAllHeatmapOrder(allHeatmapOrder)]);
     }

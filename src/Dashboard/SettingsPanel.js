@@ -49,8 +49,9 @@ const styles = theme => ({
     background: "white"
   },
   selectedCells: {
-    backgroundColor: "#c1d3e0",
-    padding: "10px 15px 15px 15px"
+    backgroundColor: "#e6eaec",
+    padding: theme.spacing(3, 3, 3, 3),
+    margin: theme.spacing(2, 0, 2, 0)
   },
   markLabel: {
     color: "rgba(225, 225, 225, 0.54)"
@@ -151,7 +152,7 @@ const SettingsPanel = ({ classes, categoryStats }) => {
           aria-controls="panel1a-content"
           id="panel1a-header"
         >
-          <Typography variant="h7">Quality</Typography>
+          <Typography variant="h7">Quality Filter</Typography>
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
           <Slider

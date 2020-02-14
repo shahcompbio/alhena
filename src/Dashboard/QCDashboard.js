@@ -57,7 +57,6 @@ const QCDashboard = ({ analysis, classes }) => {
   });
 
   if (!loading && data) {
-    console.log(data);
     const heatmapOrder = data.heatmapOrder.map(order => order.order);
 
     return [
@@ -71,11 +70,11 @@ const QCDashboard = ({ analysis, classes }) => {
         <Paper className={[classes.gcBias, classes.paperContainer]}>
           <GCBias analysis={analysis} />
         </Paper>
-        ,
+
         <Paper className={[classes.chip, classes.paperContainer]}>
           <ChipHeatmap analysis={analysis} />
         </Paper>
-        ,
+
         <Paper className={[classes.heatmapContent, classes.paperContainer]}>
           <Heatmap
             analysis={analysis}

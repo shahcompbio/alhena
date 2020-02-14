@@ -36,9 +36,6 @@
   left: 0px;
   top: 0px;
 }
-.overlay {
-  pointer-events: none;
-}
 .gw-background-lines {
   stroke-dasharray: 0.5, 2;
   fill: none;
