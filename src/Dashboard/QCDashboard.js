@@ -57,24 +57,20 @@ const QCDashboard = ({ analysis, classes }) => {
   });
 
   if (!loading && data) {
-    const heatmapOrder = data.heatmapOrder.map(order => order.order);
+    const heatmapOrder =
+      selectedCells.length > 0
+        ? selectedCells
+        : data.heatmapOrder.map(order => order.order);
 
     return [
-      <Grid item className={classes.settings} item xs={4}>
+      <Grid className={classes.settings} item xs={4}>
         <SettingsPanel
+          cellCount={data.heatmapOrder.length}
           categoryStats={data.categoriesStats}
           analysis={analysis}
         />
       </Grid>,
       <Grid item className={classes.plots}>
-        <Paper className={[classes.gcBias, classes.paperContainer]}>
-          <GCBias analysis={analysis} />
-        </Paper>
-
-        <Paper className={[classes.chip, classes.paperContainer]}>
-          <ChipHeatmap analysis={analysis} />
-        </Paper>
-
         <Paper className={[classes.heatmapContent, classes.paperContainer]}>
           <Heatmap
             analysis={analysis}
@@ -82,10 +78,20 @@ const QCDashboard = ({ analysis, classes }) => {
             categoryStats={data.categoriesStats}
           />
         </Paper>
+        <Paper className={[classes.gcBias, classes.paperContainer]}>
+          <GCBias analysis={analysis} heatmapOrder={heatmapOrder} />
+        </Paper>
+        <Paper className={[classes.chip, classes.paperContainer]}>
+          <ChipHeatmap analysis={analysis} />
+        </Paper>
       </Grid>
     ];
   } else {
-    return null;
+    return (
+      <Grid className={classes.settings} item xs={4}>
+        <SettingsPanel cellCount={null} categoryStats={[]} analysis={null} />
+      </Grid>
+    );
   }
 };
 

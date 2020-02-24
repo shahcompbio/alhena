@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import Search from "./Filter/Search.js";
-import Demographics from "./Demographics/Demographics.js";
 
 import { useAppState } from "../../util/app-state";
 import { withStyles } from "@material-ui/styles";
@@ -12,7 +11,6 @@ import { getAllAnalyses } from "../../Queries/queries.js";
 
 import { useDashboardState } from "./ProjectState/dashboardState";
 import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
 
 const styles = {
   root: { flexGrow: 1 },
@@ -36,7 +34,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
   const [graphDim, setDim] = useState(0);
   const dimRef = useRef(0);
 
-  const updateDimensions = () => {
+  /*const updateDimensions = () => {
     if (dimRef !== null) {
       setDim({
         width: dimRef.current.clientWidth,
@@ -48,7 +46,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
   window.addEventListener("resize", updateDimensions);
   useEffect(() => {
     updateDimensions();
-  }, []);
+  }, []);*/
 
   const handleFilterChange = (filter, type) => {
     var options = selectedOptions;
@@ -103,6 +101,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
                   filters={null}
                   dashboards={[]}
                   handleFilterChange={null}
+                  handleForwardStep={null}
                 />
               </Grid>
               <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
@@ -140,6 +139,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
                   handleFilterChange={(selection, type) =>
                     handleFilterChange(selection, type)
                   }
+                  handleForwardStep={handleForwardStep}
                 />
               </Grid>
               <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>

@@ -3,7 +3,6 @@ import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import RadioButtonCheckedIcon from "@material-ui/icons/RadioButtonChecked";
 import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
-import Typography from "@material-ui/core/Typography";
 import Drawer from "@material-ui/core/Drawer";
 const drawerWidth = 90;
 const useStyles = makeStyles(theme => ({
@@ -11,7 +10,7 @@ const useStyles = makeStyles(theme => ({
     maxWidth: "100px",
     marginTop: "40vh",
     background: "none",
-    position: "absolute",
+    position: "fixed",
     right: 0,
     float: "right",
     margin: theme.spacing(5)
@@ -138,13 +137,14 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
         onMouseLeave={moreDetailExit}
         onClose={() => setDetailsDrawer(false)}
         ModalProps={{
-          keepMounted: true // Better open performance on mobile.
+          keepMounted: true
         }}
       >
         <div className={classes.drawerContent}>
           {stepTextValues.map((value, index) => {
             return (
               <div
+                key={value}
                 className={clsx(
                   value.length >= 10
                     ? classes.drawerLabelTwoLines

@@ -84,10 +84,6 @@ export const hierarchyColouring = {
   2: "#95d2dc"
 };
 export const appendLegend = (svg, mainCircleDim) => {
-  var legendSpacing = 600;
-  var legendTitleSpacing = 500;
-  var radius = 30;
-
   var lineHeight = -mainCircleDim.height / 24;
   var legendCircles = svg.append("g").classed("legendCircles", true);
 

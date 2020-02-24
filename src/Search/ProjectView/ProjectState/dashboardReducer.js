@@ -1,5 +1,5 @@
 const initialState = (dashboards, selectedDashboard) => {
-  return { dashboards: dashboards, selectedDashboard: selectedDashboard };
+  return { dashboards: dashboards, selectedDashboard: "DLP" };
 };
 
 const statsStateReducer = (state, action) => {

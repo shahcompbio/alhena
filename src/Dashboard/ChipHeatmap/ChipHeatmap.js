@@ -1,7 +1,4 @@
-import React, { useRef, useEffect, useCallback, useState } from "react";
-
-import * as d3 from "d3";
-import { brush } from "d3";
+import React, { useEffect, useState } from "react";
 
 import XYFrame from "semiotic/lib/XYFrame";
 import Legend from "./Legend.js";
@@ -29,7 +26,7 @@ const margin = {
 
 const styles = theme => ({
   legend: {
-    marginTop: 50,
+    marginTop: 40,
     marginRight: 30,
     marginLeft: 15
   }
@@ -52,7 +49,7 @@ const CHIP_HEATMAP_QUERY = gql`
 `;
 
 const ChipHeatmap = ({ analysis, classes }) => {
-  const [{ quality }, dispatch] = useStatisticsState();
+  const [{ quality }] = useStatisticsState();
 
   return (
     <Query query={CHIP_HEATMAP_QUERY} variables={{ analysis, quality }}>
@@ -167,7 +164,6 @@ const getHeatmapOrderFromExtent = (extent, data) =>
     .sort((a, b) => a - b);
 
 const Chip = ({ data }) => {
-  const [paintReady, setPaintReady] = useState(false);
   const [{ selectedCells }, dispatch] = useStatisticsState();
   const [extent, setExtent] = useState([[0, 0], [0, 0]]);
   const [extentHighlight, setExtentHighlight] = useState(null);

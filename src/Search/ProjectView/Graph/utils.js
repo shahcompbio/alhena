@@ -16,6 +16,18 @@ export function originalRadius(d, isSecondLevelInteraction) {
     }
   }
 }
+export const voronoiYScale = (y1, y2) =>
+  d3
+    .scaleLinear()
+    .domain([y1, y2])
+    .range([-2700, 2700]);
+
+export const voronoiXScale = (x1, x2) =>
+  d3
+    .scaleLinear()
+    .domain([x1, x2])
+    .range([-2700, 2700]);
+
 export const voronoid = d3
   .voronoi()
   .x(d => d.x)

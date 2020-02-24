@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { useAppState } from "../util/app-state";
 
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
 import IconButton from "@material-ui/core/IconButton";
 import AddBoxIcon from "@material-ui/icons/AddBox";
-import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import SeperatedTabs from "./SeperatedTabs.js";
@@ -19,11 +17,9 @@ import Menu from "../Misc/Menu.js";
 import { ApolloConsumer } from "react-apollo";
 import TabContentWrapper from "./TabContentWrapper.js";
 
-import { createUserEmail } from "../Queries/queries.js";
 import { createNewDashboard } from "../util/utils.js";
 
 import { withStyles, useTheme } from "@material-ui/styles";
-const iconStyle = { largeIcon: { width: 60, height: 60 } };
 const styles = theme => ({
   actions: {
     float: "right"
@@ -53,7 +49,6 @@ const styles = theme => ({
 });
 const AdminPanel = ({ classes }) => {
   const theme = useTheme();
-  const [{ authKeyID, uid }, dispatch] = useAppState();
 
   const [openPopup, setOpenPopup] = useState(false);
   const [tabIndex, setTabIndex] = useState(1);
@@ -70,15 +65,6 @@ const AdminPanel = ({ classes }) => {
     if (created) {
       window.location.reload();
     }
-  };
-  const addUser = async (event, client, email, name, selectedRoles) => {
-    var data = await client.query({
-      query: createUserEmail,
-      variables: {
-        recipient: { email: email, name, roles: selectedRoles.join(",") }
-      }
-    });
-    return data.data.sendMail.accepted;
   };
 
   return (
@@ -119,7 +105,6 @@ const AdminPanel = ({ classes }) => {
                         isOpen={openPopup}
                         handleClose={handleCloseAdd}
                         client={client}
-                        addUser={addUser}
                       />
                     ),
                     openPopup && tabIndex === 1 && (

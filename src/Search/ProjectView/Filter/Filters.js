@@ -7,11 +7,7 @@ import { withStyles } from "@material-ui/styles";
 import InputLabel from "@material-ui/core/InputLabel";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
-import {
-  hierarchyColouring,
-  smallDotRadius,
-  largeDotRadius
-} from "../Graph/appendUtils.js";
+import { hierarchyColouring } from "../Graph/appendUtils.js";
 import { useDashboardState } from "../ProjectState/dashboardState";
 
 import { config } from "../../../config/config.js";
@@ -48,13 +44,20 @@ const reactSelectStyles = {
   }
 };
 
-const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
+const Filters = ({
+  filters,
+  handleFilterChange,
+  classes,
+  selectedOptions,
+  handleForwardStep
+}) => {
   const [{ selectedDashboard }, dispatch] = useDashboardState();
 
-  const onChange = (value, action, type) => {
+  const onChange = (value, action, type, handleForwardStep) => {
     const filter = value ? { value: value.label, label: value.value } : type;
     handleFilterChange(filter, action);
   };
+
   const getSelectValue = (selectedOptions, filterType, filters) => {
     if (isUserSelectedOption(selectedOptions, filterType)) {
       return selectedOptions[filterType];
@@ -78,6 +81,7 @@ const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
     }
     return null;
   };
+
   const isFilterSmallerThanLargestChoosen = (type, largestFilterIndex) =>
     filterConfig.filterHeirarchy.indexOf(type) < largestFilterIndex;
 
@@ -93,6 +97,7 @@ const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
     var largestFilterIndex = getLargestFilterIndex(selectedOptions);
     return isFilterSmallerThanLargestChoosen(filterType, largestFilterIndex);
   };
+
   if (filters) {
     const filterTypes = filters.map(filter => filter.type);
     var collator = new Intl.Collator(undefined, {
@@ -113,9 +118,19 @@ const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
                   isUserSelectedOption(selectedOptions, filterTypes[i]) ||
                   !isDisabledOption(selectedOptions, filterTypes[i])
                 }
-                onChange={(option, { action }) =>
-                  onChange(option, action, filterTypes[i])
-                }
+                onChange={(option, { action }) => {
+                  if (filterTypes[i] === "jira_id") {
+                    dispatch({
+                      type: "ANALYSIS_SELECT",
+                      value: { selectedAnalysis: option.label }
+                    });
+
+                    handleForwardStep();
+                  } else {
+                    onChange(option, action, filterTypes[i], handleForwardStep);
+                  }
+                }}
+                closeMenuOnSelect={false}
                 options={filters[i].values.sort(collator.compare).map(value => {
                   return {
                     value: filterTypes[i],
@@ -136,6 +151,7 @@ const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
   } else {
     panels = [];
   }
+
   return (
     <Grid
       container
@@ -174,7 +190,8 @@ const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
     </Grid>
   );
 };
-const FilterDots = ({}) => {
+
+const FilterDots = () => {
   var svg = d3.select("#filterDots");
 
   [1].map((colour, index) =>

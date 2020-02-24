@@ -4,8 +4,6 @@ import Filters from "./Filters.js";
 
 import { withStyles } from "@material-ui/styles";
 
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from "react-select";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 
@@ -26,7 +24,13 @@ const style = theme => ({
     width: "100%"
   }
 });
-const Search = ({ classes, filters, handleFilterChange, selectedOptions }) => {
+const Search = ({
+  classes,
+  filters,
+  handleFilterChange,
+  selectedOptions,
+  handleForwardStep
+}) => {
   return (
     <Grid container className={classes.root} spacing={2}>
       <Paper
@@ -40,6 +44,7 @@ const Search = ({ classes, filters, handleFilterChange, selectedOptions }) => {
           handleFilterChange={(selection, type) =>
             handleFilterChange(selection, type)
           }
+          handleForwardStep={handleForwardStep}
         />
       </Paper>
     </Grid>

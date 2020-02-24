@@ -9,7 +9,6 @@ import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
-import LoadingCircle from "./ProgressCircle.js";
 
 const styles = theme => ({
   circleImg: {
@@ -55,14 +54,12 @@ const styles = theme => ({
   }
 });
 const UnauthenticatedApp = ({ client, classes }) => {
-  const [data, dispatch] = useAppState();
+  const [_, dispatch] = useAppState();
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
   const usernameRef = useRef();
   const passwordRef = useRef();
 
   const handleLogin = async (event, client, dispatch) => {
-    setLoading(true);
     setError(null);
     event.preventDefault();
     try {
@@ -73,7 +70,6 @@ const UnauthenticatedApp = ({ client, classes }) => {
         dispatch
       );
     } catch (error) {
-      setLoading(false);
       error.graphQLErrors.map(message => {
         if (message.extensions.exception.meta.body.status) {
           setError(message.extensions.exception.meta.body.status);

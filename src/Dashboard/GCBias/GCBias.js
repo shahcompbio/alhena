@@ -2,8 +2,6 @@ import React from "react";
 import * as d3 from "d3";
 
 import XYFrame from "semiotic/lib/XYFrame";
-import DividedLine from "semiotic/lib/DividedLine";
-import MedianLine from "./MedianLine.js";
 import { withStyles } from "@material-ui/core/styles";
 
 import { Query } from "react-apollo";
@@ -22,8 +20,12 @@ const styles = theme => ({
 });
 
 const GCBIAS_QUERY = gql`
-  query gcBias($analysis: String!, $quality: String!) {
-    gcBias(analysis: $analysis, quality: $quality) {
+  query gcBias($analysis: String!, $quality: String!, $selectionOrder: [Int!]) {
+    gcBias(
+      analysis: $analysis
+      quality: $quality
+      selectionOrder: $selectionOrder
+    ) {
       gcCells {
         experimentalCondition
         gcPercent
@@ -41,11 +43,16 @@ const GCBIAS_QUERY = gql`
   }
 `;
 
-const GCBias = ({ analysis, classes }) => {
-  const [{ quality, categoryState }] = useStatisticsState();
+const GCBias = ({ analysis, classes, heatmapOrder }) => {
+  const [{ quality, selectedCells }] = useStatisticsState();
+
+  const selectionOrder = selectedCells.length > 0 ? heatmapOrder : null;
 
   return (
-    <Query query={GCBIAS_QUERY} variables={{ analysis, quality }}>
+    <Query
+      query={GCBIAS_QUERY}
+      variables={{ analysis, quality, selectionOrder }}
+    >
       {({ loading, error, data }) => {
         if (error) return null;
         if (loading && Object.keys(data).length === 0) {
@@ -72,12 +79,16 @@ const GCBias = ({ analysis, classes }) => {
     </Query>
   );
 };
+const plotDimensions = {
+  size: [800, 600],
+  margin: { left: 80, bottom: 90, right: 60, top: 70 }
+};
 const frameProps = (data, extent, lineFunction) => {
   return {
     lines: data,
     /* --- Size --- */
-    size: [800, 600],
-    margin: { left: 80, bottom: 90, right: 60, top: 70 },
+    size: plotDimensions.size,
+    margin: plotDimensions.margin,
 
     /* --- Layout --- */
     lineType: "difference",
@@ -98,79 +109,8 @@ const frameProps = (data, extent, lineFunction) => {
         fillOpacity: 0.6
       };
     },
-    /*customLineMark: ({ d, i, xScale, yScale }) => {
-      return (
-        <DividedLine
-          id="medianLine"
-          key={`threshold-${i}`}
-          data={[d]}
-          parameters={p => {
-            return { stroke: "#9fd0cb", fill: "none" };
-          }}
-          customAccessors={{
-            x: d => xScale(d.gcPercent),
-            y: d => yScale(d.median)
-          }}
-          lineDataAccessor={d => d.data}
-        />
-      );
-    },
-   --- Draw ---
-,
-    annotations: [
-      {
-        className: "dot-com-bubble",
-        type: "line",
-        lines: {
-          coordinates: [[0, 0.5], [50, 0.8]]
-        }
-      }
-    ],*/
+
     foregroundGraphics: <path d={lineFunction} stroke="black" fill="none" />,
-    axes: [
-      {
-        orient: "left",
-        label: "Median",
-        ticks: 10,
-        tickLineGenerator: function() {}
-      },
-      {
-        orient: "bottom",
-        label: { name: "GC Percent", locationDistance: 55 },
-        tickLineGenerator: function() {}
-      }
-    ]
-  };
-};
-const linProps = (data, extent) => {
-  const theme = [
-    "#ac58e5",
-    "#E0488B",
-    "#9fd0cb",
-    "#e0d33a",
-    "#7566ff",
-    "#533f82",
-    "#7a255d",
-    "#365350",
-    "#a19a11",
-    "#3f4482"
-  ];
-
-  return {
-    lines: data,
-    /* --- Size --- */
-    size: [700, 400],
-    margin: { left: 70, bottom: 60, right: 30, top: 40 },
-
-    /* --- Process --- */
-    xAccessor: "gcPerecent",
-    yAccessor: "median",
-    yExtent: [...extent],
-    lineStyle: (d, i) => ({
-      stroke: theme[i],
-      strokeWidth: 2,
-      fill: "none"
-    }),
     axes: [
       {
         orient: "left",
@@ -192,6 +132,7 @@ const Chart = ({ data, stats, isLineVariation }) => {
 
   const lowData = data.map(entry => ({ ...entry, type: "lowCi" }));
   const highData = data.map(entry => ({ ...entry, type: "highCi" }));
+
   const formattedData = [
     {
       title: "lowCi",
@@ -206,17 +147,19 @@ const Chart = ({ data, stats, isLineVariation }) => {
     .scaleLinear()
     .domain([0, 100])
     .range([0, 660]);
+
   const medianToScreenCord = d3
     .scaleLinear()
     .domain([...extent])
     .range([440, 0]);
+
   const lineFunction = d3
     .line()
     .x(function(d) {
       return gcPercentToScreenCord(d.gcPercent) + 70 + 10;
     })
     .y(function(d) {
-      return medianToScreenCord(d.median) + 40 + 30;
+      return medianToScreenCord(d.median) + 70;
     })(data);
 
   const props = frameProps(formattedData, extent, lineFunction);

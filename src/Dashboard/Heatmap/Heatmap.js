@@ -6,11 +6,7 @@ import { Query } from "react-apollo";
 import gql from "graphql-tag";
 import { scalePoint } from "d3";
 import { heatmapConfig } from "./config.js";
-import {
-  getYScale,
-  getChromPixelMapping,
-  heatmapOrderToCellIndex
-} from "./utils.js";
+import { getYScale, getChromPixelMapping } from "./utils.js";
 
 import CategoriesLegend from "./CategoriesLegend.js";
 import Categories from "./Categories.js";
@@ -18,7 +14,6 @@ import ChromAxis from "./ChromAxis.js";
 import HeatmapRow from "./HeatmapRow.js";
 import Indicator from "./Indicator.js";
 import Legend from "./Legend.js";
-import MenuToolBar from "../CommonModules/MenuToolBar.js";
 import Minimap from "./Minimap.js";
 import ProfileWrapper from "./ProfileWrapper.js";
 
@@ -73,18 +68,14 @@ const CHROMOSOME_SEGS_QUERY = gql`
 `;
 const getIndicesFromAllHeatmapOrder = allHeatmapOrder =>
   allHeatmapOrder.filter(
-    order =>
-      order >= allHeatmapOrder[0] &&
-      order <
-        allHeatmapOrder[heatmapConfig.height / heatmapConfig.rowHeight - 2]
+    (order, index) => index < heatmapConfig.height / heatmapConfig.rowHeight - 2
   );
 
 const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
-  const [{ quality, categoryState, selectedCells }] = useStatisticsState();
+  const [{ quality, categoryState }] = useStatisticsState();
 
   const [heatmapOrder, setHeatmapOrder] = useState([...allHeatmapOrder]);
   const [hoverCell, setHoverCell] = useState({});
-  const [allCategories] = useState(categoryStats);
   const [selectedCategories, setSelectedCategories] = useState(categoryStats);
   const [indices, setIndices] = useState([
     ...getIndicesFromAllHeatmapOrder(allHeatmapOrder)
@@ -95,19 +86,9 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
     .range([0, heatmapOrder.length - 1]);
 
   useEffect(() => {
-    if (selectedCells.length !== 0) {
-      const newIndices = selectedCells.filter(
-        (order, index) =>
-          index < heatmapConfig.height / heatmapConfig.rowHeight - 2
-      );
-
-      setHeatmapOrder([...selectedCells]);
-      setIndices([...newIndices]);
-    } else {
-      setHeatmapOrder([...allHeatmapOrder]);
-      setIndices([...getIndicesFromAllHeatmapOrder(allHeatmapOrder)]);
-    }
-  }, [selectedCells]);
+    setHeatmapOrder([...allHeatmapOrder]);
+    setIndices([...getIndicesFromAllHeatmapOrder(allHeatmapOrder)]);
+  }, [allHeatmapOrder]);
 
   useEffect(() => {
     if (categoryState) {

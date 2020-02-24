@@ -1,14 +1,10 @@
-import React, { useState, useRef, useCallback, useEffect } from "react";
-import { Route, Switch } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import Menu from "../Misc/Menu.js";
-
-import DashboardWrapper from "./DashboardWrapper.js";
 import ProjectViewContent from "./ProjectView/ProjectViewContent.js";
 import Stepper from "./Stepper.js";
 import Slide from "@material-ui/core/Slide";
 import DashboardContent from "../Dashboard/DashboardContent.js";
 import OverviewContent from "./Overview/OverviewContent.js";
-import NoMatch from "./NoMatch.js";
 
 import Backdrop from "@material-ui/core/Backdrop";
 import Grid from "@material-ui/core/Grid";
@@ -35,9 +31,8 @@ const Content = ({ classes, history }) => {
     { selectedDashboard, selectedAnalysis },
     dispatch
   ] = useDashboardState();
-  const [activeStep, setActiveStep] = useState(0);
+  const [activeStep, setActiveStep] = useState(selectedDashboard ? 1 : 0);
   const [stepTextValues, setStepTextValues] = useState(defaultStepperText);
-  const [hasBackdrop, setHasBackDrop] = useState(true);
   const [isBackwards, setIsBackwards] = useState(false);
 
   const handleBackStep = index => {
@@ -63,10 +58,10 @@ const Content = ({ classes, history }) => {
 
   useEffect(() => {
     const newStepperTextValues = stepTextValues.map((text, i) => {
-      if (selectedDashboard && i == 0) {
+      if (selectedDashboard && i === 0) {
         return selectedDashboard;
       } else if (selectedAnalysis && i === 1) {
-        return "SC-123";
+        return selectedAnalysis;
       } else {
         return defaultStepperText[i];
       }
@@ -78,14 +73,6 @@ const Content = ({ classes, history }) => {
     setIsBackwards(false);
     setActiveStep(index);
   };
-
-  useEffect(() => {
-    if (activeStep === 2) {
-      setHasBackDrop(false);
-    } else {
-      setHasBackDrop(true);
-    }
-  }, [activeStep]);
 
   const getDirection = index =>
     activeStep === index
@@ -133,7 +120,7 @@ const Content = ({ classes, history }) => {
         in={activeStep === 2}
         mountOnEnter
         unmountOnExit
-        timeout={slideTimeOut}
+        timeout={400}
         key={"slideDashboard"}
       >
         <div className={classes.sliderContent}>

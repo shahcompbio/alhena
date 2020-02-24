@@ -1,25 +1,14 @@
 import React from "react";
 
-import { withRouter } from "react-router";
-
 import { withStyles } from "@material-ui/core/styles";
-import { useAppState } from "../../util/app-state";
 
 import { useDashboardState } from "../ProjectView/ProjectState/dashboardState";
-import { Query } from "react-apollo";
 
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Typography from "@material-ui/core/Typography";
-import gql from "graphql-tag";
-const getDashboardByUser = gql`
-  query UserDashboard($user: ApiUser!) {
-    getDashboardsByUser(auth: $user) {
-      name
-    }
-  }
-`;
+
 const styles = theme => ({
   content: {
     flexGrow: 1
@@ -30,8 +19,7 @@ const styles = theme => ({
 });
 
 const OverviewContent = ({ classes, handleForwardStep }) => {
-  const [{ selectedDashboard, dashboards }, dispatch] = useDashboardState();
-  const [{ authKeyID, uid }] = useAppState();
+  const [{ dashboards }, dispatch] = useDashboardState();
   const selectProject = project => {
     handleForwardStep();
 

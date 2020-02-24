@@ -86,7 +86,7 @@ const styles = (theme, tabIndex) => ({
 
 const TabContentWrapper = ({ tabIndex, classes }) => {
   const theme = useTheme();
-  const [{ authKeyID, uid }, dispatch] = useAppState();
+  const [{ authKeyID, uid }] = useAppState();
 
   const [isLoading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -214,10 +214,11 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
       {({ loading, error, data }) => {
         if (loading) return null;
         if (error) {
-          dispatch({
-            type: "LOGOUT"
-          });
-          return null;
+          console.log(error);
+          //  dispatch({
+          //    type: "LOGOUT"
+          //  });
+          //  return null;
         }
         const modifiedData =
           data.length > 0 ? data : data[tableConfig.dataReturnName];

@@ -28,7 +28,7 @@ const legendProps = (max, maxColour) => {
         );
       }
     },
-    axes: [{ basline: false, orient: "right", ticks: 2 }],
+    axes: [{ basline: false, orient: "right", ticks: 3, tickPadding: 10 }],
     additionalDefs: [
       <linearGradient key="gradient" x1="0" x2="0" y1="0" y2="1" id="gradient">
         <stop stopColor={maxColour} offset="0%" />

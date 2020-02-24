@@ -6,7 +6,6 @@ import { Route, Switch } from "react-router-dom";
 import { withRouter } from "react-router";
 
 import AdminPanel from "./Authentication/AdminPanel.js";
-import Content from "./Search/Content.js";
 
 import DashboardWrapper from "./Search/DashboardWrapper";
 import DashboardContent from "./Dashboard/DashboardContent.js";
@@ -26,7 +25,7 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 
 const App = () => {
   const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
-
+  console.log(authKeyID, isSuperUser);
   return (
     <MuiThemeProvider theme={theme}>
       <CssBaseline />
@@ -42,7 +41,6 @@ const App = () => {
         />
         <Route
           path="/NewAccount/:redisKey"
-          //path="/secure/:key"
           component={({ match }) => (
             <NewUserUriVerification uri={match} dispatch={dispatch} />
           )}
@@ -72,5 +70,5 @@ const App = () => {
     </MuiThemeProvider>
   );
 };
-//        // <Redirect to="/login" />
+
 export default withRouter(App);

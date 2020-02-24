@@ -2,15 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useAppState } from "../../util/app-state";
 import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
 
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
-import Input from "@material-ui/core/Input";
-import Chip from "@material-ui/core/Chip";
+import {
+  InputLabel,
+  MenuItem,
+  FormControl,
+  Input,
+  Chip,
+  Button,
+  Dialog,
+  DialogActions
+} from "@material-ui/core";
 
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -18,18 +20,42 @@ import Select from "@material-ui/core/Select";
 
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 
-import LoadingCircle from "./../ProgressCircle.js";
-import IconButton from "@material-ui/core/IconButton";
-import CheckIcon from "@material-ui/icons/Check";
+import { Typography } from "@material-ui/core";
+
+import gql from "graphql-tag";
 
 import { withRouter } from "react-router";
 import { Query } from "react-apollo";
 import { getAllDashboards } from "../../Queries/queries.js";
+const copy = require("clipboard-copy");
+const createUserEmail = gql`
+  query createUserEmail($recipient: Recipient!) {
+    sendMail(recipient: $recipient) {
+      newUserLink
+    }
+  }
+`;
+const generateNewUserLink = async (
+  event,
+  client,
+  email,
+  name,
+  selectedRoles
+) => {
+  var data = await client.query({
+    query: createUserEmail,
+    variables: {
+      recipient: { email: email, name, roles: selectedRoles.join(",") }
+    }
+  });
+  return data.data.sendMail.newUserLink;
+};
 
-const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
+const NewUserPopup = ({ isOpen, handleClose, client }) => {
   const [{ authKeyID, uid }] = useAppState();
-  const [isLoading, setLoading] = useState(false);
-  const [isSent, setIsSent] = useState(false);
+  //const [isLoading, setLoading] = useState(false);
+  //const [isSent, setIsSent] = useState(false);
+  const [newUserLink, setNewUserLink] = useState(null);
   const [isSubmitDisabled, setIsDisabled] = useState(true);
 
   const [selectedRoles, setSelectedRoles] = useState([]);
@@ -72,30 +98,44 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
             onClose={handleClose}
             aria-labelledby="form-dialog-title"
           >
-            {isLoading ? (
+            {newUserLink ? (
               <DialogContent
                 style={{
-                  maxWidth: 450,
-                  height: 300,
-                  paddingTop: isSent && isLoading ? 0 : 20
+                  width: 450,
+                  height: 150
                 }}
               >
                 <div
                   style={{
                     height: 200,
                     margin: "auto",
-                    left: "25%",
                     position: "absolute"
                   }}
                 >
-                  {isSent && (
-                    <IconButton style={{ top: "65%", left: "45%" }}>
-                      <CheckIcon
-                        style={{ fontSize: "6em", position: "absolute" }}
-                      />
-                    </IconButton>
-                  )}
-                  <LoadingCircle overRideStroke={6} />
+                  <Typography variant="body">
+                    Please send this link to the user you are trying to create.
+                  </Typography>
+                  <div style={{ marginTop: "10" }}>
+                    <Typography variant="h7">
+                      <b>{newUserLink}</b>
+                    </Typography>
+                  </div>
+                  <div
+                    style={{
+                      marginLeft: "35%",
+                      marginTop: "25px"
+                    }}
+                  >
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => {
+                        copy(newUserLink);
+                      }}
+                    >
+                      Copy
+                    </Button>
+                  </div>
                 </div>
               </DialogContent>
             ) : (
@@ -108,8 +148,7 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
                   <DialogContent>
                     <DialogContentText>
                       To create a new user please enter their name and email and
-                      select what dashboards they are allowed to view. A
-                      confirmation email will be sent to them.
+                      select what dashboards they are allowed to view.
                     </DialogContentText>
                     <TextValidator
                       autoFocus
@@ -160,20 +199,21 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
                     </Button>
                     <Button
                       onClick={async ev => {
-                        setLoading(true);
-                        var acceptedEmail = await addUser(
+                        //  setLoading(true);
+                        var link = await generateNewUserLink(
                           ev,
                           client,
                           email,
                           name,
                           selectedRoles
                         );
-                        setIsSent(true);
-                        setTimeout(() => {
-                          setIsSent(false);
-                          setLoading(false);
-                          handleClose();
-                        }, 2000);
+                        setNewUserLink(link);
+                        // setIsSent(true);
+                        //  setTimeout(() => {
+
+                        //  setLoading(false);
+                        //handleClose();
+                        //  }, 2000);
                       }}
                       color="primary"
                       variant="contained"

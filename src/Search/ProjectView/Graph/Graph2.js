@@ -11,12 +11,10 @@ import { appendGlowFilter } from "./glowUtils.js";
 import {
   appendSvgLines,
   appendSvgCircles,
-  appendToolTip,
   appendLegend,
   createRoot,
   originalLineEquation,
   appendPanelText,
-  textAppendToNodes,
   hierarchyColouring,
   appendPanelTextAfterFilter
 } from "./appendUtils.js";
@@ -31,7 +29,9 @@ import {
   removeLegendLabels,
   getSelectionPath,
   voronoid,
-  originalRadius
+  originalRadius,
+  voronoiXScale,
+  voronoiYScale
 } from "./utils";
 const displayConfig = config.DisplayConfig;
 
@@ -47,8 +47,7 @@ const Graph = ({
   handleFilterChange,
   handleForwardStep
 }) => {
-  const [{ selectedAnalysis }, dispatch] = useDashboardState();
-  const [updateAfterRender, setUpdateAfterRender] = useState(false);
+  const [{}, dispatch] = useDashboardState();
   const [mainSvg, setMainSvg] = useState({});
   const graphRef = useRef(null);
 
@@ -191,7 +190,7 @@ const Graph = ({
       }
       function appendSecondCircleOnAnalysisNode(merge) {
         //second circle around the last level circle
-        const secondCircleSvg = merge
+        merge
           .append("circle")
           .filter(node => node.height === 0)
           .attr("fill", function(d) {
@@ -232,29 +231,31 @@ rotate(${nodeOffset})
               .node()
               .getBoundingClientRect();
 
-            var xScale = d3
-              .scaleLinear()
-              .domain([drawingAreaBounds.x, drawingAreaBounds.right])
-              .range([-2700, 2700]);
-
-            var yScale = d3
-              .scaleLinear()
-              .domain([drawingAreaBounds.y, drawingAreaBounds.bottom])
-              .range([-2700, 2700]);
+            var xScale = voronoiXScale(
+              drawingAreaBounds.x,
+              drawingAreaBounds.right
+            );
+            var yScale = voronoiYScale(
+              drawingAreaBounds.y,
+              drawingAreaBounds.bottom
+            );
 
             var cirlceElementCordinates = [];
-            const nodeSelect = mainSvg
+            mainSvg
               .selectAll(".allCircleNodes .g-node")
               .filter(d => {
                 return d.depth !== 1;
               })
               .each(function(element, index) {
                 var box = this.getBoundingClientRect();
-                cirlceElementCordinates.push({
-                  x: xScale(box.x + box.width / 2),
-                  y: yScale(box.y + box.height / 2),
-                  element: element
-                });
+                cirlceElementCordinates = [
+                  ...cirlceElementCordinates,
+                  {
+                    x: xScale(box.x + box.width / 2),
+                    y: yScale(box.y + box.height / 2),
+                    element: element
+                  }
+                ];
               });
 
             var voronoi = mainSvg.append("g").attr("class", "voronoi-group");
@@ -266,8 +267,8 @@ rotate(${nodeOffset})
               })
               .enter()
               .append("path")
-              //.style("stroke", "#2074A0")
-              //.style("stroke-width", 5)
+              //  .style("stroke", "#2074A0")
+              //  .style("stroke-width", 5)
               .style("fill", "none")
               .style("pointer-events", "all")
               .attr("d", d => (d ? "M" + d.join("L") + "Z" : null))
@@ -278,7 +279,7 @@ rotate(${nodeOffset})
                 if (data.data.element.height === 0) {
                   dispatch({
                     type: "ANALYSIS_SELECT",
-                    value: { selectedAnalysis: "SC-123" }
+                    value: { selectedAnalysis: data.data.element.data.target }
                   });
 
                   handleForwardStep();
@@ -292,7 +293,6 @@ rotate(${nodeOffset})
                 const nodeSelections = d3
                   .selectAll(nodeSelectionText)
                   .filter(d => d.depth !== 0);
-                const heightOfDetail = currNode.height;
                 const lastLevelNodes =
                   currNode.height === 0 ? [currNode] : currNode.children;
 
@@ -403,23 +403,25 @@ rotate(${nodeOffset})
           .node()
           .getBoundingClientRect();
 
-        var xScale = d3
-          .scaleLinear()
-          .domain([drawingAreaBounds.x, drawingAreaBounds.right])
-          .range([-3250, 3250]);
-
-        var yScale = d3
-          .scaleLinear()
-          .domain([drawingAreaBounds.y, drawingAreaBounds.bottom])
-          .range([-3250, 3250]);
+        var xScale = voronoiXScale(
+          drawingAreaBounds.x,
+          drawingAreaBounds.right
+        );
+        var yScale = voronoiYScale(
+          drawingAreaBounds.y,
+          drawingAreaBounds.bottom
+        );
 
         mainSvg.selectAll(".g-node circle").each(function(element, index) {
           var box = this.getBoundingClientRect();
-          cirlceElementCordinates.push({
-            x: xScale(box.x + box.width / 2),
-            y: yScale(box.y + box.height / 2),
-            element: element
-          });
+          cirlceElementCordinates = [
+            ...cirlceElementCordinates,
+            {
+              x: xScale(box.x + box.width / 2),
+              y: yScale(box.y + box.height / 2),
+              element: element
+            }
+          ];
         });
 
         mainSvg
@@ -514,23 +516,33 @@ rotate(${nodeOffset})
           .on(
             "mousedown",
             (data, index, element) => {
-              var currNode = data.data.element;
-              if (currNode.parent !== null) {
-                d3.selectAll(".level1Label, .level2Label, .level3Label").text(
-                  ""
-                );
+              if (data.data.element.height === 0) {
+                dispatch({
+                  type: "ANALYSIS_SELECT",
+                  value: { selectedAnalysis: data.data.element.data.target }
+                });
 
-                handleFilterChange(
-                  {
-                    value: currNode.data.target,
-                    label: depthTohierarchy[currNode.depth]
-                  },
-                  "update"
-                );
+                handleForwardStep();
+              } else {
+                var currNode = data.data.element;
+                if (currNode.parent !== null) {
+                  d3.selectAll(".level1Label, .level2Label, .level3Label").text(
+                    ""
+                  );
+
+                  handleFilterChange(
+                    {
+                      value: currNode.data.target,
+                      label: depthTohierarchy[currNode.depth]
+                    },
+                    "update"
+                  );
+                }
               }
             },
             this
-          );
+          )
+          .attr("transform", "translate(600,100)");
       }
       function initPanelText(svgCircles, mainSvg) {
         var circleText = svgCircles.filter(d => d.parent === null);

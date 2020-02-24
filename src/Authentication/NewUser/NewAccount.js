@@ -48,7 +48,6 @@ const styles = theme => ({
 const NewAccount = ({ email, dispatch, classes }) => {
   const [error, setError] = useState(null);
   const [userEmail] = useState(email);
-  const [newUser, setSuccessfullyCreated] = useState(false);
 
   const nameRef = useRef();
   const usernameRef = useRef();
@@ -107,7 +106,6 @@ const NewAccount = ({ email, dispatch, classes }) => {
       try {
         var acknowledgement = await queryCreateNewUser(user, client);
         if (acknowledgement) {
-          setSuccessfullyCreated(true);
           dispatch({
             type: "LOGOUT"
           });

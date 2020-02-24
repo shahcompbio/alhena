@@ -5,7 +5,6 @@ import {
   Typography,
   Slider,
   Grid,
-  Chip,
   FormControl,
   FormControlLabel,
   FormGroup,
@@ -18,8 +17,6 @@ import {
 import BackspaceTwoToneIcon from "@material-ui/icons/BackspaceTwoTone";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
-import _ from "lodash";
-
 import { withStyles } from "@material-ui/core/styles";
 
 import { useDashboardState } from "../Search/ProjectView/ProjectState/dashboardState";
@@ -28,9 +25,6 @@ import { useStatisticsState } from "./DashboardState/statsState";
 import { heatmapConfig } from "./Heatmap/config";
 
 const styles = theme => ({
-  fieldComponent: {
-    margin: theme.spacing(0, 3, 8, 3)
-  },
   fieldTitle: {
     paddingBottom: 30
   },
@@ -66,7 +60,7 @@ const styles = theme => ({
     margin: theme.spacing(3)
   },
   fieldComponent: {
-    margin: theme.spacing(2, 0, 2, 0)
+    margin: theme.spacing(0, 0, 2, 0)
   },
   settings: {
     padding: 10,
@@ -89,11 +83,13 @@ const styles = theme => ({
     color: "white"
   }
 });
-const SettingsPanel = ({ classes, categoryStats }) => {
-  //  const [{ selectedDashboard, selectedAnalysis }] = useDashboardState();
-  const selectedAnalysis = "Jira-123";
+const SettingsPanel = ({ classes, categoryStats, cellCount }) => {
+  const [{ selectedAnalysis }] = useDashboardState();
+  //  const selectedAnalysis = "sc-3008";
+  //  const selectedLibrary = "Library-";
   const [{ quality, selectedCells }, dispatch] = useStatisticsState();
   const [qualityMenuValue, setQualityMenuValue] = useState(quality);
+  const [expandedPanel, setExpandedPanel] = useState({});
 
   function updateCategories(selectedCategory) {
     dispatch({
@@ -117,34 +113,27 @@ const SettingsPanel = ({ classes, categoryStats }) => {
       value: []
     });
   };
+
   return (
     <Paper className={classes.settings} elevation={0}>
-      <MetaData classes={classes} count={500} analysis={selectedAnalysis} />
+      <MetaData
+        classes={classes}
+        count={cellCount}
+        analysis={selectedAnalysis}
+      />
       {selectedCells.length !== 0 && (
-        <Paper
-          className={[classes.panel, classes.selectedCells]}
-          variant="outlined"
-          elevation={0}
-        >
-          <Grid
-            container
-            direction="row"
-            justify="space-between"
-            alignItems="center"
-          >
-            <Typography variant="h6">
-              {selectedCells.length} cells selected
-            </Typography>
-            <Button onClick={() => clearCellSelection()}>
-              <BackspaceTwoToneIcon fontSize="medium" />
-            </Button>
-          </Grid>
-        </Paper>
+        <SelectedCellsPanel
+          classes={classes}
+          selectedCellsCount={selectedCells.length}
+          clearCellSelection={clearCellSelection}
+        />
       )}
       <ExpansionPanel
         classes={{
           root: classes.expansionPanelRoot
         }}
+        expanded={expandedPanel === "slider"}
+        onChange={() => setExpandedPanel("slider")}
       >
         <ExpansionPanelSummary
           classes={{ root: classes.expansionPanelSummary }}
@@ -184,7 +173,7 @@ const SettingsPanel = ({ classes, categoryStats }) => {
         >
           <Typography variant="h7">Heatmap</Typography>
         </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
+        <ExpansionPanelDetails style={{ padding: "0px 24px 24px" }}>
           <HeatmapSettings
             classes={classes}
             updateCategories={updateCategories}
@@ -195,7 +184,7 @@ const SettingsPanel = ({ classes, categoryStats }) => {
     </Paper>
   );
 };
-const MetaData = ({ classes, count, analysis }) => (
+const MetaData = ({ classes, count, analysis, library }) => (
   <Paper
     elevation={0}
     className={[classes.panel, classes.metaDataPanel]}
@@ -212,14 +201,7 @@ const MetaData = ({ classes, count, analysis }) => (
         fontWeight="fontWeightRegular"
         style={{ color: "#a2a2a2" }}
       >
-        Analysis: {analysis}
-      </Typography>
-      <Typography
-        variant="h5"
-        fontWeight="fontWeightRegular"
-        style={{ color: "#a2a2a2" }}
-      >
-        Library: ABC123
+        Analysis: <b>{analysis}</b>
       </Typography>
       <Typography
         variant="h5"
@@ -231,18 +213,26 @@ const MetaData = ({ classes, count, analysis }) => (
     </Grid>
   </Paper>
 );
-
+const SelectedCellsPanel = ({
+  classes,
+  selectedCellsCount,
+  clearCellSelection
+}) => (
+  <Paper
+    className={[classes.panel, classes.selectedCells]}
+    variant="outlined"
+    elevation={0}
+  >
+    <Grid container direction="row" justify="space-between" alignItems="center">
+      <Typography variant="h6">{selectedCellsCount} cells selected</Typography>
+      <Button onClick={() => clearCellSelection()}>
+        <BackspaceTwoToneIcon fontSize="medium" />
+      </Button>
+    </Grid>
+  </Paper>
+);
 const HeatmapSettings = ({ classes, updateCategories, categoryOptions }) => {
-  const originallySelectedCategories = categoryOptions.reduce(
-    (final, selected) => {
-      final[selected.category] = true;
-      return final;
-    },
-    {}
-  );
-  const [selectedCategories, setSelectedCategories] = useState(
-    originallySelectedCategories
-  );
+  const [selectedCategories, setSelectedCategories] = useState(categoryOptions);
 
   const handleCategoryChange = name => event => {
     const newSelection = {
@@ -252,6 +242,19 @@ const HeatmapSettings = ({ classes, updateCategories, categoryOptions }) => {
     setSelectedCategories(newSelection);
     updateCategories(newSelection);
   };
+
+  useEffect(() => {
+    if (categoryOptions.length > 0 && selectedCategories.length === 0) {
+      const originallySelectedCategories = categoryOptions.reduce(
+        (final, selected) => {
+          final[selected.category] = true;
+          return final;
+        },
+        {}
+      );
+      setSelectedCategories(originallySelectedCategories);
+    }
+  }, [categoryOptions]);
   return (
     <div className={classes.fieldComponent}>
       <Typography id="discrete-slider" variant="h7" gutterBottom>
@@ -263,7 +266,11 @@ const HeatmapSettings = ({ classes, updateCategories, categoryOptions }) => {
             <FormControlLabel
               control={
                 <Checkbox
-                  checked={selectedCategories[category.category]}
+                  checked={
+                    selectedCategories.length === 0
+                      ? true
+                      : selectedCategories[category.category]
+                  }
                   onChange={handleCategoryChange(category.category)}
                   value={category.category}
                 />

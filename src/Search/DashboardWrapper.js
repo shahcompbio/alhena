@@ -1,13 +1,8 @@
 import React from "react";
-
-import { withRouter } from "react-router";
-
-import { withStyles } from "@material-ui/core/styles";
 import { useAppState } from "../util/app-state";
 
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
-import ProjectViewContent from "./ProjectView/ProjectViewContent.js";
 import Content from "./Content.js";
 
 import dashboardStateReducer, {
