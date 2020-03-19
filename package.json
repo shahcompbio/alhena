@@ -3,10 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@apollo/react-hooks": "^3.1.3",
     "@emotion/core": "^10.0.10",
     "@emotion/styled": "^10.0.10",
     "@material-ui/core": "^4.5.1",
     "@material-ui/icons": "^4.0.1",
+    "@material-ui/lab": "^4.0.0-alpha.31",
     "@material-ui/styles": "^4.5.0",
     "@reach/visually-hidden": "^0.1.4",
     "add": "^2.0.6",
@@ -20,6 +22,8 @@
     "d3-random": "^2.0.0",
     "d3-tip": "^0.9.1",
     "d3-voronoi": "^1.1.4",
+    "d3-voronoi-treemap": "^1.1.0",
+    "d3-weighted-voronoi": "^1.0.1",
     "d3-zoom": "^1.7.3",
     "dotenv": "^8.2.0",
     "graphql": "^14.1.1",
@@ -36,7 +40,11 @@
     "react-router-dom": "^5.0.1",
     "react-scripts": "2.1.8",
     "react-select": "^3.0.4",
+    "react-virtualized-auto-sizer": "^1.0.2",
+    "react-window": "^1.8.5",
+    "seedrandom": "^3.0.5",
     "semantic-ui-react": "^0.87.1",
+    "semiotic": "^1.20.5",
     "sha1": "^1.1.1",
     "styled-components": "^4.4.0",
     "textures": "^1.2.0",
@@ -60,6 +68,5 @@
   "proxy": "http://localhost:4000",
   "devDependencies": {
     "prettier": "^1.16.4"
-  },
-  "homepage": "."
+  }
 }

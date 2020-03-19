@@ -17,7 +17,7 @@ const appStateReducer = (state, action) => {
       localStorage.setItem("isSuperUser", action.isSuperUser);
       localStorage.setItem("authKeyID", action.authKeyID);
       localStorage.setItem("uid", action.uid);
-      action.isSuperUser ? history.push("/admin") : history.push("/home");
+      action.isSuperUser ? history.push("/admin") : history.push("/dashboards");
       return {
         ...state,
         authAttempted: true,

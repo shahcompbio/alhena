@@ -1,18 +1,14 @@
-import React, { useState, useRef, useEffect } from "react";
-
-import clsx from "clsx";
-
+import React, { useState, useEffect } from "react";
+import { useAppState } from "../../util/app-state";
 import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
 
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
-import ListItemText from "@material-ui/core/ListItemText";
 import Input from "@material-ui/core/Input";
 import Chip from "@material-ui/core/Chip";
 
 import Button from "@material-ui/core/Button";
-import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -28,9 +24,10 @@ import CheckIcon from "@material-ui/icons/Check";
 
 import { withRouter } from "react-router";
 import { Query } from "react-apollo";
-import { GETPROJECTROLES } from "../../Queries/queries.js";
+import { getAllDashboards } from "../../Queries/queries.js";
 
 const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
+  const [{ authKeyID, uid }] = useAppState();
   const [isLoading, setLoading] = useState(false);
   const [isSent, setIsSent] = useState(false);
   const [isSubmitDisabled, setIsDisabled] = useState(true);
@@ -58,13 +55,17 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
   const handleRoleDelete = (event, value) =>
     setSelectedRoles(roles => roles.filter(role => role !== value));
 
-  const emailRef = useRef();
-  const nameRef = useRef();
   return (
-    <Query query={GETPROJECTROLES}>
+    <Query
+      query={getAllDashboards}
+      variables={{
+        user: { authKeyID: authKeyID, uid: uid }
+      }}
+    >
       {({ loading, error, data }) => {
         if (loading) return null;
         if (error) return null;
+
         return (
           <Dialog
             open={isOpen}
@@ -74,7 +75,7 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
             {isLoading ? (
               <DialogContent
                 style={{
-                  width: 500,
+                  maxWidth: 450,
                   height: 300,
                   paddingTop: isSent && isLoading ? 0 : 20
                 }}
@@ -82,7 +83,6 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
                 <div
                   style={{
                     height: 200,
-                    width: 250,
                     margin: "auto",
                     left: "25%",
                     position: "absolute"
@@ -100,17 +100,16 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
               </DialogContent>
             ) : (
               [
-                <ValidatorForm ref="form">
+                <ValidatorForm ref="form" style={{ maxWidth: 450 }}>
                   <DialogTitle id="form-dialog-title">
                     Create New User
                   </DialogTitle>
                   ,
                   <DialogContent>
                     <DialogContentText>
-                      To create a new user please enter their name and email. A
-                      confirmation email will be sent to them. Please tell the
-                      new user to also check their spam for an email from
-                      admin@shahcomponc.com
+                      To create a new user please enter their name and email and
+                      select what dashboards they are allowed to view. A
+                      confirmation email will be sent to them.
                     </DialogContentText>
                     <TextValidator
                       autoFocus
@@ -145,7 +144,9 @@ const NewUserPopup = ({ isOpen, handleClose, addUser, client }) => {
                       handleRoleDelete={(event, value) =>
                         handleRoleDelete(event, value)
                       }
-                      roleNames={data.getProjectRoles.roles}
+                      roleNames={data.getAllDashboards.map(
+                        dashboard => dashboard.name
+                      )}
                     />
                   </DialogContent>
                   ,
@@ -238,6 +239,7 @@ const DropDownSelect = ({
           : theme.typography.fontWeightMedium
     };
   }
+
   return (
     <FormControl required className={classes.formControl}>
       <InputLabel htmlFor="select-multiple-checkbox">

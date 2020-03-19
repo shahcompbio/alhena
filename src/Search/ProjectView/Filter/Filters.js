@@ -1,19 +1,27 @@
 import _ from "lodash";
 import React from "react";
 import Select from "react-select";
+import * as d3 from "d3";
 
 import { withStyles } from "@material-ui/styles";
 import InputLabel from "@material-ui/core/InputLabel";
 import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
+import {
+  hierarchyColouring,
+  smallDotRadius,
+  largeDotRadius
+} from "../Graph/appendUtils.js";
+import { useDashboardState } from "../ProjectState/dashboardState";
 
 import { config } from "../../../config/config.js";
 const filterConfig = config.FilterConfig;
 const styles = theme => ({
   root: {
     flexGrow: 1,
-    padding: "55px",
-    paddingRight: "0px",
-    background: "#2b2a2a"
+    padding: "45px",
+    paddingRight: "0px"
+    //  background: "#2b2a2a"
   },
   label: {
     color: "white",
@@ -21,9 +29,11 @@ const styles = theme => ({
     paddingBottom: "10px"
   },
   item: {
-    padding: "15px",
-    paddingRight: "0px",
+    paddingLeft: "25px !important",
     width: "100%"
+  },
+  filterDots: {
+    position: "absolute"
   }
 });
 const reactSelectStyles = {
@@ -37,13 +47,13 @@ const reactSelectStyles = {
     return { ...base, display: "none" };
   }
 };
+
 const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
+  const [{ selectedDashboard }, dispatch] = useDashboardState();
+
   const onChange = (value, action, type) => {
-    if (value) {
-      handleFilterChange({ value: value.label, label: value.value }, action);
-    } else {
-      handleFilterChange(type, action);
-    }
+    const filter = value ? { value: value.label, label: value.value } : type;
+    handleFilterChange(filter, action);
   };
   const getSelectValue = (selectedOptions, filterType, filters) => {
     if (isUserSelectedOption(selectedOptions, filterType)) {
@@ -85,13 +95,17 @@ const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
   };
   if (filters) {
     const filterTypes = filters.map(filter => filter.type);
-
+    var collator = new Intl.Collator(undefined, {
+      numeric: true,
+      sensitivity: "base"
+    });
     var panels = _.times(filterTypes.length, i => {
       return filterTypes[i] !== "project"
         ? {
             key: `panel-${i}`,
             content: (
               <Select
+                key={`panel-${i}select`}
                 value={getSelectValue(selectedOptions, filterTypes[i], filters)}
                 styles={reactSelectStyles}
                 isMulti={isDisabledOption(selectedOptions, filterTypes[i])}
@@ -102,7 +116,7 @@ const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
                 onChange={(option, { action }) =>
                   onChange(option, action, filterTypes[i])
                 }
-                options={filters[i].values.map(value => {
+                options={filters[i].values.sort(collator.compare).map(value => {
                   return {
                     value: filterTypes[i],
                     label: value,
@@ -112,15 +126,15 @@ const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
               />
             ),
             title: (
-              <InputLabel className={classes.label}>
-                {filters[i].label}
+              <InputLabel className={classes.label} key={`panel-${i}label`}>
+                {filters[i].label + " (" + filters[i].values.length + ")"}
               </InputLabel>
             )
           }
         : "";
     });
   } else {
-    var panels = [];
+    panels = [];
   }
   return (
     <Grid
@@ -130,14 +144,65 @@ const Filters = ({ filters, handleFilterChange, classes, selectedOptions }) => {
       alignItems="flex-start"
       spacing={3}
       className={classes.root}
+      key={"filterGrid"}
     >
-      {panels.map(panel => (
-        <Grid item className={classes.item}>
+      <Grid item className={classes.item} key={"filterMainTitle"}>
+        <Typography className={classes.label} variant="h4">
+          {selectedDashboard}
+        </Typography>
+      </Grid>
+
+      <svg
+        id="filterDots"
+        width="20px"
+        height="300px"
+        className={classes.filterDots}
+      >
+        <FilterDots />
+      </svg>
+
+      {panels.map((panel, index) => (
+        <Grid
+          item
+          className={classes.item}
+          key={"panel" + filters[index].label}
+        >
           {panel.title}
           {panel.content}
         </Grid>
       ))}
     </Grid>
   );
+};
+const FilterDots = ({}) => {
+  var svg = d3.select("#filterDots");
+
+  [1].map((colour, index) =>
+    svg
+      .append("line")
+      .attr("stroke", "white")
+      .attr("stroke-width", 1)
+      .attr("x1", 10)
+      .attr("y1", 30)
+      .attr("x2", 10)
+      .attr("y2", 240)
+      .attr("class", "filterDotsLines")
+  );
+
+  [30, 30, 87, 87, 165, 165, 240, 240].map((position, index) =>
+    svg
+      .append("g")
+      .append("circle")
+      .attr("fill", d =>
+        index % 2 !== 0 ? hierarchyColouring[3 - (index - 1) / 2] : "none"
+      )
+      .attr("r", d => (index % 2 === 0 ? 7 : 5))
+      .attr("cx", 10)
+      .attr("cy", position)
+      .attr("class", d =>
+        index % 2 === 0 ? "filterDotsOutterCircles" : "filterDotsCircles"
+      )
+  );
+  return null;
 };
 export default withStyles(styles)(Filters);

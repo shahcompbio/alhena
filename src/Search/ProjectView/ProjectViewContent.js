@@ -5,21 +5,31 @@ import Demographics from "./Demographics/Demographics.js";
 import { useAppState } from "../../util/app-state";
 import { withStyles } from "@material-ui/styles";
 
-import Graph from "./Graph/Graph.js";
+import Graph from "./Graph/Graph2.js";
 
 import { Query } from "react-apollo";
 import { getAllAnalyses } from "../../Queries/queries.js";
 
+import { useDashboardState } from "./ProjectState/dashboardState";
 import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
+
 const styles = {
   root: { flexGrow: 1 },
   hide: {
     display: "none"
+  },
+  title: {
+    color: "white",
+    filter: "url(#textGlow)",
+    paddingTop: 50,
+    paddingLeft: 50
   }
 };
 
-const ProjectViewContent = ({ classes, match }) => {
-  const [{ authKeyID, uid }, dispatch] = useAppState();
+const ProjectViewContent = ({ classes, handleForwardStep }) => {
+  const [{ selectedDashboard }] = useDashboardState();
+  const [{ authKeyID, uid }] = useAppState();
   const [selectedOptions, setSelectedOptions] = useState({});
   const [filters, setFilters] = useState([]);
 
@@ -27,10 +37,12 @@ const ProjectViewContent = ({ classes, match }) => {
   const dimRef = useRef(0);
 
   const updateDimensions = () => {
-    setDim({
-      width: dimRef.current.clientWidth,
-      height: dimRef.current.clientHeight
-    });
+    if (dimRef !== null) {
+      setDim({
+        width: dimRef.current.clientWidth,
+        height: dimRef.current.clientHeight
+      });
+    }
   };
 
   window.addEventListener("resize", updateDimensions);
@@ -58,15 +70,16 @@ const ProjectViewContent = ({ classes, match }) => {
     <Query
       query={getAllAnalyses}
       variables={{
-        filter: [...filters, { label: "project", value: match.params.project }],
+        filter: [...filters],
+        dashboardName: selectedDashboard,
         user: { authKeyID: authKeyID, uid: uid }
       }}
     >
       {({ loading, error, data }) => {
         if (error) {
-          dispatch({
+          /*  dispatch({
             type: "LOGOUT"
-          });
+          });*/
           return null;
         }
         if (loading) {
@@ -88,6 +101,7 @@ const ProjectViewContent = ({ classes, match }) => {
                   key={"search"}
                   selectedOptions={null}
                   filters={null}
+                  dashboards={[]}
                   handleFilterChange={null}
                 />
               </Grid>
@@ -97,11 +111,10 @@ const ProjectViewContent = ({ classes, match }) => {
                   key={"packing-circles"}
                   filters={[]}
                   analyses={{}}
+                  data={null}
                   handleFilterChange={null}
+                  handleForwardStep={null}
                 />
-              </Grid>
-              <Grid item xs={6} sm={3} key={"demographics-content"}>
-                <Demographics stats={null} key={"demographics"} />
               </Grid>
             </Grid>
           );
@@ -123,7 +136,7 @@ const ProjectViewContent = ({ classes, match }) => {
                 <Search
                   key={"search"}
                   selectedOptions={selectedOptions}
-                  filters={data.analysesList}
+                  filters={data.analyses.analysesList}
                   handleFilterChange={(selection, type) =>
                     handleFilterChange(selection, type)
                   }
@@ -135,14 +148,12 @@ const ProjectViewContent = ({ classes, match }) => {
                   isLoading={false}
                   key={"packing-circles"}
                   filters={filters}
-                  analyses={data.analysesTree.children}
+                  data={data.analyses.analysesTree.children}
                   handleFilterChange={(filters, type) =>
                     handleFilterChange(filters, type)
                   }
+                  handleForwardStep={handleForwardStep}
                 />
-              </Grid>
-              <Grid item xs={6} sm={3} key={"demographics-content"}>
-                <Demographics stats={data.analysesStats} key={"demographics"} />
               </Grid>
             </Grid>
           );

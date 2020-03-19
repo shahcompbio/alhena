@@ -2,15 +2,59 @@ import React, { useState, useRef } from "react";
 import logo from "../config/LoginTitle.png";
 import { login } from "../util/utils.js";
 import { useAppState } from "../util/app-state";
-
-import Grid from "@material-ui/core/Grid";
-import VisuallyHidden from "@reach/visually-hidden";
+import { withStyles } from "@material-ui/styles";
 import styled from "styled-components";
 
+import Grid from "@material-ui/core/Grid";
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
 import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
 import LoadingCircle from "./ProgressCircle.js";
 
-const UnauthenticatedApp = ({ client }) => {
+const styles = theme => ({
+  circleImg: {
+    height: 500,
+    width: 500,
+    top: "20%",
+    margin: 10,
+    position: "absolute"
+  },
+
+  floatingLabelFocusStyle: {
+    color: "black",
+    fontWeight: "500"
+  },
+  input: {
+    color: "black",
+    borderBottom: "1px solid #769bb5"
+  },
+  inputWrapper: {
+    position: "absolute",
+    top: "40vh",
+    marginLeft: 10
+  },
+  logo: {
+    position: "absolute",
+    top: "20vh",
+    margin: 10,
+    marginLeft: 30
+  },
+  submitButton: {
+    marginLeft: 110,
+    marginTop: 40,
+    backgroundColor: theme.palette.primary.dark,
+    color: theme.palette.background.default,
+    "&:hover": {
+      backgroundColor: theme.palette.primary.main
+    }
+  },
+  textField: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    width: 300
+  }
+});
+const UnauthenticatedApp = ({ client, classes }) => {
   const [data, dispatch] = useAppState();
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -38,70 +82,60 @@ const UnauthenticatedApp = ({ client }) => {
     }
   };
 
+  //<LoadingCircle isStopped={!loading} />
   return (
     <Grid container direction="row" justify="center" alignItems="center">
       {" "}
-      <div
-        style={{
-          height: 500,
-          width: 500,
-          top: "30%",
-          margin: 10,
-          position: "absolute"
-        }}
-      >
-        <LoadingCircle isStopped={!loading} />
+      <div className={classes.circleImg}>
         {error && (
           <SnackbarContentWrapper variant="error" errorNumber={error} />
         )}
       </div>
-      <img
-        src={logo}
-        style={{
-          position: "absolute",
-          top: "30%",
-          margin: 10,
-          marginLeft: 30
-        }}
-      />{" "}
-      <div
-        style={{
-          position: "absolute",
-          top: "55%",
-          marginLeft: 10
-        }}
-      >
+      <img alt="logo" src={logo} className={classes.logo} />
+      <div className={classes.inputWrapper}>
         <form onSubmit={ev => handleLogin(ev, client, dispatch)} id="loginForm">
           <ComponentWrapper>
-            <VisuallyHidden style={{ color: "#ffffff" }}>
-              <label htmlFor="login:username">Username:</label>
-            </VisuallyHidden>
-            <input
-              ref={usernameRef}
-              id="login:username"
-              className="inputField"
-              placeholder=""
+            <TextField
+              className={classes.textField}
+              margin="normal"
+              inputRef={usernameRef}
+              id={"login:username"}
               required
-              type="text"
+              fullWidth
+              InputLabelProps={{
+                className: classes.floatingLabelFocusStyle
+              }}
+              InputProps={{ className: classes.input }}
+              value={usernameRef.value}
+              label={"Username"}
+              type={"text"}
             />
           </ComponentWrapper>
           <ComponentWrapper>
-            <VisuallyHidden style={{ color: "#ffffff" }}>
-              <label htmlFor="login:password">Password:</label>
-            </VisuallyHidden>
-            <input
-              ref={passwordRef}
-              id="login:password"
+            <TextField
+              className={classes.textField}
+              margin="normal"
+              inputRef={passwordRef}
+              id={"login:password"}
+              required
+              fullWidth
+              InputLabelProps={{
+                className: classes.floatingLabelFocusStyle
+              }}
+              InputProps={{ className: classes.input, color: "primary" }}
+              value={passwordRef.value}
+              label={"Password"}
               type={"password"}
-              className="inputField"
-              required
-              placeholder="Password"
             />
           </ComponentWrapper>
           <ComponentWrapper>
-            <button style={{ marginLeft: 30 }} type="submit">
-              Submit
-            </button>
+            <Button
+              className={classes.submitButton}
+              variant="contained"
+              type="submit"
+            >
+              Log In
+            </Button>
           </ComponentWrapper>
         </form>
       </div>
@@ -113,4 +147,4 @@ const ComponentWrapper = styled.div`
   margin: 10px;
 `;
 
-export default UnauthenticatedApp;
+export default withStyles(styles)(UnauthenticatedApp);

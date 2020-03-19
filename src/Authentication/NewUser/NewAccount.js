@@ -1,45 +1,52 @@
 import React, { useState, useRef } from "react";
 
 import { ApolloConsumer } from "react-apollo";
-import { Route } from "react-router-dom";
 
 import { queryCreateNewUser } from "../../util/utils.js";
-import { useAppState } from "../../util/app-state";
 
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
-
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
 import SnackbarContentWrapper from "../../Misc/SnackBarPopup.js";
-import VisuallyHidden from "@reach/visually-hidden";
+
 import styled from "styled-components";
 import { withStyles } from "@material-ui/styles";
 
-import UnauthenticatedApp from "./../Unauthenticated.js";
 const styles = theme => ({
+  button: {
+    backgroundColor: theme.palette.primary.main
+  },
   paperTitle: {
     paddingBottom: theme.spacing.unit * 5,
     padding: theme.spacing.unit * 3,
     height: 125,
     borderRadius: 20,
     overflowX: "auto",
+    width: "25vw",
     color: "white",
-    background: "#69B3CE"
+    textAlign: "center",
+    background: theme.palette.primary.main
   },
   paperForm: {
-    marginTop: theme.spacing.unit,
     overflowX: "auto",
     margin: "auto",
     borderRadius: 20,
     padding: 20,
+    width: "25vw",
     marginBottom: theme.spacing.unit,
     marginTop: "-70px",
     display: "inline-block"
+  },
+  textField: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    width: 300
   }
 });
 const NewAccount = ({ email, dispatch, classes }) => {
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [userEmail] = useState(email);
   const [newUser, setSuccessfullyCreated] = useState(false);
 
@@ -47,6 +54,7 @@ const NewAccount = ({ email, dispatch, classes }) => {
   const usernameRef = useRef();
   const emailRef = useRef();
   const passwordRef = useRef();
+  const verifyPasswordRef = useRef();
 
   const fields = [
     {
@@ -77,29 +85,40 @@ const NewAccount = ({ email, dispatch, classes }) => {
       ref: passwordRef,
       type: "password",
       placeholder: "Password"
+    },
+    {
+      id: "newUser:passwordVerify",
+      label: "Verify Password:",
+      ref: verifyPasswordRef,
+      type: "password",
+      placeholder: "Verify Password"
     }
   ];
 
   const createNewUser = async (event, client, dispatch) => {
-    var user = {
-      email: emailRef.current.value,
-      username: usernameRef.current.value,
-      password: passwordRef.current.value,
-      name: nameRef.current.value
-    };
-    event.preventDefault();
-    try {
-      var acknowledgement = await queryCreateNewUser(user, client);
-      if (acknowledgement) {
-        setSuccessfullyCreated(true);
-        dispatch({
-          type: "LOGOUT"
-        });
-      } else {
-        setError(10);
+    if (verifyPasswordRef.current.value === passwordRef.current.value) {
+      var user = {
+        email: emailRef.current.value,
+        username: usernameRef.current.value,
+        password: passwordRef.current.value,
+        name: nameRef.current.value
+      };
+      event.preventDefault();
+      try {
+        var acknowledgement = await queryCreateNewUser(user, client);
+        if (acknowledgement) {
+          setSuccessfullyCreated(true);
+          dispatch({
+            type: "LOGOUT"
+          });
+        } else {
+          setError(10);
+        }
+      } catch (error) {
+        setError(error);
       }
-    } catch (error) {
-      setError(error);
+    } else {
+      setError(11);
     }
   };
 
@@ -107,27 +126,22 @@ const NewAccount = ({ email, dispatch, classes }) => {
     <ApolloConsumer>
       {client => (
         <Grid container direction="row" justify="center" alignItems="center">
-          {error && (
-            <SnackbarContentWrapper variant="error" errorNumber={error} />
-          )}{" "}
-          <div
-            style={{
-              top: "20%",
-              margin: 10,
-              position: "absolute"
-            }}
-          />
           <div
             style={{
               position: "absolute",
-              top: "25%",
-              marginLeft: 10,
-              textAlign: "center"
+              top: "15%"
             }}
           >
+            {error && (
+              <SnackbarContentWrapper
+                variant="error"
+                errorNumber={error}
+                setError={setError}
+              />
+            )}
             <Paper rounded className={classes.paperTitle}>
               <Typography variant="h4" color="white">
-                New User
+                Create Account
               </Typography>
             </Paper>
             <Paper rounded className={classes.paperForm}>
@@ -137,22 +151,27 @@ const NewAccount = ({ email, dispatch, classes }) => {
               >
                 {fields.map(field => (
                   <ComponentWrapper>
-                    <VisuallyHidden style={{ color: "#ffffff" }}>
-                      <label htmlFor={field.id}>{field.label}</label>
-                    </VisuallyHidden>
-                    <input
-                      ref={field.ref}
+                    <TextField
+                      className={classes.textField}
+                      margin="normal"
+                      inputRef={field.ref}
                       id={field.id}
-                      className="inputField"
                       required
+                      fullWidth
                       value={field.value}
-                      placeholder={field.placeholder}
+                      label={field.placeholder}
                       type={field.type}
                     />
                   </ComponentWrapper>
                 ))}
-                <ComponentWrapper>
-                  <button type="submit">Submit</button>
+                <ComponentWrapper style={{ textAlign: "center" }}>
+                  <Button
+                    className={classes.button}
+                    variant="contianed"
+                    onClick={ev => createNewUser(ev, client, dispatch)}
+                  >
+                    Create
+                  </Button>
                 </ComponentWrapper>
               </form>
             </Paper>

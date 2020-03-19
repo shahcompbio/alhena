@@ -1,5 +1,4 @@
 import React from "react";
-import Color from "color";
 import { makeStyles } from "@material-ui/styles";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
@@ -17,7 +16,7 @@ const useTabsStyles = makeStyles(() => ({
 }));
 const useTabStyles = makeStyles(({ palette, spacing, breakpoints }) => {
   const defaultBgColor = palette.grey[500];
-  const defaultSelectedBgColor = "#ffffff";
+  const defaultSelectedBgColor = palette.background.default;
   const defaultMinWidth = {
     md: 120
   };
@@ -26,7 +25,7 @@ const useTabStyles = makeStyles(({ palette, spacing, breakpoints }) => {
       opacity: 1,
       overflow: "initial",
       minHeight: spacing(13),
-      color: "#ffffff",
+      color: palette.background.default,
       background: "rbga(0,0,0,0)",
       transition: "0.5s",
       [breakpoints.up("md")]: {
@@ -61,7 +60,7 @@ const useTabStyles = makeStyles(({ palette, spacing, breakpoints }) => {
       }
     }),
     selected: ({ selectedBgColor = defaultSelectedBgColor }) => ({
-      color: "#ffffff",
+      color: palette.background.default,
       fontWeight: "bold",
       zIndex: 3,
       "&:before": {
@@ -86,8 +85,16 @@ const SeperatedTabs = ({ tabs, tabStyle, tabProps, ...props }) => {
   const tabClasses = useTabStyles({ ...tabProps, ...tabStyle });
   return (
     <Tabs {...props} classes={tabsClasses}>
-      {tabs.map(tab => (
-        <Tab key={tab.label} {...tabProps} {...tab} classes={tabClasses} />
+      {tabs.map((tab, index) => (
+        <Tab
+          key={tab.label}
+          {...tabProps}
+          {...tab}
+          classes={tabClasses}
+          style={{
+            color: index === 0 ? "white" : "black"
+          }}
+        />
       ))}
     </Tabs>
   );

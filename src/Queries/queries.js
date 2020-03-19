@@ -1,27 +1,69 @@
 import gql from "graphql-tag";
-
-export const UPDATEUSERROLES = gql`
-  query updateUserRoles($username: String!, $newRoles: [String!]) {
-    updateUserRoles(username: $username, newRoles: $newRoles) {
+export const DELETEDASHBOARD = gql`
+  query deleteDashboard($name: String!) {
+    deleteDashboard(name: $name) {
+      allDeleted
+    }
+  }
+`;
+export const UPDATEDASHBOARD = gql`
+  query updateDashboard($dashboard: DashboardInput!) {
+    updateDashboard(dashboard: $dashboard) {
+      updated
+    }
+  }
+`;
+export const CREATENEWDASHBOARD = gql`
+  query createNewDashboard($dashboard: DashboardInput!) {
+    createNewDashboard(dashboard: $dashboard) {
       created
     }
   }
 `;
-export const GETPROJECTROLES = gql`
-  query projectRoles {
-    getProjectRoles {
-      roles
+export const GETINDICESBYDASHBOARD = gql`
+  query getIndex($dashboard: String!) {
+    getAllIndices {
+      name
+    }
+    getIndicesByDashboard(dashboard: $dashboard) {
+      name
     }
   }
 `;
-export const getProjects = gql`
-  query projects($user: ApiUser!) {
-    getProjects(auth: $user) {
+export const GETALLDASHBOARDOPTIONS = gql`
+  query getIndices {
+    getAllIndices {
+      name
+    }
+  }
+`;
+export const UPDATEUSERROLES = gql`
+  query updateUserRoles(
+    $username: String!
+    $newRoles: [String!]
+    $email: String!
+    $name: String!
+  ) {
+    updateUserRoles(
+      username: $username
+      newRoles: $newRoles
+      email: $email
+      name: $name
+    ) {
+      created
+    }
+  }
+`;
+
+export const getAllDashboards = gql`
+  query getAllDashboards($user: ApiUser!) {
+    getAllDashboards(auth: $user) {
       name
       count
     }
   }
 `;
+
 export const VERIFYNEWUSERAUTHKEY = gql`
   query verifyNewUserUri($key: String!) {
     verifyNewUserUri(key: $key) {
@@ -71,13 +113,57 @@ export const getUsers = gql`
       full_name
       email
     }
-    getProjectRoles {
-      roles
+    getAllDashboards(auth: $user) {
+      name
     }
   }
 `;
 
 export const getAllAnalyses = gql`
+  query Sunburst($filter: [Term]!, $user: ApiUser!, $dashboardName: String!) {
+    analyses(filters: $filter, auth: $user, dashboardName: $dashboardName) {
+      analysesStats {
+        label
+        value
+      }
+      analysesList {
+        label
+        values
+        type
+      }
+      analysesTree {
+        source
+        children {
+          ... on ParentType {
+            source
+            target
+            children {
+              ... on ParentType {
+                source
+                target
+                children {
+                  ... on ParentType {
+                    source
+                    target
+                    children {
+                      ... on ChildType {
+                        source
+                        target
+                        value
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const getAllAnalyses2 = gql`
   query Sunburst($filter: [Term]!, $user: ApiUser!) {
     analysesStats(filters: $filter, auth: $user) {
       label

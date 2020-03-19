@@ -31,6 +31,17 @@
 .greyedNodes {
   opacity: 0.2 !important;
 }
+#profileCanvas {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+}
+.gw-background-lines {
+  stroke-dasharray: 0.5, 2;
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+}
 .hover {
   stroke: white !important;
   fill: white;
@@ -60,7 +71,7 @@
   stroke-width: 10 !important;
 }
 .parent-project {
-  fill: "#2b2a2a";
+  fill: #e6e6e6;
   stroke: white;
   stroke-width: 7px;
   opacity: 1 !important;
@@ -69,72 +80,86 @@
 .link-hover {
   stroke-width: 20px !important;
 }
+
 .directLabel {
   font-size: 100px;
   font-weight: bold;
   fill: white;
 }
-
-.titleUnderline {
-  opacity: 1 !important;
+.hidePanel {
+  display: none;
 }
-.legendCircles {
-  opacity: 1 !important;
-}
-
-.libraryInfoIDLabel,
-.jiraInfoIDLabel,
-.sampleIDLabel {
-  font-family: "Lucida Console", Monaco, monospace;
-  fill: white;
-  font-weight: normal;
-  opacity: 1;
-  white-space: pre;
-  font-size: 135px;
-  animation: neon 0.8s ease-in-out infinite alternate;
-}
-.jiraAfterFilterLabel,
-.libraryAfterFilterLabel {
-  font-size: 120px;
-}
-.sampleAfterFilterLabel {
-  animation: neon 0.8s ease-in-out infinite alternate;
-}
-
-.sampleAfterFilterLabel,
-.jiraAfterFilterLabel,
-.libraryAfterFilterLabel {
-  font-family: "Lucida Console", Monaco, monospace;
-  fill: white;
-  font-weight: 200;
-  white-space: pre;
-  opacity: 1;
+.labelsOutterRingHover {
+  radius: 80 !important;
+  font-weight: "bold" !important;
+  font-size: 180px !important;
+  stroke-width: 10 !important;
 }
 .jiraTicketLabelsOutterRing {
   stroke: white;
   stroke-width: 5;
   fill: none;
+  font-size: 150px;
+}
+
+.selectedText {
+  font-weight: bold !important;
+  font-size: 175px !important;
+}
+#medianLine {
+  transform: translate(0px, 100px);
+}
+.highlight0 {
+  stroke: #f1c023 !important;
+  stroke-width: 5px;
+  fill: #f1c023;
+}
+.highlight1 {
+  stroke: #bc4746 !important;
+  fill: #bc4746;
+}
+.highlight2 {
+  stroke: #95d2dc !important;
+  fill: #95d2dc;
 }
 .jiraTicketlabels {
   font-family: "Lucida Console", Monaco, monospace;
   fill: white;
   font-weight: 100;
-  font-size: 100px;
+  font-size: 120px;
   white-space: pre;
   opacity: 1;
+}
+.panelLabel {
+  font-family: "Lucida Console", Monaco, monospace;
+  fill: black;
+  font-size: 125px;
+  white-space: pre;
+  opacity: 1;
+}
+.filterDotsOutterCircles {
+  fill: none !important;
+  stroke: white !important;
+  stroke-width: 1px;
+}
+.diagramOutterCircles {
+  fill: none !important;
+  stroke: black !important;
+  stroke-width: 10px;
 }
 .legendTitles,
 .legendDescription {
   font-family: "Lucida Console", Monaco, monospace;
-  fill: white;
+  fill: black;
   font-weight: normal;
   white-space: pre;
   opacity: 1;
+  text-align: center;
   font-size: 100px;
 }
 .jiraLabel {
   font-family: arial;
-  fill: white;
+  fill: black;
   color: white;
   font-size: 45px;
   font-weight: bold;
@@ -143,7 +168,7 @@
 .d3-tip {
   line-height: 1;
   padding: 6px;
-  background: white;
+  background: #ffffff;
   color: #000;
   border-radius: 4px;
   font-size: 12px;
