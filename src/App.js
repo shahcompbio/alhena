@@ -12,7 +12,9 @@ import DashboardContent from "./Dashboard/DashboardContent.js";
 import ProjectViewContent from "./Search/ProjectView/ProjectViewContent";
 
 import Unauthenticated from "./Authentication/Unauthenticated.js";
+import ForgotPasswordWrapper from "./Authentication/ForgotPasswordWrapper.js";
 import NewUserUriVerification from "./Authentication/NewUser/NewUserUriVerification.js";
+import UpdatePasswordVerification from "./Authentication/NewUser/UpdatePasswordVerification.js";
 
 import "./App.css";
 import { theme } from "./theme/theme.js";
@@ -25,7 +27,7 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 
 const App = () => {
   const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
-  console.log(authKeyID, isSuperUser);
+
   return (
     <MuiThemeProvider theme={theme}>
       <CssBaseline />
@@ -45,20 +47,36 @@ const App = () => {
             <NewUserUriVerification uri={match} dispatch={dispatch} />
           )}
         />
+        <Route
+          path="/resetPassword/:redisKey"
+          component={({ match }) => (
+            <UpdatePasswordVerification uri={match} dispatch={dispatch} />
+          )}
+        />
+        <Route
+          path="/forgotPassword"
+          component={() => (
+            <ApolloConsumer>
+              {client => (
+                <ForgotPasswordWrapper client={client} dispatch={dispatch} />
+              )}
+            </ApolloConsumer>
+          )}
+        />
         {authKeyID && [
           <Route
-            key={"graph"}
+            key="graph"
             path="/graph"
             component={() => <ProjectViewContent />}
           />,
           <Route
-            key={"dashbaord"}
+            key="dashbaord"
             path="/dashboards"
             component={() => <DashboardWrapper />}
           />,
           <Route
             exact
-            key={"heatmap"}
+            key="heatmap"
             path="/heatmap"
             render={() => <DashboardContent />}
           />

@@ -27,26 +27,13 @@ const styles = {
 
 const ProjectViewContent = ({ classes, handleForwardStep }) => {
   const [{ selectedDashboard }] = useDashboardState();
+
   const [{ authKeyID, uid }] = useAppState();
   const [selectedOptions, setSelectedOptions] = useState({});
   const [filters, setFilters] = useState([]);
 
   const [graphDim, setDim] = useState(0);
   const dimRef = useRef(0);
-
-  /*const updateDimensions = () => {
-    if (dimRef !== null) {
-      setDim({
-        width: dimRef.current.clientWidth,
-        height: dimRef.current.clientHeight
-      });
-    }
-  };
-
-  window.addEventListener("resize", updateDimensions);
-  useEffect(() => {
-    updateDimensions();
-  }, []);*/
 
   const handleFilterChange = (filter, type) => {
     var options = selectedOptions;

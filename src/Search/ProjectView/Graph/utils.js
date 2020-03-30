@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-import { config } from "../../../config/config";
+import { config } from "../config.js";
 const displayConfig = config.DisplayConfig;
 
 export function originalRadius(d, isSecondLevelInteraction) {
@@ -114,9 +114,9 @@ export const linkSelect = selectionText => {
       "d",
       d3
         .linkRadial()
-        .angle(d => d.x + displayConfig.filtersOffSet)
+        .angle(d => d.x + config.filtersOffSet)
         .radius(d => {
-          return d.y + displayConfig.filtersOffSet + 125;
+          return d.y + config.filtersOffSet + 125;
         })
     );
 };
@@ -160,18 +160,16 @@ export const nodeDeselect = selectionText =>
     .classed("hover", true)
     .classed("greyedNodes", false);
 
-export const initSvg = root =>
+export const initSvg = (root, width, height) =>
   d3
     .select(root)
     .append("svg")
     .classed("bubbles", true)
     .attr("preserveAspectRatio", "xMinYMin meet")
-    .attr(
-      "viewBox",
-      "0 0 " + displayConfig.viewBoxX + " " + displayConfig.viewBoxY + " "
-    )
+    .attr("viewBox", "0 0 " + width + " " + height + " ")
     .attr("width", "100vw")
-    .attr("height", "100vh");
+    .attr("height", "100vh")
+    .attr("transform", "scale(1.25,1.25)");
 
 export const raiseLabels = prevState => {
   prevState.labelGroup.raise();

@@ -2,14 +2,15 @@ import React, { useState, useRef } from "react";
 import logo from "../config/LoginTitle.png";
 import { login } from "../util/utils.js";
 import { useAppState } from "../util/app-state";
-import { withStyles } from "@material-ui/styles";
-import styled from "styled-components";
+import { useHistory } from "react-router-dom";
 
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
 
+import { withStyles } from "@material-ui/styles";
+import styled from "styled-components";
 const styles = theme => ({
   circleImg: {
     height: 500,
@@ -38,8 +39,9 @@ const styles = theme => ({
     margin: 10,
     marginLeft: 30
   },
+  forgotPasswordButton: { marginLeft: 20, marginTop: 40 },
   submitButton: {
-    marginLeft: 110,
+    marginLeft: 10,
     marginTop: 40,
     backgroundColor: theme.palette.primary.dark,
     color: theme.palette.background.default,
@@ -54,6 +56,7 @@ const styles = theme => ({
   }
 });
 const UnauthenticatedApp = ({ client, classes }) => {
+  let history = useHistory();
   const [_, dispatch] = useAppState();
   const [error, setError] = useState(null);
   const usernameRef = useRef();
@@ -78,10 +81,8 @@ const UnauthenticatedApp = ({ client, classes }) => {
     }
   };
 
-  //<LoadingCircle isStopped={!loading} />
   return (
     <Grid container direction="row" justify="center" alignItems="center">
-      {" "}
       <div className={classes.circleImg}>
         {error && (
           <SnackbarContentWrapper variant="error" errorNumber={error} />
@@ -131,6 +132,13 @@ const UnauthenticatedApp = ({ client, classes }) => {
               type="submit"
             >
               Log In
+            </Button>
+            <Button
+              className={classes.forgotPasswordButton}
+              variant="contained"
+              onClick={() => history.push("/forgotPassword")}
+            >
+              Forgot Password
             </Button>
           </ComponentWrapper>
         </form>

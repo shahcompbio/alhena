@@ -98,6 +98,7 @@ const frameProps = (data, extent, lineFunction) => {
 
     yAccessor: e => e[e.type],
     yExtent: [...extent],
+
     lineDataAccessor: "coordinates",
 
     /* --- Customize --- */
@@ -114,7 +115,7 @@ const frameProps = (data, extent, lineFunction) => {
     axes: [
       {
         orient: "left",
-        label: "Median",
+        label: "Average",
         ticks: 10,
         tickLineGenerator: function() {}
       },
@@ -126,21 +127,23 @@ const frameProps = (data, extent, lineFunction) => {
     ]
   };
 };
+const mapData = (data, type, max) =>
+  data.map(entry => {
+    //entry[type] = entry[type] < 0 ? 0 : entry[type];
+    return { ...entry, type: type };
+  });
 
 const Chart = ({ data, stats, isLineVariation }) => {
-  const extent = [stats.yMin, stats.yMax];
-
-  const lowData = data.map(entry => ({ ...entry, type: "lowCi" }));
-  const highData = data.map(entry => ({ ...entry, type: "highCi" }));
+  const extent = [0, stats.yMax];
 
   const formattedData = [
     {
       title: "lowCi",
-      coordinates: lowData
+      coordinates: mapData(data, "lowCi", stats.yMax)
     },
     {
       title: "highCi",
-      coordinates: highData
+      coordinates: mapData(data, "highCi", stats.yMax)
     }
   ];
   const gcPercentToScreenCord = d3
@@ -160,7 +163,7 @@ const Chart = ({ data, stats, isLineVariation }) => {
     })
     .y(function(d) {
       return medianToScreenCord(d.median) + 70;
-    })(data);
+    })(mapData(data, "average", stats.yMax));
 
   const props = frameProps(formattedData, extent, lineFunction);
   return <XYFrame {...props} />;

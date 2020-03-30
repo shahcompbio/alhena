@@ -34,6 +34,7 @@ const DashboardWrapper = ({ classes, history }) => {
         const dashboards = data.getDashboardsByUser.map(
           dashboard => dashboard.name
         );
+
         const intialStateUpdated = initialState(dashboards, dashboards[0]);
         return (
           <DashboardProvider

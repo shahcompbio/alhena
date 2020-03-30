@@ -10,14 +10,13 @@ import Typography from "@material-ui/core/Typography";
 import { hierarchyColouring } from "../Graph/appendUtils.js";
 import { useDashboardState } from "../ProjectState/dashboardState";
 
-import { config } from "../../../config/config.js";
-const filterConfig = config.FilterConfig;
+import { config } from "../config.js";
+
 const styles = theme => ({
   root: {
     flexGrow: 1,
     padding: "45px",
     paddingRight: "0px"
-    //  background: "#2b2a2a"
   },
   label: {
     color: "white",
@@ -83,11 +82,11 @@ const Filters = ({
   };
 
   const isFilterSmallerThanLargestChoosen = (type, largestFilterIndex) =>
-    filterConfig.filterHeirarchy.indexOf(type) < largestFilterIndex;
+    config.filterHeirarchy.indexOf(type) < largestFilterIndex;
 
   const getLargestFilterIndex = selectedOptions =>
     Object.keys(selectedOptions).map(optionName =>
-      filterConfig.filterHeirarchy.indexOf(optionName)
+      config.filterHeirarchy.indexOf(optionName)
     );
 
   const isUserSelectedOption = (selectedOptions, filterType) =>
@@ -104,6 +103,7 @@ const Filters = ({
       numeric: true,
       sensitivity: "base"
     });
+
     var panels = _.times(filterTypes.length, i => {
       return filterTypes[i] !== "project"
         ? {

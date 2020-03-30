@@ -2,13 +2,12 @@ import React from "react";
 
 import { heatmapConfig } from "./config.js";
 
-const ChromAxis = ({ chromosomes, y, chromMap, categoryWidth }) => {
+const ChromAxis = ({ chromosomes, chromMap, categoryWidth }) => {
   const axisText = chromosomes.map((chromosome, i) => (
     <ChromAxisItem
       key={chromosome.id}
       chromosome={chromosome.id}
       data={chromMap[chromosome.id]}
-      y={y}
       index={i}
       categoryWidth={categoryWidth}
     />
@@ -16,18 +15,18 @@ const ChromAxis = ({ chromosomes, y, chromMap, categoryWidth }) => {
   return <g className="chromAxis">{axisText}</g>;
 };
 
-const ChromAxisItem = ({ chromosome, data, y, index, categoryWidth }) => (
+const ChromAxisItem = ({ chromosome, data, index, categoryWidth }) => (
   <g>
     <rect
       x={data["x"] + categoryWidth}
-      y={y + 3}
+      y={0}
       width={data["width"]}
       height={heatmapConfig.chromosome["height"]}
       fill={heatmapConfig.chromosome["color"][index % 2]}
     />
     <text
       x={data["x"] + data["width"] / 2 + categoryWidth}
-      y={y + heatmapConfig.chromosome["height"]}
+      y={heatmapConfig.chromosome["height"]}
       fontSize={"10px"}
       textAnchor={"middle"}
       fill={"#000000"}

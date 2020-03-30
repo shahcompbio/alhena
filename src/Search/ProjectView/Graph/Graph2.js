@@ -1,5 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
-import { config } from "../../../config/config";
+import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import * as d3 from "d3";
 
 import { useDashboardState } from "../../ProjectView/ProjectState/dashboardState";
@@ -33,13 +32,8 @@ import {
   voronoiXScale,
   voronoiYScale
 } from "./utils";
-const displayConfig = config.DisplayConfig;
+import { config } from "../config.js";
 
-const depthTohierarchy = {
-  1: "sample_id",
-  2: "library_id",
-  3: "jira_id"
-};
 const Graph = ({
   isLoading,
   data,
@@ -51,11 +45,26 @@ const Graph = ({
   const [mainSvg, setMainSvg] = useState({});
   const graphRef = useRef(null);
 
+  const [width, height] = useWindowSize();
   useEffect(() => {
-    var svg = initSvg(graphRef.current);
+    var svg = initSvg(graphRef.current, width, height);
     appendGlowFilter(svg);
     setMainSvg(svg);
   }, []);
+
+  function useWindowSize() {
+    const [size, setSize] = useState([0, 0]);
+    useLayoutEffect(() => {
+      function updateSize() {
+        setSize([window.innerWidth, window.innerHeight]);
+      }
+      window.addEventListener("resize", updateSize);
+      updateSize();
+
+      return () => window.removeEventListener("resize", updateSize);
+    }, []);
+    return size;
+  }
 
   //When data changes
   useEffect(() => {
@@ -157,7 +166,7 @@ const Graph = ({
           })
           .attr("transform", d => {
             if (d.height === 0) {
-              return `translate(700,0)`;
+              return `translate(` + config.filtersOffSet + `,0)`;
             }
           });
 
@@ -180,7 +189,7 @@ const Graph = ({
           .filter(d => d.height === 0)
           .attr("transform", d => {
             if (d.height === 0) {
-              return `translate(700,0)`;
+              return `translate(` + config.filterOffSet + `,0)`;
             }
           });
 
@@ -197,7 +206,7 @@ const Graph = ({
             return "none";
           })
           .attr("transform", d => {
-            return `translate(700,0)`;
+            return `translate(` + config.filtersOffSet + `,0)`;
           })
           .attr("r", 50)
           .attr("class", function(d) {
@@ -218,7 +227,7 @@ rotate(${nodeOffset})
           .duration(100)
           .attr("transform", d => {
             const nodeOffset = merge.size() === 4 ? 0 : 90;
-            const yOffset = d.height === 0 ? 650 : 100;
+            const yOffset = d.height === 0 ? 700 : 100;
             return `
   rotate(${(d.x * 180) / Math.PI - nodeOffset})
   translate(${d.y - yOffset},0)
@@ -267,8 +276,8 @@ rotate(${nodeOffset})
               })
               .enter()
               .append("path")
-              //  .style("stroke", "#2074A0")
-              //  .style("stroke-width", 5)
+              //.style("stroke", "#2074A0")
+              //.style("stroke-width", 5)
               .style("fill", "none")
               .style("pointer-events", "all")
               .attr("d", d => (d ? "M" + d.join("L") + "Z" : null))
@@ -339,6 +348,7 @@ rotate(${nodeOffset})
 
                 mainSvg.selectAll(".link-hover").classed(".link-hover", false);
               });
+            //  .attr("transform", "scale(0.75,0.75)");
           });
       }
       function appendTextToNodes(merge) {
@@ -417,8 +427,8 @@ rotate(${nodeOffset})
           cirlceElementCordinates = [
             ...cirlceElementCordinates,
             {
-              x: xScale(box.x + box.width / 2),
-              y: yScale(box.y + box.height / 2),
+              x: xScale(box.x),
+              y: yScale(box.y),
               element: element
             }
           ];
@@ -533,7 +543,7 @@ rotate(${nodeOffset})
                   handleFilterChange(
                     {
                       value: currNode.data.target,
-                      label: depthTohierarchy[currNode.depth]
+                      label: config.depthTohierarchy[currNode.depth]
                     },
                     "update"
                   );
@@ -541,8 +551,8 @@ rotate(${nodeOffset})
               }
             },
             this
-          )
-          .attr("transform", "translate(600,100)");
+          );
+        //  .attr("transform", "scale(1.25,1.25)");
       }
       function initPanelText(svgCircles, mainSvg) {
         var circleText = svgCircles.filter(d => d.parent === null);
@@ -573,8 +583,8 @@ rotate(${nodeOffset})
         return [
           x,
           y,
-          width + displayConfig.rootSize / 3,
-          height + displayConfig.rootSize / 3
+          width + config.rootSize / 3,
+          height + config.rootSize / 3
         ];
       }
       mainSvg.attr("viewBox", autoBox).attr("transform", "translate(100,50)");

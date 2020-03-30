@@ -12,13 +12,10 @@ import { StatsProvider } from "./DashboardState/statsState";
 import { useDashboardState } from "../Search/ProjectView/ProjectState/dashboardState";
 
 const styles = theme => ({
-  content: {
-    overflowX: "scroll"
-  },
   heatmapContent: {
     padding: 15,
     height: 1000,
-    width: 1150
+    width: 1000
   },
   paperContainer: {
     margin: 15
@@ -38,35 +35,26 @@ const styles = theme => ({
 
 const DashboardContent = ({ classes, history }) => {
   const [{ selectedAnalysis }] = useDashboardState();
+  //  const selectedAnalysis = "sc-2602";
 
   return (
     <StatsProvider initialState={initialState} reducer={statsStateReducer}>
-      <Grid
-        container
-        direction="row"
-        justify="flex-start"
-        alignItems="flex-start"
-        className={classes.content}
-      >
-        <Grid item className={classes.dashboard}>
-          {selectedAnalysis ? (
-            <QCDashboard analysis={selectedAnalysis} item xs={8} />
-          ) : (
-            [
-              <Grid className={classes.settings} item xs={4}>
-                <Paper
-                  className={[classes.heatmapContent, classes.paperContainer]}
-                />
-              </Grid>,
-              <Grid item className={classes.plots}>
-                <Paper
-                  className={[classes.heatmapContent, classes.paperContainer]}
-                />
-              </Grid>
-            ]
-          )}
-        </Grid>
-      </Grid>
+      {selectedAnalysis ? (
+        <QCDashboard analysis={selectedAnalysis} item xs={8} />
+      ) : (
+        [
+          <Grid className={classes.settings} item xs={4}>
+            <Paper
+              className={[classes.heatmapContent, classes.paperContainer]}
+            />
+          </Grid>,
+          <Grid item className={classes.plots}>
+            <Paper
+              className={[classes.heatmapContent, classes.paperContainer]}
+            />
+          </Grid>
+        ]
+      )}
     </StatsProvider>
   );
 };

@@ -34,7 +34,7 @@ export const config = {
  * Component dimensions
  */
 const COMPONENTS = {
-  width: 1200,
+  width: 1100,
   height: 539,
 
   legendWidth: 100,

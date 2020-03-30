@@ -6,8 +6,9 @@ import { useQuery } from "react-apollo-hooks";
 import { withStyles } from "@material-ui/core/styles";
 
 import Heatmap from "./Heatmap/Heatmap.js";
-import ChipHeatmap from "./ChipHeatmap/ChipHeatmap.js";
+import Chip from "./ChipHeatmap/Chip.js";
 import GCBias from "./GCBias/GCBias.js";
+import Scatterplot from "./Scatterplot/Scatterplot.js";
 
 import SettingsPanel from "./SettingsPanel.js";
 
@@ -22,16 +23,34 @@ const HEATMAP_ORDER = gql`
       category
       types
     }
+    chipHeatmapOptions {
+      type
+      label
+    }
+    scatterplotAxisOptions {
+      type
+      label
+    }
   }
 `;
 const styles = theme => ({
+  root: {
+    flexGrow: 1
+  },
+  content: {
+    overflowX: "scroll"
+  },
   heatmapContent: {
     padding: 15,
-    height: 1000,
-    width: 1150
+    height: 950,
+    width: 1050
   },
   gcBias: {
     width: 800
+  },
+  scatterplot: {
+    width: 650,
+    height: 525
   },
   chip: {
     width: 900
@@ -41,13 +60,13 @@ const styles = theme => ({
   },
   settings: {
     width: 400
-  },
-  plots: {
-    marginLeft: 400
   }
 });
 const QCDashboard = ({ analysis, classes }) => {
-  const [{ selectedCells, quality }] = useStatisticsState();
+  const [
+    { selectedCells, quality, popupFacadeIsOpen },
+    dispatch
+  ] = useStatisticsState();
 
   const { loading, data } = useQuery(HEATMAP_ORDER, {
     variables: {
@@ -61,38 +80,73 @@ const QCDashboard = ({ analysis, classes }) => {
       selectedCells.length > 0
         ? selectedCells
         : data.heatmapOrder.map(order => order.order);
-
-    return [
-      <Grid className={classes.settings} item xs={4}>
-        <SettingsPanel
-          cellCount={data.heatmapOrder.length}
-          categoryStats={data.categoriesStats}
-          analysis={analysis}
-        />
-      </Grid>,
-      <Grid item className={classes.plots}>
-        <Paper className={[classes.heatmapContent, classes.paperContainer]}>
-          <Heatmap
-            analysis={analysis}
-            allHeatmapOrder={heatmapOrder}
-            categoryStats={data.categoriesStats}
-          />
-        </Paper>
-        <Paper className={[classes.gcBias, classes.paperContainer]}>
-          <GCBias analysis={analysis} heatmapOrder={heatmapOrder} />
-        </Paper>
-        <Paper className={[classes.chip, classes.paperContainer]}>
-          <ChipHeatmap analysis={analysis} />
-        </Paper>
-      </Grid>
-    ];
+    return (
+      <div className={classes.root}>
+        <Grid
+          container
+          direction="row"
+          justify="flex-start"
+          alignItems="flex-start"
+          key="QCContainer"
+          className={classes.content}
+        >
+          <Grid className={classes.settings} item xs={3}>
+            <SettingsPanel
+              cellCount={data.heatmapOrder.length}
+              scatterplotOptions={data.scatterplotAxisOptions}
+              chipHeatmapOptions={data.chipHeatmapOptions}
+              categoryStats={data.categoriesStats}
+              analysis={analysis}
+            />
+          </Grid>
+          <Grid item className={classes.plots} xs={9}>
+            <Paper className={[classes.heatmapContent, classes.paperContainer]}>
+              <Heatmap
+                analysis={analysis}
+                allHeatmapOrder={heatmapOrder}
+                categoryStats={data.categoriesStats}
+              />
+            </Paper>
+            <Paper className={[classes.scatterplot, classes.paperContainer]}>
+              <Scatterplot analysis={analysis} />
+            </Paper>
+            <Paper className={[classes.chip, classes.paperContainer]}>
+              <Chip analysis={analysis} />
+            </Paper>
+            <Paper className={[classes.gcBias, classes.paperContainer]}>
+              <GCBias analysis={analysis} heatmapOrder={heatmapOrder} />
+            </Paper>
+          </Grid>
+        </Grid>
+      </div>
+    );
   } else {
     return (
-      <Grid className={classes.settings} item xs={4}>
-        <SettingsPanel cellCount={null} categoryStats={[]} analysis={null} />
+      <Grid
+        container
+        direction="row"
+        justify="flex-start"
+        alignItems="flex-start"
+        key="QCContainer"
+        className={classes.content}
+        spacing={3}
+      >
+        <Grid className={classes.settings} item>
+          <SettingsPanel
+            cellCount={null}
+            categoryStats={[]}
+            analysis={null}
+            scatterplotOptions={[]}
+          />
+        </Grid>
+
+        <Grid item className={classes.plots}>
+          <Paper className={[classes.chip, classes.paperContainer]}>
+            <Chip analysis={""} />
+          </Paper>
+        </Grid>
       </Grid>
     );
   }
 };
-
 export default withStyles(styles)(QCDashboard);

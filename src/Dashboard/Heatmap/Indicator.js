@@ -4,7 +4,7 @@ import { heatmapConfig } from "./config.js";
 
 const Indicator = ({ y }) => {
   return (
-    <g>
+    <g id="indicator">
       <rect
         width={heatmapConfig.width + heatmapConfig.paddingLeft}
         height={1}

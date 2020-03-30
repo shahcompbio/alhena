@@ -4,6 +4,8 @@ import { Query } from "react-apollo";
 import gql from "graphql-tag";
 import * as d3 from "d3";
 
+import Grid from "@material-ui/core/Grid";
+
 import { heatmapConfig } from "./config.js";
 import { getGenomeYScale } from "./utils.js";
 
@@ -124,29 +126,37 @@ const ProfileWrapper = ({
     ) : null;
 
   return (
-    <div
+    <Grid
+      item
+      container
+      direction="row"
       id="profileWrapper"
       ref={ref}
-      style={{ position: "absolute", marginLeft: -xOffset }}
+      style={{ position: "relative", marginLeft: -xOffset, marginTop: "-5px" }}
+      width={heatmapConfig.wrapperWidth}
     >
-      <ProfileAxis genomeYScale={genomeYScale} />
-      <svg
-        id="profileSvg"
-        width={heatmapConfig.width}
-        height={heatmapConfig.profile.height}
-      />
-      <canvas
-        id="profileCanvas"
-        style={{
-          marginLeft: heatmapConfig.profile.axisWidth,
-          paddingTop: heatmapConfig.profile.axisTextYOffset
-        }}
-        width={heatmapConfig.width}
-        height={heatmapConfig.profile.height}
-      >
-        <ProfileWithData />
-      </canvas>
-    </div>
+      <Grid item>
+        <ProfileAxis genomeYScale={genomeYScale} />
+      </Grid>
+      <Grid item>
+        <svg
+          id="profileSvg"
+          width={heatmapConfig.width}
+          height={heatmapConfig.profile.height}
+        />
+        <canvas
+          id="profileCanvas"
+          style={{
+            marginLeft: heatmapConfig.profile.axisWidth,
+            paddingTop: heatmapConfig.profile.axisTextYOffset
+          }}
+          width={heatmapConfig.width}
+          height={heatmapConfig.profile.height}
+        >
+          <ProfileWithData />
+        </canvas>
+      </Grid>
+    </Grid>
   );
 };
 

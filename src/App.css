@@ -42,6 +42,10 @@
   stroke: black;
   shape-rendering: crispEdges;
 }
+
+#chipSelection .overlay {
+  cursor: pointer;
+}
 .hover {
   stroke: white !important;
   fill: white;
@@ -80,7 +84,14 @@
 .link-hover {
   stroke-width: 20px !important;
 }
+.chipLegendAxis line,
+.chipLegendAxis path {
+  stroke: grey;
+}
 
+.chipLegendAxis text {
+  fill: grey;
+}
 .directLabel {
   font-size: 100px;
   font-weight: bold;
@@ -165,6 +176,20 @@
   font-weight: bold;
   text-anchor: middle;
 }
+#chipTip.tip span:before {
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  position: absolute;
+
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+  border-right: 8px solid black;
+  left: -8px;
+
+  top: 7px;
+}
 .d3-tip {
   line-height: 1;
   padding: 6px;
@@ -172,6 +197,10 @@
   color: #000;
   border-radius: 4px;
   font-size: 12px;
+}
+#minimapBrush g.brush > .handle,
+#chipSelection g.brush > .handle {
+  display: none;
 }
 /* Creates a small triangle extender for the tooltip */
 .d3-tip:after {
