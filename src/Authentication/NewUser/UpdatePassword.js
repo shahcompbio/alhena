@@ -2,15 +2,13 @@ import React, { useState, useRef } from "react";
 
 import { ApolloConsumer } from "react-apollo";
 
-import { queryCreateNewUser } from "../../util/utils.js";
-
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import SnackbarContentWrapper from "../../Misc/SnackBarPopup.js";
-
+import gql from "graphql-tag";
 import styled from "styled-components";
 import { withStyles } from "@material-ui/styles";
 
@@ -42,51 +40,51 @@ const styles = theme => ({
   textField: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
-    width: 300
+    width: "20vw"
   }
 });
-const NewAccount = ({ email, dispatch, classes }) => {
-  const [error, setError] = useState(null);
-  const [userEmail] = useState(email);
 
-  const nameRef = useRef();
-  const usernameRef = useRef();
-  const emailRef = useRef();
+const UPDATEPASSWORD = gql`
+  query($username: String!, $newPassword: String!) {
+    changePassword(username: $username, newPassword: $newPassword) {
+      confirmed
+    }
+  }
+`;
+export const queryNewPassword = async (client, username, password) => {
+  const { data } = await client.query({
+    query: UPDATEPASSWORD,
+    variables: {
+      username: username,
+      newPassword: password
+    }
+  });
+  return data.changePassword.confirmed;
+};
+
+const UpdatePassword = ({ username, dispatch, classes }) => {
+  const [error, setError] = useState(null);
+
   const passwordRef = useRef();
   const verifyPasswordRef = useRef();
 
   const fields = [
     {
-      id: "newUser:name",
-      label: "Full Name:",
-      ref: nameRef,
-      type: "text",
-      placeholder: "Your Name"
-    },
-    {
-      id: "newUser:username",
+      id: "updatePassword:username",
       label: "Username:",
-      ref: usernameRef,
+      value: username,
       type: "text",
       placeholder: "Username"
     },
     {
-      id: "newUser:email",
-      label: "Email:",
-      ref: emailRef,
-      type: "text",
-      value: userEmail,
-      placeholder: "Email"
-    },
-    {
-      id: "newUser:password",
+      id: "updatePassword:password",
       label: "Password:",
       ref: passwordRef,
       type: "password",
       placeholder: "Password"
     },
     {
-      id: "newUser:passwordVerify",
+      id: "updatePassword:passwordVerify",
       label: "Verify Password:",
       ref: verifyPasswordRef,
       type: "password",
@@ -94,17 +92,19 @@ const NewAccount = ({ email, dispatch, classes }) => {
     }
   ];
 
-  const createNewUser = async (event, client, dispatch) => {
+  const updatePassword = async (event, client, dispatch) => {
     if (verifyPasswordRef.current.value === passwordRef.current.value) {
       var user = {
-        email: emailRef.current.value,
-        username: usernameRef.current.value,
-        password: passwordRef.current.value,
-        name: nameRef.current.value
+        username: username,
+        password: passwordRef.current.value
       };
       event.preventDefault();
       try {
-        var acknowledgement = await queryCreateNewUser(user, client);
+        var acknowledgement = await queryNewPassword(
+          client,
+          username,
+          passwordRef.current.value
+        );
         if (acknowledgement) {
           dispatch({
             type: "LOGOUT"
@@ -116,7 +116,7 @@ const NewAccount = ({ email, dispatch, classes }) => {
         setError(error);
       }
     } else {
-      setError(11);
+      setError(12);
     }
   };
 
@@ -139,13 +139,13 @@ const NewAccount = ({ email, dispatch, classes }) => {
             )}
             <Paper rounded className={classes.paperTitle}>
               <Typography variant="h4" color="white">
-                Create Account
+                Update Password
               </Typography>
             </Paper>
             <Paper rounded className={classes.paperForm}>
               <form
-                onSubmit={ev => createNewUser(ev, client, dispatch)}
-                id="newUser"
+                onSubmit={ev => updatePassword(ev, client, dispatch)}
+                id="updatePassword"
               >
                 {fields.map(field => (
                   <ComponentWrapper>
@@ -165,10 +165,10 @@ const NewAccount = ({ email, dispatch, classes }) => {
                 <ComponentWrapper style={{ textAlign: "center" }}>
                   <Button
                     className={classes.button}
-                    variant="contianed"
-                    onClick={ev => createNewUser(ev, client, dispatch)}
+                    variant="contained"
+                    onClick={ev => updatePassword(ev, client, dispatch)}
                   >
-                    Create
+                    Update
                   </Button>
                 </ComponentWrapper>
               </form>
@@ -184,4 +184,4 @@ const ComponentWrapper = styled.div`
   margin: 10px;
 `;
 
-export default withStyles(styles)(NewAccount);
+export default withStyles(styles)(UpdatePassword);

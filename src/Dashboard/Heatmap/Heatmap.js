@@ -1,24 +1,26 @@
-import React, { useState, useEffect } from "react";
-
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import * as d3 from "d3";
 import { withStyles } from "@material-ui/core/styles";
 
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
 import { scalePoint } from "d3";
 import { heatmapConfig } from "./config.js";
+import { initContext } from "../utils.js";
 import {
   getYScale,
   getChromPixelMapping,
-  heatmapOrderToCellIndex
+  getBPRatio,
+  getSegWidth,
+  getSegX,
+  colorScale
 } from "./utils.js";
 
 import CategoriesLegend from "./CategoriesLegend.js";
 import Categories from "./Categories.js";
 import ChromAxis from "./ChromAxis.js";
-import HeatmapRow from "./HeatmapRow.js";
 import Indicator from "./Indicator.js";
 import Legend from "./Legend.js";
-import MenuToolBar from "../CommonModules/MenuToolBar.js";
 import Minimap from "./Minimap.js";
 import ProfileWrapper from "./ProfileWrapper.js";
 
@@ -26,6 +28,16 @@ import Grid from "@material-ui/core/Grid";
 
 import { useStatisticsState } from "../DashboardState/statsState";
 
+const width = heatmapConfig["width"] + heatmapConfig["paddingLeft"];
+const height = heatmapConfig["height"] + heatmapConfig["rowHeight"];
+
+const margin = {
+  left: 75,
+  top: 37,
+  bottom: 90,
+  right: 10,
+  histogram: 20
+};
 const styles = theme => ({
   content: {
     flexGrow: 1,
@@ -36,7 +48,6 @@ const styles = theme => ({
     minHeight: "100vh"
   }
 });
-
 const CHROMOSOME_SEGS_QUERY = gql`
   query chromosomes_segs(
     $analysis: String!
@@ -73,19 +84,13 @@ const CHROMOSOME_SEGS_QUERY = gql`
 `;
 const getIndicesFromAllHeatmapOrder = allHeatmapOrder =>
   allHeatmapOrder.filter(
-    order =>
-      order >= allHeatmapOrder[0] &&
-      order <
-        allHeatmapOrder[heatmapConfig.height / heatmapConfig.rowHeight - 2]
+    (order, index) => index < heatmapConfig.height / heatmapConfig.rowHeight - 2
   );
 
 const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
-  const [{ quality, categoryState, selectedCells }] = useStatisticsState();
-
+  const [{ quality }] = useStatisticsState();
   const [heatmapOrder, setHeatmapOrder] = useState([...allHeatmapOrder]);
-  const [hoverCell, setHoverCell] = useState({});
-  const [allCategories] = useState(categoryStats);
-  const [selectedCategories, setSelectedCategories] = useState(categoryStats);
+  const [hoverCell, setHoverCell] = useState({ cell: {} });
   const [indices, setIndices] = useState([
     ...getIndicesFromAllHeatmapOrder(allHeatmapOrder)
   ]);
@@ -93,30 +98,6 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
   const heatmapOrderToHeatmapIndex = scalePoint()
     .domain([...heatmapOrder])
     .range([0, heatmapOrder.length - 1]);
-
-  useEffect(() => {
-    if (selectedCells.length !== 0) {
-      const newIndices = selectedCells.filter(
-        (order, index) =>
-          index < heatmapConfig.height / heatmapConfig.rowHeight - 2
-      );
-
-      setHeatmapOrder([...selectedCells]);
-      setIndices([...newIndices]);
-    } else {
-      setHeatmapOrder([...allHeatmapOrder]);
-      setIndices([...getIndicesFromAllHeatmapOrder(allHeatmapOrder)]);
-    }
-  }, [selectedCells]);
-
-  useEffect(() => {
-    if (categoryState) {
-      const newCategories = categoryStats.filter(
-        stat => categoryState[stat.category]
-      );
-      setSelectedCategories(newCategories);
-    }
-  }, [categoryState]);
 
   return (
     <Query
@@ -128,11 +109,12 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
         if (loading && Object.keys(data).length === 0) {
           return null;
         }
+
         const { chromosomes, segs, analysisStats } = data;
 
         const categoryWidth =
-          selectedCategories.length * heatmapConfig.categories.squareSize +
-          selectedCategories.length * heatmapConfig.categories.squareSpacing;
+          categoryStats.length * heatmapConfig.categories.squareSize +
+          categoryStats.length * heatmapConfig.categories.squareSpacing;
 
         const yScale = getYScale(
           heatmapConfig.height / heatmapConfig.rowHeight
@@ -140,25 +122,6 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
 
         const chromMap = getChromPixelMapping(chromosomes);
 
-        const segRows = segs.map((seg, index) => {
-          const { id, name, ...segData } = seg;
-          const rowData = { ...segData, id: name };
-
-          return (
-            <HeatmapRow
-              index={index}
-              key={rowData["id"]}
-              rowData={rowData}
-              chromosomes={chromosomes}
-              yScale={yScale}
-              chromMap={chromMap}
-              rowMouseOver={async (id, y) =>
-                setHoverCell({ id: id, y: y, index: index })
-              }
-              categoryWidth={categoryWidth + heatmapConfig.paddingLeft}
-            />
-          );
-        });
         return (
           <Grid container direction="column">
             <Grid
@@ -167,11 +130,13 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
               direction="row"
               justify="space-between"
               alignItems="center"
-              height={heatmapConfig.categories.legendHeight}
+              height={
+                heatmapConfig["height"] - heatmapConfig.chromosome["height"]
+              }
               width={heatmapConfig.wrapperWidth}
             >
               <Grid item>
-                <CategoriesLegend choosenStats={selectedCategories} />
+                <CategoriesLegend choosenStats={categoryStats} />
               </Grid>
               <Grid item>
                 <Legend maxState={analysisStats.maxState} />
@@ -181,30 +146,45 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
               item
               container
               direction="row"
+              style={{ position: "relative" }}
               width={heatmapConfig.wrapperWidth}
+              height={
+                heatmapConfig["height"] - heatmapConfig.chromosome["height"]
+              }
             >
               <Grid item>
                 <svg
-                  width={heatmapConfig["width"] + heatmapConfig.paddingLeft}
-                  height={heatmapConfig["height"] + heatmapConfig["rowHeight"]}
+                  width={categoryWidth + heatmapConfig.paddingLeft}
+                  height={heatmapConfig["height"]}
                 >
                   <Categories
-                    categories={selectedCategories}
+                    categories={categoryStats}
                     cellStats={analysisStats.cellStats}
                     yScale={yScale}
                   />
-                  {segRows}
-                  <ChromAxis
-                    categoryWidth={categoryWidth + heatmapConfig.paddingLeft}
-                    y={yScale(segRows.length)}
-                    chromosomes={chromosomes}
-                    chromMap={chromMap}
-                  />
 
                   {hoverCell.hasOwnProperty("y") && (
-                    <Indicator y={hoverCell.y} />
+                    <Indicator y={hoverCell["y"]} />
                   )}
                 </svg>
+              </Grid>
+              <Grid item>
+                <Plot
+                  setHoverCellCoordinate={(y, heatmapRow) => {
+                    const cell = segs[heatmapRow];
+                    if (cell !== undefined) {
+                      setHoverCell({
+                        y: yScale(heatmapRow),
+                        cell: segs[heatmapRow]
+                      });
+                    }
+                  }}
+                  chromosomes={chromosomes}
+                  analysisStats={analysisStats}
+                  segs={segs}
+                  heatmapOrderToHeatmapIndex={heatmapOrderToHeatmapIndex}
+                  categoryWidth={categoryWidth + heatmapConfig.paddingLeft}
+                />
               </Grid>
               <Grid item>
                 <Minimap
@@ -220,15 +200,27 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
                 />
               </Grid>
             </Grid>
+            <Grid item style={{ marginTop: "-12px" }}>
+              <svg
+                height={heatmapConfig.chromosome["height"]}
+                width={heatmapConfig.wrapperWidth}
+              >
+                <ChromAxis
+                  categoryWidth={categoryWidth + heatmapConfig.paddingLeft}
+                  chromosomes={chromosomes}
+                  chromMap={chromMap}
+                />
+              </svg>
+            </Grid>
             <Grid item>
               <ProfileWrapper
-                categoryLength={selectedCategories.length}
-                segs={segs[hoverCell.index]}
-                maxState={analysisStats.maxState}
+                categoryLength={categoryStats.length}
+                segs={hoverCell["cell"]}
+                maxState={analysisStats["maxState"]}
                 chromosomes={chromosomes}
                 chromMap={chromMap}
                 analysis={analysis}
-                cellId={hoverCell.id}
+                cellId={hoverCell["cell"]["id"]}
                 key={"genomeProfile"}
               />
             </Grid>
@@ -239,4 +231,123 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
   );
 };
 
+const Plot = ({
+  chromosomes,
+  analysisStats,
+  setHoverCellCoordinate,
+  segs,
+  categoryWidth
+}) => {
+  const [context, saveContext] = useState();
+
+  const [ref] = useHookWithRefCallback();
+  const [rowHoverCordinates, setRowHoverCordinates] = useState(null);
+
+  const yScale = getYScale(heatmapConfig.height / heatmapConfig.rowHeight);
+
+  const invertYScale = d3.range(
+    yScale.range()[0],
+    yScale.range()[1],
+    yScale.step()
+  );
+
+  const chromMap = getChromPixelMapping(chromosomes);
+
+  useEffect(() => {
+    if (rowHoverCordinates !== null) {
+      const roundY = Math.max(rowHoverCordinates[1], 0);
+      var heatmapRow = yScale.domain()[d3.bisect(invertYScale, roundY) - 1];
+      setHoverCellCoordinate(rowHoverCordinates[1], heatmapRow);
+    }
+  }, [rowHoverCordinates]);
+
+  useEffect(() => {
+    if (context) {
+      drawHeatmap(segs, context);
+    }
+  }, [segs]);
+  function useHookWithRefCallback() {
+    const ref = useRef(null);
+    const setRef = useCallback(node => {
+      if (node) {
+        const heatmap = d3.select("#heatmap");
+        const canvas = heatmap
+          .select("canvas")
+          .attr("width", width)
+          .attr("height", height - heatmapConfig.chromosome["height"])
+          .attr("transform", "translate(" + 0 + "," + margin.top + ")");
+        const context = initContext(canvas, width, height);
+
+        saveContext(context);
+        context.save();
+        drawHeatmap(segs, context);
+        d3.select("#heatSelection").on("mousemove", function() {
+          var coordinates = d3.mouse(this);
+          var alreadySelected = d3.select(this).attr("class");
+          if (
+            alreadySelected === null ||
+            parseInt(alreadySelected) !== coordinates[1]
+          ) {
+            setRowHoverCordinates(coordinates);
+            d3.select(this).attr("class", coordinates[1]);
+          }
+        });
+      }
+    }, []);
+
+    return [setRef];
+  }
+  const drawHeatmap = (segs, context) => {
+    context.clearRect(0, 0, width, height);
+    segs.forEach((segRow, index) => {
+      const y = yScale(index);
+
+      const bpRatio = getBPRatio(chromosomes);
+      segRow.segs.forEach(seg => {
+        const x = getSegX(seg, chromMap, bpRatio, false, 0);
+
+        context.beginPath();
+        context.fillStyle = colorScale(seg["state"]);
+        context.fillRect(
+          x,
+          y,
+          getSegWidth(seg, bpRatio),
+          heatmapConfig["rowHeight"]
+        );
+        context.stroke();
+      });
+    });
+  };
+
+  return (
+    <div
+      style={{
+        width: width - categoryWidth,
+        height: height - heatmapConfig.chromosome["height"],
+        position: "relative"
+      }}
+      ref={ref}
+    >
+      <div
+        id="heatmap"
+        style={{
+          width: width - categoryWidth,
+          height: height - heatmapConfig.chromosome["height"],
+          position: "absolute",
+          pointerEvents: "all"
+        }}
+      >
+        <canvas />
+      </div>
+      <svg
+        id="heatSelection"
+        style={{
+          width: width - categoryWidth,
+          height: height - heatmapConfig.chromosome["height"],
+          position: "relative"
+        }}
+      />
+    </div>
+  );
+};
 export default withStyles(styles)(Heatmap);

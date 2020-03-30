@@ -55,7 +55,7 @@ export const getChromPixelMapping = chromosomes => {
 };
 export const getGenomeYScale = maxState =>
   scaleLinear()
-    .domain([0.5, maxState])
+    .domain([-0.5, maxState])
     .range([heatmapConfig.profile.height, 0]);
 
 export const getMinimapBPRatio = chromosomes => {
@@ -99,8 +99,8 @@ const getChromWidth = (chrom, bpRatio) =>
 
 export const getYScale = indicesLength =>
   scalePoint()
-    .domain([...Array.from(Array(indicesLength).keys())])
-    .range([0, heatmapConfig.rowHeight * indicesLength]);
+    .domain([0, ...Array.from(Array(indicesLength - 1).keys())])
+    .range([0, heatmapConfig.rowHeight * (indicesLength - 1)]);
 
 export const heatmapOrderToCellIndex = (heatmapOrder, cellCount) =>
   scalePoint()

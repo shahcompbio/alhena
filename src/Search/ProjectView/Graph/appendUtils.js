@@ -1,12 +1,9 @@
-import { config } from "../../../config/config";
 import * as d3 from "d3";
 import d3Tip from "d3-tip";
 import { originalRadius } from "./utils.js";
-
+import { config } from "../config.js";
 export const smallDotRadius = 30;
 export const largeDotRadius = 45;
-
-const displayConfig = config.DisplayConfig;
 
 export const createRoot = cluster =>
   d3
@@ -14,18 +11,14 @@ export const createRoot = cluster =>
     .separation(function(a, b) {
       return (a.parent === b.parent ? 2 : 1) / a.depth;
     })
-    .size([2 * Math.PI, displayConfig.rootSize])(cluster);
+    .size([2 * Math.PI, config.rootSize])(cluster);
 
 export const appendPanelTextAfterFilter = (filters, nodes, mainSvg) => {
-  const hierarchyToDepth = {
-    project: 0,
-    sample_id: 1,
-    library_id: 2,
-    jira_id: 3
-  };
   const lowestFilterTypeToGraphDepth = Math.max.apply(
     Math,
-    filters.map(filter => hierarchyToDepth[filter.label]).map(level => level)
+    filters
+      .map(filter => config.hierarchyToDepth[filter.label])
+      .map(level => level)
   );
 
   const filterSelectionToGraphNode = nodes.filter(
@@ -84,10 +77,6 @@ export const hierarchyColouring = {
   2: "#95d2dc"
 };
 export const appendLegend = (svg, mainCircleDim) => {
-  var legendSpacing = 600;
-  var legendTitleSpacing = 500;
-  var radius = 30;
-
   var lineHeight = -mainCircleDim.height / 24;
   var legendCircles = svg.append("g").classed("legendCircles", true);
 
@@ -141,10 +130,10 @@ export const appendLegend = (svg, mainCircleDim) => {
 };
 export const originalLineEquation = d3
   .linkRadial()
-  .angle(d => d.x + displayConfig.filtersOffSet)
+  .angle(d => d.x + config.filtersOffSet)
   .radius(d => {
     const levelOffset = d.height === 0 ? -400 : 0;
-    return d.y + displayConfig.filtersOffSet + levelOffset;
+    return d.y + config.filtersOffSet + levelOffset;
   });
 export const appendSvgCircles = (mainSvg, nodes) => {
   const svgCircles = mainSvg
@@ -162,8 +151,8 @@ export const appendSvgCircles = (mainSvg, nodes) => {
     .attr("transform", d => {
       const yOffset = d.depth === 0 ? -800 : d.height === 0 ? -400 : 0;
       return `
-  rotate(${((d.x + displayConfig.filtersOffSet) * 180) / Math.PI - 90})
-    translate(${d.y + displayConfig.filtersOffSet + yOffset},0)
+  rotate(${((d.x + config.filtersOffSet) * 180) / Math.PI - 90})
+    translate(${d.y + config.filtersOffSet + yOffset},0)
   `;
     })
     .append("circle")

@@ -5,23 +5,18 @@ import {
   Typography,
   Slider,
   Grid,
-  Chip,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  Checkbox,
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary
 } from "@material-ui/core";
 
+import ChipHeatmapSettings from "./Settings/ChipHeatmapSettings.js";
+import ScatterplotSettings from "./Settings/ScatterplotSettings.js";
+
 import BackspaceTwoToneIcon from "@material-ui/icons/BackspaceTwoTone";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
-import _ from "lodash";
-
 import { withStyles } from "@material-ui/core/styles";
-
 import { useDashboardState } from "../Search/ProjectView/ProjectState/dashboardState";
 
 import { useStatisticsState } from "./DashboardState/statsState";
@@ -66,7 +61,10 @@ const styles = theme => ({
     margin: theme.spacing(3)
   },
   fieldComponent: {
-    margin: theme.spacing(2, 0, 2, 0)
+    margin: theme.spacing(2, 0, 0, 0)
+  },
+  formControl: {
+    margin: theme.spacing(0, 0, 2, 0)
   },
   settings: {
     padding: 10,
@@ -87,80 +85,74 @@ const styles = theme => ({
   },
   whiteText: {
     color: "white"
+  },
+  panelDetails: {
+    padding: "0px 24px 24px"
   }
 });
-const SettingsPanel = ({ classes, categoryStats }) => {
-  //  const [{ selectedDashboard, selectedAnalysis }] = useDashboardState();
-  const selectedAnalysis = "Jira-123";
-  const [{ quality, selectedCells }, dispatch] = useStatisticsState();
+const SettingsPanel = ({
+  classes,
+  categoryStats,
+  cellCount,
+  scatterplotOptions,
+  chipHeatmapOptions
+}) => {
+  const [{ selectedAnalysis }] = useDashboardState();
+  //  const selectedAnalysis = "sc-2602";
+  const [
+    { quality, selectedCells, scatterplotAxis, chipHeatmapAxis },
+    dispatch
+  ] = useStatisticsState();
+
   const [qualityMenuValue, setQualityMenuValue] = useState(quality);
 
-  function updateCategories(selectedCategory) {
+  function update(value, type) {
     dispatch({
-      type: "HEATMAP_CATEGORY_UPDATE",
-      value: selectedCategory
+      type: type,
+      value: value
     });
   }
 
-  function dispatchQualityUpdate() {
-    dispatch({
-      type: "QUALITY_UPDATE",
-      value: {
-        quality: qualityMenuValue.toString()
-      }
-    });
-  }
-
-  const clearCellSelection = () => {
-    dispatch({
-      type: "BRUSH",
-      value: []
-    });
-  };
   return (
     <Paper className={classes.settings} elevation={0}>
-      <MetaData classes={classes} count={500} analysis={selectedAnalysis} />
+      <MetaData
+        classes={classes}
+        count={cellCount}
+        analysis={selectedAnalysis}
+      />
       {selectedCells.length !== 0 && (
-        <Paper
-          className={[classes.panel, classes.selectedCells]}
-          variant="outlined"
-          elevation={0}
-        >
-          <Grid
-            container
-            direction="row"
-            justify="space-between"
-            alignItems="center"
-          >
-            <Typography variant="h6">
-              {selectedCells.length} cells selected
-            </Typography>
-            <Button onClick={() => clearCellSelection()}>
-              <BackspaceTwoToneIcon fontSize="medium" />
-            </Button>
-          </Grid>
-        </Paper>
+        <SelectedCellsPanel
+          classes={classes}
+          selectedCellsCount={selectedCells.length}
+          clearCellSelection={() => update([], "BRUSH")}
+        />
       )}
-      <ExpansionPanel
-        classes={{
-          root: classes.expansionPanelRoot
-        }}
-      >
+      <ExpansionPanel className={classes.expansionPanelRoot}>
         <ExpansionPanelSummary
-          classes={{ root: classes.expansionPanelSummary }}
+          className={classes.expansionPanelSummary}
           expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
+          aria-controls="panel-quality-content"
+          id="panel-quality"
         >
-          <Typography variant="h7">Quality Filter</Typography>
+          <Typography variant="body1">Quality Filter</Typography>
         </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
+        <ExpansionPanelDetails
+          id="panel-quality-content"
+          className={classes.panelDetails}
+        >
           <Slider
             className={classes.slider}
             color={"secondary"}
             defaultValue={qualityMenuValue}
             onChange={(event, newValue) => setQualityMenuValue(newValue)}
-            onChangeCommitted={() => dispatchQualityUpdate()}
+            onChangeCommitted={() =>
+              update(
+                {
+                  quality: qualityMenuValue.toString()
+                },
+                "QUALITY_UPDATE"
+              )
+            }
             getAriaValueText={value => value}
             aria-labelledby="discrete-slider"
             step={0.05}
@@ -171,55 +163,69 @@ const SettingsPanel = ({ classes, categoryStats }) => {
           />
         </ExpansionPanelDetails>
       </ExpansionPanel>
-      <ExpansionPanel
-        classes={{
-          root: classes.expansionPanelRoot
-        }}
-      >
+      <ExpansionPanel className={classes.expansionPanelRoot}>
         <ExpansionPanelSummary
-          classes={{ root: classes.expansionPanelSummary }}
+          className={classes.expansionPanelSummary}
           expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
+          aria-controls="panel-scatterplot-content"
+          id="panel-scatterplot"
         >
-          <Typography variant="h7">Heatmap</Typography>
+          <Typography variant="body1">Scatterplot</Typography>
         </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <HeatmapSettings
+        <ExpansionPanelDetails
+          id="panel-scatterplot-content"
+          className={classes.panelDetails}
+        >
+          <ScatterplotSettings
             classes={classes}
-            updateCategories={updateCategories}
-            categoryOptions={categoryStats}
+            axisOptions={scatterplotOptions}
+            currentlySelectedAxis={scatterplotAxis}
+            setAxisOption={value => update(value, "SCATTERPLOT_AXIS_UPDATE")}
+          />
+        </ExpansionPanelDetails>
+      </ExpansionPanel>
+      <ExpansionPanel className={classes.expansionPanelRoot}>
+        <ExpansionPanelSummary
+          className={classes.expansionPanelSummary}
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1a-chip-content"
+          id="panel-chip"
+        >
+          <Typography variant="body1">Chip Heatmap</Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails
+          id="panel1a-chip-content"
+          className={classes.panelDetails}
+        >
+          <ChipHeatmapSettings
+            classes={classes}
+            axisOptions={chipHeatmapOptions}
+            currentlySelectedAxis={chipHeatmapAxis}
+            setAxisOption={value => update(value, "CHIPHEATMAP_AXIS_UPDATE")}
           />
         </ExpansionPanelDetails>
       </ExpansionPanel>
     </Paper>
   );
 };
-const MetaData = ({ classes, count, analysis }) => (
+const MetaData = ({ classes, count, analysis, library }) => (
   <Paper
     elevation={0}
-    className={[classes.panel, classes.metaDataPanel]}
+    className={[classes.panel, classes.metaDataPanel].join(" ")}
     variant="outlined"
   >
     <Grid
       container
       direction="column"
       justify="space-between"
-      alignItems="start"
+      alignItems="flex-start"
     >
       <Typography
         variant="h5"
         fontWeight="fontWeightRegular"
         style={{ color: "#a2a2a2" }}
       >
-        Analysis: {analysis}
-      </Typography>
-      <Typography
-        variant="h5"
-        fontWeight="fontWeightRegular"
-        style={{ color: "#a2a2a2" }}
-      >
-        Library: ABC123
+        Analysis: <b>{analysis}</b>
       </Typography>
       <Typography
         variant="h5"
@@ -232,48 +238,23 @@ const MetaData = ({ classes, count, analysis }) => (
   </Paper>
 );
 
-const HeatmapSettings = ({ classes, updateCategories, categoryOptions }) => {
-  const originallySelectedCategories = categoryOptions.reduce(
-    (final, selected) => {
-      final[selected.category] = true;
-      return final;
-    },
-    {}
-  );
-  const [selectedCategories, setSelectedCategories] = useState(
-    originallySelectedCategories
-  );
+const SelectedCellsPanel = ({
+  classes,
+  selectedCellsCount,
+  clearCellSelection
+}) => (
+  <Paper
+    className={[classes.panel, classes.selectedCells]}
+    variant="outlined"
+    elevation={0}
+  >
+    <Grid container direction="row" justify="space-between" alignItems="center">
+      <Typography variant="h6">{selectedCellsCount} cells selected</Typography>
+      <Button onClick={() => clearCellSelection()}>
+        <BackspaceTwoToneIcon />
+      </Button>
+    </Grid>
+  </Paper>
+);
 
-  const handleCategoryChange = name => event => {
-    const newSelection = {
-      ...selectedCategories,
-      [name]: event.target.checked
-    };
-    setSelectedCategories(newSelection);
-    updateCategories(newSelection);
-  };
-  return (
-    <div className={classes.fieldComponent}>
-      <Typography id="discrete-slider" variant="h7" gutterBottom>
-        Categories
-      </Typography>
-      <FormControl required component="fieldset">
-        <FormGroup>
-          {categoryOptions.map(category => (
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={selectedCategories[category.category]}
-                  onChange={handleCategoryChange(category.category)}
-                  value={category.category}
-                />
-              }
-              label={category.category}
-            />
-          ))}
-        </FormGroup>
-      </FormControl>
-    </div>
-  );
-};
 export default withStyles(styles)(SettingsPanel);

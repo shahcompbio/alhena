@@ -80,15 +80,6 @@ export const NEWUSER = gql`
     }
   }
 `;
-export const createUserEmail = gql`
-  query createUserEmail($recipient: Recipient!) {
-    sendMail(recipient: $recipient) {
-      response
-      rejected
-      accepted
-    }
-  }
-`;
 export const DELETEUSERBYUSERNAME = gql`
   query DeleteUser($username: String!) {
     deleteUser(username: $username) {

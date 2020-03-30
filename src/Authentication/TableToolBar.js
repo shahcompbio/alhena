@@ -7,6 +7,7 @@ import Typography from "@material-ui/core/Typography";
 import CheckIcon from "@material-ui/icons/Check";
 import ClearIcon from "@material-ui/icons/Clear";
 import EditIcon from "@material-ui/icons/Edit";
+import VpnKeyIcon from "@material-ui/icons/VpnKey";
 
 import clsx from "clsx";
 import { lighten, makeStyles } from "@material-ui/core/styles";

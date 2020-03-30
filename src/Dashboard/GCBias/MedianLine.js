@@ -2,9 +2,8 @@ import React from "react";
 
 import XYFrame from "semiotic/lib/XYFrame";
 import DividedLine from "semiotic/lib/DividedLine";
-const MedianLine = ({ data, extent }) => {
+const MedianLine = ({ data, extent, plotDimensions }) => {
   const frameProps = (data, extent) => {
-    console.log(data);
     return {
       lines: data,
       size: [800, 600],
