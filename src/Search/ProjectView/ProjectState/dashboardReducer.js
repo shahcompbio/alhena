@@ -1,5 +1,9 @@
-const initialState = (dashboards, selectedDashboard) => {
-  return { dashboards: dashboards, selectedDashboard: "DLP" };
+const initialState = (dashboards, selectedDashboard, selectedAnalysis) => {
+  return {
+    dashboards: dashboards,
+    selectedDashboard: "DLP",
+    selectedAnalysis: selectedAnalysis
+  };
 };
 
 const statsStateReducer = (state, action) => {
@@ -13,6 +17,9 @@ const statsStateReducer = (state, action) => {
     case "ANALYSIS_SELECT": {
       return {
         ...state,
+        //selectedAnalysis: action.value.selectedAnalysis
+        //  ? "sc-2602"
+        //  : action.value.selectedAnalysis
         selectedAnalysis: action.value.selectedAnalysis
       };
     }

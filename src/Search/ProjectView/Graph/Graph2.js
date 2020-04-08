@@ -43,6 +43,7 @@ const Graph = ({
 }) => {
   const [{}, dispatch] = useDashboardState();
   const [mainSvg, setMainSvg] = useState({});
+  const [voronoi, setVoronoi] = useState({});
   const graphRef = useRef(null);
 
   const [width, height] = useWindowSize();
@@ -50,6 +51,7 @@ const Graph = ({
     var svg = initSvg(graphRef.current, width, height);
     appendGlowFilter(svg);
     setMainSvg(svg);
+    svg.append("g").attr("class", "voronoi-group");
   }, []);
 
   function useWindowSize() {
@@ -267,8 +269,11 @@ rotate(${nodeOffset})
                 ];
               });
 
-            var voronoi = mainSvg.append("g").attr("class", "voronoi-group");
+            //  var voronoi = mainSvg.append("g").attr("class", "voronoi-group");
 
+            var voronoi = mainSvg.append("g").attr("class", "voronoi-group");
+            //  }
+            //  console.log(voronoi);
             voronoi
               .selectAll("path")
               .data(voronoid(cirlceElementCordinates).polygons(), d => {
@@ -276,8 +281,8 @@ rotate(${nodeOffset})
               })
               .enter()
               .append("path")
-              //.style("stroke", "#2074A0")
-              //.style("stroke-width", 5)
+              .style("stroke", "#2074A0")
+              .style("stroke-width", 5)
               .style("fill", "none")
               .style("pointer-events", "all")
               .attr("d", d => (d ? "M" + d.join("L") + "Z" : null))
@@ -438,13 +443,13 @@ rotate(${nodeOffset})
           .append("g")
           .attr("class", "voronoi-group")
           .selectAll("path")
-          .data(voronoid(cirlceElementCordinates).polygons(), d => {
+          .data(voronoid(cirlceElementCordinates).polygons(), function(d) {
             return d.data.element.data.target;
           })
           .enter()
           .append("path")
-          //.style("stroke", "#2074A0")
-          //.style("stroke-width", 5)
+          .style("stroke", "#2074A0")
+          .style("stroke-width", 5)
           .style("fill", "none")
           .style("pointer-events", "all")
           .attr("d", d => (d ? "M" + d.join("L") + "Z" : null))
@@ -551,8 +556,8 @@ rotate(${nodeOffset})
               }
             },
             this
-          );
-        //  .attr("transform", "scale(1.25,1.25)");
+          )
+          .attr("transform", "scale(1.25,1.25)");
       }
       function initPanelText(svgCircles, mainSvg) {
         var circleText = svgCircles.filter(d => d.parent === null);

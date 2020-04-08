@@ -30,11 +30,12 @@ const appStateReducer = (state, action) => {
       return { ...state, user: action.uid };
     }
     case "LOGOUT": {
-      localStorage.setItem("isSuperUser", null);
-      localStorage.setItem("authKeyID", null);
-      localStorage.setItem("uid", null);
+      localStorage.removeItem("isSuperUser");
+      localStorage.removeItem("authKeyID");
+      localStorage.removeItem("uid");
       history.push("/login");
-      return { authAttempted: false, authKeyID: null, uid: null };
+
+      return { ...state, authAttempted: false, authKeyID: null, uid: null };
     }
     default:
       return state;

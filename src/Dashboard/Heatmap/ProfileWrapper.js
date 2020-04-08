@@ -43,11 +43,7 @@ const ProfileWrapper = ({
         const container = d3.select(node).select("#profileSvg");
         container.attr(
           "transform",
-          "translate(" +
-            heatmapConfig.paddingLeft +
-            ", " +
-            heatmapConfig.profile.axisTextYOffset +
-            ")"
+          "translate(" + heatmapConfig.paddingLeft + ", " + 0 + ")"
         );
 
         container
@@ -132,7 +128,7 @@ const ProfileWrapper = ({
       direction="row"
       id="profileWrapper"
       ref={ref}
-      style={{ position: "relative", marginLeft: -xOffset, marginTop: "-5px" }}
+      style={{ position: "relative", marginLeft: -xOffset }}
       width={heatmapConfig.wrapperWidth}
     >
       <Grid item>
@@ -143,12 +139,13 @@ const ProfileWrapper = ({
           id="profileSvg"
           width={heatmapConfig.width}
           height={heatmapConfig.profile.height}
+          style={{ marginTop: 5 }}
         />
         <canvas
           id="profileCanvas"
           style={{
             marginLeft: heatmapConfig.profile.axisWidth,
-            paddingTop: heatmapConfig.profile.axisTextYOffset
+            paddingTop: heatmapConfig.profile.axisTextYOffset - 1
           }}
           width={heatmapConfig.width}
           height={heatmapConfig.profile.height}

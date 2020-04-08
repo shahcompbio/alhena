@@ -9,6 +9,7 @@ import OverviewContent from "./Overview/OverviewContent.js";
 import Backdrop from "@material-ui/core/Backdrop";
 import Grid from "@material-ui/core/Grid";
 
+import { useHistory } from "react-router-dom";
 import { useDashboardState } from "./ProjectView/ProjectState/dashboardState";
 
 import { withStyles } from "@material-ui/styles";
@@ -25,13 +26,25 @@ const defaultStepperText = [
   "Analysis Selection",
   "View Dashbaord"
 ];
+const dashboardPathname = "/dashboards";
 const slideTimeOut = 1500;
-const Content = ({ classes, history }) => {
+const Content = ({ classes }) => {
+  let history = useHistory();
   const [
     { selectedDashboard, selectedAnalysis },
     dispatch
   ] = useDashboardState();
-  const [activeStep, setActiveStep] = useState(selectedDashboard ? 1 : 0);
+
+  if (
+    history.location.pathname !== dashboardPathname &&
+    selectedAnalysis === null
+  ) {
+    history.replace(dashboardPathname);
+  }
+
+  const [activeStep, setActiveStep] = useState(
+    selectedAnalysis ? 2 : selectedDashboard ? 1 : 0
+  );
   const [stepTextValues, setStepTextValues] = useState(defaultStepperText);
   const [isBackwards, setIsBackwards] = useState(false);
 
@@ -50,6 +63,7 @@ const Content = ({ classes, history }) => {
         value: { selectedAnalysis: null }
       });
     }
+
     const newStepperTextValues = stepTextValues.map((text, i) => {
       return i < index ? defaultStepperText[i] : text;
     });

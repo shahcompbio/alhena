@@ -18,9 +18,9 @@ const getDashboardByUser = gql`
   }
 `;
 
-const DashboardWrapper = ({ classes, history }) => {
+const DashboardWrapper = ({ uri, classes, history }) => {
   const [{ authKeyID, uid }] = useAppState();
-
+  const ticketFromUrl = uri ? uri.params.ticket : null;
   return (
     <Query
       query={getDashboardByUser}
@@ -35,7 +35,11 @@ const DashboardWrapper = ({ classes, history }) => {
           dashboard => dashboard.name
         );
 
-        const intialStateUpdated = initialState(dashboards, dashboards[0]);
+        const intialStateUpdated = initialState(
+          dashboards,
+          dashboards[0],
+          ticketFromUrl
+        );
         return (
           <DashboardProvider
             initialState={intialStateUpdated}

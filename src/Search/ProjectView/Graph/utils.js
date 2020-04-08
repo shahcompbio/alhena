@@ -3,6 +3,15 @@ import * as d3 from "d3";
 import { config } from "../config.js";
 const displayConfig = config.DisplayConfig;
 
+export function originalRadiusCanvas(d) {
+  if (d.depth === 0) {
+    return 800;
+  } else if (d.depth === 1 || d.depth === 2) {
+    return 15;
+  } else {
+    return 15;
+  }
+}
 export function originalRadius(d, isSecondLevelInteraction) {
   if (isSecondLevelInteraction) {
     return d.depth === 0 ? 1400 : d.depth === 1 ? 0 : 40;

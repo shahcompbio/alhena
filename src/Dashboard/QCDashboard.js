@@ -4,6 +4,7 @@ import gql from "graphql-tag";
 import { useQuery } from "react-apollo-hooks";
 
 import { withStyles } from "@material-ui/core/styles";
+import { useHistory } from "react-router-dom";
 
 import Heatmap from "./Heatmap/Heatmap.js";
 import Chip from "./ChipHeatmap/Chip.js";
@@ -67,6 +68,7 @@ const QCDashboard = ({ analysis, classes }) => {
     { selectedCells, quality, popupFacadeIsOpen },
     dispatch
   ] = useStatisticsState();
+  let history = useHistory();
 
   const { loading, data } = useQuery(HEATMAP_ORDER, {
     variables: {
@@ -76,50 +78,57 @@ const QCDashboard = ({ analysis, classes }) => {
   });
 
   if (!loading && data) {
-    const heatmapOrder =
-      selectedCells.length > 0
-        ? selectedCells
-        : data.heatmapOrder.map(order => order.order);
-    return (
-      <div className={classes.root}>
-        <Grid
-          container
-          direction="row"
-          justify="flex-start"
-          alignItems="flex-start"
-          key="QCContainer"
-          className={classes.content}
-        >
-          <Grid className={classes.settings} item xs={3}>
-            <SettingsPanel
-              cellCount={data.heatmapOrder.length}
-              scatterplotOptions={data.scatterplotAxisOptions}
-              chipHeatmapOptions={data.chipHeatmapOptions}
-              categoryStats={data.categoriesStats}
-              analysis={analysis}
-            />
-          </Grid>
-          <Grid item className={classes.plots} xs={9}>
-            <Paper className={[classes.heatmapContent, classes.paperContainer]}>
-              <Heatmap
-                analysis={analysis}
-                allHeatmapOrder={heatmapOrder}
+    if (data.heatmapOrder) {
+      const heatmapOrder =
+        selectedCells.length > 0
+          ? selectedCells
+          : data.heatmapOrder.map(order => order.order);
+      return (
+        <div className={classes.root}>
+          <Grid
+            container
+            direction="row"
+            justify="flex-start"
+            alignItems="flex-start"
+            key="QCContainer"
+            className={classes.content}
+          >
+            <Grid className={classes.settings} item xs={3}>
+              <SettingsPanel
+                cellCount={data.heatmapOrder.length}
+                scatterplotOptions={data.scatterplotAxisOptions}
+                chipHeatmapOptions={data.chipHeatmapOptions}
                 categoryStats={data.categoriesStats}
+                analysis={analysis}
               />
-            </Paper>
-            <Paper className={[classes.scatterplot, classes.paperContainer]}>
-              <Scatterplot analysis={analysis} />
-            </Paper>
-            <Paper className={[classes.chip, classes.paperContainer]}>
-              <Chip analysis={analysis} />
-            </Paper>
-            <Paper className={[classes.gcBias, classes.paperContainer]}>
-              <GCBias analysis={analysis} heatmapOrder={heatmapOrder} />
-            </Paper>
+            </Grid>
+            <Grid item className={classes.plots} xs={9}>
+              <Paper
+                className={[classes.heatmapContent, classes.paperContainer]}
+              >
+                <Heatmap
+                  analysis={analysis}
+                  allHeatmapOrder={heatmapOrder}
+                  categoryStats={data.categoriesStats}
+                />
+              </Paper>
+              <Paper className={[classes.scatterplot, classes.paperContainer]}>
+                <Scatterplot analysis={analysis} />
+              </Paper>
+              <Paper className={[classes.chip, classes.paperContainer]}>
+                <Chip analysis={analysis} />
+              </Paper>
+              <Paper className={[classes.gcBias, classes.paperContainer]}>
+                <GCBias analysis={analysis} heatmapOrder={heatmapOrder} />
+              </Paper>
+            </Grid>
           </Grid>
-        </Grid>
-      </div>
-    );
+        </div>
+      );
+    } else {
+      history.push("/dashboards");
+      return null;
+    }
   } else {
     return (
       <Grid

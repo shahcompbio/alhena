@@ -212,7 +212,7 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
                 />
               </svg>
             </Grid>
-            <Grid item>
+            <Grid item style={{ marginTop: 5, marginLeft: 3 }}>
               <ProfileWrapper
                 categoryLength={categoryStats.length}
                 segs={hoverCell["cell"]}
