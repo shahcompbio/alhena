@@ -4,6 +4,7 @@ import { ApolloConsumer } from "react-apollo";
 import { Route, Switch } from "react-router-dom";
 
 import { withRouter } from "react-router";
+import { useHistory } from "react-router-dom";
 
 import AdminPanel from "./Authentication/AdminPanel.js";
 
@@ -27,11 +28,38 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 
 const App = () => {
   const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
+  let history = useHistory();
 
   return (
     <MuiThemeProvider theme={theme}>
       <CssBaseline />
       <Switch>
+        <Route
+          path="/"
+          exact={true}
+          component={() => {
+            history.replace("/login");
+            return (
+              <ApolloConsumer>
+                {client => <Unauthenticated client={client} />}
+              </ApolloConsumer>
+            );
+          }}
+        />
+        {!authKeyID && (
+          <Route
+            key="dashboardUnauth"
+            path="/dashboards"
+            component={() => {
+              history.replace("/login");
+              return (
+                <ApolloConsumer>
+                  {client => <Unauthenticated client={client} />}
+                </ApolloConsumer>
+              );
+            }}
+          />
+        )}
         <Route
           path="/login"
           exact={true}
@@ -70,15 +98,25 @@ const App = () => {
             component={() => <ProjectViewContent />}
           />,
           <Route
-            key="dashbaord"
+            key="dashbaordTicket"
+            path="/dashboards/:ticket"
+            component={({ match }) => <DashboardWrapper uri={match} />}
+          />,
+          <Route
+            key="dashboard"
             path="/dashboards"
-            component={() => <DashboardWrapper />}
+            component={() => <DashboardWrapper ticket={null} />}
           />,
           <Route
             exact
             key="heatmap"
             path="/heatmap"
             render={() => <DashboardContent />}
+          />,
+          <Route
+            key="canvasGraph"
+            path="/canvasGraph"
+            component={() => <DashboardWrapper ticket={null} />}
           />
         ]}
         {authKeyID && isSuperUser && (

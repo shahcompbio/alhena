@@ -113,6 +113,7 @@ export const getUsers = gql`
 export const getAllAnalyses = gql`
   query Sunburst($filter: [Term]!, $user: ApiUser!, $dashboardName: String!) {
     analyses(filters: $filter, auth: $user, dashboardName: $dashboardName) {
+      error
       analysesStats {
         label
         value

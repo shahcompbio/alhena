@@ -92,7 +92,7 @@ const defaultActions = [
 const adminActions = [{ icon: <SupervisorAccountIcon />, name: "Admin" }];
 
 const Menu = ({ history, classes }) => {
-  const [{ isSuperUser, authKeyID }] = useAppState();
+  const [{ isSuperUser, authKeyID }, dispatch] = useAppState();
   const [actions] = useState(
     isSuperUser
       ? [...adminActions, ...defaultActions]
@@ -111,12 +111,16 @@ const Menu = ({ history, classes }) => {
   const handleOpen = () => {
     setOpen(true);
   };
-  const handleAction = (name, history) => {
+  const handleAction = (name, history, dispatch) => {
     switch (name) {
       case "Back":
         return history.goBack();
-      case "Logout":
-        return history.push("/login");
+      case "Logout": {
+        dispatch({
+          type: "LOGOUT"
+        });
+        return;
+      }
       case "Admin":
         return history.push("/admin");
       case "Search":
@@ -149,7 +153,9 @@ const Menu = ({ history, classes }) => {
               icon={action.icon}
               tooltipTitle={action.name}
               tooltipPlacement={"right"}
-              onClick={() => handleAction(action.name, history)}
+              onClick={() => {
+                return handleAction(action.name, history, dispatch);
+              }}
             />
           ))}
         </SpeedDial>
