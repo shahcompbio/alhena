@@ -28,9 +28,9 @@ import { withRouter } from "react-router";
 import { Query } from "react-apollo";
 import { getAllDashboards } from "../../Queries/queries.js";
 const copy = require("clipboard-copy");
-const createUserEmail = gql`
-  query createUserEmail($recipient: Recipient!) {
-    sendMail(recipient: $recipient) {
+const createNewUserLink = gql`
+  query generateNewUserLink($newUser: NewUserLink!) {
+    newUserLink(newUser: $newUser) {
       newUserLink
     }
   }
@@ -43,18 +43,16 @@ const generateNewUserLink = async (
   selectedRoles
 ) => {
   var data = await client.query({
-    query: createUserEmail,
+    query: createNewUserLink,
     variables: {
-      recipient: { email: email, name, roles: selectedRoles.join(",") }
+      newUser: { email: email, name, roles: selectedRoles.join(",") }
     }
   });
-  return data.data.sendMail.newUserLink;
+  return data.data.newUserLink.newUserLink;
 };
 
 const NewUserPopup = ({ isOpen, handleClose, client }) => {
   const [{ authKeyID, uid }] = useAppState();
-  //const [isLoading, setLoading] = useState(false);
-  //const [isSent, setIsSent] = useState(false);
   const [newUserLink, setNewUserLink] = useState(null);
   const [isSubmitDisabled, setIsDisabled] = useState(true);
 
@@ -199,7 +197,6 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
                     </Button>
                     <Button
                       onClick={async ev => {
-                        //  setLoading(true);
                         var link = await generateNewUserLink(
                           ev,
                           client,
@@ -208,18 +205,12 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
                           selectedRoles
                         );
                         setNewUserLink(link);
-                        // setIsSent(true);
-                        //  setTimeout(() => {
-
-                        //  setLoading(false);
-                        //handleClose();
-                        //  }, 2000);
                       }}
                       color="primary"
                       variant="contained"
                       disabled={isSubmitDisabled}
                     >
-                      Send
+                      Generate
                     </Button>
                   </DialogActions>
                 </ValidatorForm>

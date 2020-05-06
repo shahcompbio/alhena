@@ -22,10 +22,6 @@ import { theme } from "./theme/theme.js";
 import { MuiThemeProvider } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 
-//const title = "Alhena";
-//const description =
-//  "Alhena is a single cell DNA (scDNA) dashboard for MSK SPECTRUM. It takes the CSV output from the single cell pipeline.";
-
 const App = () => {
   const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
   let history = useHistory();
