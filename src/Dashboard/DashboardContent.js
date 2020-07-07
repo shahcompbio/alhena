@@ -3,6 +3,7 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 
 import QCDashboard from "./QCDashboard.js";
+import LoadingCircle from "./CommonModules/LoadingCircle.js";
 
 import { Grid, Paper } from "@material-ui/core";
 

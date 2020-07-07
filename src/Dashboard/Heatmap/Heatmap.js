@@ -22,6 +22,7 @@ import ChromAxis from "./ChromAxis.js";
 import Indicator from "./Indicator.js";
 import Legend from "./Legend.js";
 import Minimap from "./Minimap.js";
+import LoadingCircle from "../CommonModules/LoadingCircle.js";
 import ProfileWrapper from "./ProfileWrapper.js";
 
 import Grid from "@material-ui/core/Grid";
@@ -107,7 +108,7 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
       {({ loading, error, data }) => {
         if (error) return null;
         if (loading && Object.keys(data).length === 0) {
-          return null;
+          return <LoadingCircle />;
         }
 
         const { chromosomes, segs, analysisStats } = data;
