@@ -13,6 +13,8 @@ import Scatterplot from "./Scatterplot/Scatterplot.js";
 
 import SettingsPanel from "./SettingsPanel.js";
 
+import LoadingCircle from "./CommonModules/LoadingCircle.js";
+
 import { Paper, Grid } from "@material-ui/core";
 import { useStatisticsState } from "./DashboardState/statsState";
 const HEATMAP_ORDER = gql`
@@ -148,14 +150,14 @@ const QCDashboard = ({ analysis, classes }) => {
             scatterplotOptions={[]}
           />
         </Grid>
-
         <Grid item className={classes.plots}>
           <Paper className={[classes.chip, classes.paperContainer]}>
-            <Chip analysis={""} />
+            <LoadingCircle />
           </Paper>
         </Grid>
       </Grid>
     );
   }
 };
+//<Chip analysis={""} />
 export default withStyles(styles)(QCDashboard);

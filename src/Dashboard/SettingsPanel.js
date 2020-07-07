@@ -12,6 +12,7 @@ import {
 
 import ChipHeatmapSettings from "./Settings/ChipHeatmapSettings.js";
 import ScatterplotSettings from "./Settings/ScatterplotSettings.js";
+import LoadingCircle from "./CommonModules/LoadingCircle.js";
 
 import BackspaceTwoToneIcon from "@material-ui/icons/BackspaceTwoTone";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -227,13 +228,17 @@ const MetaData = ({ classes, count, analysis, library }) => (
       >
         Analysis: <b>{analysis}</b>
       </Typography>
-      <Typography
-        variant="h5"
-        fontWeight="fontWeightRegular"
-        style={{ color: "#a2a2a2" }}
-      >
-        {count} cells
-      </Typography>
+      {count === null ? (
+        <LoadingCircle />
+      ) : (
+        <Typography
+          variant="h5"
+          fontWeight="fontWeightRegular"
+          style={{ color: "#a2a2a2" }}
+        >
+          {count} cells
+        </Typography>
+      )}
     </Grid>
   </Paper>
 );

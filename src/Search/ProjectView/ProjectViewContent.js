@@ -8,8 +8,7 @@ import Graph from "./Graph/Graph2.js";
 import CanvasGraph from "./Graph/CanvasGraph.js";
 
 import { Query } from "react-apollo";
-import { getAllAnalyses } from "../../Queries/queries.js";
-
+import gql from "graphql-tag";
 import { useDashboardState } from "./ProjectState/dashboardState";
 import Grid from "@material-ui/core/Grid";
 
@@ -25,7 +24,50 @@ const styles = {
     paddingLeft: 50
   }
 };
-
+const getAllAnalyses = gql`
+  query Sunburst($filter: [Term]!, $user: ApiUser!, $dashboardName: String!) {
+    analyses(filters: $filter, auth: $user, dashboardName: $dashboardName) {
+      error
+      analysesStats {
+        label
+        value
+      }
+      analysesList {
+        label
+        values
+        type
+      }
+      analysesTree {
+        source
+        children {
+          ... on ParentType {
+            source
+            target
+            children {
+              ... on ParentType {
+                source
+                target
+                children {
+                  ... on ParentType {
+                    source
+                    target
+                    children {
+                      ... on ChildType {
+                        source
+                        target
+                        value
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 const ProjectViewContent = ({ classes, handleForwardStep }) => {
   const [{ selectedDashboard }] = useDashboardState();
 
@@ -52,7 +94,8 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
       setFilters([...newFilters]);
     }
   };
-  return (
+
+  return selectedDashboard !== null ? (
     <Query
       query={getAllAnalyses}
       variables={{
@@ -155,7 +198,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
         }
       }}
     </Query>
-  );
+  ) : null;
 };
 
 export default withStyles(styles)(ProjectViewContent);
