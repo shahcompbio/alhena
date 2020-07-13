@@ -4,19 +4,9 @@ import {
   VERIFYNEWUSERAUTHKEY,
   DELETEUSERBYUSERNAME,
   UPDATEUSERROLES,
-  DELETEDASHBOARD,
-  CREATENEWDASHBOARD,
-  UPDATEDASHBOARD
+  CREATENEWDASHBOARD
 } from "../Queries/queries.js";
-export const updateDashboard = async (client, name, selectedIndices) => {
-  const { data } = await client.query({
-    query: UPDATEDASHBOARD,
-    variables: {
-      dashboard: { name: name, indices: selectedIndices }
-    }
-  });
-  return data.created;
-};
+
 export const createNewDashboard = async (client, name, selectedIndices) => {
   const { data } = await client.query({
     query: CREATENEWDASHBOARD,
@@ -26,15 +16,7 @@ export const createNewDashboard = async (client, name, selectedIndices) => {
   });
   return data.created;
 };
-export const deleteDashboard = async (name, client) => {
-  const { data } = await client.query({
-    query: DELETEDASHBOARD,
-    variables: {
-      name: name
-    }
-  });
-  return data.deleteDashboard.allDeleted;
-};
+
 export const updateUserRoles = async (
   username,
   roles,
@@ -52,16 +34,6 @@ export const updateUserRoles = async (
     }
   });
   return data.updateUserRoles.created;
-};
-
-export const deleteUserByUsername = async (username, client) => {
-  const { data } = await client.query({
-    query: DELETEUSERBYUSERNAME,
-    variables: {
-      username: username
-    }
-  });
-  return data.deleteUser.isDeleted;
 };
 
 export const verifyNewUserSecureUrl = async (key, client) => {

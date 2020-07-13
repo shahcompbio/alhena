@@ -47,6 +47,7 @@ const styles = theme => ({
   tabs: { alignSelf: "flex-end" },
   toolbar: { overflow: "hidden" }
 });
+
 const AdminPanel = ({ classes }) => {
   const theme = useTheme();
 

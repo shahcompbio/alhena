@@ -1,13 +1,16 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
-//import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import Checkbox from "@material-ui/core/Checkbox";
-import Button from "@material-ui/core/Button";
-import Paper from "@material-ui/core/Paper";
+
+import {
+  Grid,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Checkbox,
+  Button,
+  Paper
+} from "@material-ui/core";
+
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 
@@ -90,7 +93,7 @@ const TransferList = ({ allIndices, setSelectedIndices, alreadyChoosen }) => {
     const labelId = `transfer-list-item-${value}-label`;
     return (
       <ListItem
-        key={value}
+        key={value + "item"}
         role="listitem"
         dense
         disableGutters
@@ -106,7 +109,7 @@ const TransferList = ({ allIndices, setSelectedIndices, alreadyChoosen }) => {
             inputProps={{ "aria-labelledby": labelId }}
           />
         </ListItemIcon>
-        <ListItemText id={labelId} primary={`${value + 1}`} />
+        <ListItemText id={labelId} primary={`${value}`} />
       </ListItem>
     );
   };

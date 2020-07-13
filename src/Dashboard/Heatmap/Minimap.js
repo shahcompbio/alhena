@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useCallback, useState } from "react";
 
 import gql from "graphql-tag";
 import { Query } from "react-apollo";
+import LoadingCircle from "../CommonModules/LoadingCircle.js";
 
 import * as d3 from "d3";
 import { heatmapConfig } from "./config.js";
@@ -139,7 +140,7 @@ const Minimap = ({
   return (
     <Query query={MINI_MAP_QUERY} variables={{ analysis, indices, quality }}>
       {({ loading, error, data }) => {
-        if (loading) return null;
+        if (loading) return <LoadingCircle />;
         if (error) return null;
 
         const { segs } = data;
