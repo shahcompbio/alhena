@@ -1,7 +1,7 @@
 const initialState = (dashboards, selectedDashboard, selectedAnalysis) => {
   return {
     dashboards: dashboards,
-    selectedDashboard: "DLP",
+    selectedDashboard: selectedDashboard,
     selectedAnalysis: selectedAnalysis
   };
 };

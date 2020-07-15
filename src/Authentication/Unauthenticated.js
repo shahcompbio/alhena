@@ -4,9 +4,17 @@ import { login } from "../util/utils.js";
 import { useAppState } from "../util/app-state";
 import { useHistory } from "react-router-dom";
 
-import Grid from "@material-ui/core/Grid";
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
+import {
+  Button,
+  Grid,
+  InputAdornment,
+  IconButton,
+  TextField
+} from "@material-ui/core";
+import { Visibility, VisibilityOff } from "@material-ui/icons";
+
+import LoadingCircle from "../Dashboard/CommonModules/LoadingCircle.js";
+
 import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
 
 import { withStyles } from "@material-ui/styles";
@@ -59,13 +67,17 @@ const UnauthenticatedApp = ({ client, classes }) => {
   let history = useHistory();
   const [_, dispatch] = useAppState();
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const usernameRef = useRef();
   const passwordRef = useRef();
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (event, client, dispatch) => {
     setError(null);
     event.preventDefault();
     try {
+      setLoading(true);
       await login(
         usernameRef.current.value,
         passwordRef.current.value,
@@ -78,6 +90,7 @@ const UnauthenticatedApp = ({ client, classes }) => {
           setError(message.extensions.exception.meta.body.status);
         }
       });
+      setLoading(false);
     }
   };
 
@@ -89,59 +102,81 @@ const UnauthenticatedApp = ({ client, classes }) => {
         )}
       </div>
       <img alt="logo" src={logo} className={classes.logo} />
+
       <div className={classes.inputWrapper}>
-        <form onSubmit={ev => handleLogin(ev, client, dispatch)} id="loginForm">
-          <ComponentWrapper>
-            <TextField
-              className={classes.textField}
-              margin="normal"
-              inputRef={usernameRef}
-              id={"login:username"}
-              required
-              fullWidth
-              InputLabelProps={{
-                className: classes.floatingLabelFocusStyle
-              }}
-              InputProps={{ className: classes.input }}
-              value={usernameRef.value}
-              label={"Username"}
-              type={"text"}
-            />
-          </ComponentWrapper>
-          <ComponentWrapper>
-            <TextField
-              className={classes.textField}
-              margin="normal"
-              inputRef={passwordRef}
-              id={"login:password"}
-              required
-              fullWidth
-              InputLabelProps={{
-                className: classes.floatingLabelFocusStyle
-              }}
-              InputProps={{ className: classes.input, color: "primary" }}
-              value={passwordRef.value}
-              label={"Password"}
-              type={"password"}
-            />
-          </ComponentWrapper>
-          <ComponentWrapper>
-            <Button
-              className={classes.submitButton}
-              variant="contained"
-              type="submit"
-            >
-              Log In
-            </Button>
-            <Button
-              className={classes.forgotPasswordButton}
-              variant="contained"
-              onClick={() => history.push("/forgotPassword")}
-            >
-              Forgot Password
-            </Button>
-          </ComponentWrapper>
-        </form>
+        {loading ? (
+          <LoadingCircle />
+        ) : (
+          <form
+            onSubmit={ev => handleLogin(ev, client, dispatch)}
+            id="loginForm"
+          >
+            <ComponentWrapper>
+              <TextField
+                className={classes.textField}
+                margin="normal"
+                inputRef={usernameRef}
+                id={"login:username"}
+                required
+                fullWidth
+                InputLabelProps={{
+                  className: classes.floatingLabelFocusStyle
+                }}
+                InputProps={{ className: classes.input }}
+                value={usernameRef.value}
+                label={"Username"}
+                type={"text"}
+              />
+            </ComponentWrapper>
+            <ComponentWrapper>
+              <TextField
+                className={classes.textField}
+                margin="normal"
+                inputRef={passwordRef}
+                id={"login:password"}
+                type={showPassword ? "text" : "password"}
+                required
+                fullWidth
+                InputLabelProps={{
+                  className: classes.floatingLabelFocusStyle
+                }}
+                InputProps={{
+                  className: classes.input,
+                  color: "primary",
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={() => setShowPassword(!showPassword)}
+                        onMouseDown={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+                value={passwordRef.value}
+                label={"Password"}
+              />
+            </ComponentWrapper>
+            <ComponentWrapper>
+              <Button
+                className={classes.submitButton}
+                variant="contained"
+                type="submit"
+              >
+                Log In
+              </Button>
+              <Button
+                className={classes.forgotPasswordButton}
+                variant="contained"
+                onClick={() => history.push("/forgotPassword")}
+              >
+                Forgot Password
+              </Button>
+            </ComponentWrapper>
+          </form>
+        )}
       </div>
     </Grid>
   );

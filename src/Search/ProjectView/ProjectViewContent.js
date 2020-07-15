@@ -80,6 +80,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
 
   const handleFilterChange = (filter, type) => {
     var options = selectedOptions;
+
     if (filter && type.localeCompare("clear") !== 0) {
       options[filter.label] = {
         value: filter.label,
@@ -91,6 +92,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
       var newFilters = filters.filter((value, i) => value.label !== filter);
       delete selectedOptions[filter];
 
+      setSelectedOptions(selectedOptions);
       setFilters([...newFilters]);
     }
   };

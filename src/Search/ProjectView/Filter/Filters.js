@@ -1,11 +1,20 @@
 import _ from "lodash";
-import React from "react";
-import Select from "react-select";
+import React, { useState } from "react";
+
 import * as d3 from "d3";
 
 import { withStyles } from "@material-ui/styles";
-import InputLabel from "@material-ui/core/InputLabel";
-import Grid from "@material-ui/core/Grid";
+import Autocomplete from "@material-ui/lab/Autocomplete";
+
+import {
+  Chip,
+  InputLabel,
+  FormControl,
+  Grid,
+  TextField,
+  MenuItem,
+  Select
+} from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import { hierarchyColouring } from "../Graph/appendUtils.js";
 import { useDashboardState } from "../ProjectState/dashboardState";
@@ -19,7 +28,8 @@ const styles = theme => ({
     paddingRight: "0px"
   },
   label: {
-    color: "white",
+    color: "black",
+    minWidth: 200,
     fontWeight: "normal",
     paddingBottom: "10px"
   },
@@ -29,20 +39,19 @@ const styles = theme => ({
   },
   filterDots: {
     position: "absolute"
+  },
+  input: { background: "white", borderRadius: 5, opacity: "80%" },
+  formControl: { minWidth: 300 },
+  dropdownStyle: {
+    maxHeight: 100,
+    overflowY: "scroll",
+    backgroundColor: "lightgrey"
   }
 });
-const reactSelectStyles = {
-  multiValue: (base, state) => {
-    return { ...base, backgroundColor: "#bdc3c7" };
-  },
-  multiValueLabel: (base, state) => {
-    return { ...base, fontWeight: "bold", color: "white", paddingRight: 6 };
-  },
-  multiValueRemove: (base, state) => {
-    return { ...base, display: "none" };
-  }
-};
-
+var collator = new Intl.Collator(undefined, {
+  numeric: true,
+  sensitivity: "base"
+});
 const Filters = ({
   filters,
   handleFilterChange,
@@ -51,9 +60,12 @@ const Filters = ({
   handleForwardStep
 }) => {
   const [{ selectedDashboard }, dispatch] = useDashboardState();
+  const [selectedValues, setSelectedValues] = useState({});
 
-  const onChange = (value, action, type, handleForwardStep) => {
-    const filter = value ? { value: value.label, label: value.value } : type;
+  const onChange = (value, type, handleForwardStep) => {
+    const filter = value ? { label: type, value: value["value"] } : type;
+    const action = value ? "add" : "clear";
+
     handleFilterChange(filter, action);
   };
 
@@ -99,51 +111,61 @@ const Filters = ({
 
   if (filters) {
     const filterTypes = filters.map(filter => filter.type);
-    var collator = new Intl.Collator(undefined, {
-      numeric: true,
-      sensitivity: "base"
-    });
 
     var panels = _.times(filterTypes.length, i => {
       return filterTypes[i] !== "project"
         ? {
             key: `panel-${i}`,
             content: (
-              <Select
-                key={`panel-${i}select`}
-                value={getSelectValue(selectedOptions, filterTypes[i], filters)}
-                styles={reactSelectStyles}
-                isMulti={isDisabledOption(selectedOptions, filterTypes[i])}
-                isClearable={
-                  isUserSelectedOption(selectedOptions, filterTypes[i]) ||
-                  !isDisabledOption(selectedOptions, filterTypes[i])
+              <Autocomplete
+                key={`panel-${filterTypes[i]}select`}
+                value={selectedOptions[filterTypes[i]]}
+                multiple={isDisabledOption(selectedOptions, filterTypes[i])}
+                disableClearable={
+                  !(
+                    isUserSelectedOption(selectedOptions, filterTypes[i]) ||
+                    !isDisabledOption(selectedOptions, filterTypes[i])
+                  )
                 }
-                onChange={(option, { action }) => {
+                renderTags={(value, getTagProps) => {
+                  return value.map((option, index) => (
+                    <Chip
+                      variant="outlined"
+                      label={option}
+                      {...getTagProps({ index })}
+                    />
+                  ));
+                }}
+                onChange={(event, value) => {
                   if (filterTypes[i] === "jira_id") {
                     dispatch({
                       type: "ANALYSIS_SELECT",
-                      value: { selectedAnalysis: option.label }
+                      value: { selectedAnalysis: value }
                     });
 
                     handleForwardStep();
                   } else {
-                    onChange(option, action, filterTypes[i], handleForwardStep);
+                    onChange(value, filterTypes[i], handleForwardStep);
                   }
                 }}
-                closeMenuOnSelect={false}
-                options={filters[i].values.sort(collator.compare).map(value => {
-                  return {
-                    value: filterTypes[i],
-                    label: value,
-                    disabled: selectedOptions[filterTypes[i]] === value
-                  };
-                })}
+                renderInput={(params, index) => (
+                  <TextField
+                    {...params}
+                    label={
+                      filters[i].label + " (" + filters[i].values.length + ")"
+                    }
+                    className={classes.label}
+                    variant="outlined"
+                  />
+                )}
+                options={filters[i].values
+                  .sort(collator.compare)
+                  .reduce((final, value) => {
+                    final = [...final, { label: value, value: value }];
+                    return final;
+                  }, [])}
+                getOptionLabel={value => value["label"]}
               />
-            ),
-            title: (
-              <InputLabel className={classes.label} key={`panel-${i}label`}>
-                {filters[i].label + " (" + filters[i].values.length + ")"}
-              </InputLabel>
             )
           }
         : "";
@@ -151,7 +173,7 @@ const Filters = ({
   } else {
     panels = [];
   }
-
+  //  disabled: selectedOptions[filterTypes[i]] === value
   return (
     <Grid
       container
@@ -177,16 +199,21 @@ const Filters = ({
         <FilterDots />
       </svg>
 
-      {panels.map((panel, index) => (
-        <Grid
-          item
-          className={classes.item}
-          key={"panel" + filters[index].label}
-        >
-          {panel.title}
-          {panel.content}
-        </Grid>
-      ))}
+      {panels.length > 0
+        ? panels
+            .filter(panel => panel !== "")
+            .map((panel, index) => (
+              <Grid
+                item
+                className={classes.item}
+                key={"panel" + filters[index].label}
+              >
+                <FormControl variant="outlined" className={classes.formControl}>
+                  {panel.content}
+                </FormControl>
+              </Grid>
+            ))
+        : []}
     </Grid>
   );
 };
@@ -202,11 +229,11 @@ const FilterDots = () => {
       .attr("x1", 10)
       .attr("y1", 30)
       .attr("x2", 10)
-      .attr("y2", 240)
+      .attr("y2", 250)
       .attr("class", "filterDotsLines")
   );
 
-  [30, 30, 87, 87, 165, 165, 240, 240].map((position, index) =>
+  [30, 30, 110, 110, 180, 180, 250, 250].map((position, index) =>
     svg
       .append("g")
       .append("circle")

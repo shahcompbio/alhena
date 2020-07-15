@@ -42,6 +42,7 @@ export const DELETEUSERBYUSERNAME = gql`
     }
   }
 `;
+
 const styles = (theme, tabIndex) => ({
   root: {
     width: "95%",
