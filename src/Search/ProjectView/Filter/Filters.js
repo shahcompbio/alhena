@@ -28,7 +28,7 @@ const styles = theme => ({
     paddingRight: "0px"
   },
   label: {
-    color: "black",
+    color: "white",
     minWidth: 200,
     fontWeight: "normal",
     paddingBottom: "10px"
@@ -46,7 +46,27 @@ const styles = theme => ({
     maxHeight: 100,
     overflowY: "scroll",
     backgroundColor: "lightgrey"
-  }
+  },
+
+  whiteBorder: {
+    "& .MuiInputBase-root": {
+      color: "white"
+    },
+    "& .MuiIconButton-label": {
+      color: "white"
+    },
+    "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+      borderColor: "white"
+    },
+    "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
+      borderColor: "white"
+    },
+    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "white"
+    },
+    color: "white"
+  },
+  whiteText: { color: "white" }
 });
 var collator = new Intl.Collator(undefined, {
   numeric: true,
@@ -122,19 +142,19 @@ const Filters = ({
                 value={selectedOptions[filterTypes[i]]}
                 multiple={isDisabledOption(selectedOptions, filterTypes[i])}
                 disableClearable={
-                  !(
-                    isUserSelectedOption(selectedOptions, filterTypes[i]) ||
-                    !isDisabledOption(selectedOptions, filterTypes[i])
-                  )
+                  selectedOptions[filterTypes[i]] ? false : true
                 }
                 renderTags={(value, getTagProps) => {
-                  return value.map((option, index) => (
-                    <Chip
-                      variant="outlined"
-                      label={option}
-                      {...getTagProps({ index })}
-                    />
-                  ));
+                  return value.length > 0
+                    ? value.map((option, index) => (
+                        <Chip
+                          variant="outlined"
+                          label={option}
+                          className={classes.whiteText}
+                          {...getTagProps({ index })}
+                        />
+                      ))
+                    : null;
                 }}
                 onChange={(event, value) => {
                   if (filterTypes[i] === "jira_id") {
@@ -154,10 +174,15 @@ const Filters = ({
                     label={
                       filters[i].label + " (" + filters[i].values.length + ")"
                     }
+                    InputLabelProps={{
+                      shrink: true,
+                      className: classes.whiteText
+                    }}
                     className={classes.label}
                     variant="outlined"
                   />
                 )}
+                className={classes.whiteBorder}
                 options={filters[i].values
                   .sort(collator.compare)
                   .reduce((final, value) => {
@@ -229,11 +254,11 @@ const FilterDots = () => {
       .attr("x1", 10)
       .attr("y1", 30)
       .attr("x2", 10)
-      .attr("y2", 250)
+      .attr("y2", 270)
       .attr("class", "filterDotsLines")
   );
 
-  [30, 30, 110, 110, 180, 180, 250, 250].map((position, index) =>
+  [30, 30, 115, 115, 190, 190, 270, 270].map((position, index) =>
     svg
       .append("g")
       .append("circle")

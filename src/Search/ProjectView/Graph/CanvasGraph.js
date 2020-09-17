@@ -8,12 +8,14 @@ import React, {
 import * as d3 from "d3";
 
 import { createRoot, hierarchyColouring } from "./appendUtils.js";
-import { getSelectionPath, voronoid, originalRadiusCanvas } from "./utils";
+import { getSelectionPath, originalRadiusCanvas } from "./utils";
 import { config } from "../config.js";
 
 import _ from "lodash";
 
 import { useDashboardState } from "../ProjectState/dashboardState";
+
+import { useAppState } from "../../../util/app-state";
 
 import { initContext } from "../../../Dashboard/utils.js";
 const graphDimension = 800;
@@ -31,6 +33,8 @@ const CanvasGraph = ({
   handleForwardStep
 }) => {
   const [{}, dispatch] = useDashboardState();
+  const [{ dimensions }] = useAppState();
+
   const [context, saveContext] = useState();
   const [nodes, setNodes] = useState();
   const [links, setLinks] = useState();
@@ -39,8 +43,14 @@ const CanvasGraph = ({
   const [allCircleCords, setAllCircleCords] = useState([]);
 
   const graphRef = useRef(null);
-
-  const [width, height] = useWindowSize();
+  const voronoid = d3
+    .voronoi()
+    .x(d => d.x * 0.5 + dimensions.width / 6)
+    .y(d => d.y * 0.5 + dimensions.height / 4)
+    .extent([
+      [-dimensions.width, -dimensions.height],
+      [dimensions.width, dimensions.height]
+    ]);
 
   useEffect(() => {
     if (data && context) {
@@ -58,8 +68,15 @@ const CanvasGraph = ({
       context.restore();
       clearAll(context);
       if (currScale !== 0.9) {
-        context.translate(graphDimension / 2, graphDimension / 2);
-        context.scale(0.09, 0.09);
+        console.log(dimensions.width);
+        context.translate(dimensions.width / 3, dimensions.height / 2);
+        //  context.translate(300, 300);
+        if (dimensions.width > 2000) {
+          context.scale(0.2, 0.2);
+        } else {
+          context.scale(0.1, 0.1);
+        }
+        //  context.scale(0.9, 0.9);
         context.save();
       }
       setCurrScale(0.9);
@@ -130,7 +147,7 @@ const CanvasGraph = ({
       }
       //main node
       if (node.depth === 0) {
-        var gradient = context.createLinearGradient(0, 0, 0, height);
+        var gradient = context.createLinearGradient(0, 0, 0, dimensions.height);
         gradient.addColorStop(0, "#fff9de");
         gradient.addColorStop(1, "#f0f0d6");
         context.shadowBlur = 10;
@@ -174,11 +191,24 @@ const CanvasGraph = ({
       if (!d3.select("#canvasGraphSelection g").empty()) {
         d3.select("#canvasGraphSelection g").remove();
       }
+      const rootNode = allCircleCords.filter(
+        node => node.element.depth === 0
+      )[0];
       var voronoi = d3
         .select("#canvasGraphSelection")
         .append("g")
         .attr("class", "voronoi-group")
-        .attr("transform", `rotate(-90)scale(0.5,0.5)translate(-1200,400)`);
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", "0 0 " + dimensions.width + "," + dimensions.height)
+        .attr("transform", "rotate(-90 " + rootNode.x + " " + rootNode.y + ")");
+      /*   .attr(
+          "transform",
+          `rotate(-90)scale(0.5,0.5)translate(-` +
+            (dimensions.width - dimensions.width / 6) +
+            `,` +
+            (dimensions.height - dimensions.height / 4) +
+            `)`
+        );*/
 
       voronoi
         .selectAll("path")
@@ -187,7 +217,7 @@ const CanvasGraph = ({
         })
         .enter()
         .append("path")
-        //.style("stroke", "#2074A0")
+        //  .style("stroke", "#2074A0")
         //.style("stroke-width", 5)
         .style("fill", "none")
         .style("pointer-events", "all")
@@ -226,7 +256,12 @@ const CanvasGraph = ({
           } else {
             context.save();
             context.setTransform(1, 0, 0, 1, 0, 0);
-            context.clearRect(0, 0, graphDimension * 2, graphDimension * 2);
+            context.clearRect(
+              0,
+              0,
+              dimensions.width * 2,
+              dimensions.height * 2
+            );
             context.fill();
             context.restore();
             filterOffset = filters.length > 0 ? spacingOffset : 0;
@@ -269,7 +304,7 @@ const CanvasGraph = ({
   const clearAll = context => {
     context.save();
     context.setTransform(1, 0, 0, 1, 0, 0);
-    context.clearRect(0, 0, graphDimension * 2, graphDimension * 2);
+    context.clearRect(0, 0, dimensions.width * 2, dimensions.height * 2);
     context.fill();
     context.restore();
   };
@@ -311,44 +346,44 @@ const CanvasGraph = ({
       const xIncrementVar = 130;
       context.fillText(
         sampleText,
-        graphDimension - xIncrementVar,
-        graphDimension - yIncrementVar
+        (2 * dimensions.width) / 3 - xIncrementVar,
+        dimensions.height - yIncrementVar
       );
       context.fillText(
         libraryText,
-        graphDimension - xIncrementVar,
-        graphDimension
+        (2 * dimensions.width) / 3 - xIncrementVar,
+        dimensions.height
       );
       context.fillText(
         analysisText,
-        graphDimension - xIncrementVar,
-        graphDimension + yIncrementVar
+        (2 * dimensions.width) / 3 - xIncrementVar,
+        dimensions.height + yIncrementVar
       );
 
       context.shadowBlur = 0;
       context.fillStyle = "black";
       context.fillText(
         sampleText,
-        graphDimension - xIncrementVar,
-        graphDimension - yIncrementVar
+        (2 * dimensions.width) / 3 - xIncrementVar,
+        dimensions.height - yIncrementVar
       );
 
       if (hoverNode.height === 1) {
         context.fillText(
           libraryText,
-          graphDimension - xIncrementVar,
-          graphDimension
+          (2 * dimensions.width) / 3 - xIncrementVar,
+          dimensions.height
         );
       } else if (hoverNode.height === 0) {
         context.fillText(
           libraryText,
-          graphDimension - xIncrementVar,
-          graphDimension
+          (2 * dimensions.width) / 3 - xIncrementVar,
+          dimensions.height
         );
         context.fillText(
           analysisText,
-          graphDimension - xIncrementVar,
-          graphDimension + yIncrementVar
+          (2 * dimensions.width) / 3 - xIncrementVar,
+          dimensions.height + yIncrementVar
         );
       }
     }
@@ -368,20 +403,6 @@ const CanvasGraph = ({
     };
   }
 
-  function useWindowSize() {
-    const [size, setSize] = useState([0, 0]);
-    useLayoutEffect(() => {
-      function updateSize() {
-        setSize([window.innerWidth, window.innerHeight]);
-      }
-      window.addEventListener("resize", updateSize);
-      updateSize();
-
-      return () => window.removeEventListener("resize", updateSize);
-    }, []);
-    return size;
-  }
-
   const [ref] = useHookWithRefCallback();
 
   function useHookWithRefCallback() {
@@ -391,18 +412,23 @@ const CanvasGraph = ({
         const graph = d3.select("#canvasGraph");
         const canvas = graph
           .select("canvas")
-          .attr("width", graphDimension)
-          .attr("height", graphDimension)
-          .attr(
+          .attr("width", dimensions.width)
+          .attr("height", dimensions.height);
+        /*    .attr(
             "transform",
-            "translate(" + margin.left + "," + margin.top + ")"
-          );
+            "translate(-" + dimensions.width / 4 + "," + margin.top + ")"
+          );*/
 
-        const context = initContext(canvas, graphDimension, graphDimension);
+        const context = initContext(
+          canvas,
+          dimensions.width,
+          dimensions.height
+        );
         saveContext(context);
+
         d3.select("#canvasGraphSelection")
-          .attr("width", graphDimension)
-          .attr("height", graphDimension);
+          .attr("width", dimensions.width)
+          .attr("height", dimensions.height);
       }
     }, []);
 
@@ -412,8 +438,8 @@ const CanvasGraph = ({
   return (
     <div
       style={{
-        width: graphDimension,
-        height: graphDimension,
+        width: dimensions.width,
+        height: dimensions.height,
         position: "relative"
       }}
       ref={ref}
@@ -421,8 +447,8 @@ const CanvasGraph = ({
       <div
         id="canvasGraph"
         style={{
-          width: graphDimension,
-          height: graphDimension,
+          width: dimensions.width,
+          height: dimensions.height,
           position: "absolute",
           pointerEvents: "all"
         }}
@@ -432,8 +458,8 @@ const CanvasGraph = ({
       <svg
         id="canvasGraphSelection"
         style={{
-          width: 3200,
-          height: 3200,
+          width: dimensions.width,
+          height: dimensions.height,
           position: "relative"
         }}
       />
