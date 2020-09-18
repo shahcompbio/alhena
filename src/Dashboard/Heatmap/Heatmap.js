@@ -89,12 +89,14 @@ const getIndicesFromAllHeatmapOrder = allHeatmapOrder =>
   );
 
 const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
-  const [{ quality }] = useStatisticsState();
-  const [heatmapOrder, setHeatmapOrder] = useState([...allHeatmapOrder]);
+  const [{ quality, selectedCells }] = useStatisticsState();
+  const [heatmapOrder, setHeatmapOrder] = useState([]);
   const [hoverCell, setHoverCell] = useState({ cell: {} });
-  const [indices, setIndices] = useState([
-    ...getIndicesFromAllHeatmapOrder(allHeatmapOrder)
-  ]);
+  const [indices, setIndices] = useState([]);
+  useEffect(() => {
+    setHeatmapOrder([...allHeatmapOrder]);
+    setIndices([...getIndicesFromAllHeatmapOrder(allHeatmapOrder)]);
+  }, [allHeatmapOrder]);
 
   const heatmapOrderToHeatmapIndex = scalePoint()
     .domain([...heatmapOrder])
