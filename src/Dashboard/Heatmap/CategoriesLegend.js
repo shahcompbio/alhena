@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
 
+import d3Tip from "d3-tip";
+
 import * as d3 from "d3";
 import { heatmapConfig } from "./config.js";
 import { cleanUpPreviousContent } from "./utils.js";
@@ -14,11 +16,16 @@ const CategoriesLegend = ({ choosenStats }) => {
   const categoryWidth =
     squareSize * choosenStats.length + choosenStats.length * spacing;
 
+  var tooltip = d3Tip()
+    .attr("class", "d3-tip n")
+    .attr("id", "chipTip");
+
   useEffect(() => {
     if (choosenStats) {
       const xOffset = getXOffset(choosenStats.length);
 
       const categoryLegend = d3.select("#categoryLegend");
+      categoryLegend.call(tooltip);
       cleanUpPreviousContent(categoryLegend);
 
       choosenStats.forEach((category, index) => {
@@ -35,7 +42,7 @@ const CategoriesLegend = ({ choosenStats }) => {
           .text(categoryName);
 
         var horizLineDim = index * squareSize + index * spacing;
-        //const xOffset = getXOffset();
+
         //Horizontal line
         categoryLegend
           .append("rect")
@@ -73,7 +80,21 @@ const CategoriesLegend = ({ choosenStats }) => {
           )
           .attr("width", squareSize)
           .attr("height", squareSize)
-          .attr("fill", colouredCategories[4]);
+          .attr("fill", colouredCategories[4])
+          .on("mousemove", function(d) {
+            var coordinates = d3.mouse(this);
+
+            d3.select("#chipTip")
+              .style("visibility", "visible")
+              .style("opacity", 1)
+              .style("left", d3.event.pageX + -92 + "px")
+              .style("top", d3.event.pageY - 60 + "px")
+              .classed("hidden", false)
+              .html(function(d) {
+                return "<strong>" + categoryName + "</strong>";
+              });
+          })
+          .on("mouseout", tooltip.hide);
       });
     }
   }, [choosenStats]);

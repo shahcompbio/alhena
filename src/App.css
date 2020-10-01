@@ -224,7 +224,45 @@
   left: 0;
   text-align: center;
 }
+#violinTip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: white;
+  position: absolute;
+  pointer-events: none;
+}
+/* Style northward tooltips differently */
+#violinTip.w:after {
+  content: "\25B6";
+  margin: -4px 0 0 -1px;
+  top: 50%;
+  left: 100%;
+}
+#violinTip {
+  stroke: black;
+  stroke-width: 2;
+  background: #c2c0bf;
 
+  background-color: #c2c0bf;
+  opacity: 0.1;
+}
+
+.hoverViolin {
+  stroke-width: 10px;
+}
+#categoryChipTip {
+  stroke: black;
+  stroke-width: 2;
+  /*background: #c2c0bf;
+  opacity: 0.3;*/
+}
+.hoveredCategorySquare {
+  stroke: black;
+  stroke-width: 2;
+}
 @keyframes neon {
   from {
     text-shadow: 0 0 2px rgba(255, 255, 225, 0.92),

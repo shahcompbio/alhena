@@ -11,6 +11,10 @@ const initialState = {
     y: { label: "Mapped Reads", type: "total_reads" },
     popupFacadeIsOpen: false,
     selectedCellsDispatchFrom: null
+  },
+  violinAxis: {
+    y: { label: "Quality", type: "quality" },
+    x: { label: "Experimental Condition", type: "experimental_condition" }
   }
 };
 
@@ -21,6 +25,11 @@ const statsStateReducer = (state, action) => {
         ...state,
         selectedCells: action.value,
         selectedCellsDispatchFrom: action.dispatchedFrom
+      };
+    }
+    case "VIOLIN_CATEGORY_SELECT": {
+      return {
+        ...state
       };
     }
     case "QUALITY_UPDATE": {
@@ -43,6 +52,13 @@ const statsStateReducer = (state, action) => {
         ...state,
         selectedCells: [],
         chipHeatmapAxis: action.value
+      };
+    }
+    case "VIOLIN_AXIS_UPDATE": {
+      return {
+        ...state,
+        selectedCells: [],
+        violinAxis: action.value
       };
     }
     case "SCATTERPLOT_AXIS_UPDATE": {

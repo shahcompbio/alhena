@@ -182,6 +182,7 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
                       });
                     }
                   }}
+                  indicator={hoverCell["y"]}
                   chromosomes={chromosomes}
                   analysisStats={analysisStats}
                   segs={segs}
@@ -239,7 +240,8 @@ const Plot = ({
   analysisStats,
   setHoverCellCoordinate,
   segs,
-  categoryWidth
+  categoryWidth,
+  indicator
 }) => {
   const [context, saveContext] = useState();
 
@@ -260,7 +262,10 @@ const Plot = ({
     if (rowHoverCordinates !== null) {
       const roundY = Math.max(rowHoverCordinates[1], 0);
       var heatmapRow = yScale.domain()[d3.bisect(invertYScale, roundY) - 1];
-      setHoverCellCoordinate(rowHoverCordinates[1], heatmapRow);
+      if (heatmapRow < segs.length) {
+        setHoverCellCoordinate(rowHoverCordinates[1], heatmapRow);
+        drawHeatmap(segs, context, yScale(heatmapRow));
+      }
     }
   }, [rowHoverCordinates]);
 
@@ -279,11 +284,13 @@ const Plot = ({
           .attr("width", width)
           .attr("height", height - heatmapConfig.chromosome["height"])
           .attr("transform", "translate(" + 0 + "," + margin.top + ")");
+
         const context = initContext(canvas, width, height);
 
         saveContext(context);
         context.save();
-        drawHeatmap(segs, context);
+        drawHeatmap(segs, context, indicator);
+
         d3.select("#heatSelection").on("mousemove", function() {
           var coordinates = d3.mouse(this);
           var alreadySelected = d3.select(this).attr("class");
@@ -300,7 +307,7 @@ const Plot = ({
 
     return [setRef];
   }
-  const drawHeatmap = (segs, context) => {
+  const drawHeatmap = (segs, context, indicator) => {
     context.clearRect(0, 0, width, height);
     segs.forEach((segRow, index) => {
       const y = yScale(index);
@@ -319,6 +326,20 @@ const Plot = ({
         );
         context.stroke();
       });
+
+      if (indicator) {
+        context.beginPath();
+        context.fillStyle = "black";
+
+        context.fillRect(
+          0,
+          indicator + heatmapConfig["rowHeight"],
+          heatmapConfig["width"] - categoryWidth,
+          0.8
+        );
+
+        context.stroke();
+      }
     });
   };
 

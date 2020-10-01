@@ -10,6 +10,7 @@ import Heatmap from "./Heatmap/Heatmap.js";
 import Chip from "./ChipHeatmap/Chip.js";
 import GCBias from "./GCBias/GCBias.js";
 import Scatterplot from "./Scatterplot/Scatterplot.js";
+import Violin from "./Violin/Violin.js";
 
 import SettingsPanel from "./SettingsPanel.js";
 
@@ -34,6 +35,16 @@ const HEATMAP_ORDER = gql`
       type
       label
     }
+    violinAxisOptions {
+      xAxis {
+        type
+        label
+      }
+      yAxis {
+        type
+        label
+      }
+    }
   }
 `;
 const styles = theme => ({
@@ -47,6 +58,11 @@ const styles = theme => ({
     padding: 15,
     height: 950,
     width: 1050
+  },
+  violinContent: {
+    padding: 15,
+    height: 375,
+    width: 800
   },
   gcBias: {
     width: 800
@@ -85,6 +101,8 @@ const QCDashboard = ({ analysis, classes }) => {
         selectedCells.length > 0
           ? selectedCells
           : data.heatmapOrder.map(order => order.order);
+
+      console.log(data.violinAxisOptions);
       return (
         <div className={classes.root}>
           <Grid
@@ -100,28 +118,20 @@ const QCDashboard = ({ analysis, classes }) => {
                 cellCount={data.heatmapOrder.length}
                 scatterplotOptions={data.scatterplotAxisOptions}
                 chipHeatmapOptions={data.chipHeatmapOptions}
+                violinOptions={data.violinAxisOptions}
                 categoryStats={data.categoriesStats}
                 analysis={analysis}
               />
             </Grid>
             <Grid item className={classes.plots} xs={9}>
               <Paper
-                className={[classes.heatmapContent, classes.paperContainer]}
+                className={[classes.violinContent, classes.paperContainer]}
               >
-                <Heatmap
+                <Violin
                   analysis={analysis}
                   allHeatmapOrder={heatmapOrder}
                   categoryStats={data.categoriesStats}
                 />
-              </Paper>
-              <Paper className={[classes.scatterplot, classes.paperContainer]}>
-                <Scatterplot analysis={analysis} />
-              </Paper>
-              <Paper className={[classes.chip, classes.paperContainer]}>
-                <Chip analysis={analysis} />
-              </Paper>
-              <Paper className={[classes.gcBias, classes.paperContainer]}>
-                <GCBias analysis={analysis} heatmapOrder={heatmapOrder} />
               </Paper>
             </Grid>
           </Grid>
@@ -148,6 +158,7 @@ const QCDashboard = ({ analysis, classes }) => {
             categoryStats={[]}
             analysis={null}
             scatterplotOptions={[]}
+            violionOptions={[]}
           />
         </Grid>
         <Grid item className={classes.plots}>
@@ -159,5 +170,23 @@ const QCDashboard = ({ analysis, classes }) => {
     );
   }
 };
-//<Chip analysis={""} />
+/*
+<Paper
+  className={[classes.heatmapContent, classes.paperContainer]}
+>
+  <Heatmap
+    analysis={analysis}
+    allHeatmapOrder={heatmapOrder}
+    categoryStats={data.categoriesStats}
+  />
+</Paper>
+<Paper className={[classes.scatterplot, classes.paperContainer]}>
+  <Scatterplot analysis={analysis} />
+</Paper>
+<Paper className={[classes.chip, classes.paperContainer]}>
+  <Chip analysis={analysis} />
+</Paper>
+<Paper className={[classes.gcBias, classes.paperContainer]}>
+  <GCBias analysis={analysis} heatmapOrder={heatmapOrder} />
+</Paper>*/
 export default withStyles(styles)(QCDashboard);

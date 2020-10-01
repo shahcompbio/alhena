@@ -1,5 +1,7 @@
 import React, { useEffect } from "react";
 
+import d3Tip from "d3-tip";
+
 import { scaleOrdinal } from "d3";
 import * as d3 from "d3";
 import { heatmapConfig } from "./config.js";
@@ -16,9 +18,15 @@ const getCategoryWidth = categoriesLength =>
 const Categories = ({ cellStats, yScale, categories }) => {
   const squareSize = heatmapConfig.categories.squareSize;
 
+  var tooltip = d3Tip()
+    .attr("class", "d3-tip n")
+    .attr("id", "categoryChipTip");
+
   useEffect(() => {
     if (cellStats) {
       const categoriesWrapper = d3.select("#categories");
+      categoriesWrapper.call(tooltip);
+
       cleanUpPreviousContent(categoriesWrapper);
 
       const categoryWidth = getCategoryWidth(categories.length);
@@ -44,6 +52,25 @@ const Categories = ({ cellStats, yScale, categories }) => {
           .attr("height", squareSize)
           .attr("fill", function(d) {
             return colourScale(d[categoryName]);
+          })
+          .on("mousemove", function(d) {
+            var coordinates = d3.mouse(this);
+            d3.select(this).attr("class", "hoveredCategorySquare");
+
+            const colour = colourScale(d[categoryName]);
+            const name = d[categoryName];
+            d3.select("#categoryChipTip")
+              .style("visibility", "visible")
+              .style("opacity", 1)
+              .style("left", d3.event.pageX - 10 + "px")
+              .style("top", d3.event.pageY - 40 + "px")
+              .classed("hidden", false)
+              .html("<strong>" + name + "</strong>");
+          })
+          .on("mouseout", function() {
+            d3.select(this).classed("hoveredCategorySquare", false);
+
+            tooltip.hide();
           });
 
         function xCordinate(d, i) {

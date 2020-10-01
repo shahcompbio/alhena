@@ -13,6 +13,7 @@ import {
 import ChipHeatmapSettings from "./Settings/ChipHeatmapSettings.js";
 import ScatterplotSettings from "./Settings/ScatterplotSettings.js";
 import LoadingCircle from "./CommonModules/LoadingCircle.js";
+import ViolinSettings from "./Settings/ViolinSettings.js";
 
 import BackspaceTwoToneIcon from "@material-ui/icons/BackspaceTwoTone";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -96,12 +97,13 @@ const SettingsPanel = ({
   categoryStats,
   cellCount,
   scatterplotOptions,
-  chipHeatmapOptions
+  chipHeatmapOptions,
+  violinOptions
 }) => {
   const [{ selectedAnalysis }] = useDashboardState();
   //  const selectedAnalysis = "sc-2602";
   const [
-    { quality, selectedCells, scatterplotAxis, chipHeatmapAxis },
+    { quality, selectedCells, scatterplotAxis, chipHeatmapAxis, violinAxis },
     dispatch
   ] = useStatisticsState();
 
@@ -203,6 +205,27 @@ const SettingsPanel = ({
             axisOptions={chipHeatmapOptions}
             currentlySelectedAxis={chipHeatmapAxis}
             setAxisOption={value => update(value, "CHIPHEATMAP_AXIS_UPDATE")}
+          />
+        </ExpansionPanelDetails>
+      </ExpansionPanel>
+      <ExpansionPanel className={classes.expansionPanelRoot}>
+        <ExpansionPanelSummary
+          className={classes.expansionPanelSummary}
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel-violin-content"
+          id="panel-violin"
+        >
+          <Typography variant="body1">Violin</Typography>
+        </ExpansionPanelSummary>
+        <ExpansionPanelDetails
+          id="panel-violin-content"
+          className={classes.panelDetails}
+        >
+          <ViolinSettings
+            classes={classes}
+            axisOptions={violinOptions}
+            currentlySelectedAxis={violinAxis}
+            setAxisOption={value => update(value, "VIOLIN_AXIS_UPDATE")}
           />
         </ExpansionPanelDetails>
       </ExpansionPanel>
