@@ -102,7 +102,6 @@ const QCDashboard = ({ analysis, classes }) => {
           ? selectedCells
           : data.heatmapOrder.map(order => order.order);
 
-      console.log(data.violinAxisOptions);
       return (
         <div className={classes.root}>
           <Grid
@@ -132,6 +131,24 @@ const QCDashboard = ({ analysis, classes }) => {
                   allHeatmapOrder={heatmapOrder}
                   categoryStats={data.categoriesStats}
                 />
+              </Paper>
+              <Paper
+                className={[classes.heatmapContent, classes.paperContainer]}
+              >
+                <Heatmap
+                  analysis={analysis}
+                  allHeatmapOrder={heatmapOrder}
+                  categoryStats={data.categoriesStats}
+                />
+              </Paper>
+              <Paper className={[classes.scatterplot, classes.paperContainer]}>
+                <Scatterplot analysis={analysis} />
+              </Paper>
+              <Paper className={[classes.chip, classes.paperContainer]}>
+                <Chip analysis={analysis} />
+              </Paper>
+              <Paper className={[classes.gcBias, classes.paperContainer]}>
+                <GCBias analysis={analysis} heatmapOrder={heatmapOrder} />
               </Paper>
             </Grid>
           </Grid>
@@ -170,23 +187,5 @@ const QCDashboard = ({ analysis, classes }) => {
     );
   }
 };
-/*
-<Paper
-  className={[classes.heatmapContent, classes.paperContainer]}
->
-  <Heatmap
-    analysis={analysis}
-    allHeatmapOrder={heatmapOrder}
-    categoryStats={data.categoriesStats}
-  />
-</Paper>
-<Paper className={[classes.scatterplot, classes.paperContainer]}>
-  <Scatterplot analysis={analysis} />
-</Paper>
-<Paper className={[classes.chip, classes.paperContainer]}>
-  <Chip analysis={analysis} />
-</Paper>
-<Paper className={[classes.gcBias, classes.paperContainer]}>
-  <GCBias analysis={analysis} heatmapOrder={heatmapOrder} />
-</Paper>*/
+
 export default withStyles(styles)(QCDashboard);

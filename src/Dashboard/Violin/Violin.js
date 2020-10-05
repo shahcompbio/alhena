@@ -17,33 +17,34 @@ import d3Tip from "d3-tip";
 import { initContext } from "../utils.js";
 
 const margin = {
-  left: 50,
-  top: 20,
-  bottom: 50,
+  left: 60,
+  top: 15,
+  bottom: 30,
   right: 10
 };
+
 const dimensions = {
   x1: margin.left,
   y1: margin.top,
-  x2: 700 - margin.right,
-  y2: 350 - margin.bottom,
-  height: 350,
-  width: 700
+  x2: 700 + margin.left,
+  y2: 300 + margin.top,
+  height: 375,
+  width: 700,
+  padding: 4
 };
 const selfType = "VIOLIN";
 
 const styles = theme => ({
-  legend: {
-    marginTop: 40,
-    marginRight: 30,
-    marginLeft: 15
-  }
+  root: {}
 });
 const color = {
-  defaultStroke: "#4183d7",
-  defaultFill: "#2c82c9",
+  defaultStroke: "black",
+  defaultFill: "#4fabf7",
+  hoverFill: "#6db9f7",
+  hoverStroke: "black",
+  grey: "#c7ccd1",
   black: "#000000",
-  green: "#26a65b",
+  green: "#2f7d29",
   red: "#96281b"
 };
 
@@ -103,7 +104,7 @@ const Violin = ({ analysis, classes }) => {
   const xAxis = violinAxis.x.type;
   const yAxis = violinAxis.y.type;
   const selection = selectedCellsDispatchFrom === selfType ? [] : selectedCells;
-
+  console.log(selection);
   return (
     <Query
       query={VIOLIN_QUERY}
@@ -128,7 +129,7 @@ const Violin = ({ analysis, classes }) => {
             direction="row"
             justify="flex-start"
             alignItems="flex-start"
-            key="scatterplot"
+            key="violin"
           >
             <Grid item key="violinWrapper">
               <Plot
@@ -149,6 +150,12 @@ const Violin = ({ analysis, classes }) => {
     </Query>
   );
 };
+const tooltip = d3Tip()
+  .attr("class", "d3-tip w")
+  .attr("id", "violinTip");
+const getYInterval = data =>
+  parseFloat(data[0]["histogram"][1]["key"]) -
+  parseFloat(data[0]["histogram"][0]["key"]);
 
 const Plot = ({ data, stats, cells, selectionAllowed }) => {
   const [
@@ -162,18 +169,21 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
   const [context, saveContext] = useState();
 
   const [violinPaths, setViolinPaths] = useState({});
+
   const [ref] = useHookWithRefCallback();
   const brush = d3.brush();
 
   var x = d3
     .scaleBand()
-    .range([0, dimensions.width])
+    .range([dimensions.x1, dimensions.width])
     .domain([...data.map(option => option["name"])])
     .padding(0.05);
 
+  const interval = getYInterval(data);
+
   var y = d3
     .scaleLinear()
-    .domain([stats.max, stats.min])
+    .domain([stats.max === 1 ? 1 : stats.max + interval, stats.min - interval])
     .range([dimensions.y1, dimensions.y2])
     .nice();
 
@@ -182,25 +192,46 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
     _.flatten(data.map(d => d["histogram"])).map(d => d["count"])
   );
 
+  useEffect(() => {
+    if (selectedCells.length === 0 && context) {
+      const percentileObj = getPercentileObject(data);
+
+      d3.select("#violin").attr("category", null);
+      context.clearRect(0, 0, dimensions.width, dimensions.height);
+      Object.keys(violinPaths).map(name => {
+        drawViolinArea(context, name, violinPaths[name]);
+        drawQLines(context, percentileObj[name], name);
+        drawAxis(context, x, y, xNum, data);
+        drawAxisLabels(context, x, y);
+      });
+    }
+  }, [selectedCells]);
+
   var xNum = d3
     .scaleLinear()
     .range([0, x.bandwidth()])
     .domain([-maxNum, maxNum]);
 
   useEffect(() => {
-    if (context) {
+    if (context && data) {
+      context.clearRect(0, 0, dimensions.width, dimensions.height);
+      //setViolinPaths({});
+      console.log(data);
+      console.log("new data");
+      drawViolin(context, data);
+      drawAxis(context, x, y, xNum, data);
+      drawAxisLabels(context, x, y);
     }
   }, [data]);
-
-  var tooltip = d3Tip()
-    .attr("class", "d3-tip n")
-    .attr("id", "violionTip");
 
   function useHookWithRefCallback() {
     const ref = useRef(null);
     const setRef = useCallback(node => {
       if (node) {
         const violin = d3.select("#violin");
+
+        d3.select("#violinSelection").call(tooltip);
+
         const canvas = violin
           .select("canvas")
           .attr("width", dimensions["width"])
@@ -215,7 +246,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
 
         drawViolin(context, data);
 
-        drawAxis(context, x, y, data);
+        drawAxis(context, x, y, xNum, data);
         drawAxisLabels(context, x, y);
       }
     }, []);
@@ -224,7 +255,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
   }
   const drawAxisLabels = (context, x, y) => {
     context.save();
-    context.translate(x(x.domain()[0]) - margin.left, dimensions.height / 2);
+    context.translate(10, dimensions.height / 2);
     context.rotate(-Math.PI / 2);
 
     context.fillText(yAxis, 0, 0);
@@ -233,27 +264,31 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
     context.fillText(
       xAxis,
       dimensions.width / 2,
-      y(y.domain()[1]) + margin.bottom / 2
+      dimensions.y2 + margin.bottom
     );
     context.stroke();
-    context.save();
+    context.restore();
   };
 
-  const drawAxis = (context, x, y, data) => {
+  const drawAxis = (context, x, y, xNum, data) => {
     const tickFormat = d3.format(".3f");
 
     data.forEach(d => {
       context.fillStyle = color["black"];
       context.fillText(
         d["name"],
-        x(d["name"]) + xNum(0),
-        dimensions.y2 + margin.top
+        x(d["name"]) + xNum(0) - dimensions.padding,
+        dimensions.y2 + margin.top + dimensions.padding
       );
     });
 
-    y.ticks(15).forEach(function(d) {
+    y.ticks(data[0]["histogram"].length).forEach(function(d) {
       context.fillStyle = color["black"];
-      context.fillText(tickFormat(d), dimensions.x1 - margin.left, y(d));
+      context.fillText(
+        tickFormat(d),
+        dimensions.x1 - margin.left / 2 - dimensions.padding,
+        y(d)
+      );
     });
     context.strokeStyle = color["black"];
     context.beginPath();
@@ -269,17 +304,23 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
 
   const drawViolin = (context, data) => {
     var svg = d3.select("#violinSelection");
+    svg.selectAll("*").remove();
 
     svg = svg
       .selectAll("path")
       .data(data)
       .enter()
-      .append("g");
+      .append("g")
+      .attr("id", (d, index) => data[index]["name"]);
 
+    const percentileObj = getPercentileObject(data);
     svg
       .append("path")
       .datum(function(d) {
         return d.histogram;
+      })
+      .attr("transform", (d, index) => {
+        return "translate(" + +x(data[index]["name"]) + "," + 0 + ")";
       })
       .style("stroke", "none")
       .style("fill", "none")
@@ -297,56 +338,177 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
             return y(d.key);
           })
           .curve(d3.curveCatmullRom)
-      );
-    var violinPaths = {};
+      )
+      .on("mousemove", function(d) {
+        const selectedCategory = d3.select("#violin").attr("category");
+        if (selectedCategory) {
+          showTooltip(percentileObj[d["name"]], d["name"]);
+        } else {
+          context.clearRect(0, 0, dimensions.width, dimensions.height);
+          drawAxis(context, x, y, xNum, data);
+          drawAxisLabels(context, x, y);
+          Object.keys(percentileObj).map(name => {
+            if (name === d["name"]) {
+              showTooltip(percentileObj[name], name);
+              drawViolinArea(context, name, violinPathObjects[name], {
+                isHover: true
+              });
+            } else {
+              drawViolinArea(context, name, violinPathObjects[name]);
+            }
+            drawQLines(context, percentileObj[name], name);
+          });
+        }
+      })
+      .on("mouseout", function(d) {
+        const selectedCategory = d3.select("#violin").attr("category");
+        tooltip.hide();
+        context.clearRect(0, 0, dimensions.width, dimensions.height);
+        drawAxis(context, x, y, xNum, data);
+        drawAxisLabels(context, x, y);
+        Object.keys(percentileObj).map(name => {
+          !selectedCategory || selectedCategory === name
+            ? drawViolinArea(context, name, violinPathObjects[name])
+            : drawViolinArea(context, name, violinPathObjects[name], {
+                isGrey: true
+              });
+          !selectedCategory || selectedCategory === name
+            ? drawQLines(context, percentileObj[name], name)
+            : drawQLines(context, percentileObj[name], name, { isGrey: true });
+        });
+      })
+      .on("mousedown", function(d) {
+        if (!d3.select("#violin").attr("category")) {
+          context.clearRect(0, 0, dimensions.width, dimensions.height);
 
-    context.translate(margin.left, margin.top);
-    context.save();
-    console.log(data);
-    const percentileObj = getPercentileObject(data);
-    console.log(percentileObj);
+          drawAxis(context, x, y, xNum, data);
+          drawAxisLabels(context, x, y);
+          Object.keys(percentileObj).map(name => {
+            if (d["name"] === name) {
+              d3.select("#violin").attr("category", name);
+              drawViolinArea(context, name, violinPathObjects[name]);
+              drawQLines(context, percentileObj[name], name);
+            } else {
+              drawViolinArea(context, name, violinPathObjects[name], {
+                isGrey: true
+              });
+              drawQLines(context, percentileObj[name], name, {
+                isGrey: true
+              });
+            }
+          });
+
+          dispatch({
+            type: "BRUSH",
+            value: [
+              ...cells
+                .filter(cell => cell.category === d["name"])
+                .map(cell => cell["order"])
+            ],
+            dispatchedFrom: selfType
+          });
+        }
+      });
+
+    var violinPathObjects = {};
+
     svg.each(function(d, index) {
       const that = d3.select(this).select("path");
       const path = that.attr("d");
       const violinPath = new Path2D(path);
 
-      violinPaths[d["name"]] = violinPath;
-      drawViolinArea(context, data[index], violinPath);
-      drawQLines(context, data[index]["percentiles"]);
+      violinPathObjects[d["name"]] = violinPath;
+      drawViolinArea(context, d["name"], violinPath);
+      drawQLines(context, percentileObj[d["name"]], d["name"]);
     });
 
-    setViolinPaths(violinPaths);
+    setViolinPaths(violinPathObjects);
+  };
+  const showTooltip = (data, name) => {
+    const format = d3.format(".3f");
+
+    const dim = d3
+      .select("#" + name)
+      .node()
+      .getBoundingClientRect();
+
+    d3.select("#violinTip")
+      .style("visibility", "visible")
+      .style("opacity", 1)
+      .style("left", dim.x + dim.width + "px")
+      .style("top", dim.y + dim.height / 2 + "px")
+      .classed("hidden", false)
+      .html(function(d) {
+        return (
+          "<strong>Max: </strong>" +
+          format(data["99.0"]) +
+          "</span></br>" +
+          "<strong>Q3: </strong>" +
+          "</span>" +
+          format(data["75.0"]) +
+          "</br><strong>Median: </strong>" +
+          format(data["50.0"]) +
+          "</br><strong>Q1: </strong>" +
+          format(data["25.0"]) +
+          "</span>"
+        );
+      });
   };
   const getPercentileObject = data =>
-    data.reduce(
-      (final, curr) =>
-        (final[curr["name"]] = curr["percentiles"].reduce(
-          (f, c, index) => (f[c] = curr["percentiles"][index]),
-          {}
-        )),
-      {}
-    );
+    data.reduce((final, curr) => {
+      final[curr["name"]] = curr["percentiles"].reduce((f, c, index) => {
+        f[c["percentile"]] = c["value"];
+        return f;
+      }, {});
+      return final;
+    }, {});
 
   const setDefaultStyles = context => {
     context.strokeStyle = color["defaultStroke"];
     context.fillStyle = color["defaultFill"];
   };
-  const drawQLines = (context, data) => {
+  const setHoverStyles = context => {
+    context.strokeStyle = color["hoverStroke"];
+    context.fillStyle = color["hoverFill"];
+  };
+  const setGreyedOutStyles = context => {
+    context.strokeStyle = color["grey"];
+    context.fillStyle = color["grey"];
+  };
+  const drawQLines = (context, data, categoryName, isGrey) => {
     //q1
+    context.restore();
     context.beginPath();
-    context.strokeStyle = color["green"];
-    console.log(data);
-    console.log(xNum.range()[0]);
-    context.moveTo(xNum.range()[0], y(data["25.0"]));
-    context.lineTo(xNum.range()[1], y(data["25.0"]));
+    context.strokeStyle = isGrey ? color["grey"] : color["red"];
+
+    const xShift = x(categoryName);
+    context.moveTo(xNum.range()[0] + xShift, y(data["25.0"]));
+    context.lineTo(xNum.range()[1] + xShift, y(data["25.0"]));
+    context.stroke();
+
+    //q3
+    context.beginPath();
+    context.moveTo(xNum.range()[0] + xShift, y(data["75.0"]));
+    context.lineTo(xNum.range()[1] + xShift, y(data["75.0"]));
+    context.stroke();
+
+    //q2
+    context.beginPath();
+    context.strokeStyle = isGrey ? color["grey"] : color["green"];
+    context.moveTo(xNum.range()[0] + xShift, y(data["50.0"]));
+    context.lineTo(xNum.range()[1] + xShift, y(data["50.0"]));
     context.stroke();
   };
-  const drawViolinArea = (context, data, path) => {
+  const drawViolinArea = (context, name, path, style) => {
     context.save();
     context.beginPath();
-    context.translate(x(data.name) + margin.left, -margin.top);
+    context.translate(x(name), 0);
 
-    setDefaultStyles(context);
+    style
+      ? style.isHover
+        ? setHoverStyles(context)
+        : setGreyedOutStyles(context)
+      : setDefaultStyles(context);
 
     context.stroke(path);
     context.fill(path);
@@ -354,7 +516,9 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
   };
   return (
     <div
+      id="violinWrapper"
       style={{
+        pointerEvents: "all",
         width: dimensions["width"],
         height: dimensions["height"],
         position: "relative"
@@ -375,6 +539,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
       <svg
         id="violinSelection"
         style={{
+          pointerEvents: "all",
           width: dimensions["width"],
           height: dimensions["height"],
           position: "relative"
