@@ -4,7 +4,7 @@ import d3Tip from "d3-tip";
 
 import * as d3 from "d3";
 import { heatmapConfig } from "./config.js";
-import { cleanUpPreviousContent } from "./utils.js";
+import { cleanUpPreviousContent, getColourScale } from "./utils.js";
 
 const getXOffset = categoryLength =>
   categoryLength === 1 ? 4 : categoryLength === 2 ? 2 : 4;
@@ -17,8 +17,8 @@ const CategoriesLegend = ({ choosenStats }) => {
     squareSize * choosenStats.length + choosenStats.length * spacing;
 
   var tooltip = d3Tip()
-    .attr("class", "d3-tip n")
-    .attr("id", "chipTip");
+    .attr("class", "d3-tip w")
+    .attr("id", "categoryTip");
 
   useEffect(() => {
     if (choosenStats) {
@@ -32,13 +32,17 @@ const CategoriesLegend = ({ choosenStats }) => {
         const colouredCategories = heatmapConfig.categories.colours[index];
         const categoryName = category.category;
 
+        const colourScale = getColourScale(category.types, index);
+
         // Title
         categoryLegend
           .append("text")
           .attr("x", categoryWidth + squareSize + 10)
           .attr("y", config.legendHeight - config.lengendLineHeight * index - 5)
+          .attr("id", "title-" + categoryName)
           .attr("class", "cat-legend category-" + categoryName)
           .attr("text-anchor", "start")
+          .on("mouseout", tooltip.hide)
           .text(categoryName);
 
         var horizLineDim = index * squareSize + index * spacing;
@@ -84,17 +88,44 @@ const CategoriesLegend = ({ choosenStats }) => {
           .on("mousemove", function(d) {
             var coordinates = d3.mouse(this);
 
-            d3.select("#chipTip")
+            const dim = d3
+              .select("#title-" + categoryName)
+              .node()
+              .getBoundingClientRect();
+
+            const typesText = category["types"].reduce((final, curr, index) => {
+              final +=
+                "<g><rect width='10px' height='10px' x='0' y='" +
+                (index * 10 + 1 * index) +
+                "' style='fill:" +
+                colourScale(curr) +
+                ";'/><text x='15' y='" +
+                (index * 10 + 1 * index + 1 + 7) +
+                "' style='font-size:10px;font-weight:bold;fill:#ffffff;'>" +
+                curr +
+                "</text></g>";
+              return final;
+            }, "");
+
+            d3.select("#categoryTip")
               .style("visibility", "visible")
               .style("opacity", 1)
-              .style("left", d3.event.pageX + -92 + "px")
-              .style("top", d3.event.pageY - 60 + "px")
+              .style("left", dim.right + 5 + "px")
+              .style("top", dim.top - 20 + "px")
               .classed("hidden", false)
               .html(function(d) {
-                return "<strong>" + categoryName + "</strong>";
+                return (
+                  "<svg width='30px' height='" +
+                  (category["types"].length * 10 + 3) +
+                  "px'>" +
+                  typesText +
+                  "</svg>"
+                );
               });
           })
-          .on("mouseout", tooltip.hide);
+          .on("mouseout", function(d) {
+            d3.select("#categoryTip").style("opacity", 0);
+          });
       });
     }
   }, [choosenStats]);

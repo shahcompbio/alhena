@@ -284,6 +284,7 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
           })
           .on("mousemove", function() {
             var coordinates = d3.mouse(this);
+
             const highlightedCell = getSingleWellFromCordinates(coordinates);
 
             var wellSelection = d3.select(this).attr("class");
@@ -305,12 +306,16 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
                 const allWells = [...alreadySelectedWells, ...heatmapOrder];
                 setAllSelectedWells([...allWells]);
               }
+              const tooltipDim = d3
+                .select("#chipTip")
+                .node()
+                .getBoundingClientRect();
 
               d3.select("#chipTip")
                 .style("visibility", "visible")
                 .style("opacity", 1)
-                .style("left", d3.event.pageX + -92 + "px")
-                .style("top", d3.event.pageY - 60 + "px")
+                .style("left", d3.event.pageX - tooltipDim.width / 2 + "px")
+                .style("top", d3.event.pageY - tooltipDim.height - 10 + "px")
                 .classed("hidden", false)
                 .html(function(d) {
                   return (

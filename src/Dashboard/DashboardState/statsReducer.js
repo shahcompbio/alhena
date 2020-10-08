@@ -27,11 +27,6 @@ const statsStateReducer = (state, action) => {
         selectedCellsDispatchFrom: action.dispatchedFrom
       };
     }
-    case "VIOLIN_CATEGORY_SELECT": {
-      return {
-        ...state
-      };
-    }
     case "QUALITY_UPDATE": {
       return {
         ...state,
@@ -72,6 +67,13 @@ const statsStateReducer = (state, action) => {
       return {
         ...state,
         popupFacadeIsOpen: action.value
+      };
+    }
+    case "SIZE_CHANGE": {
+      return {
+        ...state,
+        width: action.width,
+        height: action.height
       };
     }
     default:

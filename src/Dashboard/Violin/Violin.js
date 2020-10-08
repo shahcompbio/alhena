@@ -104,7 +104,7 @@ const Violin = ({ analysis, classes }) => {
   const xAxis = violinAxis.x.type;
   const yAxis = violinAxis.y.type;
   const selection = selectedCellsDispatchFrom === selfType ? [] : selectedCells;
-  console.log(selection);
+
   return (
     <Query
       query={VIOLIN_QUERY}
@@ -153,6 +153,7 @@ const Violin = ({ analysis, classes }) => {
 const tooltip = d3Tip()
   .attr("class", "d3-tip w")
   .attr("id", "violinTip");
+
 const getYInterval = data =>
   parseFloat(data[0]["histogram"][1]["key"]) -
   parseFloat(data[0]["histogram"][0]["key"]);
@@ -195,15 +196,17 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
   useEffect(() => {
     if (selectedCells.length === 0 && context) {
       const percentileObj = getPercentileObject(data);
-
       d3.select("#violin").attr("category", null);
       context.clearRect(0, 0, dimensions.width, dimensions.height);
       Object.keys(violinPaths).map(name => {
-        drawViolinArea(context, name, violinPaths[name]);
-        drawQLines(context, percentileObj[name], name);
-        drawAxis(context, x, y, xNum, data);
-        drawAxisLabels(context, x, y);
+        //grapql cache error
+        if (percentileObj[name]) {
+          drawViolinArea(context, name, violinPaths[name]);
+          drawQLines(context, percentileObj[name], name);
+        }
       });
+      drawAxis(context, x, y, xNum, data);
+      drawAxisLabels(context, x, y);
     }
   }, [selectedCells]);
 
@@ -215,9 +218,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
   useEffect(() => {
     if (context && data) {
       context.clearRect(0, 0, dimensions.width, dimensions.height);
-      //setViolinPaths({});
-      console.log(data);
-      console.log("new data");
+      setViolinPaths({});
       drawViolin(context, data);
       drawAxis(context, x, y, xNum, data);
       drawAxisLabels(context, x, y);
@@ -311,7 +312,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
       .data(data)
       .enter()
       .append("g")
-      .attr("id", (d, index) => data[index]["name"]);
+      .attr("id", (d, index) => "violinCategory-" + data[index]["name"]);
 
     const percentileObj = getPercentileObject(data);
     svg
@@ -378,7 +379,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
         });
       })
       .on("mousedown", function(d) {
-        if (!d3.select("#violin").attr("category")) {
+        if (!d3.select("#violin").attr("category") && selectionAllowed) {
           context.clearRect(0, 0, dimensions.width, dimensions.height);
 
           drawAxis(context, x, y, xNum, data);
@@ -428,7 +429,11 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
     const format = d3.format(".3f");
 
     const dim = d3
-      .select("#" + name)
+      .select("#violinCategory-" + name)
+      .node()
+      .getBoundingClientRect();
+    const containerDim = d3
+      .select("#violinWrapper")
       .node()
       .getBoundingClientRect();
 
@@ -436,7 +441,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
       .style("visibility", "visible")
       .style("opacity", 1)
       .style("left", dim.x + dim.width + "px")
-      .style("top", dim.y + dim.height / 2 + "px")
+      .style("top", dim.y + dim.height / 2 + window.scrollY + "px")
       .classed("hidden", false)
       .html(function(d) {
         return (
@@ -482,6 +487,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
     context.strokeStyle = isGrey ? color["grey"] : color["red"];
 
     const xShift = x(categoryName);
+
     context.moveTo(xNum.range()[0] + xShift, y(data["25.0"]));
     context.lineTo(xNum.range()[1] + xShift, y(data["25.0"]));
     context.stroke();

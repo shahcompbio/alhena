@@ -193,6 +193,12 @@
 
   top: 7px;
 }
+#categoryTip {
+  margin: 5px;
+  border: 1px solid #2e3131;
+  border-radius: 5px;
+  background: #2e3131;
+}
 .d3-tip {
   line-height: 1;
   padding: 6px;
@@ -254,10 +260,23 @@
   stroke-width: 10px;
 }
 #categoryChipTip {
-  stroke: black;
+  fill: #ffffff;
+  color: #ffffff;
   stroke-width: 2;
-  /*background: #c2c0bf;
-  opacity: 0.3;*/
+
+  border: 1px solid #2e3131;
+  border-radius: 5px;
+  background: #2e3131;
+}
+/* Northward tooltips */
+#categoryChipTip.n:after {
+  content: "\25BC";
+
+  color: #2e3131;
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+  text-align: center;
 }
 .hoveredCategorySquare {
   stroke: black;

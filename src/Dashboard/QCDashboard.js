@@ -124,15 +124,6 @@ const QCDashboard = ({ analysis, classes }) => {
             </Grid>
             <Grid item className={classes.plots} xs={9}>
               <Paper
-                className={[classes.violinContent, classes.paperContainer]}
-              >
-                <Violin
-                  analysis={analysis}
-                  allHeatmapOrder={heatmapOrder}
-                  categoryStats={data.categoriesStats}
-                />
-              </Paper>
-              <Paper
                 className={[classes.heatmapContent, classes.paperContainer]}
               >
                 <Heatmap
@@ -141,14 +132,23 @@ const QCDashboard = ({ analysis, classes }) => {
                   categoryStats={data.categoriesStats}
                 />
               </Paper>
-              <Paper className={[classes.scatterplot, classes.paperContainer]}>
-                <Scatterplot analysis={analysis} />
-              </Paper>
               <Paper className={[classes.chip, classes.paperContainer]}>
                 <Chip analysis={analysis} />
               </Paper>
+              <Paper
+                className={[classes.violinContent, classes.paperContainer]}
+              >
+                <Violin
+                  analysis={analysis}
+                  allHeatmapOrder={heatmapOrder}
+                  categoryStats={data.categoriesStats}
+                />
+              </Paper>
               <Paper className={[classes.gcBias, classes.paperContainer]}>
                 <GCBias analysis={analysis} heatmapOrder={heatmapOrder} />
+              </Paper>
+              <Paper className={[classes.scatterplot, classes.paperContainer]}>
+                <Scatterplot analysis={analysis} />
               </Paper>
             </Grid>
           </Grid>

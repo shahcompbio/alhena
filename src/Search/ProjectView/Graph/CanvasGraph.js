@@ -68,7 +68,6 @@ const CanvasGraph = ({
       context.restore();
       clearAll(context);
       if (currScale !== 0.9) {
-        console.log(dimensions.width);
         context.translate(dimensions.width / 3, dimensions.height / 2);
         //  context.translate(300, 300);
         if (dimensions.width > 2000) {

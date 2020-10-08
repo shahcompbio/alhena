@@ -2,15 +2,9 @@ import React, { useEffect } from "react";
 
 import d3Tip from "d3-tip";
 
-import { scaleOrdinal } from "d3";
 import * as d3 from "d3";
 import { heatmapConfig } from "./config.js";
-import { cleanUpPreviousContent } from "./utils.js";
-
-const getColourScale = (types, index) =>
-  scaleOrdinal()
-    .domain(types)
-    .range(heatmapConfig.categories.colours[index]);
+import { cleanUpPreviousContent, getColourScale } from "./utils.js";
 
 const getCategoryWidth = categoriesLength =>
   categoriesLength * heatmapConfig.categories.squareSize;
@@ -65,12 +59,16 @@ const Categories = ({ cellStats, yScale, categories }) => {
               .style("left", d3.event.pageX - 10 + "px")
               .style("top", d3.event.pageY - 40 + "px")
               .classed("hidden", false)
-              .html("<strong>" + name + "</strong>");
+              .html(
+                "<text style='fill:#ffffff;font-weight:bold;'>" +
+                  name +
+                  "</text>"
+              );
           })
           .on("mouseout", function() {
             d3.select(this).classed("hoveredCategorySquare", false);
 
-            tooltip.hide();
+            d3.select("#categoryChipTip").style("opacity", 0);
           });
 
         function xCordinate(d, i) {
