@@ -272,8 +272,9 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
   };
 
   const drawAxis = (context, x, y, xNum, data) => {
-    const tickFormat = d3.format(".3f");
-
+    const decimalFormat = d3.format(".3f");
+    const intFormat = d3.format("0.5~s");
+    const isDecimal = d => parseFloat(d) < 1 && parseFloat(d) > 0;
     data.forEach(d => {
       context.fillStyle = color["black"];
       context.fillText(
@@ -283,10 +284,10 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
       );
     });
 
-    y.ticks(data[0]["histogram"].length).forEach(function(d) {
+    y.ticks(10).forEach(function(d) {
       context.fillStyle = color["black"];
       context.fillText(
-        tickFormat(d),
+        isDecimal(d) ? decimalFormat(d) : intFormat(parseInt(d)),
         dimensions.x1 - margin.left / 2 - dimensions.padding,
         y(d)
       );
