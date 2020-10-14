@@ -146,8 +146,15 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
   const [context, saveContext] = useState();
   const [highlightedCells, setHighlightCells] = useState(null);
   const [extentHighlight, setExtentHighlight] = useState(null);
+  const [savedCanvas, saveCanvas] = useState();
+
+  var polyList = [];
   const [ref] = useHookWithRefCallback();
   const brush = d3.brush();
+
+  var lassPath = "";
+
+  var mousePos = { x: 0, y: 0 };
 
   var x = d3
     .scaleLinear()
@@ -170,18 +177,34 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       }
     }
   }, [selectionAllowed]);
-
   useEffect(() => {
-    if (selectedCells.length === 0 && highlightedCells !== null) {
-      setHighlightCells(null);
-      setExtentHighlight(null);
-      savedBrush.call(brush.move, null);
+    if (selectedCells.length === 0 && context) {
+      console.log("clear");
+      polyList = [];
+      lassPath = "";
+
       context.clearRect(
         0,
         0,
         scatterplotDimension + histogramMaxHeight + margin.histogram,
         scatterplotDimension + histogramMaxHeight + margin.histogram
       );
+
+      drawPoints(context, data);
+      drawAxis(context, x, y);
+      drawAxisLabels(context, x, y, stats, scatterplotAxis);
+
+      drawHistogram(context, histogram, stats, x, y);
+    }
+  }, [selectedCells]);
+
+  useEffect(() => {
+    if (selectedCells.length === 0 && highlightedCells !== null) {
+      setHighlightCells(null);
+      setExtentHighlight(null);
+      savedBrush.call(brush.move, null);
+
+      context.restore();
 
       drawPoints(context, data);
       drawAxis(context, x, y);
@@ -221,6 +244,12 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       const highlightedCellsObject = createHighlightedObjectFromArray(
         highlighted
       );
+      context.clearRect(
+        0,
+        0,
+        scatterplotDimension + histogramMaxHeight + margin.histogram,
+        scatterplotDimension + histogramMaxHeight + margin.histogram
+      );
       drawPoints(context, data, highlightedCellsObject);
       saveContext(context);
     }
@@ -253,8 +282,9 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     const ref = useRef(null);
     const setRef = useCallback(node => {
       if (node) {
-        const chip = d3.select("#scatterplot");
-        const canvas = chip
+        const scatter = d3.select("#scatterplot");
+        var docCanvas = document.getElementById("scatterCanvas");
+        const canvas = scatter
           .select("canvas")
           .attr(
             "width",
@@ -266,6 +296,22 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
             "translate(" + margin.left + "," + margin.top + ")"
           );
 
+        const scatterSelection = d3.select("#scatterSelection");
+
+        scatterSelection
+          .selectAll("rect")
+          .data(data)
+          .enter()
+          .append("rect")
+          .attr("width", 1)
+          .attr("height", 1)
+          .attr("x", function(d) {
+            return x(d.x);
+          })
+          .attr("y", function(d) {
+            return y(d.y);
+          });
+
         const context = initContext(
           canvas,
           scatterplotDimension + histogramMaxHeight + margin.histogram,
@@ -273,30 +319,94 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
         );
         saveContext(context);
 
+        docCanvas.addEventListener(
+          "mousemove",
+          function(e) {
+            drawLasso(e, context, this.getBoundingClientRect());
+          },
+          false
+        );
+
+        docCanvas.addEventListener(
+          "mousedown",
+          function(e) {
+            context.restore();
+            context.beginPath();
+            polyList = [];
+            setMousePosition(e, this.getBoundingClientRect());
+          },
+          false
+        );
+
+        docCanvas.addEventListener(
+          "mouseenter",
+          function(e) {
+            setMousePosition(e, this.getBoundingClientRect());
+          },
+          false
+        );
+        docCanvas.addEventListener(
+          "mouseup",
+          function(e) {
+            const bouding = canvas.node().getBoundingClientRect();
+            context.save();
+
+            context.strokeWidth = 1;
+            context.globalAlpha = 0.5;
+            context.strokeStyle = "purple";
+            context.fillStyle = "black";
+
+            context.fill();
+            var lassoSvgPath = new Path2D(lassPath);
+
+            context.fill(lassoSvgPath, "evenodd");
+            context.closePath();
+
+            var selectedNodes = [];
+            scatterSelection.selectAll("rect").each(function(d) {
+              const that = d3.select(this);
+              if (isPointInPoly(polyList, { x: x(d.x), y: y(d.y) })) {
+                selectedNodes = [...selectedNodes, d["heatmapOrder"]];
+              }
+            });
+
+            context.restore();
+
+            lassPath = "";
+            if (selectedNodes.length > 0) {
+              const highlightedCellsObject = createHighlightedObjectFromArray(
+                selectedNodes
+              );
+              drawPoints(context, data, highlightedCellsObject);
+              saveContext(context);
+              dispatch({
+                type: "BRUSH",
+                value: selectedNodes,
+                dispatchedFrom: selfType
+              });
+            }
+          },
+          false
+        );
         drawPoints(context, data);
         drawAxis(context, x, y);
         drawAxisLabels(context, x, y, stats, scatterplotAxis);
 
         drawHistogram(context, histogram, stats, x, y);
 
-        brush
-          .extent([
-            [scatterplotDim.x1, scatterplotDim.y1],
-            [scatterplotDim.x2, scatterplotDim.y2]
-          ])
-          .on("brush", brushing)
-          .on("end", brushended);
-
-        const scatterSelection = d3.select("#scatterSelection");
+        brush.extent([
+          [scatterplotDim.x1, scatterplotDim.y1],
+          [scatterplotDim.x2, scatterplotDim.y2]
+        ]);
+        //    .on("brush", brushing)
+        //    .on("end", brushended);
 
         scatterSelection.call(tooltip);
 
-        const gBrush = scatterSelection
-          .append("g")
-          .attr("class", "brush")
+        /*const gBrush = scatterSelection.append("g").attr("class", "brush");
           .call(brush);
 
-        saveBrush(gBrush);
+        saveBrush(gBrush);*/
 
         function brushing() {
           const selection = d3.event.selection;
@@ -318,6 +428,51 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
 
     return [setRef];
   }
+
+  //taken from
+  //https://gist.github.com/maxogden/574870
+  function isPointInPoly(poly, pt) {
+    for (var c = false, i = -1, l = poly.length, j = l - 1; ++i < l; j = i)
+      ((poly[i][1] <= pt.y && pt.y < poly[j][1]) ||
+        (poly[j][1] <= pt.y && pt.y < poly[i][1])) &&
+        pt.x <
+          ((poly[j][0] - poly[i][0]) * (pt.y - poly[i][1])) /
+            (poly[j][1] - poly[i][1]) +
+            poly[i][0] &&
+        (c = !c);
+    return c;
+  }
+
+  function setMousePosition(e, boundingRect) {
+    mousePos.x = e.clientX - boundingRect.left;
+    mousePos.y = e.clientY - boundingRect.top;
+  }
+
+  function drawLasso(e, context, boundingRect) {
+    // mouse left button must be pressed
+    if (e.buttons !== 1) return;
+
+    context.lineCap = "round";
+    context.strokeStyle = "#c0392b";
+    //  context.setLineDash([5, 3]);
+    context.lineWidth = 3;
+
+    context.moveTo(mousePos.x, mousePos.y);
+    polyList = [...polyList, [mousePos.x, mousePos.y]];
+    lassPath +=
+      lassPath === ""
+        ? "M " + mousePos.x + " " + mousePos.y + " "
+        : "L " + mousePos.x + " " + mousePos.y + " ";
+
+    setMousePosition(e, boundingRect);
+
+    context.lineTo(mousePos.x, mousePos.y);
+    lassPath += "L " + mousePos.x + " " + mousePos.y + " ";
+    polyList = [...polyList, [mousePos.x, mousePos.y]];
+
+    context.stroke();
+  }
+
   const drawAxisLabels = (context, x, y, stats, labels) => {
     context.save();
     context.translate(
@@ -371,6 +526,8 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
 
   const drawPoints = (context, data, highlightedCells) => {
     context.beginPath();
+    context.lineWidth = 1;
+    context.strokeStyle = "black";
 
     data.map(point => {
       context.beginPath();
@@ -498,17 +655,33 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
           pointerEvents: "all"
         }}
       >
-        <canvas />
+        <canvas id="scatterCanvas" />
       </div>
       <svg
         id="scatterSelection"
         style={{
           width: scatterplotDimension,
           height: scatterplotDimension,
-          position: "relative"
+          position: "unset"
         }}
       />
     </div>
   );
 };
+/*      <svg
+        id="scatterSelection"
+        style={{
+          width: scatterplotDimension,
+          height: scatterplotDimension,
+          position: "unset"
+        }}
+      />*/
+/*        <svg
+          id="scatterSelection"
+          style={{
+            width: scatterplotDimension,
+            height: scatterplotDimension,
+            position: "relative"
+          }}
+        />*/
 export default withStyles(styles)(Scatterplot);
