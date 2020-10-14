@@ -193,13 +193,34 @@ const CanvasGraph = ({
       const rootNode = allCircleCords.filter(
         node => node.element.depth === 0
       )[0];
+
+      d3.select("#canvasGraphSelection")
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", "0 0 " + dimensions.width + "," + dimensions.height);
+
       var voronoi = d3
         .select("#canvasGraphSelection")
         .append("g")
-        .attr("class", "voronoi-group")
-        .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", "0 0 " + dimensions.width + "," + dimensions.height)
-        .attr("transform", "rotate(-90 " + rootNode.x + " " + rootNode.y + ")");
+        .attr("class", "voronoi-group");
+      var devicePixelRatio = window.devicePixelRatio || 1;
+
+      if (devicePixelRatio === 1) {
+        voronoi.attr(
+          "transform",
+          "scale(2,2) translate(" +
+            -dimensions.width * 0.1 +
+            "," +
+            -dimensions.height * 0.1 +
+            ")"
+        );
+      } else {
+        voronoi.attr(
+          "transform",
+          "rotate(-90 " + rootNode.x + " " + rootNode.y + ")"
+        );
+      }
+      console.log(devicePixelRatio);
+      console.log(window);
       /*   .attr(
           "transform",
           `rotate(-90)scale(0.5,0.5)translate(-` +
@@ -216,8 +237,8 @@ const CanvasGraph = ({
         })
         .enter()
         .append("path")
-        //  .style("stroke", "#2074A0")
-        //.style("stroke-width", 5)
+        .style("stroke", "#2074A0")
+        .style("stroke-width", 3)
         .style("fill", "none")
         .style("pointer-events", "all")
         .attr("d", d => (d ? "M" + d.join("L") + "Z" : null))
@@ -426,19 +447,19 @@ const CanvasGraph = ({
         saveContext(context);
 
         d3.select("#canvasGraphSelection")
-          .attr("width", dimensions.width)
-          .attr("height", dimensions.height);
+          .attr("width", dimensions.width + "px")
+          .attr("height", dimensions.height + "px");
       }
     }, []);
 
     return [setRef, data];
   }
-
+  console.log(window.devicePixelRatio);
   return (
     <div
       style={{
-        width: dimensions.width,
-        height: dimensions.height,
+        width: dimensions.width + "px",
+        height: dimensions.height + "px",
         position: "relative"
       }}
       ref={ref}
@@ -446,8 +467,8 @@ const CanvasGraph = ({
       <div
         id="canvasGraph"
         style={{
-          width: dimensions.width,
-          height: dimensions.height,
+          width: dimensions.width + "px",
+          height: dimensions.height + "px",
           position: "absolute",
           pointerEvents: "all"
         }}
@@ -456,9 +477,16 @@ const CanvasGraph = ({
       </div>
       <svg
         id="canvasGraphSelection"
+        viewBox={
+          "0 0 " + window.devicePixelRatio === 2
+            ? dimensions.width / 2
+            : dimensions.width + " " + window.devicePixelRatio === 2
+            ? dimensions.height / 2
+            : dimensions.height
+        }
         style={{
-          width: dimensions.width,
-          height: dimensions.height,
+          width: dimensions.width + "px",
+          height: dimensions.height + "px",
           position: "relative"
         }}
       />
