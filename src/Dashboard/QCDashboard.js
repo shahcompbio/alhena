@@ -65,7 +65,8 @@ const styles = theme => ({
     width: 800
   },
   gcBias: {
-    width: 800
+    width: 850,
+    height: 625
   },
   scatterplot: {
     width: 650,
