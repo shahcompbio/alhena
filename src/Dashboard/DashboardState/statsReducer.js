@@ -19,7 +19,8 @@ const initialState = {
   gcBiasAxis: {
     x: { label: "GC Percent" },
     y: { label: "Average" }
-  }
+  },
+  gcBiasIsGrouped: true
 };
 
 const statsStateReducer = (state, action) => {
@@ -65,6 +66,12 @@ const statsStateReducer = (state, action) => {
         ...state,
         selectedCells: [],
         scatterplotAxis: action.value
+      };
+    }
+    case "GCBIAS_IS_GROUPED": {
+      return {
+        ...state,
+        gcBiasIsGrouped: action.value
       };
     }
     case "FACADE_EXISTS_WARNING": {

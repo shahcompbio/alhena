@@ -14,6 +14,7 @@ import ChipHeatmapSettings from "./Settings/ChipHeatmapSettings.js";
 import ScatterplotSettings from "./Settings/ScatterplotSettings.js";
 import LoadingCircle from "./CommonModules/LoadingCircle.js";
 import ViolinSettings from "./Settings/ViolinSettings.js";
+import GCBiasSettings from "./Settings/GCBiasSettings.js";
 
 import BackspaceTwoToneIcon from "@material-ui/icons/BackspaceTwoTone";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -130,108 +131,89 @@ const SettingsPanel = ({
           clearCellSelection={() => update([], "BRUSH")}
         />
       )}
-      <ExpansionPanel className={classes.expansionPanelRoot}>
-        <ExpansionPanelSummary
-          className={classes.expansionPanelSummary}
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel-quality-content"
-          id="panel-quality"
-        >
-          <Typography variant="body1">Quality Filter</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails
-          id="panel-quality-content"
-          className={classes.panelDetails}
-        >
-          <Slider
-            className={classes.slider}
-            color={"secondary"}
-            defaultValue={qualityMenuValue}
-            onChange={(event, newValue) => setQualityMenuValue(newValue)}
-            onChangeCommitted={() =>
-              update(
-                {
-                  quality: qualityMenuValue.toString()
-                },
-                "QUALITY_UPDATE"
-              )
-            }
-            getAriaValueText={value => value}
-            aria-labelledby="discrete-slider"
-            step={0.05}
-            marks={heatmapConfig.qualitySliderMarks}
-            valueLabelDisplay="on"
-            min={0}
-            max={1.0}
-          />
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
-      <ExpansionPanel className={classes.expansionPanelRoot}>
-        <ExpansionPanelSummary
-          className={classes.expansionPanelSummary}
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel-scatterplot-content"
-          id="panel-scatterplot"
-        >
-          <Typography variant="body1">Scatterplot</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails
-          id="panel-scatterplot-content"
-          className={classes.panelDetails}
-        >
-          <ScatterplotSettings
-            classes={classes}
-            axisOptions={scatterplotOptions}
-            currentlySelectedAxis={scatterplotAxis}
-            setAxisOption={value => update(value, "SCATTERPLOT_AXIS_UPDATE")}
-          />
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
-      <ExpansionPanel className={classes.expansionPanelRoot}>
-        <ExpansionPanelSummary
-          className={classes.expansionPanelSummary}
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-chip-content"
-          id="panel-chip"
-        >
-          <Typography variant="body1">Chip Heatmap</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails
-          id="panel1a-chip-content"
-          className={classes.panelDetails}
-        >
-          <ChipHeatmapSettings
-            classes={classes}
-            axisOptions={chipHeatmapOptions}
-            currentlySelectedAxis={chipHeatmapAxis}
-            setAxisOption={value => update(value, "CHIPHEATMAP_AXIS_UPDATE")}
-          />
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
-      <ExpansionPanel className={classes.expansionPanelRoot}>
-        <ExpansionPanelSummary
-          className={classes.expansionPanelSummary}
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel-violin-content"
-          id="panel-violin"
-        >
-          <Typography variant="body1">Violin</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails
-          id="panel-violin-content"
-          className={classes.panelDetails}
-        >
-          <ViolinSettings
-            classes={classes}
-            axisOptions={violinOptions}
-            currentlySelectedAxis={violinAxis}
-            setAxisOption={value => update(value, "VIOLIN_AXIS_UPDATE")}
-          />
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
+      <AccordianWrapper
+        classes={classes}
+        name="qualityFilter"
+        title="Quality Filter"
+      >
+        <Slider
+          className={classes.slider}
+          color={"secondary"}
+          defaultValue={qualityMenuValue}
+          onChange={(event, newValue) => setQualityMenuValue(newValue)}
+          onChangeCommitted={() =>
+            update(
+              {
+                quality: qualityMenuValue.toString()
+              },
+              "QUALITY_UPDATE"
+            )
+          }
+          getAriaValueText={value => value}
+          aria-labelledby="discrete-slider"
+          step={0.05}
+          marks={heatmapConfig.qualitySliderMarks}
+          valueLabelDisplay="on"
+          min={0}
+          max={1.0}
+        />
+      </AccordianWrapper>
+      <AccordianWrapper
+        classes={classes}
+        name="scatterplot"
+        title="Scatterplot"
+      >
+        <ScatterplotSettings
+          classes={classes}
+          axisOptions={scatterplotOptions}
+          currentlySelectedAxis={scatterplotAxis}
+          setAxisOption={value => update(value, "SCATTERPLOT_AXIS_UPDATE")}
+        />
+      </AccordianWrapper>
+      <AccordianWrapper classes={classes} name="chip" title="Chip">
+        <ChipHeatmapSettings
+          classes={classes}
+          axisOptions={chipHeatmapOptions}
+          currentlySelectedAxis={chipHeatmapAxis}
+          setAxisOption={value => update(value, "CHIPHEATMAP_AXIS_UPDATE")}
+        />
+      </AccordianWrapper>
+      <AccordianWrapper classes={classes} name="violin" title="Violin">
+        <ViolinSettings
+          classes={classes}
+          axisOptions={violinOptions}
+          currentlySelectedAxis={violinAxis}
+          setAxisOption={value => update(value, "VIOLIN_AXIS_UPDATE")}
+        />
+      </AccordianWrapper>
+      <AccordianWrapper classes={classes} name="GCBias" title="GC Bias">
+        <GCBiasSettings
+          classes={classes}
+          setAxisOption={value => update(value, "GCBIAS_IS_GROUPED")}
+        />
+      </AccordianWrapper>
     </Paper>
   );
 };
+const AccordianWrapper = ({ children, name, title, classes }) => (
+  <ExpansionPanel className={classes.expansionPanelRoot}>
+    <ExpansionPanelSummary
+      className={classes.expansionPanelSummary}
+      expandIcon={<ExpandMoreIcon />}
+      aria-controls={"panel-" + name + "-content"}
+      id={"panel-" + name}
+    >
+      <Typography variant="body1">{title}</Typography>
+    </ExpansionPanelSummary>
+    <ExpansionPanelDetails
+      id={"panel-" + name + "-content"}
+      className={classes.panelDetails}
+    >
+      {children}
+    </ExpansionPanelDetails>
+  </ExpansionPanel>
+);
+
 const MetaData = ({ classes, count, analysis, library }) => (
   <Paper
     elevation={0}

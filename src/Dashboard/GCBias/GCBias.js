@@ -22,13 +22,20 @@ const axisTextPadding = 55;
 const selfType = "gcBias";
 
 const GCBIAS_QUERY = gql`
-  query gcBias($analysis: String!, $quality: String!, $selectionOrder: [Int!]) {
+  query gcBias(
+    $analysis: String!
+    $quality: String!
+    $selectedCells: [Int!]
+    $gcBiasIsGrouped: Boolean!
+  ) {
     gcBias(
       analysis: $analysis
       quality: $quality
-      selectionOrder: $selectionOrder
+      selectedCells: $selectedCells
+      isGrouped: $gcBiasIsGrouped
     ) {
       experimentalCondition
+      cellOrder
       gcCells {
         gcPercent
         highCi
@@ -47,13 +54,18 @@ const GCBIAS_QUERY = gql`
 
 const GCBias = ({ analysis }) => {
   const [
-    { quality, selectedCells, selectedCellsDispatchFrom }
+    { gcBiasIsGrouped, quality, selectedCells, selectedCellsDispatchFrom }
   ] = useStatisticsState();
 
   return (
     <Query
       query={GCBIAS_QUERY}
-      variables={{ analysis, quality, selectedCells }}
+      variables={{
+        analysis,
+        quality,
+        selectedCells,
+        gcBiasIsGrouped
+      }}
     >
       {({ loading, error, data }) => {
         if (error) return null;
@@ -105,6 +117,8 @@ const Plot = ({ data, selectionAllowed }) => {
   ] = useStatisticsState();
 
   const [context, saveContext] = useState();
+
+  const [canvasPaths, setCanvasPaths] = useState();
 
   const [savedCanvas, saveCanvas] = useState();
 
@@ -184,6 +198,42 @@ const Plot = ({ data, selectionAllowed }) => {
       "#f2784b"
     ]);
 
+  useEffect(() => {
+    if (selectedCells.length === 0 && context) {
+      context.clearRect(0, 0, gcBiasDim.width, gcBiasDim.height);
+      drawAxis(context, x, y);
+      drawAxisLabels(context, x, y, gcBiasAxis);
+
+      var svg = d3.select("#gcBiasSelection");
+      svg.selectAll("g").remove("*");
+
+      setSvgPaths(svg);
+      const paths = getSvgPaths(svg);
+
+      drawPaths(context, paths);
+      clearTopRect(context);
+      drawLegend(context, data, svg, paths);
+    }
+  }, [selectedCells]);
+
+  useEffect(() => {
+    if (data && context) {
+      context.clearRect(0, 0, gcBiasDim.width, gcBiasDim.height);
+      drawAxis(context, x, y);
+      drawAxisLabels(context, x, y, gcBiasAxis);
+
+      var svg = d3.select("#gcBiasSelection");
+      svg.selectAll("g").remove("*");
+
+      setSvgPaths(svg);
+      const paths = getSvgPaths(svg);
+
+      drawPaths(context, paths);
+      clearTopRect(context);
+      drawLegend(context, data, svg, paths);
+    }
+  }, [data]);
+
   function useHookWithRefCallback() {
     const ref = useRef(null);
     const setRef = useCallback(node => {
@@ -205,13 +255,18 @@ const Plot = ({ data, selectionAllowed }) => {
         setSvgPaths(svg);
         const paths = getSvgPaths(svg);
         drawPaths(context, paths);
-        drawLegend(context, data);
+        clearTopRect(context);
+        drawLegend(context, data, svg, paths);
       }
     }, []);
 
     return [setRef];
   }
-  const drawLegend = (context, data) => {
+  const clearTopRect = context => {
+    context.clearRect(0, 0, gcBiasDim.width, gcBiasDim.y1);
+    context.save();
+  };
+  const drawLegend = (context, data, svg, canvasPaths) => {
     context.beginPath();
     const rectSize = 10;
     const padding = rectSize / 2;
@@ -235,7 +290,7 @@ const Plot = ({ data, selectionAllowed }) => {
       const yLocation =
         gcBiasDim.y1 + rectSize * index + padding * index + titleHeight;
       const rectXLocation = gcBiasDim.x2 + padding;
-      context.fillRect(rectXLocation, yLocation, rectSize, rectSize);
+      //  context.fillRect(rectXLocation, yLocation, rectSize, rectSize);
       context.fillStyle = "black";
       context.font = "13px MyFont";
       context.globalAlpha = 1;
@@ -244,18 +299,75 @@ const Plot = ({ data, selectionAllowed }) => {
         rectXLocation + rectSize + padding,
         yLocation + rectSize
       );
+
+      const rect = svg.append("g").append("rect");
+
+      rect
+        .attr("x", rectXLocation)
+        .attr("y", yLocation)
+        .attr("width", rectSize)
+        .attr("height", rectSize)
+        .attr("opacity", 0.5)
+        .attr("fill", colors(category["experimentalCondition"]))
+        .on("mousedown", function(d) {
+          if (category["experimentalCondition"] !== "All" && selectionAllowed) {
+            context.clearRect(
+              gcBiasDim.x1,
+              gcBiasDim.y1,
+              plotWidth,
+              plotHeight
+            );
+            canvasPaths.map(path => {
+              fillPaths(
+                context,
+                path,
+                path.category !== category["experimentalCondition"]
+              );
+            });
+
+            clearTopRect(context);
+
+            dispatch({
+              type: "BRUSH",
+              value: [
+                ...data.filter(
+                  option =>
+                    option["experimentalCondition"] ===
+                    category["experimentalCondition"]
+                )[0]["cellOrder"]
+              ],
+              dispatchedFrom: selfType
+            });
+          }
+        })
+        .on("mouseover", function(d) {
+          const that = d3.select(this);
+          that.attr("opacity", 1);
+        })
+        .on("mouseout", function(d) {
+          const that = d3.select(this);
+          that.attr("opacity", 0.5);
+        });
     });
+  };
+  const fillPaths = (context, path, isGrey) => {
+    if (isGrey) {
+      context.strokeStyle = "#dadfe1";
+      context.fillStyle = "#ececec";
+    } else {
+      context.strokeStyle = colors(path["category"]);
+      context.fillStyle = colors(path["category"]);
+    }
+
+    context.stroke(path["path"]);
+    context.globalAlpha = 0.5;
+    context.fill(path["path"]);
+    context.restore();
   };
   const drawPaths = (context, paths) => {
     context.beginPath();
     paths.map(path => {
-      context.strokeStyle = colors(path["category"]);
-      context.fillStyle = colors(path["category"]);
-
-      context.stroke(path["path"]);
-      context.globalAlpha = 0.5;
-      context.fill(path["path"]);
-      context.restore();
+      fillPaths(context, path);
     });
     context.clearRect(0, 0, gcBiasDim.width, gcBiasDim.y1);
     context.save();
@@ -282,6 +394,7 @@ const Plot = ({ data, selectionAllowed }) => {
       .data(data)
       .enter()
       .append("g")
+      .attr("display", "none")
       .attr(
         "id",
         (d, index) => "gcbias-" + data[index]["experimentalCondition"]
@@ -348,6 +461,8 @@ const Plot = ({ data, selectionAllowed }) => {
   };
 
   const drawAxis = (context, x, y) => {
+    context.fillStyle = "black";
+    context.strokeStyle = "black";
     const fontDim = 20;
     x.ticks(15).forEach(function(d) {
       context.fillStyle = "#000000";
@@ -358,7 +473,8 @@ const Plot = ({ data, selectionAllowed }) => {
       context.fillStyle = "#000000";
       context.fillText(d, gcBiasDim.x1 - fontDim, y(d));
     });
-
+    context.fillStyle = "black";
+    context.strokeStyle = "black";
     context.beginPath();
     context.moveTo(gcBiasDim.x1, gcBiasDim.y1);
     context.lineTo(gcBiasDim.x1, gcBiasDim.y2);
@@ -375,7 +491,8 @@ const Plot = ({ data, selectionAllowed }) => {
       style={{
         width: gcBiasDim.width,
         height: gcBiasDim.height,
-        position: "relative"
+        position: "relative",
+        pointerEvents: "all"
       }}
       ref={ref}
     >
@@ -384,8 +501,8 @@ const Plot = ({ data, selectionAllowed }) => {
         style={{
           width: gcBiasDim.width,
           height: gcBiasDim.height,
-          position: "absolute",
-          pointerEvents: "all"
+          pointerEvents: "none",
+          position: "absolute"
         }}
       >
         <canvas id="gcBiasCanvas" />
@@ -393,7 +510,7 @@ const Plot = ({ data, selectionAllowed }) => {
       <svg
         id="gcBiasSelection"
         style={{
-          display: "none",
+          pointerEvents: "all",
           width: gcBiasDim.width,
           height: gcBiasDim.height,
           position: "unset"
