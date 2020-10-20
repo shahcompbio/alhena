@@ -219,8 +219,7 @@ const CanvasGraph = ({
           "rotate(-90 " + rootNode.x + " " + rootNode.y + ")"
         );
       }
-      console.log(devicePixelRatio);
-      console.log(window);
+
       /*   .attr(
           "transform",
           `rotate(-90)scale(0.5,0.5)translate(-` +
@@ -237,8 +236,8 @@ const CanvasGraph = ({
         })
         .enter()
         .append("path")
-        .style("stroke", "#2074A0")
-        .style("stroke-width", 3)
+        //  .style("stroke", "#2074A0")
+        //.style("stroke-width", 3)
         .style("fill", "none")
         .style("pointer-events", "all")
         .attr("d", d => (d ? "M" + d.join("L") + "Z" : null))
@@ -454,7 +453,6 @@ const CanvasGraph = ({
 
     return [setRef, data];
   }
-  console.log(window.devicePixelRatio);
   return (
     <div
       style={{
