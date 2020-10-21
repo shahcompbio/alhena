@@ -15,7 +15,12 @@ const initialState = {
   violinAxis: {
     y: { label: "Quality", type: "quality" },
     x: { label: "Experimental Condition", type: "experimental_condition" }
-  }
+  },
+  gcBiasAxis: {
+    x: { label: "GC Percent" },
+    y: { label: "Average" }
+  },
+  gcBiasIsGrouped: true
 };
 
 const statsStateReducer = (state, action) => {
