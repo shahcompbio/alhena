@@ -453,6 +453,7 @@ const CanvasGraph = ({
 
     return [setRef, data];
   }
+
   return (
     <div
       style={{
@@ -476,11 +477,10 @@ const CanvasGraph = ({
       <svg
         id="canvasGraphSelection"
         viewBox={
-          "0 0 " + window.devicePixelRatio === 2
-            ? dimensions.width / 2
-            : dimensions.width + " " + window.devicePixelRatio === 2
-            ? dimensions.height / 2
-            : dimensions.height
+          "0 0 " +
+          dimensions.width / window.devicePixelRatio +
+          " " +
+          dimensions.height / window.devicePixelRatio
         }
         style={{
           width: dimensions.width + "px",

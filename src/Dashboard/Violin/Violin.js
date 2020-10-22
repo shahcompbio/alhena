@@ -182,11 +182,34 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
 
   const interval = getYInterval(data);
 
-  var y = d3
-    .scaleLinear()
-    .domain([stats.max === 1 ? 1 : stats.max + interval, stats.min - interval])
-    .range([dimensions.y1, dimensions.y2])
-    .nice();
+  const isCountInsignificant = data.reduce((final, cur) => {
+    if (
+      cur["stat"]["min"] > parseFloat(cur["histogram"]["0"]["key"]) ||
+      final
+    ) {
+      return true;
+    } else {
+      return false;
+    }
+  }, false);
+
+  var y =
+    isCountInsignificant < 10
+      ? d3
+          .scaleLinear()
+          .domain([
+            parseFloat(data[0]["histogram"][9]["key"]) > stats.max
+              ? parseFloat(data[0]["histogram"][9]["key"])
+              : stats.max,
+            parseFloat(data[0]["histogram"][0]["key"])
+          ])
+          .range([dimensions.y1, dimensions.y2])
+          .nice()
+      : d3
+          .scaleLinear()
+          .domain([stats.max, stats.min])
+          .range([dimensions.y1, dimensions.y2])
+          .nice();
 
   const maxNum = Math.max.apply(
     Math,

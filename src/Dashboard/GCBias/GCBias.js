@@ -56,6 +56,7 @@ const GCBias = ({ analysis }) => {
   const [
     { gcBiasIsGrouped, quality, selectedCells, selectedCellsDispatchFrom }
   ] = useStatisticsState();
+  const selection = selectedCellsDispatchFrom === selfType ? [] : selectedCells;
 
   return (
     <Query
@@ -63,7 +64,7 @@ const GCBias = ({ analysis }) => {
       variables={{
         analysis,
         quality,
-        selectedCells,
+        selectedCells: selection,
         gcBiasIsGrouped
       }}
     >
@@ -201,8 +202,6 @@ const Plot = ({ data, selectionAllowed }) => {
   useEffect(() => {
     if (selectedCells.length === 0 && context) {
       context.clearRect(0, 0, gcBiasDim.width, gcBiasDim.height);
-      drawAxis(context, x, y);
-      drawAxisLabels(context, x, y, gcBiasAxis);
 
       var svg = d3.select("#gcBiasSelection");
       svg.selectAll("g").remove("*");
@@ -211,7 +210,10 @@ const Plot = ({ data, selectionAllowed }) => {
       const paths = getSvgPaths(svg);
 
       drawPaths(context, paths);
-      clearTopRect(context);
+      canvasClipping(context);
+
+      drawAxis(context, x, y);
+      drawAxisLabels(context, x, y, gcBiasAxis);
       drawLegend(context, data, svg, paths);
     }
   }, [selectedCells]);
@@ -219,8 +221,6 @@ const Plot = ({ data, selectionAllowed }) => {
   useEffect(() => {
     if (data && context) {
       context.clearRect(0, 0, gcBiasDim.width, gcBiasDim.height);
-      drawAxis(context, x, y);
-      drawAxisLabels(context, x, y, gcBiasAxis);
 
       var svg = d3.select("#gcBiasSelection");
       svg.selectAll("g").remove("*");
@@ -229,7 +229,10 @@ const Plot = ({ data, selectionAllowed }) => {
       const paths = getSvgPaths(svg);
 
       drawPaths(context, paths);
-      clearTopRect(context);
+      canvasClipping(context);
+
+      drawAxis(context, x, y);
+      drawAxisLabels(context, x, y, gcBiasAxis);
       drawLegend(context, data, svg, paths);
     }
   }, [data]);
@@ -248,22 +251,23 @@ const Plot = ({ data, selectionAllowed }) => {
         const context = initContext(canvas, gcBiasDim.width, gcBiasDim.height);
         saveContext(context);
 
-        drawAxis(context, x, y);
-        drawAxisLabels(context, x, y, gcBiasAxis);
-
         var svg = d3.select("#gcBiasSelection");
         setSvgPaths(svg);
         const paths = getSvgPaths(svg);
         drawPaths(context, paths);
-        clearTopRect(context);
+        canvasClipping(context);
+
+        drawAxis(context, x, y);
+        drawAxisLabels(context, x, y, gcBiasAxis);
         drawLegend(context, data, svg, paths);
       }
     }, []);
 
     return [setRef];
   }
-  const clearTopRect = context => {
+  const canvasClipping = context => {
     context.clearRect(0, 0, gcBiasDim.width, gcBiasDim.y1);
+    context.clearRect(0, gcBiasDim.y2, gcBiasDim.width, margin.bottom);
     context.save();
   };
   const drawLegend = (context, data, svg, canvasPaths) => {
@@ -325,7 +329,10 @@ const Plot = ({ data, selectionAllowed }) => {
               );
             });
 
-            clearTopRect(context);
+            canvasClipping(context);
+            drawAxis(context, x, y);
+            drawAxisLabels(context, x, y, gcBiasAxis);
+            drawLegend(context, data, svg, canvasPaths);
 
             dispatch({
               type: "BRUSH",
@@ -444,6 +451,7 @@ const Plot = ({ data, selectionAllowed }) => {
       .style("opacity", 0.2);
   };
   const drawAxisLabels = (context, x, y, labels) => {
+    context.globalAlpha = 1;
     context.save();
     context.translate(gcBiasDim.x1 / 3, plotHeight / 2);
     context.rotate(-Math.PI / 2);
@@ -461,6 +469,7 @@ const Plot = ({ data, selectionAllowed }) => {
   };
 
   const drawAxis = (context, x, y) => {
+    context.globalAlpha = 1;
     context.fillStyle = "black";
     context.strokeStyle = "black";
     const fontDim = 20;
@@ -519,5 +528,4 @@ const Plot = ({ data, selectionAllowed }) => {
     </div>
   );
 };
-
 export default GCBias;
