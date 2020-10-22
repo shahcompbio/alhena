@@ -198,7 +198,9 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
       ? d3
           .scaleLinear()
           .domain([
-            parseFloat(data[0]["histogram"][9]["key"]),
+            parseFloat(data[0]["histogram"][9]["key"]) > stats.max
+              ? parseFloat(data[0]["histogram"][9]["key"])
+              : stats.max,
             parseFloat(data[0]["histogram"][0]["key"])
           ])
           .range([dimensions.y1, dimensions.y2])

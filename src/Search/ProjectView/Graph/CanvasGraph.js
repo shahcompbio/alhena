@@ -237,8 +237,8 @@ const CanvasGraph = ({
         })
         .enter()
         .append("path")
-        .style("stroke", "#2074A0")
-        .style("stroke-width", 3)
+        //  .style("stroke", "#2074A0")
+        //.style("stroke-width", 3)
         .style("fill", "none")
         .style("pointer-events", "all")
         .attr("d", d => (d ? "M" + d.join("L") + "Z" : null))
@@ -454,7 +454,7 @@ const CanvasGraph = ({
 
     return [setRef, data];
   }
-  console.log(window.devicePixelRatio);
+
   return (
     <div
       style={{
@@ -478,11 +478,10 @@ const CanvasGraph = ({
       <svg
         id="canvasGraphSelection"
         viewBox={
-          "0 0 " + window.devicePixelRatio === 2
-            ? dimensions.width / 2
-            : dimensions.width + " " + window.devicePixelRatio === 2
-            ? dimensions.height / 2
-            : dimensions.height
+          "0 0 " +
+          dimensions.width / window.devicePixelRatio +
+          " " +
+          dimensions.height / window.devicePixelRatio
         }
         style={{
           width: dimensions.width + "px",

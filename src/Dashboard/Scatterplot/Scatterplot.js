@@ -236,8 +236,9 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       drawPoints(context, data);
       drawAxis(context, x, y);
       drawAxisLabels(context, x, y, stats, scatterplotAxis);
-
-      drawHistogram(context, histogram, stats, x, y);
+      if (selectedCells.length !== 1) {
+        drawHistogram(context, histogram, stats, x, y);
+      }
       if (!selectionAllowed || selectedCells.length > 0) {
         removePointerEventsFromCanvas();
       } else {
@@ -429,10 +430,8 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
   };
   const drawAxisLabels = (context, x, y, stats, labels) => {
     context.save();
-    context.translate(
-      x(x.domain()[0]) - axisTextPadding,
-      scatterplotDimension / 2
-    );
+
+    context.translate(scatterplotDim.x1 / 2, scatterplotDimension / 2);
     context.rotate(-Math.PI / 2);
 
     context.fillText(labels.y.label, 0, 0);
@@ -441,7 +440,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     context.fillText(
       labels.x.label,
       scatterplotDimension / 2,
-      y(y.domain()[1]) + axisTextPadding
+      scatterplotDim.y2 + margin.bottom / 2
     );
     context.stroke();
     context.save();
@@ -523,14 +522,14 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
 
     const xBarWidth = data.xBuckets[1]
       ? x(data.xBuckets[1].key) - x(data.xBuckets[0].key) - barPadding.width
-      : -x(data.xBuckets[0].key) - barPadding.width;
+      : x(data.xBuckets[0].key) - barPadding.width;
     const xBucketCountMax = _.maxBy(data.xBuckets, "count").count;
 
     const yBucketCountMax = _.maxBy(data.yBuckets, "count").count;
 
     const yBarHeight = data.yBuckets[1]
       ? y(data.yBuckets[1].key) - y(data.yBuckets[0].key) - barPadding.height
-      : y(data.yBuckets[0].key) - barPadding.height;
+      : y(data.yBuckets[0].key);
 
     const xBucketHeightScale = d3
       .scaleLinear()
