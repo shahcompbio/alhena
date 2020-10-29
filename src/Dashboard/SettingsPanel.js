@@ -3,7 +3,6 @@ import {
   Paper,
   Button,
   Typography,
-  Slider,
   Grid,
   ExpansionPanel,
   ExpansionPanelDetails,
@@ -15,6 +14,7 @@ import ScatterplotSettings from "./Settings/ScatterplotSettings.js";
 import LoadingCircle from "./CommonModules/LoadingCircle.js";
 import ViolinSettings from "./Settings/ViolinSettings.js";
 import GCBiasSettings from "./Settings/GCBiasSettings.js";
+import DataFilters from "./Settings/DataFilters.js";
 
 import BackspaceTwoToneIcon from "@material-ui/icons/BackspaceTwoTone";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -102,13 +102,14 @@ const SettingsPanel = ({
   violinOptions
 }) => {
   const [{ selectedAnalysis }] = useDashboardState();
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0b7b8bea6bbd8cb0b1e50a4083c5e509a811c21d
   const [
-    { quality, selectedCells, scatterplotAxis, chipHeatmapAxis, violinAxis },
+    { selectedCells, scatterplotAxis, chipHeatmapAxis, violinAxis },
     dispatch
   ] = useStatisticsState();
-
-  const [qualityMenuValue, setQualityMenuValue] = useState(quality);
 
   function update(value, type) {
     dispatch({
@@ -133,29 +134,12 @@ const SettingsPanel = ({
       )}
       <AccordianWrapper
         classes={classes}
-        name="qualityFilter"
-        title="Quality Filter"
+        name="dataFilter"
+        title="Data Filters"
       >
-        <Slider
-          className={classes.slider}
-          color={"secondary"}
-          defaultValue={qualityMenuValue}
-          onChange={(event, newValue) => setQualityMenuValue(newValue)}
-          onChangeCommitted={() =>
-            update(
-              {
-                quality: qualityMenuValue.toString()
-              },
-              "QUALITY_UPDATE"
-            )
-          }
-          getAriaValueText={value => value}
-          aria-labelledby="discrete-slider"
-          step={0.05}
-          marks={heatmapConfig.qualitySliderMarks}
-          valueLabelDisplay="on"
-          min={0}
-          max={1.0}
+        <DataFilters
+          classes={classes}
+          update={(value, type) => update(value, type)}
         />
       </AccordianWrapper>
       <AccordianWrapper
