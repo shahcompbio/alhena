@@ -123,6 +123,7 @@ const QCDashboard = ({ analysis, classes }) => {
                 analysis={analysis}
               />
             </Grid>
+
             <Grid item className={classes.plots} xs={9}>
               <Paper
                 className={[classes.heatmapContent, classes.paperContainer]}

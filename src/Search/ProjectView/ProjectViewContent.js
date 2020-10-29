@@ -4,7 +4,6 @@ import Search from "./Filter/Search.js";
 import { useAppState } from "../../util/app-state";
 import { withStyles } from "@material-ui/styles";
 
-import Graph from "./Graph/Graph2.js";
 import CanvasGraph from "./Graph/CanvasGraph.js";
 
 import { Query } from "react-apollo";

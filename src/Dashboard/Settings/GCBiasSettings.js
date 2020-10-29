@@ -1,11 +1,5 @@
-import React, { useState, useEffect } from "react";
-import {
-  FormControl,
-  FormControlLabel,
-  InputLabel,
-  Select,
-  Switch
-} from "@material-ui/core";
+import React, { useState } from "react";
+import { FormControl, FormControlLabel, Switch } from "@material-ui/core";
 
 const GCBiasSettings = ({ classes, setAxisOption }) => {
   const [checked, setChecked] = useState(true);

@@ -1,29 +1,28 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  useLayoutEffect
-} from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import * as d3 from "d3";
 
 import { createRoot, hierarchyColouring } from "./appendUtils.js";
-import { getSelectionPath, originalRadiusCanvas } from "./utils";
+import {
+  getSelectionPath,
+  originalRadiusCanvas,
+  setSmallerPanelFont,
+  setLargerPanelFont
+} from "./utils";
 import { config } from "../config.js";
-
-import _ from "lodash";
 
 import { useDashboardState } from "../ProjectState/dashboardState";
 
 import { useAppState } from "../../../util/app-state";
 
 import { initContext } from "../../../Dashboard/utils.js";
-const graphDimension = 800;
+
 const spacingOffset = 200;
-const margin = {
-  left: 50,
-  top: 100
-};
+const getScreenType = width => ({
+  isBigScreen: width > 1700,
+  isMedScreen: width >= 1330 && width <= 1700,
+  isSmallScreen: width < 1330,
+  is1DPR: window.devicePixelRatio === 1
+});
 
 const CanvasGraph = ({
   isLoading,
@@ -32,7 +31,7 @@ const CanvasGraph = ({
   handleFilterChange,
   handleForwardStep
 }) => {
-  const [{}, dispatch] = useDashboardState();
+  const [{ filterMouseover }, dispatch] = useDashboardState();
   const [{ dimensions }] = useAppState();
 
   const [context, saveContext] = useState();
@@ -41,16 +40,40 @@ const CanvasGraph = ({
   const [currScale, setCurrScale] = useState(1);
 
   const [allCircleCords, setAllCircleCords] = useState([]);
+  const screenType = getScreenType(dimensions.width);
 
-  const graphRef = useRef(null);
-  const voronoid = d3
-    .voronoi()
-    .x(d => d.x * 0.5 + dimensions.width / 6)
-    .y(d => d.y * 0.5 + dimensions.height / 4)
-    .extent([
-      [-dimensions.width, -dimensions.height],
-      [dimensions.width, dimensions.height]
-    ]);
+  useEffect(() => {
+    if (filterMouseover) {
+      if (filterMouseover.value === null) {
+        //clear
+        clearAll(context);
+        drawLinks(context, links, [], 0);
+        drawNodes(context, nodes, [], 0, null);
+      } else {
+        d3.select(
+          "#canvasGraphSelection ." + filterMouseover.value + "-voronoi"
+        ).dispatch("mouseover");
+      }
+    }
+  }, [filterMouseover]);
+
+  const voronoid = screenType.is1DPR
+    ? d3
+        .voronoi()
+        .x(d => d.x)
+        .y(d => d.y)
+        .extent([
+          [-dimensions.width, -dimensions.height],
+          [dimensions.width, dimensions.height]
+        ])
+    : d3
+        .voronoi()
+        .x(d => d.x * 0.5 + dimensions.width / 6)
+        .y(d => d.y * 0.5 + dimensions.height / 4)
+        .extent([
+          [-dimensions.width, -dimensions.height],
+          [dimensions.width, dimensions.height]
+        ]);
 
   useEffect(() => {
     if (data && context) {
@@ -69,13 +92,26 @@ const CanvasGraph = ({
       clearAll(context);
       if (currScale !== 0.9) {
         context.translate(dimensions.width / 3, dimensions.height / 2);
-        //  context.translate(300, 300);
-        if (dimensions.width > 2000) {
-          context.scale(0.2, 0.2);
+
+        if (screenType.is1DPR) {
+          if (screenType.isBigScreen) {
+            context.scale(0.15, 0.15);
+          } else if (screenType.isMedScreen) {
+            //med screen 1dpr
+            context.scale(0.1, 0.1);
+          } else {
+            context.scale(0.1, 0.1);
+          }
         } else {
-          context.scale(0.1, 0.1);
+          if (screenType.isMedScreen || screenType.isBigScreen) {
+            //med screen 1dpr
+            context.scale(0.1, 0.1);
+          } else if (screenType.isSmallScreen) {
+            //small screen 2 dpr
+            context.scale(0.08, 0.08);
+          }
         }
-        //  context.scale(0.9, 0.9);
+
         context.save();
       }
       setCurrScale(0.9);
@@ -149,7 +185,7 @@ const CanvasGraph = ({
         var gradient = context.createLinearGradient(0, 0, 0, dimensions.height);
         gradient.addColorStop(0, "#fff9de");
         gradient.addColorStop(1, "#f0f0d6");
-        context.shadowBlur = 10;
+        context.shadowBlur = 15;
         context.shadowColor = "white";
         context.fillStyle = gradient;
         xPos += 100 + filterOffset;
@@ -202,15 +238,18 @@ const CanvasGraph = ({
         .select("#canvasGraphSelection")
         .append("g")
         .attr("class", "voronoi-group");
-      var devicePixelRatio = window.devicePixelRatio || 1;
 
-      if (devicePixelRatio === 1) {
+      if (screenType.is1DPR) {
         voronoi.attr(
           "transform",
-          "scale(2,2) translate(" +
-            -dimensions.width * 0.1 +
+          "translate(" +
+            dimensions.width / 6 +
             "," +
-            -dimensions.height * 0.1 +
+            dimensions.height / 4 +
+            ") rotate(-90 " +
+            rootNode.x +
+            " " +
+            rootNode.y +
             ")"
         );
       } else {
@@ -220,23 +259,17 @@ const CanvasGraph = ({
         );
       }
 
-      /*   .attr(
-          "transform",
-          `rotate(-90)scale(0.5,0.5)translate(-` +
-            (dimensions.width - dimensions.width / 6) +
-            `,` +
-            (dimensions.height - dimensions.height / 4) +
-            `)`
-        );*/
-
       voronoi
         .selectAll("path")
         .data(voronoid(allCircleCords).polygons(), d => {
-          return d.data.element.data.target;
+          if (!d) {
+            console.log(d);
+          }
+          return d ? d.data.element.data.target : null;
         })
         .enter()
         .append("path")
-        //  .style("stroke", "#2074A0")
+        //.style("stroke", "#2074A0")
         //.style("stroke-width", 3)
         .style("fill", "none")
         .style("pointer-events", "all")
@@ -355,7 +388,11 @@ const CanvasGraph = ({
         libraryText = "Library  | " + hoverNode.data.source;
         analysisText = "Analysis | " + hoverNode.data.target;
       }
-      context.font = "20px Lucida Console, Monaco, monospace";
+
+      screenType.is1DPR
+        ? setSmallerPanelFont(context, screenType)
+        : setLargerPanelFont(context, screenType);
+
       context.fillStyle = "grey";
       context.shadowColor = "grey";
       context.shadowBlur = 7;
@@ -363,47 +400,46 @@ const CanvasGraph = ({
 
       const yIncrementVar = 40;
       const xIncrementVar = 130;
-      context.fillText(
-        sampleText,
-        (2 * dimensions.width) / 3 - xIncrementVar,
-        dimensions.height - yIncrementVar
-      );
-      context.fillText(
-        libraryText,
-        (2 * dimensions.width) / 3 - xIncrementVar,
-        dimensions.height
-      );
-      context.fillText(
-        analysisText,
-        (2 * dimensions.width) / 3 - xIncrementVar,
-        dimensions.height + yIncrementVar
-      );
+
+      const rootNode = allCircleCords.filter(
+        node => node.element.depth === 0
+      )[0];
+
+      const rootRadius = originalRadiusCanvas(rootNode["element"]);
+
+      var xPos = 0,
+        yPos = 0;
+      if (screenType.is1DPR) {
+        if (screenType.isSmallScreen) {
+          xPos = (2 * dimensions.width) / 3 / 2 - rootRadius / 16;
+          yPos = dimensions.height / 2;
+        } else {
+          xPos = (2 * dimensions.width) / 3 / 2 - rootRadius / 8;
+          yPos = dimensions.height / 2;
+        }
+      } else {
+        if (screenType.isSmallScreen) {
+          xPos = (2 * dimensions.width) / 3 - rootRadius / 8;
+          yPos = dimensions.height;
+        } else {
+          xPos = (2 * dimensions.width) / 3 - rootRadius / 8;
+          yPos = dimensions.height;
+        }
+      }
+
+      context.fillText(sampleText, xPos, yPos - yIncrementVar);
+      context.fillText(libraryText, xPos, yPos);
+      context.fillText(analysisText, xPos, yPos + yIncrementVar);
 
       context.shadowBlur = 0;
       context.fillStyle = "black";
-      context.fillText(
-        sampleText,
-        (2 * dimensions.width) / 3 - xIncrementVar,
-        dimensions.height - yIncrementVar
-      );
+      context.fillText(sampleText, xPos, yPos - yIncrementVar);
 
       if (hoverNode.height === 1) {
-        context.fillText(
-          libraryText,
-          (2 * dimensions.width) / 3 - xIncrementVar,
-          dimensions.height
-        );
+        context.fillText(libraryText, xPos, yPos);
       } else if (hoverNode.height === 0) {
-        context.fillText(
-          libraryText,
-          (2 * dimensions.width) / 3 - xIncrementVar,
-          dimensions.height
-        );
-        context.fillText(
-          analysisText,
-          (2 * dimensions.width) / 3 - xIncrementVar,
-          dimensions.height + yIncrementVar
-        );
+        context.fillText(libraryText, xPos, yPos);
+        context.fillText(analysisText, xPos, yPos + yIncrementVar);
       }
     }
     context.stroke();

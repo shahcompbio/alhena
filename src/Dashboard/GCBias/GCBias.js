@@ -1,23 +1,14 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import * as d3 from "d3";
 
-import { withStyles } from "@material-ui/core/styles";
-
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
-
-import _ from "lodash";
 
 import Grid from "@material-ui/core/Grid";
 
 import { useStatisticsState } from "../DashboardState/statsState";
-import { scaleLinear } from "d3-scale";
-import d3Tip from "d3-tip";
 
 import { initContext } from "../utils.js";
-
-const gcBiasDimension = 550;
-const axisTextPadding = 55;
 
 const selfType = "gcBias";
 
@@ -112,16 +103,9 @@ const gcBiasDim = {
   height: margin.top + plotHeight + margin.bottom
 };
 const Plot = ({ data, selectionAllowed }) => {
-  const [
-    { gcBiasAxis, selectedCells, selectedCellsDispatchFrom },
-    dispatch
-  ] = useStatisticsState();
+  const [{ gcBiasAxis, selectedCells }, dispatch] = useStatisticsState();
 
   const [context, saveContext] = useState();
-
-  const [canvasPaths, setCanvasPaths] = useState();
-
-  const [savedCanvas, saveCanvas] = useState();
 
   const [ref] = useHookWithRefCallback();
 
@@ -129,7 +113,6 @@ const Plot = ({ data, selectionAllowed }) => {
     ...data.map(category => category["stats"]["yMax"])
   );
 
-  const extent = [0, highestMax];
   var medianLine = d3
     .area()
     .curve(d3.curveMonotoneX)
@@ -383,7 +366,7 @@ const Plot = ({ data, selectionAllowed }) => {
     var pathsList = [];
     svg.selectAll("g").each(function(d) {
       const that = d3.select(this);
-      const paths = that.selectAll("path").each(function(d) {
+      that.selectAll("path").each(function(d) {
         const thatPath = d3.select(this);
         const dAttr = thatPath.attr("d");
 

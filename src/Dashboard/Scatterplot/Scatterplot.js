@@ -6,18 +6,15 @@ import { withStyles } from "@material-ui/core/styles";
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
 
+import d3Tip from "d3-tip";
 import _ from "lodash";
 
 import Grid from "@material-ui/core/Grid";
 
 import { useStatisticsState } from "../DashboardState/statsState";
-import { scaleLinear } from "d3-scale";
-import d3Tip from "d3-tip";
-
 import { initContext } from "../utils.js";
 
 const scatterplotDimension = 550;
-const axisTextPadding = 55;
 const histogramMaxHeight = 55;
 
 const margin = {
@@ -138,12 +135,8 @@ const Scatterplot = ({ analysis, classes }) => {
 };
 
 const Plot = ({ data, stats, histogram, selectionAllowed }) => {
-  const [
-    { scatterplotAxis, selectedCells, selectedCellsDispatchFrom },
-    dispatch
-  ] = useStatisticsState();
+  const [{ scatterplotAxis, selectedCells }, dispatch] = useStatisticsState();
   const [context, saveContext] = useState();
-  const [savedCanvas, saveCanvas] = useState();
 
   var polyList = [];
   const [ref] = useHookWithRefCallback();
@@ -350,7 +343,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
   const appendEventListenersToCanvas = context => {
     var docCanvas = document.getElementById("scatterCanvas");
     const scatterSelection = d3.select("#scatterSelection");
-    const canvas = d3.select("#scatterplot").select("canvas");
+
     docCanvas.addEventListener(
       "mousemove",
       function(e) {
@@ -380,7 +373,6 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     docCanvas.addEventListener(
       "mouseup",
       function(e) {
-        const bouding = canvas.node().getBoundingClientRect();
         context.save();
 
         context.strokeWidth = 1;
@@ -395,8 +387,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
         context.closePath();
 
         var selectedNodes = [];
-        scatterSelection.selectAll("rect").each(function(d) {
-          const that = d3.select(this);
+        scatterSelection.selectAll("rect").each(d => {
           if (isPointInPoly(polyList, { x: x(d.x), y: y(d.y) })) {
             selectedNodes = [...selectedNodes, d["heatmapOrder"]];
           }
@@ -505,17 +496,6 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       final[heatmapOrder] = true;
       return final;
     }, {});
-
-  const getHeatmapOrderFromExtent = (extent, data) =>
-    data
-      .filter(
-        point =>
-          point.y >= extent[1][1] &&
-          point.y <= extent[0][1] &&
-          point.x >= extent[0][0] &&
-          point.x <= extent[1][0]
-      )
-      .map(entry => entry.heatmapOrder);
 
   const drawHistogram = (context, data, stats, x, y) => {
     const barPadding = { width: 5, height: 2, margin: 10 };

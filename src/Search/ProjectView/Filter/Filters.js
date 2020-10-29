@@ -6,15 +6,7 @@ import * as d3 from "d3";
 import { withStyles } from "@material-ui/styles";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 
-import {
-  Chip,
-  InputLabel,
-  FormControl,
-  Grid,
-  TextField,
-  MenuItem,
-  Select
-} from "@material-ui/core";
+import { Chip, FormControl, Grid, TextField, Select } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import { hierarchyColouring } from "../Graph/appendUtils.js";
 import { useDashboardState } from "../ProjectState/dashboardState";
@@ -80,37 +72,12 @@ const Filters = ({
   handleForwardStep
 }) => {
   const [{ selectedDashboard }, dispatch] = useDashboardState();
-  const [selectedValues, setSelectedValues] = useState({});
 
   const onChange = (value, type, handleForwardStep) => {
     const filter = value ? { label: type, value: value["value"] } : type;
     const action = value ? "add" : "clear";
 
     handleFilterChange(filter, action);
-  };
-
-  const getSelectValue = (selectedOptions, filterType, filters) => {
-    if (isUserSelectedOption(selectedOptions, filterType)) {
-      return selectedOptions[filterType];
-    } else {
-      if (Object.keys(selectedOptions).length !== 0) {
-        const largestFilterIndex = getLargestFilterIndex(selectedOptions);
-        var currFilterType = filters.filter(
-          filter => filter.type.localeCompare(filterType) === 0
-        )[0];
-        if (
-          isFilterSmallerThanLargestChoosen(
-            currFilterType.type,
-            largestFilterIndex
-          )
-        ) {
-          return currFilterType.values.map(value => {
-            return { label: value, value: currFilterType.type };
-          });
-        }
-      }
-    }
-    return null;
   };
 
   const isFilterSmallerThanLargestChoosen = (type, largestFilterIndex) =>
@@ -144,6 +111,12 @@ const Filters = ({
                 disableClearable={
                   selectedOptions[filterTypes[i]] ? false : true
                 }
+                onMouseLeave={() => {
+                  dispatch({
+                    type: "FILTER_MOUSEOVER",
+                    value: { value: null, type: null }
+                  });
+                }}
                 renderTags={(value, getTagProps) => {
                   return value.length > 0
                     ? value.map((option, index) => (
@@ -160,7 +133,7 @@ const Filters = ({
                   if (filterTypes[i] === "jira_id") {
                     dispatch({
                       type: "ANALYSIS_SELECT",
-                      value: { selectedAnalysis: value }
+                      value: { selectedAnalysis: value.value }
                     });
 
                     handleForwardStep();
@@ -189,6 +162,22 @@ const Filters = ({
                     final = [...final, { label: value, value: value }];
                     return final;
                   }, [])}
+                renderOption={value => (
+                  <span
+                    style={{ width: "100%" }}
+                    onMouseOver={event => {
+                      dispatch({
+                        type: "FILTER_MOUSEOVER",
+                        value: {
+                          type: filterTypes[i],
+                          value: event.currentTarget.innerText
+                        }
+                      });
+                    }}
+                  >
+                    {value["label"]}
+                  </span>
+                )}
                 getOptionLabel={value => value["label"]}
               />
             )
@@ -198,7 +187,7 @@ const Filters = ({
   } else {
     panels = [];
   }
-  //  disabled: selectedOptions[filterTypes[i]] === value
+
   return (
     <Grid
       container

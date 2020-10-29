@@ -102,7 +102,7 @@ const SettingsPanel = ({
   violinOptions
 }) => {
   const [{ selectedAnalysis }] = useDashboardState();
-  //  const selectedAnalysis = "sc-2602";
+
   const [
     { quality, selectedCells, scatterplotAxis, chipHeatmapAxis, violinAxis },
     dispatch

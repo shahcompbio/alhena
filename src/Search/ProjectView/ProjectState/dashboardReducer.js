@@ -2,7 +2,8 @@ const initialState = (dashboards, selectedDashboard, selectedAnalysis) => {
   return {
     dashboards: dashboards,
     selectedDashboard: selectedDashboard,
-    selectedAnalysis: selectedAnalysis
+    selectedAnalysis: selectedAnalysis,
+    filterMouseover: null
   };
 };
 
@@ -18,6 +19,15 @@ const statsStateReducer = (state, action) => {
       return {
         ...state,
         selectedAnalysis: action.value.selectedAnalysis
+      };
+    }
+    case "FILTER_MOUSEOVER": {
+      return {
+        ...state,
+        filterMouseover: {
+          type: action.value.type,
+          value: action.value.value
+        }
       };
     }
     default:

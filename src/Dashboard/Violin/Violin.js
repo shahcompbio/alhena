@@ -11,7 +11,7 @@ import _ from "lodash";
 import Grid from "@material-ui/core/Grid";
 
 import { useStatisticsState } from "../DashboardState/statsState";
-import { scaleLinear } from "d3-scale";
+
 import d3Tip from "d3-tip";
 
 import { initContext } from "../utils.js";
@@ -154,15 +154,8 @@ const tooltip = d3Tip()
   .attr("class", "d3-tip w")
   .attr("id", "violinTip");
 
-const getYInterval = data =>
-  parseFloat(data[0]["histogram"][1]["key"]) -
-  parseFloat(data[0]["histogram"][0]["key"]);
-
 const Plot = ({ data, stats, cells, selectionAllowed }) => {
-  const [
-    { scatterplotAxis, selectedCells, selectedCellsDispatchFrom, violinAxis },
-    dispatch
-  ] = useStatisticsState();
+  const [{ selectedCells, violinAxis }, dispatch] = useStatisticsState();
 
   const xAxis = violinAxis.x.label;
   const yAxis = violinAxis.y.label;
@@ -172,15 +165,12 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
   const [violinPaths, setViolinPaths] = useState({});
 
   const [ref] = useHookWithRefCallback();
-  const brush = d3.brush();
 
   var x = d3
     .scaleBand()
     .range([dimensions.x1, dimensions.width])
     .domain([...data.map(option => option["name"])])
     .padding(0.05);
-
-  const interval = getYInterval(data);
 
   const isCountInsignificant = data.reduce((final, cur) => {
     if (
@@ -221,7 +211,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
       const percentileObj = getPercentileObject(data);
       d3.select("#violin").attr("category", null);
       context.clearRect(0, 0, dimensions.width, dimensions.height);
-      Object.keys(violinPaths).map(name => {
+      Object.keys(violinPaths).forEach(name => {
         //grapql cache error
         if (percentileObj[name]) {
           drawViolinArea(context, name, violinPaths[name]);
@@ -372,7 +362,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
           context.clearRect(0, 0, dimensions.width, dimensions.height);
           drawAxis(context, x, y, xNum, data);
           drawAxisLabels(context, x, y);
-          Object.keys(percentileObj).map(name => {
+          Object.keys(percentileObj).forEach(name => {
             if (name === d["name"]) {
               showTooltip(percentileObj[name], name);
               drawViolinArea(context, name, violinPathObjects[name], {
@@ -391,7 +381,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
         context.clearRect(0, 0, dimensions.width, dimensions.height);
         drawAxis(context, x, y, xNum, data);
         drawAxisLabels(context, x, y);
-        Object.keys(percentileObj).map(name => {
+        Object.keys(percentileObj).forEach(name => {
           !selectedCategory || selectedCategory === name
             ? drawViolinArea(context, name, violinPathObjects[name])
             : drawViolinArea(context, name, violinPathObjects[name], {
@@ -454,10 +444,6 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
 
     const dim = d3
       .select("#violinCategory-" + name)
-      .node()
-      .getBoundingClientRect();
-    const containerDim = d3
-      .select("#violinWrapper")
       .node()
       .getBoundingClientRect();
 
