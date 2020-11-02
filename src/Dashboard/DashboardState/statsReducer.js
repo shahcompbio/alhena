@@ -2,26 +2,34 @@ import { heatmapConfig } from "../Heatmap/config.js";
 const initialState = {
   quality: heatmapConfig.defaultQuality,
   isContaminated: false,
-  selectedExperimentalCondition: null,
+  experimentalCondition: {
+    label: "Experimental Condition",
+    type: "experimental_condition"
+  },
   selectedCells: [],
+
   chipHeatmapAxis: {
     label: "Total Mapped Reads",
     type: "total_mapped_reads"
   },
+
   scatterplotAxis: {
     x: { label: "Total Mapped Reads", type: "total_mapped_reads" },
     y: { label: "Mapped Reads", type: "total_reads" },
     popupFacadeIsOpen: false,
     selectedCellsDispatchFrom: null
   },
+
   violinAxis: {
     y: { label: "Quality", type: "quality" },
     x: { label: "Experimental Condition", type: "experimental_condition" }
   },
+
   gcBiasAxis: {
     x: { label: "GC Percent" },
     y: { label: "Average" }
   },
+
   gcBiasIsGrouped: true
 };
 

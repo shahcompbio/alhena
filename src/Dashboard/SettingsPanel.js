@@ -9,6 +9,8 @@ import {
   ExpansionPanelSummary
 } from "@material-ui/core";
 
+import { ApolloConsumer } from "react-apollo";
+
 import ChipHeatmapSettings from "./Settings/ChipHeatmapSettings.js";
 import ScatterplotSettings from "./Settings/ScatterplotSettings.js";
 import LoadingCircle from "./CommonModules/LoadingCircle.js";
@@ -67,6 +69,7 @@ const styles = theme => ({
     margin: theme.spacing(2, 0, 0, 0)
   },
   formControl: {
+    width: "100%",
     margin: theme.spacing(0, 0, 2, 0)
   },
   settings: {
@@ -103,7 +106,13 @@ const SettingsPanel = ({
 }) => {
   const [{ selectedAnalysis }] = useDashboardState();
   const [
-    { selectedCells, scatterplotAxis, chipHeatmapAxis, violinAxis },
+    {
+      selectedCells,
+      scatterplotAxis,
+      chipHeatmapAxis,
+      violinAxis,
+      experimentalCondition
+    },
     dispatch
   ] = useStatisticsState();
 
@@ -133,11 +142,22 @@ const SettingsPanel = ({
         name="dataFilter"
         title="Data Filters"
       >
-        <DataFilters
-          analysis={selectedAnalysis}
-          classes={classes}
-          update={(value, type) => update(value, type)}
-        />
+        <ApolloConsumer>
+          {client =>
+            categoryStats.length > 0 ? (
+              <DataFilters
+                client={client}
+                experimentalConditions={categoryStats.filter(
+                  category =>
+                    category["category"] === experimentalCondition["type"]
+                )}
+                analysis={selectedAnalysis}
+                classes={classes}
+                update={(value, type) => update(value, type)}
+              />
+            ) : null
+          }
+        </ApolloConsumer>
       </AccordianWrapper>
       <AccordianWrapper
         classes={classes}

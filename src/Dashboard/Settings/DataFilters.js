@@ -4,9 +4,12 @@ import { useDashboardState } from "../../Search/ProjectView/ProjectState/dashboa
 import gql from "graphql-tag";
 import { useQuery } from "react-apollo-hooks";
 import {
-  Grid,
   FormControl,
   FormControlLabel,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Select,
   Slider,
   Switch,
   Typography
@@ -30,22 +33,31 @@ const orderFromParamsQuary = gql`
   }
 `;
 
-const DataFilters = ({ classes, update, analysis }) => {
+const DataFilters = ({
+  classes,
+  update,
+  analysis,
+  client,
+  experimentalConditions
+}) => {
   const [{ quality, isContaminated }, dispatch] = useStatisticsState();
   const [qualityMenuValue, setQualityMenuValue] = useState(quality);
   const [contaminatedMenuValue, setContaminatedMenuValue] = useState(
     isContaminated
   );
+  const [experimentalMenuValue, setExperimentalMenuValue] = useState(null);
 
-  const sendQuery = () => {
-    const { loading, data } = useQuery(orderFromParamsQuary, {
+  const [paramObj, setParamObj] = useState({});
+
+  const sendQuery = async (client, dispatch, params) => {
+    const { loading, data } = await client.query({
+      query: orderFromParamsQuary,
       variables: {
         analysis: analysis,
         quality: quality,
-        params: [{ param: "is_contaminated", value: contaminatedMenuValue }]
+        params: Object.values(params)
       }
     });
-    console.log(data);
   };
 
   return [
@@ -106,42 +118,65 @@ const DataFilters = ({ classes, update, analysis }) => {
                 checked={contaminatedMenuValue}
                 onChange={() => {
                   setContaminatedMenuValue(!contaminatedMenuValue);
-                  sendQuery();
+                  setParamObj["is_contaminated"] = {
+                    param: "is_contaminated",
+                    value: contaminatedMenuValue.toString()
+                  };
+                  sendQuery(client, dispatch, setParamObj);
                 }}
               />
             }
           />
         </FormControl>
       </Grid>
+      <Grid item>
+        <Typography
+          id="discrete-slider"
+          gutterBottom
+          style={{ marginBottom: 0 }}
+        >
+          Experimental Conditions
+        </Typography>
+        <FormControl
+          variant="outlined"
+          key="xAxisFormControl"
+          className={classes.formControl}
+        >
+          <Select
+            key="experimentalCondition"
+            value={experimentalMenuValue || ""}
+            name="experimentalConditionSelection"
+            displayEmpty
+            onChange={event => {
+              const value = event.target.value;
+              setExperimentalMenuValue(value);
+              if (value === "None") {
+                delete setParamObj["experimental_condition"];
+              } else {
+                setParamObj["experimental_condition"] = {
+                  param: "experimental_condition",
+                  value: value
+                };
+              }
+              sendQuery(client, dispatch, setParamObj);
+            }}
+          >
+            <MenuItem value="">None</MenuItem>
+            {experimentalConditions.length > 0
+              ? experimentalConditions[0]["types"].map((option, index) => (
+                  <MenuItem
+                    key={"expCondition" + option + "_" + index}
+                    value={option}
+                  >
+                    {option}
+                  </MenuItem>
+                ))
+              : null}
+          </Select>
+        </FormControl>
+      </Grid>
     </Grid>
-    /*  <FormControl
-      variant="outlined"
-      key="xAxisFormControl"
-      className={classes.formControl}
-    >
-      <InputLabel
-        shrink={true}
-        htmlFor="xAxisSettings"
-        className={classes.dropDownLabel}
-        key="xAxis ScatterplotInput"
-      >
-        X Axis
-      </InputLabel>
-      <Select
-        native
-        key="xAxisScatterplot"
-        value={xAxisLabel || ""}
-        name="xAxis"
-        onChange={handleAxisChange("x")}
-        labelWidth={100}
-      >
-        {axisOptions.map((option, index) => (
-          <option key={"xAxis" + option.type + "_" + index} value={option.type}>
-            {option.label}
-          </option>
-        ))}
-      </Select>
-    </FormControl>*/
   ];
 };
+
 export default DataFilters;
