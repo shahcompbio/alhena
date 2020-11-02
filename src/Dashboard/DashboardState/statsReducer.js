@@ -1,6 +1,8 @@
 import { heatmapConfig } from "../Heatmap/config.js";
 const initialState = {
   quality: heatmapConfig.defaultQuality,
+  isContaminated: false,
+  selectedExperimentalCondition: null,
   selectedCells: [],
   chipHeatmapAxis: {
     label: "Total Mapped Reads",

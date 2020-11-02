@@ -102,10 +102,6 @@ const SettingsPanel = ({
   violinOptions
 }) => {
   const [{ selectedAnalysis }] = useDashboardState();
-<<<<<<< HEAD
-
-=======
->>>>>>> 0b7b8bea6bbd8cb0b1e50a4083c5e509a811c21d
   const [
     { selectedCells, scatterplotAxis, chipHeatmapAxis, violinAxis },
     dispatch
@@ -138,6 +134,7 @@ const SettingsPanel = ({
         title="Data Filters"
       >
         <DataFilters
+          analysis={selectedAnalysis}
           classes={classes}
           update={(value, type) => update(value, type)}
         />
