@@ -19,7 +19,11 @@ import LoadingCircle from "./CommonModules/LoadingCircle.js";
 import { Paper, Grid } from "@material-ui/core";
 import { useStatisticsState } from "./DashboardState/statsState";
 const HEATMAP_ORDER = gql`
-  query heatmapOrder($analysis: String!, $quality: String!) {
+  query heatmapOrder(
+    $analysis: String!
+    $quality: String!
+    $params: [InputParams]
+  ) {
     heatmapOrder(analysis: $analysis, quality: $quality) {
       order
     }
@@ -28,10 +32,6 @@ const HEATMAP_ORDER = gql`
       types
     }
     chipHeatmapOptions {
-      type
-      label
-    }
-    scatterplotAxisOptions {
       type
       label
     }
@@ -45,13 +45,32 @@ const HEATMAP_ORDER = gql`
         label
       }
     }
+    numericalDataFilters(
+      analysis: $analysis
+      quality: $quality
+      params: $params
+    ) {
+      numericalDataFilters {
+        localMax
+        min
+        localMin
+        max
+        name
+        label
+      }
+      heatmapOrderFromDataFilters {
+        order
+      }
+    }
   }
 `;
 const styles = theme => ({
   root: {
-    flexGrow: 1
+    flexGrow: 1,
+    height: "100%"
   },
   content: {
+    height: "100%",
     overflowX: "scroll"
   },
   heatmapContent: {
@@ -82,27 +101,68 @@ const styles = theme => ({
     width: 400
   }
 });
-const QCDashboard = ({ analysis, classes }) => {
+const getQueryParams = (isContaminated, expCondition, numericalDataFilters) => {
+  var params = isContaminated
+    ? [{ param: "is_contaminated", value: "false" }]
+    : [];
+  params = expCondition
+    ? [...params, { param: "experimental_condition", value: expCondition }]
+    : [...params];
+  if (numericalDataFilters) {
+    params = [...params, ...numericalDataFilters];
+  }
+  return params;
+};
+
+const QCDashboard = ({ analysis, classes, client }) => {
   const [
-    { selectedCells, quality, popupFacadeIsOpen },
+    {
+      selectedCells,
+      quality,
+      popupFacadeIsOpen,
+      isContaminated,
+      numericalDataFilters,
+      expCondition,
+      axisChange
+    },
     dispatch
   ] = useStatisticsState();
   let history = useHistory();
 
+  const params = getQueryParams(
+    isContaminated,
+    expCondition,
+    numericalDataFilters
+  );
   const { loading, data } = useQuery(HEATMAP_ORDER, {
     variables: {
       analysis: analysis,
-      quality: quality
+      quality: quality,
+      params: [...params]
     }
   });
 
   if (!loading && data) {
     if (data.heatmapOrder) {
-      const heatmapOrder =
-        selectedCells.length > 0
-          ? selectedCells
-          : data.heatmapOrder.map(order => order.order);
-
+      var heatmapOrder;
+      if (axisChange["datafilter"]) {
+        const selection = data.numericalDataFilters.heatmapOrderFromDataFilters.map(
+          order => order.order
+        );
+        if (selection.length !== selectedCells.length) {
+          dispatch({
+            type: "BRUSH",
+            value: selection,
+            dispatchedFrom: "dataFilter"
+          });
+        }
+      } else {
+        heatmapOrder =
+          selectedCells.length > 0
+            ? selectedCells
+            : data.heatmapOrder.map(order => order.order);
+      }
+      //    console.log(heatmapOrder);
       return (
         <div className={classes.root}>
           <Grid
@@ -115,8 +175,11 @@ const QCDashboard = ({ analysis, classes }) => {
           >
             <Grid className={classes.settings} item xs={3}>
               <SettingsPanel
+                client={client}
+                numericalDataFilters={
+                  data.numericalDataFilters.numericalDataFilters
+                }
                 cellCount={data.heatmapOrder.length}
-                scatterplotOptions={data.scatterplotAxisOptions}
                 chipHeatmapOptions={data.chipHeatmapOptions}
                 violinOptions={data.violinAxisOptions}
                 categoryStats={data.categoriesStats}
@@ -125,33 +188,19 @@ const QCDashboard = ({ analysis, classes }) => {
             </Grid>
 
             <Grid item className={classes.plots} xs={9}>
-              <Paper
-                className={[classes.heatmapContent, classes.paperContainer]}
-              >
-                <Heatmap
-                  analysis={analysis}
-                  allHeatmapOrder={heatmapOrder}
-                  categoryStats={data.categoriesStats}
-                />
-              </Paper>
-              <Paper className={[classes.chip, classes.paperContainer]}>
-                <Chip analysis={analysis} />
-              </Paper>
-              <Paper
-                className={[classes.violinContent, classes.paperContainer]}
-              >
-                <Violin
-                  analysis={analysis}
-                  allHeatmapOrder={heatmapOrder}
-                  categoryStats={data.categoriesStats}
-                />
-              </Paper>
-              <Paper className={[classes.gcBias, classes.paperContainer]}>
-                <GCBias analysis={analysis} heatmapOrder={heatmapOrder} />
-              </Paper>
-              <Paper className={[classes.scatterplot, classes.paperContainer]}>
-                <Scatterplot analysis={analysis} />
-              </Paper>
+              {heatmapOrder && heatmapOrder.length === 0 ? (
+                <Paper
+                  className={[classes.scatterplot, classes.paperContainer]}
+                >
+                  <div>NO CELLS SELECTED</div>
+                </Paper>
+              ) : (
+                <Paper
+                  className={[classes.scatterplot, classes.paperContainer]}
+                >
+                  <Scatterplot analysis={analysis} />
+                </Paper>
+              )}
             </Grid>
           </Grid>
         </div>
@@ -189,5 +238,31 @@ const QCDashboard = ({ analysis, classes }) => {
     );
   }
 };
-
+/*
+<Paper
+  className={[classes.heatmapContent, classes.paperContainer]}
+>
+  <Heatmap
+    analysis={analysis}
+    allHeatmapOrder={heatmapOrder}
+    categoryStats={data.categoriesStats}
+  />
+</Paper><Paper className={[classes.chip, classes.paperContainer]}>
+  <Chip analysis={analysis} />
+</Paper>
+<Paper
+  className={[classes.violinContent, classes.paperContainer]}
+>
+  <Violin
+    analysis={analysis}
+    allHeatmapOrder={heatmapOrder}
+    categoryStats={data.categoriesStats}
+  />
+</Paper>
+<Paper className={[classes.gcBias, classes.paperContainer]}>
+  <GCBias analysis={analysis} heatmapOrder={heatmapOrder} />
+</Paper>
+<Paper className={[classes.scatterplot, classes.paperContainer]}>
+  <Scatterplot analysis={analysis} />
+</Paper>*/
 export default withStyles(styles)(QCDashboard);

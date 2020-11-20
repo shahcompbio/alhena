@@ -45,9 +45,20 @@ const GCBIAS_QUERY = gql`
 
 const GCBias = ({ analysis }) => {
   const [
-    { gcBiasIsGrouped, quality, selectedCells, selectedCellsDispatchFrom }
+    {
+      gcBiasIsGrouped,
+      quality,
+      selectedCells,
+      selectedCellsDispatchFrom,
+      subsetSelection
+    }
   ] = useStatisticsState();
-  const selection = selectedCellsDispatchFrom === selfType ? [] : selectedCells;
+  const selection =
+    selectedCellsDispatchFrom === selfType
+      ? []
+      : subsetSelection.length > 0
+      ? subsetSelection
+      : selectedCells;
 
   return (
     <Query
@@ -103,7 +114,10 @@ const gcBiasDim = {
   height: margin.top + plotHeight + margin.bottom
 };
 const Plot = ({ data, selectionAllowed }) => {
-  const [{ gcBiasAxis, selectedCells }, dispatch] = useStatisticsState();
+  const [
+    { gcBiasAxis, selectedCells, axisChange },
+    dispatch
+  ] = useStatisticsState();
 
   const [context, saveContext] = useState();
 
@@ -317,17 +331,26 @@ const Plot = ({ data, selectionAllowed }) => {
             drawAxisLabels(context, x, y, gcBiasAxis);
             drawLegend(context, data, svg, canvasPaths);
 
-            dispatch({
-              type: "BRUSH",
-              value: [
-                ...data.filter(
-                  option =>
-                    option["experimentalCondition"] ===
-                    category["experimentalCondition"]
-                )[0]["cellOrder"]
-              ],
-              dispatchedFrom: selfType
-            });
+            const selection = data.filter(
+              option =>
+                option["experimentalCondition"] ===
+                category["experimentalCondition"]
+            )[0]["cellOrder"];
+
+            if (axisChange["datafilter"]) {
+              dispatch({
+                type: "BRUSH",
+                value: [...selection],
+                subsetSelection: [...selection],
+                dispatchedFrom: selfType
+              });
+            } else {
+              dispatch({
+                type: "BRUSH",
+                value: [...selection],
+                dispatchedFrom: selfType
+              });
+            }
           }
         })
         .on("mouseover", function(d) {

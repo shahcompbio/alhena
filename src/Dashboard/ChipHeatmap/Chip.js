@@ -64,10 +64,21 @@ const CHIP_HEATMAP_QUERY = gql`
 
 const Chip = ({ analysis, classes }) => {
   const [
-    { quality, selectedCells, selectedCellsDispatchFrom, chipHeatmapAxis }
+    {
+      quality,
+      selectedCells,
+      selectedCellsDispatchFrom,
+      chipHeatmapAxis,
+      subsetSelection
+    }
   ] = useStatisticsState();
-  const selection = selectedCellsDispatchFrom === selfType ? [] : selectedCells;
 
+  const selection =
+    selectedCellsDispatchFrom === selfType
+      ? []
+      : subsetSelection.length > 0
+      ? subsetSelection
+      : selectedCells;
   return (
     <Query
       query={CHIP_HEATMAP_QUERY}
@@ -133,7 +144,7 @@ const getHeatmapOrderFromExtent = (extent, data) =>
     .sort((a, b) => a - b);
 
 const ChipHeatmap = ({ data, selectionAllowed }) => {
-  const [{ selectedCells }, dispatch] = useStatisticsState();
+  const [{ selectedCells, axisChange }, dispatch] = useStatisticsState();
 
   const colourScale = d3.scaleLinear(
     [0, data.stats.max],
@@ -210,11 +221,20 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
       drawBackground(context);
       drawBackgroundLines(context);
       drawWells(data.squares, context, extentHighlight);
-      dispatch({
-        type: "BRUSH",
-        value: extentHighlight,
-        dispatchedFrom: selfType
-      });
+      if (axisChange["datafilter"]) {
+        dispatch({
+          type: "BRUSH",
+          value: extentHighlight,
+          dispatchedFrom: selfType,
+          subsetSelection: extentHighlight
+        });
+      } else {
+        dispatch({
+          type: "BRUSH",
+          value: extentHighlight,
+          dispatchedFrom: selfType
+        });
+      }
     }
   }, [extentHighlight]);
 

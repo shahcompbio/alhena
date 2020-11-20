@@ -5,7 +5,8 @@ const ViolinSettings = ({
   classes,
   axisOptions,
   setAxisOption,
-  currentlySelectedAxis
+  currentlySelectedAxis,
+  isDisabled
 }) => {
   const [xAxisLabel, setXAxisLabel] = useState(currentlySelectedAxis.x.type);
   const [yAxisLabel, setYAxisLabel] = useState(currentlySelectedAxis.y.type);
@@ -31,6 +32,7 @@ const ViolinSettings = ({
         variant="outlined"
         key="xAxisViolinFormControl"
         className={classes.formControl}
+        disabled={isDisabled}
       >
         <InputLabel
           shrink={true}
@@ -64,6 +66,7 @@ const ViolinSettings = ({
         variant="outlined"
         key="yAxis FormControl"
         className={classes.formControl}
+        disabled={isDisabled}
       >
         <InputLabel
           shrink={true}

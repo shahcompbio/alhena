@@ -11,9 +11,9 @@ export const setLargerPanelFont = (context, screenType) => {
 };
 export const setSmallerPanelFont = (context, screenType) => {
   context.font = screenType.isBigScreen
-    ? "20px Lucida Console, Monaco, monospace"
-    : screenType.isMedScreen
     ? "15px Lucida Console, Monaco, monospace"
+    : screenType.isMedScreen
+    ? "12px Lucida Console, Monaco, monospace"
     : "10px Lucida Console, Monaco, monospace";
 };
 export function originalRadiusCanvas(d) {

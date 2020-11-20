@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  useLayoutEffect
+} from "react";
 import * as d3 from "d3";
 
 import { createRoot, hierarchyColouring } from "./appendUtils.js";
@@ -31,9 +37,10 @@ const CanvasGraph = ({
   handleFilterChange,
   handleForwardStep
 }) => {
-  const [{ filterMouseover }, dispatch] = useDashboardState();
-  const [{ dimensions }] = useAppState();
-
+  const [
+    { filterMouseover, dimensions, selectedAnalysis },
+    dispatch
+  ] = useDashboardState();
   const [context, saveContext] = useState();
   const [nodes, setNodes] = useState();
   const [links, setLinks] = useState();
@@ -43,7 +50,7 @@ const CanvasGraph = ({
   const screenType = getScreenType(dimensions.width);
 
   useEffect(() => {
-    if (filterMouseover) {
+    if (filterMouseover && context) {
       if (filterMouseover.value === null) {
         //clear
         clearAll(context);
@@ -74,6 +81,33 @@ const CanvasGraph = ({
           [-dimensions.width, -dimensions.height],
           [dimensions.width, dimensions.height]
         ]);
+  useEffect(() => {
+    if (dimensions.width !== 0 && dimensions.height !== 0 && !context) {
+      const graph = d3.select("#canvasGraph");
+      const canvas = graph
+        .select("canvas")
+        .attr("width", dimensions.width)
+        .attr("height", dimensions.height);
+
+      //  setCurrScale(1);
+
+      const context = initContext(canvas, dimensions.width, dimensions.height);
+      saveContext(context);
+
+      d3.select("#canvasGraphSelection")
+        .attr("width", dimensions.width + "px")
+        .attr("height", dimensions.height + "px");
+    }
+    if (context && dimensions.width !== 0 && dimensions.height !== 0) {
+      const canvas = d3.select("#canvasGraph canvas").node();
+
+      let scale = window.devicePixelRatio;
+      canvas.style.width = dimensions.width + "px";
+      canvas.style.height = dimensions.height + "px";
+      canvas.width = dimensions.width * scale;
+      canvas.height = dimensions.height * scale;
+    }
+  }, [dimensions]);
 
   useEffect(() => {
     if (data && context) {
@@ -90,30 +124,39 @@ const CanvasGraph = ({
 
       context.restore();
       clearAll(context);
-      if (currScale !== 0.9) {
-        context.translate(dimensions.width / 3, dimensions.height / 2);
+      //if (currScale !== 0.9) {
+      context.setTransform(
+        window.devicePixelRatio,
+        0,
+        0,
+        window.devicePixelRatio,
+        0,
+        0
+      );
 
-        if (screenType.is1DPR) {
-          if (screenType.isBigScreen) {
-            context.scale(0.15, 0.15);
-          } else if (screenType.isMedScreen) {
-            //med screen 1dpr
-            context.scale(0.1, 0.1);
-          } else {
-            context.scale(0.1, 0.1);
-          }
+      context.translate(dimensions.width / 3, dimensions.height / 2);
+
+      if (screenType.is1DPR) {
+        if (screenType.isBigScreen) {
+          context.scale(0.15, 0.15);
+        } else if (screenType.isMedScreen) {
+          //med screen 1dpr
+          context.scale(0.1, 0.1);
         } else {
-          if (screenType.isMedScreen || screenType.isBigScreen) {
-            //med screen 1dpr
-            context.scale(0.1, 0.1);
-          } else if (screenType.isSmallScreen) {
-            //small screen 2 dpr
-            context.scale(0.08, 0.08);
-          }
+          context.scale(0.1, 0.1);
         }
-
-        context.save();
+      } else {
+        if (screenType.isMedScreen || screenType.isBigScreen) {
+          //med screen 2dpr
+          context.scale(0.1, 0.1);
+        } else if (screenType.isSmallScreen) {
+          //small screen 2 dpr
+          context.scale(0.08, 0.08);
+        }
       }
+
+      context.save();
+      //}
       setCurrScale(0.9);
 
       var filterOffset = filters.length > 0 ? spacingOffset : 0;
@@ -127,7 +170,7 @@ const CanvasGraph = ({
       context.fill();
       setAllCircleCords([...allCords]);
     }
-  }, [data, context]);
+  }, [data, context, dimensions]);
 
   const drawLinks = (context, links, selectionText, filterOffset) => {
     context.strokeStyle = "white";
@@ -413,6 +456,9 @@ const CanvasGraph = ({
         if (screenType.isSmallScreen) {
           xPos = (2 * dimensions.width) / 3 / 2 - rootRadius / 16;
           yPos = dimensions.height / 2;
+        } else if (screenType.isMedScreen) {
+          xPos = (2 * dimensions.width) / 3 / 2;
+          yPos = dimensions.height / 2;
         } else {
           xPos = (2 * dimensions.width) / 3 / 2 - rootRadius / 8;
           yPos = dimensions.height / 2;
@@ -422,7 +468,7 @@ const CanvasGraph = ({
           xPos = (2 * dimensions.width) / 3 - rootRadius / 8;
           yPos = dimensions.height;
         } else {
-          xPos = (2 * dimensions.width) / 3 - rootRadius / 8;
+          xPos = (2 * dimensions.width) / 3 - rootRadius / 8 - 10;
           yPos = dimensions.height;
         }
       }
@@ -464,15 +510,12 @@ const CanvasGraph = ({
     const ref = useRef(null);
     const setRef = useCallback(node => {
       if (node && context === undefined) {
-        const graph = d3.select("#canvasGraph");
+        /*  const graph = d3.select("#canvasGraph");
         const canvas = graph
           .select("canvas")
           .attr("width", dimensions.width)
           .attr("height", dimensions.height);
-        /*    .attr(
-            "transform",
-            "translate(-" + dimensions.width / 4 + "," + margin.top + ")"
-          );*/
+
 
         const context = initContext(
           canvas,
@@ -483,7 +526,7 @@ const CanvasGraph = ({
 
         d3.select("#canvasGraphSelection")
           .attr("width", dimensions.width + "px")
-          .attr("height", dimensions.height + "px");
+          .attr("height", dimensions.height + "px");*/
       }
     }, []);
 

@@ -98,13 +98,23 @@ const VIOLIN_QUERY = gql`
 
 const Violin = ({ analysis, classes }) => {
   const [
-    { quality, selectedCellsDispatchFrom, selectedCells, violinAxis }
+    {
+      quality,
+      selectedCellsDispatchFrom,
+      selectedCells,
+      violinAxis,
+      subsetSelection
+    }
   ] = useStatisticsState();
 
   const xAxis = violinAxis.x.type;
   const yAxis = violinAxis.y.type;
-  const selection = selectedCellsDispatchFrom === selfType ? [] : selectedCells;
-
+  const selection =
+    selectedCellsDispatchFrom === selfType
+      ? []
+      : subsetSelection.length > 0
+      ? subsetSelection
+      : selectedCells;
   return (
     <Query
       query={VIOLIN_QUERY}
@@ -155,7 +165,10 @@ const tooltip = d3Tip()
   .attr("id", "violinTip");
 
 const Plot = ({ data, stats, cells, selectionAllowed }) => {
-  const [{ selectedCells, violinAxis }, dispatch] = useStatisticsState();
+  const [
+    { selectedCells, violinAxis, axisChange },
+    dispatch
+  ] = useStatisticsState();
 
   const xAxis = violinAxis.x.label;
   const yAxis = violinAxis.y.label;
@@ -412,16 +425,24 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
               });
             }
           });
+          const selection = cells
+            .filter(cell => cell.category === d["name"])
+            .map(cell => cell["order"]);
 
-          dispatch({
-            type: "BRUSH",
-            value: [
-              ...cells
-                .filter(cell => cell.category === d["name"])
-                .map(cell => cell["order"])
-            ],
-            dispatchedFrom: selfType
-          });
+          if (axisChange["datafilter"]) {
+            dispatch({
+              type: "BRUSH",
+              value: [...selection],
+              dispatchedFrom: selfType,
+              subsetSelection: [...selection]
+            });
+          } else {
+            dispatch({
+              type: "BRUSH",
+              value: [...selection],
+              dispatchedFrom: selfType
+            });
+          }
         }
       });
 

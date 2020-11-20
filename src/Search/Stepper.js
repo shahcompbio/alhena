@@ -60,7 +60,7 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(15)
   },
   drawerLabelOneLine: {
-    marginBottom: theme.spacing(22)
+    marginBottom: theme.spacing(20)
   },
   line: {
     minHeight: 80
