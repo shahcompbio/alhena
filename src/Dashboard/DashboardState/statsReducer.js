@@ -40,7 +40,7 @@ const initialState = {
     y: { label: "Average" }
   },
 
-  gcBiasIsGrouped: true,
+  gcBiasIsGrouped: false,
 
   isScatterAxisChanged: false,
   isChipAxisChanged: false,
@@ -57,7 +57,8 @@ const statsStateReducer = (state, action) => {
           action.subsetSelection && action.dispatchedFrom !== "clear"
             ? state.selectedCells
             : action.value,
-        selectedCellsDispatchFrom: action.dispatchedFrom,
+        selectedCellsDispatchFrom:
+          action.dispatchedFrom === "clear" ? null : action.dispatchedFrom,
         subsetSelection: action.subsetSelection ? action.subsetSelection : []
       };
     }
@@ -69,7 +70,8 @@ const statsStateReducer = (state, action) => {
         isContaminated: false,
         numericalDataFilters: [],
         selectedCells: [],
-        selectedCellsDispatchFrom: null
+        selectedCellsDispatchFrom: null,
+        subsetSelection: []
       };
     }
     case "CONTIMATED_UPDATE": {
@@ -80,9 +82,17 @@ const statsStateReducer = (state, action) => {
       };
     }
     case "EXP_CONDITION_UPDATE": {
+      const isBackToDefault =
+        action.value.expCondition === null &&
+        state.quality === heatmapConfig.defaultQuality &&
+        state.isContaminated === false;
       return {
         ...state,
-        axisChange: { ...state.axisChange, datafilter: true },
+        axisChange: {
+          ...state.axisChange,
+          datafilter: isBackToDefault ? false : true
+        },
+        selectedCells: isBackToDefault ? [] : state.selectedCells,
         expCondition: action.value.expCondition
       };
     }
@@ -146,6 +156,9 @@ const statsStateReducer = (state, action) => {
       return {
         ...state,
         axisChange: { ...state.axisChange, chip: false },
+        selectedCells: [],
+        selectedCellsDispatchFrom: null,
+        subsetSelection: [],
         chipHeatmapAxis: {
           label: "Total Mapped Reads",
           type: "total_mapped_reads"
@@ -156,6 +169,9 @@ const statsStateReducer = (state, action) => {
       return {
         ...state,
         axisChange: { ...state.axisChange, violin: false },
+        selectedCells: [],
+        selectedCellsDispatchFrom: null,
+        subsetSelection: [],
         violinAxis: {
           y: { label: "Quality", type: "quality" },
           x: { label: "Experimental Condition", type: "experimental_condition" }
@@ -182,6 +198,9 @@ const statsStateReducer = (state, action) => {
       return {
         ...state,
         axisChange: { ...state.axisChange, scatterplot: false },
+        selectedCells: [],
+        selectedCellsDispatchFrom: null,
+        subsetSelection: [],
         scatterplotAxis: {
           x: { label: "Total Mapped Reads", type: "total_mapped_reads" },
           y: { label: "Mapped Reads", type: "total_reads" },

@@ -17,12 +17,11 @@ const ScatterplotSettings = ({
   analysis,
   classes,
   setAxisOption,
-  currentlySelectedAxis,
   isDisabled
 }) => {
   const [{ quality, scatterplotAxis }, dispatch] = useStatisticsState();
-  const [xAxisLabel, setXAxisLabel] = useState(currentlySelectedAxis.x.type);
-  const [yAxisLabel, setYAxisLabel] = useState(currentlySelectedAxis.y.type);
+  const [xAxisLabel, setXAxisLabel] = useState(scatterplotAxis.x.type);
+  const [yAxisLabel, setYAxisLabel] = useState(scatterplotAxis.y.type);
   const { loading, data } = useQuery(SCATTERPLOT_OPTIONS, {
     variables: {
       analysis: analysis,
@@ -30,7 +29,6 @@ const ScatterplotSettings = ({
     }
   });
   useEffect(() => {
-    console.log(scatterplotAxis);
     if (scatterplotAxis) {
       if (scatterplotAxis.x.type !== xAxisLabel) {
         setXAxisLabel(scatterplotAxis.x.type);
@@ -45,7 +43,7 @@ const ScatterplotSettings = ({
     const axisOptions = data.scatterplotAxisOptions;
 
     const handleAxisChange = name => event => {
-      var axisObjext = currentlySelectedAxis;
+      var axisObjext = scatterplotAxis;
       axisObjext[name] = {
         type: event.target.value,
         label: event.target.selectedOptions[0].label
@@ -133,7 +131,7 @@ const ScatterplotSettings = ({
           variant="outlined"
           key="xAxisFormControl"
           className={classes.formControl}
-          isDisabled={isDisabled}
+          disabled={isDisabled}
         />
       </div>
     );

@@ -14,7 +14,7 @@ import { useStatisticsState } from "../DashboardState/statsState";
 
 import d3Tip from "d3-tip";
 
-import { initContext } from "../utils.js";
+import { initContext, getSelection, isSelectionAllowed } from "../utils.js";
 
 const margin = {
   left: 60,
@@ -103,18 +103,20 @@ const Violin = ({ analysis, classes }) => {
       selectedCellsDispatchFrom,
       selectedCells,
       violinAxis,
-      subsetSelection
+      subsetSelection,
+      axisChange
     }
   ] = useStatisticsState();
 
   const xAxis = violinAxis.x.type;
   const yAxis = violinAxis.y.type;
-  const selection =
-    selectedCellsDispatchFrom === selfType
-      ? []
-      : subsetSelection.length > 0
-      ? subsetSelection
-      : selectedCells;
+  const selection = getSelection(
+    axisChange,
+    subsetSelection,
+    selectedCells,
+    selectedCellsDispatchFrom,
+    selfType
+  );
   return (
     <Query
       query={VIOLIN_QUERY}
@@ -146,11 +148,13 @@ const Violin = ({ analysis, classes }) => {
                 cells={violin.cells}
                 data={violin.data}
                 stats={violin.stats}
-                selectionAllowed={
-                  selectedCellsDispatchFrom === selfType ||
-                  selectedCellsDispatchFrom === null ||
-                  selectedCellsDispatchFrom === undefined
-                }
+                selectionAllowed={isSelectionAllowed(
+                  selfType,
+                  selectedCellsDispatchFrom,
+                  subsetSelection,
+                  selectedCells,
+                  axisChange
+                )}
                 key="violinplot"
               />
             </Grid>

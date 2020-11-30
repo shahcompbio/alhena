@@ -6,7 +6,7 @@ export const setLargerPanelFont = (context, screenType) => {
   context.font = screenType.isBigScreen
     ? "30px Lucida Console, Monaco, monospace"
     : screenType.isMedScreen
-    ? "20px Lucida Console, Monaco, monospace"
+    ? "18px Lucida Console, Monaco, monospace"
     : "15px Lucida Console, Monaco, monospace";
 };
 export const setSmallerPanelFont = (context, screenType) => {
@@ -54,7 +54,10 @@ export const voronoid = d3
   .voronoi()
   .x(d => d.x)
   .y(d => d.y)
-  .extent([[-4000, -4000], [4000, 4000]]);
+  .extent([
+    [-4000, -4000],
+    [4000, 4000]
+  ]);
 
 export const removeLegendLabels = () => {
   d3.selectAll(

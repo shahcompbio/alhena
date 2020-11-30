@@ -6,9 +6,9 @@ import {
   Paper,
   Typography,
   Grid,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary
+  Accordion,
+  AccordionDetails,
+  AccordionSummary
 } from "@material-ui/core";
 
 import { ApolloConsumer } from "react-apollo";
@@ -35,11 +35,11 @@ const styles = theme => ({
   fieldTitle: {
     paddingBottom: 30
   },
-  expansionPanelRoot: {
+  AccordionRoot: {
     boxShadow:
       "0px 2px 1px -1px rgba(255, 255, 255, 0.85), 0px -1px 0px 0px rgb(255, 255, 255), 0px 1px 3px 0px rgba(204, 196, 196, 0)"
   },
-  expansionPanelSummary: {
+  AccordionSummary: {
     padding: "0 14px 0 14px"
   },
   expanded: { margin: "0px !important" },
@@ -119,15 +119,21 @@ const SettingsPanel = ({
   const [
     {
       selectedCells,
-      scatterplotAxis,
       chipHeatmapAxis,
-      violinAxis,
       experimentalCondition,
       axisChange,
-      subsetSelection
+      subsetSelection,
+      selectedCellsDispatchFrom
     },
     dispatch
   ] = useStatisticsState();
+  const [openAccordian, setIsOpenAccordian] = useState({
+    dataFilter: false,
+    scatterplot: false,
+    chip: false,
+    GCBias: false,
+    violin: false
+  });
 
   const resetFilter = type => {
     update("", type);
@@ -139,8 +145,11 @@ const SettingsPanel = ({
       value: value
     });
   }
-  const isDisabled = selectedCells ? true : false;
-  console.log("dis", isDisabled);
+  const isDisabled =
+    selectedCells.length > 0 && selectedCellsDispatchFrom !== "dataFilter"
+      ? true
+      : false;
+
   return (
     <Paper className={classes.settings} elevation={0}>
       <MetaData
@@ -176,6 +185,8 @@ const SettingsPanel = ({
       <AccordianWrapper
         classes={classes}
         name="dataFilter"
+        setIsOpenAccordian={setIsOpenAccordian}
+        openAccordian={openAccordian}
         key={"datafiltersAccordianWrapper"}
         title="Data Filters"
         isResetPossible={axisChange["datafilter"]}
@@ -210,6 +221,8 @@ const SettingsPanel = ({
         key={"scatterplotAccordianWrapper"}
         name="scatterplot"
         title="Scatterplot"
+        setIsOpenAccordian={setIsOpenAccordian}
+        openAccordian={openAccordian}
         isResetPossible={axisChange["scatterplot"]}
         resetFilter={() => {
           resetFilter("SCATTERPLOT_AXIS_RESET");
@@ -218,7 +231,6 @@ const SettingsPanel = ({
         <ScatterplotSettings
           classes={classes}
           analysis={analysis}
-          currentlySelectedAxis={scatterplotAxis}
           setAxisOption={value => update(value, "SCATTERPLOT_AXIS_UPDATE")}
           isDisabled={isDisabled}
         />
@@ -228,6 +240,8 @@ const SettingsPanel = ({
         key={"chipAccordianWrapper"}
         name="chip"
         title="Chip"
+        setIsOpenAccordian={setIsOpenAccordian}
+        openAccordian={openAccordian}
         isResetPossible={axisChange["chip"]}
         resetFilter={() => {
           resetFilter("CHIP_AXIS_RESET");
@@ -246,6 +260,8 @@ const SettingsPanel = ({
         classes={classes}
         name="violin"
         title="Violin"
+        setIsOpenAccordian={setIsOpenAccordian}
+        openAccordian={openAccordian}
         isResetPossible={axisChange["violin"]}
         resetFilter={() => {
           resetFilter("VIOLIN_AXIS_RESET");
@@ -254,7 +270,6 @@ const SettingsPanel = ({
         <ViolinSettings
           classes={classes}
           axisOptions={violinOptions}
-          currentlySelectedAxis={violinAxis}
           setAxisOption={value => update(value, "VIOLIN_AXIS_UPDATE")}
           isDisabled={isDisabled}
         />
@@ -264,6 +279,8 @@ const SettingsPanel = ({
         classes={classes}
         name="GCBias"
         title="GC Bias"
+        setIsOpenAccordian={setIsOpenAccordian}
+        openAccordian={openAccordian}
         isResetPossible={false}
         resetFilter={() => {
           resetFilter("GCBIAS_AXIS_RESET");
@@ -284,11 +301,22 @@ const AccordianWrapper = ({
   title,
   classes,
   resetFilter,
-  isResetPossible
+  isResetPossible,
+  setIsOpenAccordian,
+  openAccordian
 }) => (
-  <ExpansionPanel className={classes.expansionPanelRoot}>
-    <ExpansionPanelSummary
-      className={classes.expansionPanelSummary}
+  <Accordion
+    className={classes.AccordionRoot}
+    expanded={openAccordian[name]}
+    onChange={() =>
+      setIsOpenAccordian({
+        ...openAccordian,
+        [name]: !openAccordian[name]
+      })
+    }
+  >
+    <AccordionSummary
+      className={classes.AccordionSummary}
       expandIcon={<ExpandMoreIcon />}
       aria-controls={"panel-" + name + "-content"}
       id={"panel-" + name}
@@ -301,14 +329,14 @@ const AccordianWrapper = ({
           </Button>
         </AccordionActions>
       )}
-    </ExpansionPanelSummary>
-    <ExpansionPanelDetails
+    </AccordionSummary>
+    <AccordionDetails
       id={"panel-" + name + "-content"}
       className={classes.panelDetails}
     >
       {children}
-    </ExpansionPanelDetails>
-  </ExpansionPanel>
+    </AccordionDetails>
+  </Accordion>
 );
 
 const MetaData = ({ classes, count, analysis, library }) => (

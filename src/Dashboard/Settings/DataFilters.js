@@ -4,10 +4,13 @@ import { useDashboardState } from "../../Search/ProjectView/ProjectState/dashboa
 import gql from "graphql-tag";
 import { useQuery } from "react-apollo-hooks";
 import {
+  Checkbox,
   FormControl,
   FormControlLabel,
   Grid,
+  Input,
   InputLabel,
+  ListItemText,
   MenuItem,
   Select,
   Slider,
@@ -51,7 +54,7 @@ const DataFilters = ({
     isContaminated
   );
 
-  const [experimentalMenuValue, setExperimentalMenuValue] = useState(null);
+  const [experimentalMenuValue, setExperimentalMenuValue] = useState([]);
 
   const [paramObj, setParamObj] = useState({});
   useEffect(() => {
@@ -60,8 +63,11 @@ const DataFilters = ({
     }
   }, [axisChange]);
   useEffect(() => {
-    if (expCondition !== experimentalMenuValue) {
-      setExperimentalMenuValue(expCondition);
+    if (
+      expCondition &&
+      expCondition.split(",").length !== experimentalMenuValue.length
+    ) {
+      setExperimentalMenuValue([...expCondition.split(",")]);
     }
   }, [expCondition]);
   useEffect(() => {
@@ -75,7 +81,6 @@ const DataFilters = ({
       setQualityMenuValue(quality);
     }
   }, [quality]);
-
   return [
     <Grid
       container
@@ -117,7 +122,7 @@ const DataFilters = ({
           max={1.0}
         />
       </Grid>
-      <Grid item>
+      <Grid item className={classes.gridSlider}>
         <Typography
           id="discrete-slider"
           gutterBottom
@@ -137,24 +142,23 @@ const DataFilters = ({
                 checked={contaminatedMenuValue}
                 onChange={() => {
                   setContaminatedMenuValue(!contaminatedMenuValue);
-                  setParamObj["is_contaminated"] = {
+                  /*    setParamObj["is_contaminated"] = {
                     param: "is_contaminated",
                     value: contaminatedMenuValue.toString()
-                  };
+                  };*/
                   update(
                     {
                       isContaminated: contaminatedMenuValue
                     },
                     "CONTIMATED_UPDATE"
                   );
-                  //  sendQuery(client, dispatch, setParamObj);
                 }}
               />
             }
           />
         </FormControl>
       </Grid>
-      <Grid item>
+      <Grid item className={classes.gridSlider}>
         <Typography
           id="discrete-slider"
           key={"quality-slider"}
@@ -171,14 +175,19 @@ const DataFilters = ({
         >
           <Select
             key="experimentalCondition-Select"
-            value={experimentalMenuValue || ""}
+            value={experimentalMenuValue || []}
             name="experimentalConditionSelection"
             displayEmpty
+            input={<Input />}
+            multiple
+            renderValue={selected =>
+              selected.length > 1 ? selected.join(",") : selected
+            }
             onChange={event => {
               const value = event.target.value;
-              setExperimentalMenuValue(value);
-              if (value === "None") {
-                delete setParamObj["experimental_condition"];
+              if (value.indexOf("") !== -1) {
+                setExperimentalMenuValue([]);
+                setParamObj["experimental_condition"] = [];
                 update(
                   {
                     expCondition: null
@@ -186,13 +195,22 @@ const DataFilters = ({
                   "EXP_CONDITION_UPDATE"
                 );
               } else {
+                setExperimentalMenuValue(value);
+                var expValue = setParamObj["experimental_condition"]
+                  ? [...setParamObj["experimental_condition"], ...value]
+                  : [...value];
+
                 setParamObj["experimental_condition"] = {
                   param: "experimental_condition",
-                  value: value
+                  value: [...expValue]
                 };
+
                 update(
                   {
-                    expCondition: value
+                    expCondition:
+                      expValue.length > 1
+                        ? expValue.join(",")
+                        : value.toString()
                   },
                   "EXP_CONDITION_UPDATE"
                 );
@@ -200,12 +218,25 @@ const DataFilters = ({
             }}
           >
             <MenuItem value="" key={"none"}>
-              None
+              <Checkbox
+                checked={
+                  experimentalMenuValue === null ||
+                  experimentalMenuValue.length === 0
+                }
+              />
+              <ListItemText primary={"None"} />
             </MenuItem>
             {experimentalConditions.length > 0 && experimentalConditions[0]
               ? experimentalConditions[0]["types"].map((option, index) => (
                   <MenuItem key={"expCondition-" + option} value={option}>
-                    {option}
+                    <Checkbox
+                      checked={
+                        experimentalMenuValue
+                          ? experimentalMenuValue.indexOf(option) > -1
+                          : false
+                      }
+                    />
+                    <ListItemText primary={option} />
                   </MenuItem>
                 ))
               : null}
@@ -216,12 +247,13 @@ const DataFilters = ({
         <NumericalDataFilters
           filters={numericalDataFilters}
           classes={classes}
+          isDisabled={isDisabled}
         />
       )}
     </Grid>
   ];
 };
-const NumericalDataFilters = ({ filters, classes }) => {
+const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
   const [
     { axisChange, absoluteMinMaxDataFilters, selectedCells },
     dispatch
@@ -292,7 +324,7 @@ const NumericalDataFilters = ({ filters, classes }) => {
           value={defaultValues[filter["name"]]}
           className={classes.slider}
           color={"secondary"}
-          disabled={selectedCells ? true : false}
+          disabled={isDisabled}
           marks={[
             {
               value: filter["min"],

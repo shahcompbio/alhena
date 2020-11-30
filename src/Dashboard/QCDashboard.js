@@ -123,7 +123,8 @@ const QCDashboard = ({ analysis, classes, client }) => {
       isContaminated,
       numericalDataFilters,
       expCondition,
-      axisChange
+      axisChange,
+      subsetSelection
     },
     dispatch
   ] = useStatisticsState();
@@ -149,6 +150,7 @@ const QCDashboard = ({ analysis, classes, client }) => {
         const selection = data.numericalDataFilters.heatmapOrderFromDataFilters.map(
           order => order.order
         );
+        heatmapOrder = subsetSelection.length > 0 ? subsetSelection : selection;
         if (selection.length !== selectedCells.length) {
           dispatch({
             type: "BRUSH",
@@ -162,7 +164,6 @@ const QCDashboard = ({ analysis, classes, client }) => {
             ? selectedCells
             : data.heatmapOrder.map(order => order.order);
       }
-      //    console.log(heatmapOrder);
       return (
         <div className={classes.root}>
           <Grid
@@ -173,8 +174,14 @@ const QCDashboard = ({ analysis, classes, client }) => {
             key="QCContainer"
             className={classes.content}
           >
-            <Grid className={classes.settings} item xs={3}>
+            <Grid
+              key={"settingsPanelGrid"}
+              className={classes.settings}
+              item
+              xs={3}
+            >
               <SettingsPanel
+                key={"settingsPanel"}
                 client={client}
                 numericalDataFilters={
                   data.numericalDataFilters.numericalDataFilters
@@ -187,21 +194,62 @@ const QCDashboard = ({ analysis, classes, client }) => {
               />
             </Grid>
 
-            <Grid item className={classes.plots} xs={9}>
-              {heatmapOrder && heatmapOrder.length === 0 ? (
+            {heatmapOrder && heatmapOrder.length === 0 ? (
+              <Grid item className={classes.plots} xs={9} key={"plotPanelGrid"}>
                 <Paper
                   className={[classes.scatterplot, classes.paperContainer]}
                 >
                   <div>NO CELLS SELECTED</div>
                 </Paper>
-              ) : (
+              </Grid>
+            ) : (
+              <Grid item className={classes.plots} xs={9} key={"plotPanelGrid"}>
                 <Paper
+                  key={"heatmapPaper"}
+                  className={[classes.heatmapContent, classes.paperContainer]}
+                >
+                  <Heatmap
+                    key={"heatmapPlot"}
+                    analysis={analysis}
+                    allHeatmapOrder={heatmapOrder}
+                    categoryStats={data.categoriesStats}
+                  />
+                </Paper>
+                <Paper
+                  key={"chipPaper"}
+                  className={[classes.chip, classes.paperContainer]}
+                >
+                  <Chip key={"chipPlot"} analysis={analysis} />
+                </Paper>
+                <Paper
+                  key={"violinPaper"}
+                  className={[classes.violinContent, classes.paperContainer]}
+                >
+                  <Violin
+                    key={"violinPlot"}
+                    analysis={analysis}
+                    allHeatmapOrder={heatmapOrder}
+                    categoryStats={data.categoriesStats}
+                  />
+                </Paper>
+                <Paper
+                  key={"gcBiasPaper"}
+                  className={[classes.gcBias, classes.paperContainer]}
+                >
+                  <GCBias
+                    key={"gcBiasPlot"}
+                    analysis={analysis}
+                    heatmapOrder={heatmapOrder}
+                  />
+                </Paper>
+                <Paper
+                  key={"scatterPaper"}
                   className={[classes.scatterplot, classes.paperContainer]}
                 >
-                  <Scatterplot analysis={analysis} />
+                  <Scatterplot key={"scatterplot"} analysis={analysis} />
                 </Paper>
-              )}
-            </Grid>
+              </Grid>
+            )}
           </Grid>
         </div>
       );
@@ -211,58 +259,110 @@ const QCDashboard = ({ analysis, classes, client }) => {
     }
   } else {
     return (
-      <Grid
-        container
-        direction="row"
-        justify="flex-start"
-        alignItems="flex-start"
-        key="QCContainer"
-        className={classes.content}
-        spacing={3}
-      >
-        <Grid className={classes.settings} item>
-          <SettingsPanel
-            cellCount={null}
-            categoryStats={[]}
-            analysis={null}
-            scatterplotOptions={[]}
-            violionOptions={[]}
-          />
+      <div className={classes.root}>
+        <Grid
+          container
+          direction="row"
+          justify="flex-start"
+          alignItems="flex-start"
+          key="QCContainer"
+          className={classes.content}
+        >
+          <Grid
+            key={"settingsPanelGrid"}
+            className={classes.settings}
+            item
+            xs={3}
+          >
+            <SettingsPanel
+              key={"settingsPanel"}
+              cellCount={null}
+              categoryStats={[]}
+              analysis={null}
+              scatterplotOptions={[]}
+              violionOptions={[]}
+            />
+          </Grid>
+          <Grid item className={classes.plots} xs={9} key={"plotPanelGrid"}>
+            <Paper
+              key={"heatmapPaper"}
+              className={[classes.heatmapContent, classes.paperContainer]}
+            >
+              <LoadingCircle />
+            </Paper>
+            <Paper
+              key={"chipPaper"}
+              className={[classes.chip, classes.paperContainer]}
+            >
+              <LoadingCircle />
+            </Paper>
+            <Paper
+              key={"violinPaper"}
+              className={[classes.violinContent, classes.paperContainer]}
+            >
+              <LoadingCircle />
+            </Paper>
+            <Paper
+              key={"gcBiasPaper"}
+              className={[classes.gcBias, classes.paperContainer]}
+            >
+              <LoadingCircle />
+            </Paper>
+            <Paper
+              key={"scatterPaper"}
+              className={[classes.scatterplot, classes.paperContainer]}
+            >
+              <LoadingCircle />
+            </Paper>
+          </Grid>
         </Grid>
-        <Grid item className={classes.plots}>
-          <Paper className={[classes.chip, classes.paperContainer]}>
-            <LoadingCircle />
-          </Paper>
-        </Grid>
-      </Grid>
+      </div>
     );
   }
 };
 /*
 <Paper
+  key={"heatmapPaper"}
   className={[classes.heatmapContent, classes.paperContainer]}
 >
   <Heatmap
+    key={"heatmapPlot"}
     analysis={analysis}
     allHeatmapOrder={heatmapOrder}
     categoryStats={data.categoriesStats}
   />
-</Paper><Paper className={[classes.chip, classes.paperContainer]}>
-  <Chip analysis={analysis} />
 </Paper>
 <Paper
+  key={"chipPaper"}
+  className={[classes.chip, classes.paperContainer]}
+>
+  <Chip key={"chipPlot"} analysis={analysis} />
+</Paper>
+<Paper
+  key={"violinPaper"}
   className={[classes.violinContent, classes.paperContainer]}
 >
   <Violin
+    key={"violinPlot"}
     analysis={analysis}
     allHeatmapOrder={heatmapOrder}
     categoryStats={data.categoriesStats}
   />
 </Paper>
-<Paper className={[classes.gcBias, classes.paperContainer]}>
-  <GCBias analysis={analysis} heatmapOrder={heatmapOrder} />
+<Paper
+  key={"gcBiasPaper"}
+  className={[classes.gcBias, classes.paperContainer]}
+>
+  <GCBias
+    key={"gcBiasPlot"}
+    analysis={analysis}
+    heatmapOrder={heatmapOrder}
+  />
 </Paper>
-<Paper className={[classes.scatterplot, classes.paperContainer]}>
-  <Scatterplot analysis={analysis} />
+<Paper
+  key={"scatterPaper"}
+  className={[classes.scatterplot, classes.paperContainer]}
+>
+  <Scatterplot key={"scatterplot"} analysis={analysis} />
 </Paper>*/
 export default withStyles(styles)(QCDashboard);

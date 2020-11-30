@@ -13,7 +13,7 @@ import _ from "lodash";
 
 import Grid from "@material-ui/core/Grid";
 
-import { initContext } from "../utils.js";
+import { initContext, getSelection, isSelectionAllowed } from "../utils.js";
 import { useStatisticsState } from "../DashboardState/statsState";
 import { scaleLinear } from "d3-scale";
 import d3Tip from "d3-tip";
@@ -69,16 +69,18 @@ const Chip = ({ analysis, classes }) => {
       selectedCells,
       selectedCellsDispatchFrom,
       chipHeatmapAxis,
-      subsetSelection
+      subsetSelection,
+      axisChange
     }
   ] = useStatisticsState();
 
-  const selection =
-    selectedCellsDispatchFrom === selfType
-      ? []
-      : subsetSelection.length > 0
-      ? subsetSelection
-      : selectedCells;
+  const selection = getSelection(
+    axisChange,
+    subsetSelection,
+    selectedCells,
+    selectedCellsDispatchFrom,
+    selfType
+  );
   return (
     <Query
       query={CHIP_HEATMAP_QUERY}
@@ -108,11 +110,13 @@ const Chip = ({ analysis, classes }) => {
               <ChipHeatmap
                 data={chipHeatmap}
                 key="chip"
-                selectionAllowed={
-                  selectedCellsDispatchFrom === selfType ||
-                  selectedCellsDispatchFrom === null ||
-                  selectedCellsDispatchFrom === undefined
-                }
+                selectionAllowed={isSelectionAllowed(
+                  selfType,
+                  selectedCellsDispatchFrom,
+                  subsetSelection,
+                  selectedCells,
+                  axisChange
+                )}
               />
             </Grid>
             <Grid item className={classes.legend} key="legendWrapper">

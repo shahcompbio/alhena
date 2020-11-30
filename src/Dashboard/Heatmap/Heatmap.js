@@ -89,14 +89,16 @@ const getIndicesFromAllHeatmapOrder = allHeatmapOrder =>
   );
 
 const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
-  const [{ quality, selectedCells }] = useStatisticsState();
+  const [{ quality, selectedCells, subsetSelection }] = useStatisticsState();
   const [heatmapOrder, setHeatmapOrder] = useState([]);
   const [hoverCell, setHoverCell] = useState({ cell: {} });
   const [indices, setIndices] = useState([]);
   useEffect(() => {
-    setHeatmapOrder([...allHeatmapOrder]);
-    setIndices([...getIndicesFromAllHeatmapOrder(allHeatmapOrder)]);
-  }, [allHeatmapOrder]);
+    if (allHeatmapOrder) {
+      setHeatmapOrder([...allHeatmapOrder]);
+      setIndices([...getIndicesFromAllHeatmapOrder(allHeatmapOrder)]);
+    }
+  }, [allHeatmapOrder, selectedCells, subsetSelection]);
 
   const heatmapOrderToHeatmapIndex = scalePoint()
     .domain([...heatmapOrder])
@@ -191,6 +193,7 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
                 />
               </Grid>
               <Grid item>
+                {" "}
                 <Minimap
                   triggerHeatmapRequery={index => setIndices([...index])}
                   heatmapOrder={heatmapOrder}

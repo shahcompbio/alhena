@@ -8,7 +8,7 @@ import Grid from "@material-ui/core/Grid";
 
 import { useStatisticsState } from "../DashboardState/statsState";
 
-import { initContext } from "../utils.js";
+import { initContext, getSelection, isSelectionAllowed } from "../utils.js";
 
 const selfType = "gcBias";
 
@@ -50,15 +50,17 @@ const GCBias = ({ analysis }) => {
       quality,
       selectedCells,
       selectedCellsDispatchFrom,
-      subsetSelection
+      subsetSelection,
+      axisChange
     }
   ] = useStatisticsState();
-  const selection =
-    selectedCellsDispatchFrom === selfType
-      ? []
-      : subsetSelection.length > 0
-      ? subsetSelection
-      : selectedCells;
+  const selection = getSelection(
+    axisChange,
+    subsetSelection,
+    selectedCells,
+    selectedCellsDispatchFrom,
+    selfType
+  );
 
   return (
     <Query
@@ -88,11 +90,13 @@ const GCBias = ({ analysis }) => {
             <Grid item key="gcBiasWrapper">
               <Plot
                 data={gcBias}
-                selectionAllowed={
-                  selectedCellsDispatchFrom === selfType ||
-                  selectedCellsDispatchFrom === null ||
-                  selectedCellsDispatchFrom === undefined
-                }
+                selectionAllowed={isSelectionAllowed(
+                  selfType,
+                  selectedCellsDispatchFrom,
+                  subsetSelection,
+                  selectedCells,
+                  axisChange
+                )}
                 key="plot"
               />
             </Grid>

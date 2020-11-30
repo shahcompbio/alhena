@@ -1,4 +1,5 @@
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import * as d3 from "d3";
 import logo from "../config/LoginTitle.png";
 import { login } from "../util/utils.js";
 import { useAppState } from "../util/app-state";
@@ -72,6 +73,30 @@ const UnauthenticatedApp = ({ client, classes }) => {
   const passwordRef = useRef();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [ref] = useHookWithRefCallback();
+  function useHookWithRefCallback() {
+    const ref = useRef(null);
+    const setRef = useCallback(node => {
+      if (node) {
+        const title = d3.select("#title");
+        title
+          .append("text")
+          .attr("x", 10)
+          .attr("y", 100)
+          .attr("dy", ".35em")
+          .text(function(d) {
+            return "ALHENA";
+          });
+        /*  title
+          .transition()
+          .duration(2000)
+          .delay(2000)
+          .attr("d", "M75,300 A125,125 0 0,1 325,300");*/
+      }
+    }, []);
+
+    return [setRef];
+  }
 
   const handleLogin = async (event, client, dispatch) => {
     setError(null);
@@ -101,7 +126,33 @@ const UnauthenticatedApp = ({ client, classes }) => {
           <SnackbarContentWrapper variant="error" errorNumber={error} />
         )}
       </div>
-      <img alt="logo" src={logo} className={classes.logo} />
+      <div
+        ref={ref}
+        alt="logo"
+        style={{
+          //  backgroundImage: `url(${logo})`,
+          backgroundPosition: "50% 50%",
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+          imageRendering: "-webkit-optimize-contrast",
+          height: "191px",
+          width: "528px"
+        }}
+        className={classes.logo}
+        height={"191px"}
+        width={"528px"}
+      >
+        <svg
+          id="title"
+          style={{
+            pointerEvents: "all",
+            width: 500,
+            height: 200,
+            position: "relative"
+          }}
+        />
+      </div>
 
       <div className={classes.inputWrapper}>
         {loading ? (

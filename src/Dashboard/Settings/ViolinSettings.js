@@ -1,18 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
 import { FormControl, InputLabel, Select } from "@material-ui/core";
 
+import { useStatisticsState } from "../DashboardState/statsState";
 const ViolinSettings = ({
   classes,
   axisOptions,
   setAxisOption,
-  currentlySelectedAxis,
   isDisabled
 }) => {
-  const [xAxisLabel, setXAxisLabel] = useState(currentlySelectedAxis.x.type);
-  const [yAxisLabel, setYAxisLabel] = useState(currentlySelectedAxis.y.type);
+  const [{ quality, violinAxis }, dispatch] = useStatisticsState();
+  const [xAxisLabel, setXAxisLabel] = useState(violinAxis.x.type);
+  const [yAxisLabel, setYAxisLabel] = useState(violinAxis.y.type);
+
+  useEffect(() => {
+    if (violinAxis) {
+      if (violinAxis.x.type !== xAxisLabel) {
+        setXAxisLabel(violinAxis.x.type);
+      }
+      if (violinAxis.y.type !== yAxisLabel) {
+        setYAxisLabel(violinAxis.y.type);
+      }
+    }
+  }, [violinAxis]);
 
   const handleAxisChange = name => event => {
-    var axisObjext = currentlySelectedAxis;
+    var axisObjext = violinAxis;
     axisObjext[name] = {
       type: event.target.value,
       label: event.target.selectedOptions[0].label
