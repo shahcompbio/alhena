@@ -100,7 +100,7 @@ const Scatterplot = ({ analysis, classes }) => {
     selectedCellsDispatchFrom,
     selfType
   );
-
+  console.log(selection);
   return (
     <Query
       query={SCATTERPLOT_QUERY}
@@ -175,11 +175,9 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     .nice();
 
   useEffect(() => {
-    console.log(selectionAllowed);
     if (selectionAllowed && selectedCells.length === 0 && context) {
       //  polyList = [];
       //  lassPath = "";
-      console.log("lets draw more???");
       context.clearRect(
         0,
         0,
@@ -410,8 +408,6 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
 
         context.fill();
         var lassoSvgPath = new Path2D(lassPath);
-        console.log(lassoSvgPath);
-        console.log(context);
         lassoSvgPath.closePath();
         context.fill(lassoSvgPath, "evenodd");
         context.fill();
@@ -428,12 +424,11 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
         context.restore();
 
         lassPath = "";
-        console.log(selectedNodes);
         if (selectedNodes.length > 0) {
           const highlightedCellsObject = createHighlightedObjectFromArray(
             selectedNodes
           );
-          console.log(highlightedCellsObject);
+
           drawPoints(context, data, highlightedCellsObject);
 
           saveContext(context);
@@ -509,7 +504,6 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     context.strokeStyle = "black";
 
     data.map(point => {
-      console.log(point);
       context.beginPath();
       context.arc(x(point.x), y(point.y), 4, 0, Math.PI * 2, true);
       if (!highlightedCells) {

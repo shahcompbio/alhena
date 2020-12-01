@@ -49,7 +49,7 @@ export const getSelection = (
     selectedCellsDispatchFrom === selfType
   ) {
     //came from here
-    selection = [];
+    selection = selectedCells;
   } else if (
     axisChange["datafilter"] &&
     subsetSelection.length !== 0 &&
