@@ -13,7 +13,7 @@ import _ from "lodash";
 
 import Grid from "@material-ui/core/Grid";
 
-import { initContext } from "../utils.js";
+import { initContext, getSelection, isSelectionAllowed } from "../utils.js";
 import { useStatisticsState } from "../DashboardState/statsState";
 import { scaleLinear } from "d3-scale";
 import d3Tip from "d3-tip";
@@ -64,10 +64,23 @@ const CHIP_HEATMAP_QUERY = gql`
 
 const Chip = ({ analysis, classes }) => {
   const [
-    { quality, selectedCells, selectedCellsDispatchFrom, chipHeatmapAxis }
+    {
+      quality,
+      selectedCells,
+      selectedCellsDispatchFrom,
+      chipHeatmapAxis,
+      subsetSelection,
+      axisChange
+    }
   ] = useStatisticsState();
-  const selection = selectedCellsDispatchFrom === selfType ? [] : selectedCells;
 
+  const selection = getSelection(
+    axisChange,
+    subsetSelection,
+    selectedCells,
+    selectedCellsDispatchFrom,
+    selfType
+  );
   return (
     <Query
       query={CHIP_HEATMAP_QUERY}
@@ -97,11 +110,13 @@ const Chip = ({ analysis, classes }) => {
               <ChipHeatmap
                 data={chipHeatmap}
                 key="chip"
-                selectionAllowed={
-                  selectedCellsDispatchFrom === selfType ||
-                  selectedCellsDispatchFrom === null ||
-                  selectedCellsDispatchFrom === undefined
-                }
+                selectionAllowed={isSelectionAllowed(
+                  selfType,
+                  selectedCellsDispatchFrom,
+                  subsetSelection,
+                  selectedCells,
+                  axisChange
+                )}
               />
             </Grid>
             <Grid item className={classes.legend} key="legendWrapper">
@@ -133,7 +148,7 @@ const getHeatmapOrderFromExtent = (extent, data) =>
     .sort((a, b) => a - b);
 
 const ChipHeatmap = ({ data, selectionAllowed }) => {
-  const [{ selectedCells }, dispatch] = useStatisticsState();
+  const [{ selectedCells, axisChange }, dispatch] = useStatisticsState();
 
   const colourScale = d3.scaleLinear(
     [0, data.stats.max],
@@ -210,11 +225,20 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
       drawBackground(context);
       drawBackgroundLines(context);
       drawWells(data.squares, context, extentHighlight);
-      dispatch({
-        type: "BRUSH",
-        value: extentHighlight,
-        dispatchedFrom: selfType
-      });
+      if (axisChange["datafilter"]) {
+        dispatch({
+          type: "BRUSH",
+          value: extentHighlight,
+          dispatchedFrom: selfType,
+          subsetSelection: extentHighlight
+        });
+      } else {
+        dispatch({
+          type: "BRUSH",
+          value: extentHighlight,
+          dispatchedFrom: selfType
+        });
+      }
     }
   }, [extentHighlight]);
 

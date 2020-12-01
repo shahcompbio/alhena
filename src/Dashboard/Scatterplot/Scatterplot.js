@@ -12,7 +12,7 @@ import _ from "lodash";
 import Grid from "@material-ui/core/Grid";
 
 import { useStatisticsState } from "../DashboardState/statsState";
-import { initContext } from "../utils.js";
+import { initContext, isSelectionAllowed, getSelection } from "../utils.js";
 
 const scatterplotDimension = 550;
 const histogramMaxHeight = 55;
@@ -81,13 +81,26 @@ const SCATTERPLOT_QUERY = gql`
 
 const Scatterplot = ({ analysis, classes }) => {
   const [
-    { quality, selectedCellsDispatchFrom, selectedCells, scatterplotAxis }
+    {
+      quality,
+      selectedCellsDispatchFrom,
+      selectedCells,
+      scatterplotAxis,
+      axisChange,
+      subsetSelection
+    }
   ] = useStatisticsState();
 
   const xAxis = scatterplotAxis.x.type;
   const yAxis = scatterplotAxis.y.type;
-  const selection = selectedCellsDispatchFrom === selfType ? [] : selectedCells;
-
+  const selection = getSelection(
+    axisChange,
+    subsetSelection,
+    selectedCells,
+    selectedCellsDispatchFrom,
+    selfType
+  );
+  console.log(selection);
   return (
     <Query
       query={SCATTERPLOT_QUERY}
@@ -119,11 +132,13 @@ const Scatterplot = ({ analysis, classes }) => {
                 data={scatterplot.points}
                 stats={scatterplot.stats}
                 histogram={scatterplot.histogram}
-                selectionAllowed={
-                  selectedCellsDispatchFrom === selfType ||
-                  selectedCellsDispatchFrom === null ||
-                  selectedCellsDispatchFrom === undefined
-                }
+                selectionAllowed={isSelectionAllowed(
+                  selfType,
+                  selectedCellsDispatchFrom,
+                  subsetSelection,
+                  selectedCells,
+                  axisChange
+                )}
                 key="plot"
               />
             </Grid>
@@ -135,9 +150,11 @@ const Scatterplot = ({ analysis, classes }) => {
 };
 
 const Plot = ({ data, stats, histogram, selectionAllowed }) => {
-  const [{ scatterplotAxis, selectedCells }, dispatch] = useStatisticsState();
+  const [
+    { scatterplotAxis, selectedCells, axisChange, subsetSelection },
+    dispatch
+  ] = useStatisticsState();
   const [context, saveContext] = useState();
-
   var polyList = [];
   const [ref] = useHookWithRefCallback();
 
@@ -158,36 +175,24 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     .nice();
 
   useEffect(() => {
-    if (selectedCells.length === 0 && context) {
-      polyList = [];
-      lassPath = "";
-
+    if (selectionAllowed && selectedCells.length === 0 && context) {
+      //  polyList = [];
+      //  lassPath = "";
       context.clearRect(
         0,
         0,
         scatterplotDimension + histogramMaxHeight + margin.histogram,
         scatterplotDimension + histogramMaxHeight + margin.histogram
       );
-
+      //  saveContext(context);
+      appendEventListenersToCanvas(context);
       drawPoints(context, data);
       drawAxis(context, x, y);
       drawAxisLabels(context, x, y, stats, scatterplotAxis);
 
       drawHistogram(context, histogram, stats, x, y);
     }
-  }, [selectedCells]);
-
-  useEffect(() => {
-    if (selectedCells.length === 0 && context) {
-      context.restore();
-
-      drawPoints(context, data);
-      drawAxis(context, x, y);
-      drawAxisLabels(context, x, y, stats, scatterplotAxis);
-
-      drawHistogram(context, histogram, stats, x, y);
-    }
-  }, [selectedCells]);
+  }, [selectedCells, subsetSelection]);
 
   useEffect(() => {
     if (context) {
@@ -202,8 +207,10 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
         .select("#scatterSelection")
         .selectAll("rect")
         .data(data);
+
       //old data to remove
       newData.exit().remove();
+
       //old data to update
       newData
         .attr("x", function(d) {
@@ -211,7 +218,9 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
         })
         .attr("y", function(d) {
           return y(d.y);
-        });
+        })
+        .attr("width", 1)
+        .attr("height", 1);
       //new data to add
       newData
         .enter()
@@ -225,14 +234,14 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
           return y(d.y);
         });
 
-      saveContext(context);
       drawPoints(context, data);
       drawAxis(context, x, y);
       drawAxisLabels(context, x, y, stats, scatterplotAxis);
       if (selectedCells.length !== 1) {
         drawHistogram(context, histogram, stats, x, y);
       }
-      if (!selectionAllowed || selectedCells.length > 0) {
+      appendEventListenersToCanvas(context);
+      if (!selectionAllowed || subsetSelection.length > 0) {
         removePointerEventsFromCanvas();
       } else {
         appendPointerEventsToCanvas();
@@ -262,10 +271,26 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
           );
 
         const scatterSelection = d3.select("#scatterSelection");
-
-        scatterSelection
+        const newData = d3
+          .select("#scatterSelection")
           .selectAll("rect")
-          .data(data)
+          .data(data);
+
+        //old data to remove
+        newData.exit().remove();
+
+        //old data to update
+        newData
+          .attr("x", function(d) {
+            return x(d.x);
+          })
+          .attr("y", function(d) {
+            return y(d.y);
+          })
+          .attr("width", 1)
+          .attr("height", 1);
+        //new data to add
+        newData
           .enter()
           .append("rect")
           .attr("width", 1)
@@ -276,14 +301,20 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
           .attr("y", function(d) {
             return y(d.y);
           });
-
         const context = initContext(
           canvas,
           scatterplotDimension + histogramMaxHeight + margin.histogram,
           scatterplotDimension
         );
         saveContext(context);
+
         appendEventListenersToCanvas(context);
+        drawPoints(context, data);
+        drawAxis(context, x, y);
+        drawAxisLabels(context, x, y, stats, scatterplotAxis);
+
+        drawHistogram(context, histogram, stats, x, y);
+        scatterSelection.call(tooltip);
       }
     }, []);
 
@@ -308,10 +339,13 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     mousePos.x = e.clientX - boundingRect.left;
     mousePos.y = e.clientY - boundingRect.top;
   }
-
-  function drawLasso(e, context, boundingRect) {
+  function setD3MousePosition(event, boundingRect) {
+    mousePos.x = event.pageX - boundingRect.left;
+    mousePos.y = event.pageY - boundingRect.top;
+  }
+  function drawLasso(context, boundingRect, x, y) {
     // mouse left button must be pressed
-    if (e.buttons !== 1) return;
+    if (d3.event.buttons !== 1) return;
 
     context.lineCap = "round";
     context.strokeStyle = "#c0392b";
@@ -324,8 +358,8 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
         ? "M " + mousePos.x + " " + mousePos.y + " "
         : "L " + mousePos.x + " " + mousePos.y + " ";
 
-    setMousePosition(e, boundingRect);
-
+    //setMousePosition(e, boundingRect);
+    setD3MousePosition(d3.event, boundingRect);
     context.lineTo(mousePos.x, mousePos.y);
     lassPath += "L " + mousePos.x + " " + mousePos.y + " ";
     polyList = [...polyList, [mousePos.x, mousePos.y]];
@@ -344,35 +378,27 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     var docCanvas = document.getElementById("scatterCanvas");
     const scatterSelection = d3.select("#scatterSelection");
 
-    docCanvas.addEventListener(
-      "mousemove",
-      function(e) {
-        drawLasso(e, context, this.getBoundingClientRect());
-      },
-      false
-    );
-
-    docCanvas.addEventListener(
-      "mousedown",
-      function(e) {
+    d3.select("#scatterCanvas")
+      .on("mousemove", function mousemove(e) {
+        drawLasso(
+          context,
+          this.getBoundingClientRect(),
+          d3.event.pageX,
+          d3.event.pageY
+        );
+      })
+      .on("mousedown", function mousedown() {
         context.restore();
         context.beginPath();
         polyList = [];
-        setMousePosition(e, this.getBoundingClientRect());
-      },
-      false
-    );
-
-    docCanvas.addEventListener(
-      "mouseenter",
-      function(e) {
-        setMousePosition(e, this.getBoundingClientRect());
-      },
-      false
-    );
-    docCanvas.addEventListener(
-      "mouseup",
-      function(e) {
+        setD3MousePosition(d3.event, this.getBoundingClientRect());
+        //setMousePosition(e, this.getBoundingClientRect());
+      })
+      .on("mouseenter", function mouseenter(e) {
+        setD3MousePosition(d3.event, this.getBoundingClientRect());
+        //setMousePosition(e, this.getBoundingClientRect());
+      })
+      .on("mouseup", function mouseup(e) {
         context.save();
 
         context.strokeWidth = 1;
@@ -382,17 +408,19 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
 
         context.fill();
         var lassoSvgPath = new Path2D(lassPath);
-
+        lassoSvgPath.closePath();
         context.fill(lassoSvgPath, "evenodd");
+        context.fill();
         context.closePath();
 
         var selectedNodes = [];
-        scatterSelection.selectAll("rect").each(d => {
-          if (isPointInPoly(polyList, { x: x(d.x), y: y(d.y) })) {
+        scatterSelection.selectAll("rect").each(function(d) {
+          const xCord = d3.select(this).attr("x");
+          const yCord = d3.select(this).attr("y");
+          if (isPointInPoly(polyList, { x: xCord, y: yCord })) {
             selectedNodes = [...selectedNodes, d["heatmapOrder"]];
           }
         });
-
         context.restore();
 
         lassPath = "";
@@ -400,24 +428,26 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
           const highlightedCellsObject = createHighlightedObjectFromArray(
             selectedNodes
           );
+
           drawPoints(context, data, highlightedCellsObject);
+
           saveContext(context);
-          dispatch({
-            type: "BRUSH",
-            value: selectedNodes,
-            dispatchedFrom: selfType
-          });
+          if (axisChange["datafilter"]) {
+            dispatch({
+              type: "BRUSH",
+              value: selectedNodes,
+              dispatchedFrom: selfType,
+              subsetSelection: selectedNodes
+            });
+          } else {
+            dispatch({
+              type: "BRUSH",
+              value: selectedNodes,
+              dispatchedFrom: selfType
+            });
+          }
         }
-      },
-      false
-    );
-    drawPoints(context, data);
-    drawAxis(context, x, y);
-    drawAxisLabels(context, x, y, stats, scatterplotAxis);
-
-    drawHistogram(context, histogram, stats, x, y);
-
-    scatterSelection.call(tooltip);
+      });
   };
   const drawAxisLabels = (context, x, y, stats, labels) => {
     context.save();

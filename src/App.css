@@ -10,7 +10,11 @@
   height: 40vmin;
   pointer-events: none;
 }
-
+#title {
+  fill: #345c70;
+  font-kerning: 2px;
+  font-size: 120px;
+}
 .App-header {
   background-color: #2b2a2a;
   min-height: 100vh;

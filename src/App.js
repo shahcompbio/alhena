@@ -29,12 +29,13 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 
 const App = () => {
   const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
-  const [width, height] = useWindowSize();
+
+  //const [width, height] = useWindowSize();
   let history = useHistory();
 
-  useEffect(() => {
+  /*  useEffect(() => {
     if (height && width) {
-      dispatch({
+      /*  dispatch({
         type: "SIZE_CHANGE",
         width: width,
         height: height
@@ -54,7 +55,7 @@ const App = () => {
       return () => window.removeEventListener("resize", updateSize);
     }, []);
     return size;
-  }
+  }*/
 
   return (
     <MuiThemeProvider theme={theme}>
@@ -118,6 +119,21 @@ const App = () => {
           )}
         />
         {authKeyID && [
+          <Route
+            key="ticketSandbox"
+            path="/sandbox"
+            component={({ match }) => {
+              var uri = match;
+              //  SC-3079
+              uri.params.ticket = "sc-3964";
+              //uri.params.ticket = "sc-2978";
+              return (
+                <ApolloConsumer>
+                  {client => <DashboardWrapper uri={uri} client={client} />}
+                </ApolloConsumer>
+              );
+            }}
+          />,
           <Route
             key="graph"
             path="/graph"

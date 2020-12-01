@@ -39,8 +39,10 @@ const styles = theme => ({
     overflowY: "scroll",
     backgroundColor: "lightgrey"
   },
-
   whiteBorder: {
+    "& .MuiAutocomplete-popper": {
+      marginTop: -15
+    },
     "& .MuiInputBase-root": {
       color: "white"
     },

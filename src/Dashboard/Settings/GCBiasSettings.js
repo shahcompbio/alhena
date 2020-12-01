@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { FormControl, FormControlLabel, Switch } from "@material-ui/core";
 
-const GCBiasSettings = ({ classes, setAxisOption }) => {
-  const [checked, setChecked] = useState(true);
+import { useStatisticsState } from "../DashboardState/statsState";
+
+const GCBiasSettings = ({ classes, setAxisOption, isDisabled }) => {
+  const [{ gcBiasIsGrouped }, dispatch] = useStatisticsState();
+  const [checked, setChecked] = useState(gcBiasIsGrouped);
   const toggleSwitch = () => {
     setAxisOption(!checked);
     setChecked(!checked);
@@ -13,6 +16,7 @@ const GCBiasSettings = ({ classes, setAxisOption }) => {
         variant="outlined"
         key="gcbiasFormControll"
         className={classes.formControl}
+        disabled={isDisabled}
       >
         <FormControlLabel
           control={<Switch checked={checked} onChange={toggleSwitch} />}

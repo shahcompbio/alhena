@@ -124,6 +124,7 @@ const Minimap = ({
           triggerHeatmapRequery(heatmapIndex);
         }
       }
+      brushSvg.selectAll(".brush").remove();
       var gBrush = brushSvg.append("g").attr("class", "brush");
 
       gBrush.call(brush);

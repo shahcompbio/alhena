@@ -8,7 +8,7 @@ import Grid from "@material-ui/core/Grid";
 
 import { useStatisticsState } from "../DashboardState/statsState";
 
-import { initContext } from "../utils.js";
+import { initContext, getSelection, isSelectionAllowed } from "../utils.js";
 
 const selfType = "gcBias";
 
@@ -45,9 +45,22 @@ const GCBIAS_QUERY = gql`
 
 const GCBias = ({ analysis }) => {
   const [
-    { gcBiasIsGrouped, quality, selectedCells, selectedCellsDispatchFrom }
+    {
+      gcBiasIsGrouped,
+      quality,
+      selectedCells,
+      selectedCellsDispatchFrom,
+      subsetSelection,
+      axisChange
+    }
   ] = useStatisticsState();
-  const selection = selectedCellsDispatchFrom === selfType ? [] : selectedCells;
+  const selection = getSelection(
+    axisChange,
+    subsetSelection,
+    selectedCells,
+    selectedCellsDispatchFrom,
+    selfType
+  );
 
   return (
     <Query
@@ -77,11 +90,13 @@ const GCBias = ({ analysis }) => {
             <Grid item key="gcBiasWrapper">
               <Plot
                 data={gcBias}
-                selectionAllowed={
-                  selectedCellsDispatchFrom === selfType ||
-                  selectedCellsDispatchFrom === null ||
-                  selectedCellsDispatchFrom === undefined
-                }
+                selectionAllowed={isSelectionAllowed(
+                  selfType,
+                  selectedCellsDispatchFrom,
+                  subsetSelection,
+                  selectedCells,
+                  axisChange
+                )}
                 key="plot"
               />
             </Grid>
@@ -103,7 +118,10 @@ const gcBiasDim = {
   height: margin.top + plotHeight + margin.bottom
 };
 const Plot = ({ data, selectionAllowed }) => {
-  const [{ gcBiasAxis, selectedCells }, dispatch] = useStatisticsState();
+  const [
+    { gcBiasAxis, selectedCells, axisChange },
+    dispatch
+  ] = useStatisticsState();
 
   const [context, saveContext] = useState();
 
@@ -317,17 +335,26 @@ const Plot = ({ data, selectionAllowed }) => {
             drawAxisLabels(context, x, y, gcBiasAxis);
             drawLegend(context, data, svg, canvasPaths);
 
-            dispatch({
-              type: "BRUSH",
-              value: [
-                ...data.filter(
-                  option =>
-                    option["experimentalCondition"] ===
-                    category["experimentalCondition"]
-                )[0]["cellOrder"]
-              ],
-              dispatchedFrom: selfType
-            });
+            const selection = data.filter(
+              option =>
+                option["experimentalCondition"] ===
+                category["experimentalCondition"]
+            )[0]["cellOrder"];
+
+            if (axisChange["datafilter"]) {
+              dispatch({
+                type: "BRUSH",
+                value: [...selection],
+                subsetSelection: [...selection],
+                dispatchedFrom: selfType
+              });
+            } else {
+              dispatch({
+                type: "BRUSH",
+                value: [...selection],
+                dispatchedFrom: selfType
+              });
+            }
           }
         })
         .on("mouseover", function(d) {

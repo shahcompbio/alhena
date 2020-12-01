@@ -3,12 +3,19 @@ const initialState = (dashboards, selectedDashboard, selectedAnalysis) => {
     dashboards: dashboards,
     selectedDashboard: selectedDashboard,
     selectedAnalysis: selectedAnalysis,
-    filterMouseover: null
+    filterMouseover: null,
+    dimensions: { width: 0, height: 0 }
   };
 };
 
 const statsStateReducer = (state, action) => {
   switch (action.type) {
+    case "SIZE_CHANGE": {
+      return {
+        ...state,
+        dimensions: { width: action.width, height: action.height }
+      };
+    }
     case "DASHBOARD_SELECT": {
       return {
         ...state,

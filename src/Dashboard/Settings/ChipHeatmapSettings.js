@@ -5,7 +5,8 @@ const ChipHeatmapSettings = ({
   classes,
   axisOptions,
   setAxisOption,
-  currentlySelectedAxis
+  currentlySelectedAxis,
+  isDisabled
 }) => {
   const [axisLabel, setAxisLabel] = useState(currentlySelectedAxis.type);
   const handleAxisChange = event => {
@@ -23,6 +24,7 @@ const ChipHeatmapSettings = ({
         variant="outlined"
         key="chipheatmapAxisFormControl"
         className={classes.formControl}
+        disabled={isDisabled}
       >
         <InputLabel
           shrink={true}
