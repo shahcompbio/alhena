@@ -56,8 +56,7 @@
     "semiotic": "^1.20.5",
     "sha1": "^1.1.1",
     "styled-components": "^4.4.0",
-    "textures": "^1.2.0",
-    "yarn": "^1.15.2"
+    "textures": "^1.2.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -79,5 +78,6 @@
   "devDependencies": {
     "env-cmd": "^9.0.3",
     "prettier": "^1.16.4"
-  }
+  },
+  ""
 }
