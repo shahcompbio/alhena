@@ -14,7 +14,7 @@ import IconButton from "@material-ui/core/IconButton";
 import CheckIcon from "@material-ui/icons/Check";
 
 import TransferList from "./TransferList.js";
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   button: { color: "black", backgroundColor: theme.palette.secondary.main },
   dialogContent: { padding: "0px 24px" },
   dialogTitle: { paddinBottom: 0 },
@@ -23,11 +23,11 @@ const useStyles = makeStyles(theme => ({
     width: 250,
     margin: "auto",
     left: "25%",
-    position: "absolute"
+    position: "absolute",
   },
   icon: { fontSize: "6em", position: "absolute" },
   iconButton: { top: "65%", left: "45%" },
-  textValidator: { paddingBottom: 20 }
+  textValidator: { paddingBottom: 20 },
 }));
 
 const PopUpContent = ({
@@ -37,7 +37,7 @@ const PopUpContent = ({
   dashboardAction,
   dashboardName,
   allIndices,
-  alreadySelectedIndices
+  alreadySelectedIndices,
 }) => {
   const classes = useStyles();
   const [selectedIndices, setSelectedIndices] = useState([]);
@@ -46,7 +46,7 @@ const PopUpContent = ({
   const [isSent, setIsSent] = useState(null);
   const [isActionDisabled, setIsDisabled] = useState(true);
 
-  const handleNameChange = event => {
+  const handleNameChange = (event) => {
     setName(event.target.value);
   };
   useEffect(() => {
@@ -69,7 +69,7 @@ const PopUpContent = ({
           style={{
             width: 500,
             height: 300,
-            paddingTop: isSent && isLoading ? 0 : 20
+            paddingTop: isSent && isLoading ? 0 : 20,
           }}
         >
           <LoadingContent classes={classes} isSent={isSent} />
@@ -81,7 +81,7 @@ const PopUpContent = ({
             className={classes.dialogTitle}
             key={"dialogTitle"}
           >
-            {isEdit ? "Edit Dashboard" : "Create New Dashboard"}
+            {isEdit ? "Edit View" : "Create New View"}
           </DialogTitle>
           <DialogContent className={classes.dialogContent}>
             <TextValidator
@@ -102,7 +102,7 @@ const PopUpContent = ({
             <TransferList
               key={"transferList"}
               allIndices={allIndices}
-              setSelectedIndices={indices => setSelectedIndices(indices)}
+              setSelectedIndices={(indices) => setSelectedIndices(indices)}
               alreadyChoosen={alreadySelectedIndices}
             />
           </DialogContent>
@@ -116,7 +116,7 @@ const PopUpContent = ({
               Cancel
             </Button>
             <Button
-              onClick={async ev => {
+              onClick={async (ev) => {
                 setLoading(true);
                 await dashboardAction(name, selectedIndices);
                 setIsSent(true);

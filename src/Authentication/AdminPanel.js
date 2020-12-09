@@ -130,7 +130,7 @@ const AdminPanel = ({ classes }) => {
           <Toolbar className={classes.toolBar}>
             <SeperatedTabs
               className={classes.tabs}
-              tabs={[{ label: "Users" }, { label: "Dashboards" }]}
+              tabs={[{ label: "Users" }, { label: "Views" }]}
               tabStyle={{
                 bgColor:
                   tabIndex === 0
