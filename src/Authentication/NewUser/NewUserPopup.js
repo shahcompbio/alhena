@@ -10,7 +10,7 @@ import {
   Chip,
   Button,
   Dialog,
-  DialogActions
+  DialogActions,
 } from "@material-ui/core";
 
 import DialogContent from "@material-ui/core/DialogContent";
@@ -45,8 +45,8 @@ const generateNewUserLink = async (
   var data = await client.query({
     query: createNewUserLink,
     variables: {
-      newUser: { email: email, name, roles: selectedRoles.join(",") }
-    }
+      newUser: { email: email, name, roles: selectedRoles.join(",") },
+    },
   });
   return data.data.newUserLink.newUserLink;
 };
@@ -66,24 +66,24 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
     }
   }, [email, selectedRoles, name]);
 
-  const handleNameChange = event => {
+  const handleNameChange = (event) => {
     setName(event.target.value);
   };
-  const handleEmailChange = event => {
+  const handleEmailChange = (event) => {
     setEmail(event.target.value);
   };
-  const handleRoleChange = event => {
+  const handleRoleChange = (event) => {
     setSelectedRoles(event.target.value);
   };
 
   const handleRoleDelete = (event, value) =>
-    setSelectedRoles(roles => roles.filter(role => role !== value));
+    setSelectedRoles((roles) => roles.filter((role) => role !== value));
 
   return (
     <Query
       query={getAllDashboards}
       variables={{
-        user: { authKeyID: authKeyID, uid: uid }
+        user: { authKeyID: authKeyID, uid: uid },
       }}
     >
       {({ loading, error, data }) => {
@@ -101,7 +101,7 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
                 style={{
                   width: 450,
                   height: 150,
-                  textAlign: "center"
+                  textAlign: "center",
                 }}
               >
                 <Typography variant="body">
@@ -114,7 +114,7 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
                 </div>
                 <div
                   style={{
-                    marginTop: "25px"
+                    marginTop: "25px",
                   }}
                 >
                   <Button
@@ -162,7 +162,7 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
                     validators={["required", "isEmail"]}
                     errorMessages={[
                       "This field is required",
-                      "Email is not valid"
+                      "Email is not valid",
                     ]}
                   />
                   <DropDownSelect
@@ -172,7 +172,7 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
                       handleRoleDelete(event, value)
                     }
                     roleNames={data.getAllDashboards.map(
-                      dashboard => dashboard.name
+                      (dashboard) => dashboard.name
                     )}
                   />
                 </DialogContent>
@@ -185,15 +185,20 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
                     Cancel
                   </Button>
                   <Button
-                    onClick={async ev => {
-                      var link = await generateNewUserLink(
+                    onClick={async (ev) => {
+                      var userKey = await generateNewUserLink(
                         ev,
                         client,
                         email,
                         name,
                         selectedRoles
                       );
-                      setNewUserLink(link);
+                      var basename = process.env.PUBLIC_URL || "localhost:3000";
+
+                      basename = basename.endsWith("/")
+                        ? basename
+                        : basename + "/";
+                      setNewUserLink(basename + userKey);
                     }}
                     color="primary"
                     variant="contained"
@@ -210,25 +215,25 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
     </Query>
   );
 };
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
-    flexWrap: "wrap"
+    flexWrap: "wrap",
   },
   formControl: {
     margin: theme.spacing(1),
-    width: "100%"
+    width: "100%",
   },
   chips: {
     display: "flex",
-    flexWrap: "wrap"
+    flexWrap: "wrap",
   },
   chip: {
-    margin: 2
+    margin: 2,
   },
   noLabel: {
-    marginTop: theme.spacing(3)
-  }
+    marginTop: theme.spacing(3),
+  },
 }));
 
 const ITEM_HEIGHT = 48;
@@ -236,16 +241,16 @@ const ITEM_PADDING_TOP = 8;
 const MenuProps = {
   PaperProps: {
     style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP
-    }
-  }
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+    },
+  },
 };
 
 const DropDownSelect = ({
   roleNames,
   handleRoleDelete,
   handleRoleChange,
-  selectedRoles
+  selectedRoles,
 }) => {
   const classes = useStyles();
   const theme = useTheme();
@@ -255,7 +260,7 @@ const DropDownSelect = ({
       fontWeight:
         roles.indexOf(name) === -1
           ? theme.typography.fontWeightRegular
-          : theme.typography.fontWeightMedium
+          : theme.typography.fontWeightMedium,
     };
   }
 
@@ -269,11 +274,11 @@ const DropDownSelect = ({
         value={selectedRoles}
         onChange={handleRoleChange}
         input={<Input id="select-multiple-chip" />}
-        renderValue={selected => (
+        renderValue={(selected) => (
           <div className={classes.chips}>
-            {selected.map(value => (
+            {selected.map((value) => (
               <Chip
-                onDelete={event => handleRoleDelete(event, value)}
+                onDelete={(event) => handleRoleDelete(event, value)}
                 key={value}
                 label={value}
                 className={classes.chip}
@@ -283,7 +288,7 @@ const DropDownSelect = ({
         )}
         MenuProps={MenuProps}
       >
-        {roleNames.map(name => (
+        {roleNames.map((name) => (
           <MenuItem
             key={name}
             value={name}
