@@ -1,15 +1,12 @@
 FROM node:8 as builder
 
 WORKDIR /usr/src/app
+ARG BUILD_FILE
 
-COPY package*.json ./
+COPY . ./
 RUN yarn install
 
-COPY . .
-RUN if [ "$BUILD_ENV" = "staging" ]; \
-    then yarn build:staging; \
-    else yarn build; \
-    fi
+RUN ./node_modules/.bin/env-cmd -f "$BUILD_FILE" ./node_modules/.bin/react-scripts build
 
 FROM ubuntu
   RUN apt-get update && apt-get install -y nginx
