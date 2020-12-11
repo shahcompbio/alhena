@@ -198,7 +198,7 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
                       basename = basename.endsWith("/")
                         ? basename
                         : basename + "/";
-                      setNewUserLink(basename + userKey);
+                      setNewUserLink(basename + "NewAccount/" + userKey);
                     }}
                     color="primary"
                     variant="contained"
