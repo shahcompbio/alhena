@@ -236,26 +236,6 @@ const SettingsPanel = ({
         />
       </AccordianWrapper>
       <AccordianWrapper
-        classes={classes}
-        key={"chipAccordianWrapper"}
-        name="chip"
-        title="Chip"
-        setIsOpenAccordian={setIsOpenAccordian}
-        openAccordian={openAccordian}
-        isResetPossible={axisChange["chip"]}
-        resetFilter={() => {
-          resetFilter("CHIP_AXIS_RESET");
-        }}
-      >
-        <ChipHeatmapSettings
-          classes={classes}
-          axisOptions={chipHeatmapOptions}
-          currentlySelectedAxis={chipHeatmapAxis}
-          setAxisOption={value => update(value, "CHIPHEATMAP_AXIS_UPDATE")}
-          isDisabled={isDisabled}
-        />
-      </AccordianWrapper>
-      <AccordianWrapper
         key={"violinAccordianWrapper"}
         classes={classes}
         name="violin"
@@ -391,5 +371,24 @@ const SelectedCellsPanel = ({
     </Grid>
   </Paper>
 );
-
+/*      <AccordianWrapper
+        classes={classes}
+        key={"chipAccordianWrapper"}
+        name="chip"
+        title="Chip"
+        setIsOpenAccordian={setIsOpenAccordian}
+        openAccordian={openAccordian}
+        isResetPossible={axisChange["chip"]}
+        resetFilter={() => {
+          resetFilter("CHIP_AXIS_RESET");
+        }}
+      >
+        <ChipHeatmapSettings
+          classes={classes}
+          axisOptions={chipHeatmapOptions}
+          currentlySelectedAxis={chipHeatmapAxis}
+          setAxisOption={value => update(value, "CHIPHEATMAP_AXIS_UPDATE")}
+          isDisabled={isDisabled}
+        />
+      </AccordianWrapper>*/
 export default withStyles(styles)(SettingsPanel);

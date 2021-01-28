@@ -150,7 +150,8 @@ const HEATMAP_CONSTANTS = {
         "#252525",
         "#000000"
       ],
-      2: ["#fee391", "#fec44f", "#fe9929", "#ec7014", "#cc4c02", "#8c2d04"]
+      2: ["#fee391", "#fec44f", "#fe9929", "#ec7014", "#cc4c02", "#8c2d04"],
+      3: ["#003f5c", "#58508d", "#bc5090", "#ff6361", "#ffa600"]
     }
   },
   qualitySliderMarks: [

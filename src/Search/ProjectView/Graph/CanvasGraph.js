@@ -116,9 +116,31 @@ const CanvasGraph = ({
         modifiedData = data[0].children;
       }
       var root = createRoot(d3.hierarchy(modifiedData[0]));
-      var nodes = root.descendants();
-      var links = root.links();
-
+      var nodes = root.descendants().map(node => ({
+        ...node,
+        selectionText: getSelectionPath(node)
+          .split(",")
+          .sort()
+          .join(",")
+      }));
+      var links = root.links().map(link => {
+        return {
+          source: {
+            ...link.source,
+            selectionText: getSelectionPath(link.source)
+              .split(",")
+              .sort()
+              .join(",")
+          },
+          target: {
+            ...link.target,
+            selectionText: getSelectionPath(link.target)
+              .split(",")
+              .sort()
+              .join(",")
+          }
+        };
+      });
       setNodes([...nodes]);
       setLinks([...links]);
 
@@ -179,7 +201,8 @@ const CanvasGraph = ({
     links.forEach(link => {
       if (selectionText.length === 0) {
         context.strokeStyle = "white";
-      } else if (selectionText.indexOf(link.target.data.target) !== -1) {
+      } else if (selectionText.sort().join(",") === link.target.selectionText) {
+        //  else if (selectionText.indexOf(link.target.data.target) !== -1) {
         context.lineWidth = 15;
         context.strokeStyle = "white";
       } else {
@@ -191,7 +214,13 @@ const CanvasGraph = ({
         .angle(d => d.x)
         .radius(d => {
           const compactVersion = d.height === 0 ? 250 : 0;
-          if (selectionText.indexOf(d.data.target) !== -1) {
+          //  console.log("se;", selectionText);
+          //  console.log(d.data);
+          //  if (selectionText. === d.data.target) {
+          if (
+            selectionText.indexOf(d.data.target) !== -1 &&
+            selectionText.indexOf(d.data.source) !== -1
+          ) {
             return d.y + 200 - filterOffset - compactVersion;
           } else {
             return d.y - filterOffset - compactVersion;
@@ -223,7 +252,7 @@ const CanvasGraph = ({
       if (selectionText.length !== 0) {
         context.shadowBlur = 0;
       }
-      //main node
+      var selectionNodeList = node.selectionText.split(",");
       if (node.depth === 0) {
         var gradient = context.createLinearGradient(0, 0, 0, dimensions.height);
         gradient.addColorStop(0, "#fff9de");
@@ -232,7 +261,19 @@ const CanvasGraph = ({
         context.shadowColor = "white";
         context.fillStyle = gradient;
         xPos += 100 + filterOffset;
-      } else if (selectionText.indexOf(node.data.target) !== -1) {
+      }
+      //else if (selectionText.indexOf(node.data.target) !== -1) {
+      else if (
+        selectionNodeList.length > selectionText.length &&
+        selectionNodeList[1] === selectionText[1]
+      ) {
+        //if more than one child node on a parent node, colour parent
+        radius = 30;
+        context.strokeStyle = hierarchyColouring[node.height];
+        context.fillStyle = hierarchyColouring[node.height];
+        context.shadowBlur = 0;
+        xPos += 200;
+      } else if (selectionNodeList.every(val => selectionText.includes(val))) {
         //if hovered over
         if (node.depth === currNode.depth) {
           radius = 70;
@@ -312,12 +353,13 @@ const CanvasGraph = ({
         })
         .enter()
         .append("path")
-        //.style("stroke", "#2074A0")
-        //.style("stroke-width", 3)
+        //  .style("stroke", "#2074A0")
+        //  .style("stroke-width", 3)
         .style("fill", "none")
         .style("pointer-events", "all")
         .attr("d", d => (d ? "M" + d.join("L") + "Z" : null))
         .attr("class", d => {
+          //  console.log(d.data.element);
           return d ? d.data.element.data.target + "-voronoi" : "";
         })
         .on("mouseover", (data, index, element) => {
@@ -328,7 +370,6 @@ const CanvasGraph = ({
             var nodeSelectionText = getSelectionPath(currNode, ",");
             const selectionLayer = d3.select("#canvasGraphSelection");
             var previousSelectionClasses = selectionLayer.attr("class");
-
             const prevSelectedList =
               previousSelectionClasses === null
                 ? []
@@ -370,7 +411,8 @@ const CanvasGraph = ({
           if (data.data.element.height === 0) {
             dispatch({
               type: "ANALYSIS_SELECT",
-              value: { selectedAnalysis: data.data.element.data.target }
+              value: { selectedAnalysis: "SC-2570" }
+              //value: { selectedAnalysis: data.data.element.data.target }
             });
 
             handleForwardStep();
@@ -417,18 +459,18 @@ const CanvasGraph = ({
     } else {
       if (hoverNode.height === 2) {
         //sample
-        sampleText = "Sample   | " + hoverNode.data.target;
-        libraryText = "Library  | " + hoverNode.data.children.length;
+        sampleText = "Project   | " + hoverNode.data.target;
+        libraryText = "Group  | " + hoverNode.data.children.length;
         analysisText = "Analysis | " + hoverNode.data.children.length;
       } else if (hoverNode.height === 1) {
         //library
-        sampleText = "Sample   | " + hoverNode.data.source;
-        libraryText = "Library  | " + hoverNode.data.target;
+        sampleText = "Project   | " + hoverNode.data.source;
+        libraryText = "Group  | " + hoverNode.data.target;
         analysisText = "Analysis | " + hoverNode.data.children.length;
       } else {
         //analysis
-        sampleText = "Sample   | " + hoverNode.parent.data.source;
-        libraryText = "Library  | " + hoverNode.data.source;
+        sampleText = "Project   | " + hoverNode.parent.data.source;
+        libraryText = "Group  | " + hoverNode.data.source;
         analysisText = "Analysis | " + hoverNode.data.target;
       }
 
@@ -460,7 +502,7 @@ const CanvasGraph = ({
           xPos = (2 * dimensions.width) / 3 / 2;
           yPos = dimensions.height / 2;
         } else {
-          xPos = (2 * dimensions.width) / 3 / 2 - rootRadius / 8;
+          xPos = (2 * dimensions.width) / 3 / 2 - rootRadius / 4;
           yPos = dimensions.height / 2;
         }
       } else {

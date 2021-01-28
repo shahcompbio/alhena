@@ -5,14 +5,15 @@ import { useAppState } from "../../util/app-state";
 import { withStyles } from "@material-ui/styles";
 
 import CanvasGraph from "./Graph/CanvasGraph.js";
+import Publications from "./Publications/Publications.js";
 
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
 import { useDashboardState } from "./ProjectState/dashboardState";
-import Grid from "@material-ui/core/Grid";
+import { Grid } from "@material-ui/core";
 
 const styles = {
-  root: { flexGrow: 1 },
+  root: { flexGrow: 1, background: "#20262b" },
   hide: {
     display: "none"
   },
@@ -24,8 +25,8 @@ const styles = {
   }
 };
 const getAllAnalyses = gql`
-  query Sunburst($filter: [Term]!, $user: ApiUser!, $dashboardName: String!) {
-    analyses(filters: $filter, auth: $user, dashboardName: $dashboardName) {
+  query Sunburst($filter: [Term]!, $dashboardName: String!) {
+    analyses(filters: $filter, dashboardName: $dashboardName) {
       error
       analysesStats {
         label
@@ -47,16 +48,10 @@ const getAllAnalyses = gql`
                 source
                 target
                 children {
-                  ... on ParentType {
+                  ... on ChildType {
                     source
                     target
-                    children {
-                      ... on ChildType {
-                        source
-                        target
-                        value
-                      }
-                    }
+                    value
                   }
                 }
               }
@@ -101,8 +96,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
       query={getAllAnalyses}
       variables={{
         filter: [...filters],
-        dashboardName: selectedDashboard,
-        user: { authKeyID: authKeyID, uid: uid }
+        dashboardName: selectedDashboard
       }}
     >
       {({ loading, error, data }) => {
@@ -126,18 +120,9 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
                 sm={3}
                 style={{ height: "50vh" }}
                 key={"grid-search"}
-              >
-                <Search
-                  key={"search"}
-                  selectedOptions={null}
-                  filters={null}
-                  dashboards={[]}
-                  handleFilterChange={null}
-                  handleForwardStep={null}
-                />
-              </Grid>
+              ></Grid>
               <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
-                <CanvasGraph
+                <Publications
                   isLoading={true}
                   key={"packing-circles"}
                   filters={[]}
@@ -163,25 +148,8 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
                 spacing={2}
                 key={"grid-container"}
               >
-                <Grid
-                  item
-                  xs={6}
-                  sm={3}
-                  style={{ height: "50vh" }}
-                  key={"grid-search"}
-                >
-                  <Search
-                    key={"search"}
-                    selectedOptions={selectedOptions}
-                    filters={data.analyses.analysesList}
-                    handleFilterChange={(selection, type) =>
-                      handleFilterChange(selection, type)
-                    }
-                    handleForwardStep={handleForwardStep}
-                  />
-                </Grid>
                 <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
-                  <CanvasGraph
+                  <Publications
                     graphDim={graphDim}
                     isLoading={false}
                     key={"packing-circles"}
@@ -201,5 +169,13 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
     </Query>
   ) : null;
 };
-
+/*                  <Search
+                    key={"search"}
+                    selectedOptions={selectedOptions}
+                    filters={data.analyses.analysesList}
+                    handleFilterChange={(selection, type) =>
+                      handleFilterChange(selection, type)
+                    }
+                    handleForwardStep={handleForwardStep}
+                  />*/
 export default withStyles(styles)(ProjectViewContent);

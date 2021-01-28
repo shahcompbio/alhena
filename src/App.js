@@ -29,34 +29,21 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 
 const App = () => {
   const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
-
-  //const [width, height] = useWindowSize();
   let history = useHistory();
-
-  /*  useEffect(() => {
-    if (height && width) {
-      /*  dispatch({
-        type: "SIZE_CHANGE",
-        width: width,
-        height: height
-      });
-    }
-  }, [height, width]);
-
-  function useWindowSize() {
-    const [size, setSize] = useState([0, 0]);
-    useLayoutEffect(() => {
-      function updateSize() {
-        setSize([window.innerWidth, window.innerHeight]);
-      }
-      window.addEventListener("resize", updateSize);
-      updateSize();
-
-      return () => window.removeEventListener("resize", updateSize);
-    }, []);
-    return size;
-  }*/
-
+  /*{!authKeyID && (
+    <Route
+      key="dashboardUnauth"
+      path="/dashboards"
+      component={() => {
+        history.replace("/login");
+        return (
+          <ApolloConsumer>
+            {client => <Unauthenticated client={client} />}
+          </ApolloConsumer>
+        );
+      }}
+    />
+  )}*/
   return (
     <MuiThemeProvider theme={theme}>
       <CssBaseline />
@@ -73,20 +60,6 @@ const App = () => {
             );
           }}
         />
-        {!authKeyID && (
-          <Route
-            key="dashboardUnauth"
-            path="/dashboards"
-            component={() => {
-              history.replace("/login");
-              return (
-                <ApolloConsumer>
-                  {client => <Unauthenticated client={client} />}
-                </ApolloConsumer>
-              );
-            }}
-          />
-        )}
         <Route
           path="/login"
           exact={true}
@@ -118,6 +91,16 @@ const App = () => {
             </ApolloConsumer>
           )}
         />
+        <Route
+          key="dashboard"
+          path="/dashboards"
+          component={() => <DashboardWrapper ticket={null} />}
+        />
+        <Route
+          key="dashbaordTicket"
+          path="/dashboards/:ticket"
+          component={({ match }) => <DashboardWrapper uri={match} />}
+        />
         {authKeyID && [
           <Route
             key="ticketSandbox"
@@ -125,7 +108,7 @@ const App = () => {
             component={({ match }) => {
               var uri = match;
               //  SC-3079
-              uri.params.ticket = "sc-3964";
+              uri.params.ticket = "sc-2570";
               //uri.params.ticket = "sc-2978";
               return (
                 <ApolloConsumer>
@@ -133,32 +116,6 @@ const App = () => {
                 </ApolloConsumer>
               );
             }}
-          />,
-          <Route
-            key="graph"
-            path="/graph"
-            component={() => <ProjectViewContent />}
-          />,
-          <Route
-            key="dashbaordTicket"
-            path="/dashboards/:ticket"
-            component={({ match }) => <DashboardWrapper uri={match} />}
-          />,
-          <Route
-            key="dashboard"
-            path="/dashboards"
-            component={() => <DashboardWrapper ticket={null} />}
-          />,
-          <Route
-            exact
-            key="heatmap"
-            path="/heatmap"
-            render={() => <DashboardContent />}
-          />,
-          <Route
-            key="canvasGraph"
-            path="/canvasGraph"
-            component={() => <DashboardWrapper ticket={null} />}
           />
         ]}
         {authKeyID && isSuperUser && (

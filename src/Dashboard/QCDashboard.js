@@ -135,6 +135,7 @@ const QCDashboard = ({ analysis, classes, client }) => {
     expCondition,
     numericalDataFilters
   );
+
   const { loading, data } = useQuery(HEATMAP_ORDER, {
     variables: {
       analysis: analysis,
@@ -214,12 +215,6 @@ const QCDashboard = ({ analysis, classes, client }) => {
                     allHeatmapOrder={heatmapOrder}
                     categoryStats={data.categoriesStats}
                   />
-                </Paper>
-                <Paper
-                  key={"chipPaper"}
-                  className={[classes.chip, classes.paperContainer]}
-                >
-                  <Chip key={"chipPlot"} analysis={analysis} />
                 </Paper>
                 <Paper
                   key={"violinPaper"}

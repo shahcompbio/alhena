@@ -26,14 +26,14 @@ const styles = theme => ({
     paddingBottom: "10px"
   },
   item: {
-    paddingLeft: "25px !important",
+    paddingLeft: "0px !important",
     width: "100%"
   },
   filterDots: {
     position: "absolute"
   },
   input: { background: "white", borderRadius: 5, opacity: "80%" },
-  formControl: { minWidth: 300 },
+  formControl: { minWidth: 200 },
   dropdownStyle: {
     maxHeight: 100,
     overflowY: "scroll",
@@ -132,10 +132,11 @@ const Filters = ({
                     : null;
                 }}
                 onChange={(event, value) => {
-                  if (filterTypes[i] === "jira_id") {
+                  if (filterTypes[i] === "alhena_id") {
                     dispatch({
                       type: "ANALYSIS_SELECT",
-                      value: { selectedAnalysis: value.value }
+                      value: { selectedAnalysis: "SC-2570" }
+                      //  value: { selectedAnalysis: value.value }
                     });
 
                     handleForwardStep();
@@ -205,15 +206,6 @@ const Filters = ({
           {selectedDashboard}
         </Typography>
       </Grid>
-
-      <svg
-        id="filterDots"
-        width="20px"
-        height="300px"
-        className={classes.filterDots}
-      >
-        <FilterDots />
-      </svg>
 
       {panels.length > 0
         ? panels

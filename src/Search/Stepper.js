@@ -74,7 +74,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function getSteps() {
-  return ["Project Selection", "Analysis Search", "Dashboard"];
+  return ["Analysis Search", "Dashboard"];
 }
 
 const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {

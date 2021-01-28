@@ -6,6 +6,8 @@ import React, {
 } from "react";
 import Menu from "../Misc/Menu.js";
 import ProjectViewContent from "./ProjectView/ProjectViewContent.js";
+import Publications from "./ProjectView/Publications/Publications.js";
+
 import Stepper from "./Stepper.js";
 import Slide from "@material-ui/core/Slide";
 import DashboardContent from "../Dashboard/DashboardContent.js";
@@ -134,8 +136,6 @@ const Content = ({ classes }) => {
 
   return (
     <Grid className={classes.root}>
-      <Menu />
-
       <Slide
         timeout={slideTimeOut}
         direction={getDirection(0)}

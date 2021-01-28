@@ -107,9 +107,7 @@ function traverseParentTree(tree, type) {
     return "";
   } else {
     if (tree.data.source !== null) {
-      return (
-        type + tree.data.source + "," + traverseParentTree(tree.parent, type)
-      );
+      return tree.data.source + "," + traverseParentTree(tree.parent, type);
     } else {
       return "";
     }
@@ -117,11 +115,11 @@ function traverseParentTree(tree, type) {
 }
 function traverseTree(tree, type) {
   if (!tree.hasOwnProperty("children")) {
-    return type + tree.data.target + ",";
+    return tree.data.target + ",";
   } else {
     return tree["children"].reduce(
       (str, child) => str + traverseTree(child, type),
-      type + tree.data.target + ","
+      tree.data.target + ","
     );
   }
 }

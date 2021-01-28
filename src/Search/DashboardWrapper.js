@@ -21,8 +21,8 @@ const getDashboardByUser = gql`
 const DashboardWrapper = ({ uri, classes, history }) => {
   const [{ authKeyID, uid }] = useAppState();
   const ticketFromUrl = uri ? uri.params.ticket : null;
-  return (
-    <Query
+
+  /*  <Query
       query={getDashboardByUser}
       variables={{
         user: { authKeyID: authKeyID, uid: uid }
@@ -35,23 +35,23 @@ const DashboardWrapper = ({ uri, classes, history }) => {
         const dashboards = data.getDashboardsByUser.map(
           dashboard => dashboard.name
         );
+*/
 
-        const intialStateUpdated = initialState(
-          dashboards,
-          dashboards[0],
-          ticketFromUrl
-        );
-        return (
-          <DashboardProvider
-            initialState={intialStateUpdated}
-            reducer={dashboardStateReducer}
-          >
-            <Content />
-          </DashboardProvider>
-        );
-      }}
-    </Query>
+  const intialStateUpdated = initialState(
+    ["Fitness"],
+    "Fitness",
+    ticketFromUrl
   );
+  return (
+    <DashboardProvider
+      initialState={intialStateUpdated}
+      reducer={dashboardStateReducer}
+    >
+      <Content />
+    </DashboardProvider>
+  );
+  //  }}
+  //  </Query>
 };
 
 export default DashboardWrapper;

@@ -63,6 +63,7 @@ const CHROMOSOME_SEGS_QUERY = gql`
         experimental_condition
         cell_call
         heatmap_order
+        clone_id
       }
     }
     chromosomes(analysis: $analysis) {
@@ -193,7 +194,6 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
                 />
               </Grid>
               <Grid item>
-                {" "}
                 <Minimap
                   triggerHeatmapRequery={index => setIndices([...index])}
                   heatmapOrder={heatmapOrder}
