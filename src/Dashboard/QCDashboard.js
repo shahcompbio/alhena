@@ -75,7 +75,7 @@ const styles = theme => ({
   },
   heatmapContent: {
     padding: 15,
-    height: 950,
+    height: 975,
     width: 1050
   },
   violinContent: {

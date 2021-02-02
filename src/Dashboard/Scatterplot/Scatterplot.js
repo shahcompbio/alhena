@@ -10,6 +10,7 @@ import d3Tip from "d3-tip";
 import _ from "lodash";
 
 import Grid from "@material-ui/core/Grid";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 import { useStatisticsState } from "../DashboardState/statsState";
 import { initContext, isSelectionAllowed, getSelection } from "../utils.js";
@@ -100,7 +101,6 @@ const Scatterplot = ({ analysis, classes }) => {
     selectedCellsDispatchFrom,
     selfType
   );
-  console.log(selection);
   return (
     <Query
       query={SCATTERPLOT_QUERY}
@@ -115,7 +115,7 @@ const Scatterplot = ({ analysis, classes }) => {
       {({ loading, error, data }) => {
         if (error) return null;
         if (loading && Object.keys(data).length === 0) {
-          return null;
+          return <CircularProgress />;
         }
         const { scatterplot } = data;
 
@@ -161,16 +161,19 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
   var lassPath = "";
 
   var mousePos = { x: 0, y: 0 };
-
-  var x = d3
+  const xMin = stats.xMax - stats.xMin > 1 ? stats.xMin - 1 : stats.xMin;
+  const xMax = stats.xMax - stats.xMin > 1 ? stats.xMax + 1 : stats.xMax;
+  const x = d3
     .scaleLinear()
-    .domain([stats.xMin, stats.xMax])
+    .domain([xMin, xMax])
     .range([scatterplotDim.x1, scatterplotDim.x2])
     .nice();
 
-  var y = d3
+  const yMin = stats.yMax - stats.yMin > 1 ? stats.yMin - 1 : stats.yMin;
+  const yMax = stats.yMax - stats.yMin > 1 ? stats.yMax + 1 : stats.yMax;
+  const y = d3
     .scaleLinear()
-    .domain([stats.yMax, stats.yMin])
+    .domain([yMax, yMin])
     .range([scatterplotDim.y1, scatterplotDim.y2])
     .nice();
 
@@ -533,6 +536,10 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     const xBarWidth = data.xBuckets[1]
       ? x(data.xBuckets[1].key) - x(data.xBuckets[0].key) - barPadding.width
       : x(data.xBuckets[0].key) - barPadding.width;
+
+    console.log(x(data.xBuckets[1].key));
+    console.log(x(data.xBuckets[0].key));
+
     const xBucketCountMax = _.maxBy(data.xBuckets, "count").count;
 
     const yBucketCountMax = _.maxBy(data.yBuckets, "count").count;
@@ -581,7 +588,10 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       context.stroke();
     });
 
-    data.xBuckets.forEach(bucket => {
+    data.xBuckets.forEach((bucket, i) => {
+      console.log("b", bucket);
+      console.log(x(bucket.key));
+
       const y1 = xBucketHeightScale(bucket.count);
       context.beginPath();
       context.fillStyle = "#e8ecf1";
