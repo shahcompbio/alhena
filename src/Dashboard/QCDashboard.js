@@ -205,6 +205,44 @@ const QCDashboard = ({ analysis, classes, client }) => {
             ) : (
               <Grid item className={classes.plots} xs={9} key={"plotPanelGrid"}>
                 <Paper
+                  key={"heatmapPaper"}
+                  className={[classes.heatmapContent, classes.paperContainer]}
+                >
+                  <Heatmap
+                    key={"heatmapPlot"}
+                    analysis={analysis}
+                    allHeatmapOrder={heatmapOrder}
+                    categoryStats={data.categoriesStats}
+                  />
+                </Paper>
+                <Paper
+                  key={"chipPaper"}
+                  className={[classes.chip, classes.paperContainer]}
+                >
+                  <Chip key={"chipPlot"} analysis={analysis} />
+                </Paper>
+                <Paper
+                  key={"violinPaper"}
+                  className={[classes.violinContent, classes.paperContainer]}
+                >
+                  <Violin
+                    key={"violinPlot"}
+                    analysis={analysis}
+                    allHeatmapOrder={heatmapOrder}
+                    categoryStats={data.categoriesStats}
+                  />
+                </Paper>
+                <Paper
+                  key={"gcBiasPaper"}
+                  className={[classes.gcBias, classes.paperContainer]}
+                >
+                  <GCBias
+                    key={"gcBiasPlot"}
+                    analysis={analysis}
+                    heatmapOrder={heatmapOrder}
+                  />
+                </Paper>
+                <Paper
                   key={"scatterPaper"}
                   className={[classes.scatterplot, classes.paperContainer]}
                 >
