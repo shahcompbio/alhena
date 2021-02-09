@@ -150,7 +150,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
             </Grid>
           );
         } else {
-          if (data["analyses"]["error"]) {
+          if (data["analyses"] && data["analyses"]["error"]) {
             dispatch({
               type: "LOGOUT"
             });
@@ -167,7 +167,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
                   item
                   xs={6}
                   sm={3}
-                  style={{ height: "50vh" }}
+                  style={{ height: "50vh", zIndex: 1000 }}
                   key={"grid-search"}
                 >
                   <Search

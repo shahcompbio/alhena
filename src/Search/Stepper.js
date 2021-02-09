@@ -16,16 +16,19 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(5)
   },
   activeWhite: {
+    cursor: "pointer",
     color: "white !important"
   },
   activeBlack: {
     color: "#1b1919a3 !important"
   },
   activeBold: {
+    cursor: "pointer",
     fontWeight: "bold"
   },
   disabled: {
-    color: "#1b1919a3"
+    color: "#1b1919a3",
+    pointer: "none !important"
   },
   drawerClose: {
     transition: theme.transitions.create("width", {
@@ -57,9 +60,11 @@ const useStyles = makeStyles(theme => ({
     marginLeft: theme.spacing(2)
   },
   drawerLabelTwoLines: {
-    marginBottom: theme.spacing(15)
+    cursor: "pointer",
+    marginBottom: theme.spacing(20)
   },
   drawerLabelOneLine: {
+    cursor: "pointer",
     marginBottom: theme.spacing(20)
   },
   line: {
@@ -80,7 +85,9 @@ function getSteps() {
 const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
   const classes = useStyles();
   const steps = getSteps();
-  const [detailsDrawer, setDetailsDrawer] = useState(false);
+  const [detailsDrawer, setDetailsDrawer] = useState(
+    activeStep === 1 ? true : false
+  );
   const [stepperColour, setStepperColour] = useState(classes.activeWhite);
 
   useEffect(() => {
@@ -90,6 +97,9 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
   }, [activeStep]);
 
   const handleStep = step => {
+    if (activeStep === 1) {
+      setDetailsDrawer(true);
+    }
     if (step < activeStep) {
       handleBackStep(step);
     }
@@ -98,7 +108,9 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
     setDetailsDrawer(true);
   };
   const moreDetailExit = () => {
-    setDetailsDrawer(false);
+    if (activeStep !== 1) {
+      setDetailsDrawer(false);
+    }
   };
   return (
     <div className={classes.root}>
@@ -152,6 +164,7 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
                   index <= activeStep ? stepperColour : classes.disabled,
                   index === activeStep ? classes.activeBold : ""
                 )}
+                onClick={() => handleStep(index)}
               >
                 {value}
               </div>

@@ -537,9 +537,6 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       ? x(data.xBuckets[1].key) - x(data.xBuckets[0].key) - barPadding.width
       : x(data.xBuckets[0].key) - barPadding.width;
 
-    console.log(x(data.xBuckets[1].key));
-    console.log(x(data.xBuckets[0].key));
-
     const xBucketCountMax = _.maxBy(data.xBuckets, "count").count;
 
     const yBucketCountMax = _.maxBy(data.yBuckets, "count").count;
@@ -589,9 +586,6 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     });
 
     data.xBuckets.forEach((bucket, i) => {
-      console.log("b", bucket);
-      console.log(x(bucket.key));
-
       const y1 = xBucketHeightScale(bucket.count);
       context.beginPath();
       context.fillStyle = "#e8ecf1";

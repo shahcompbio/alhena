@@ -57,9 +57,14 @@ const CanvasGraph = ({
         drawLinks(context, links, [], 0);
         drawNodes(context, nodes, [], 0, null);
       } else {
-        d3.select(
-          "#canvasGraphSelection ." + filterMouseover.value + "-voronoi"
-        ).dispatch("mouseover");
+        const graph = d3.select("#canvasGraphSelection");
+        const filterSelection = graph.select(
+          "#canvasGraphSelection .voronoi-" + filterMouseover.value
+        );
+
+        if (!filterSelection.empty()) {
+          filterSelection.dispatch("mouseover");
+        }
       }
     }
   }, [filterMouseover]);
@@ -148,7 +153,11 @@ const CanvasGraph = ({
       } else {
         if (screenType.isMedScreen || screenType.isBigScreen) {
           //med screen 2dpr
-          context.scale(0.1, 0.1);
+          if (data[0].children.length > 100) {
+            context.scale(0.12, 0.12);
+          } else {
+            context.scale(0.1, 0.1);
+          }
         } else if (screenType.isSmallScreen) {
           //small screen 2 dpr
           context.scale(0.08, 0.08);
@@ -177,6 +186,7 @@ const CanvasGraph = ({
     context.lineWidth = 10;
     context.rotate(1.5708);
     links.forEach(link => {
+      context.beginPath();
       if (selectionText.length === 0) {
         context.strokeStyle = "white";
       } else if (selectionText.indexOf(link.target.data.target) !== -1) {
@@ -185,7 +195,7 @@ const CanvasGraph = ({
       } else {
         context.strokeStyle = "#bdc3c7";
       }
-      context.beginPath();
+
       d3
         .linkRadial()
         .angle(d => d.x)
@@ -249,6 +259,7 @@ const CanvasGraph = ({
           context.fillStyle = "white";
         } else {
           //not hovered over
+          context.strokeStyle = "grey";
           context.fillStyle = "grey";
         }
       }
@@ -312,13 +323,13 @@ const CanvasGraph = ({
         })
         .enter()
         .append("path")
-        //.style("stroke", "#2074A0")
+        //  .style("stroke", "#2074A0")
         //.style("stroke-width", 3)
         .style("fill", "none")
         .style("pointer-events", "all")
         .attr("d", d => (d ? "M" + d.join("L") + "Z" : null))
         .attr("class", d => {
-          return d ? d.data.element.data.target + "-voronoi" : "";
+          return d ? "voronoi-" + d.data.element.data.target : "";
         })
         .on("mouseover", (data, index, element) => {
           var currNode = data.data.element;
@@ -326,6 +337,8 @@ const CanvasGraph = ({
 
           if (currNode.parent !== null) {
             var nodeSelectionText = getSelectionPath(currNode, ",");
+            console.log(nodeSelectionText);
+
             const selectionLayer = d3.select("#canvasGraphSelection");
             var previousSelectionClasses = selectionLayer.attr("class");
 
