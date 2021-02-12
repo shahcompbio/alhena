@@ -13,7 +13,7 @@ import { useDashboardState } from "./ProjectState/dashboardState";
 import { Grid } from "@material-ui/core";
 
 const styles = {
-  root: { flexGrow: 1, background: "#20262b" },
+  root: { flexGrow: 1, background: "#586773" },
   hide: {
     display: "none"
   },

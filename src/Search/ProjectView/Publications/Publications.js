@@ -11,8 +11,12 @@ import {
   Switch,
   SvgIcon
 } from "@material-ui/core";
-import { ReactSVG } from "react-svg";
-import lineage from "./SA1101.svg";
+
+//import { ReactSVG } from "react-svg";
+import lineageMixtureA from "./illistrator/mixtureA.svg";
+import sA535X5XB02895 from "./illistrator/SA535X5XB02895.svg";
+import sa1035 from "./illistrator/sa1035.svg";
+import all from "./illistrator/all.svg";
 
 import { useDashboardState } from "../ProjectState/dashboardState";
 //import { ReactComponent as UpArrow } from "./upArrow-2.svg";
@@ -21,7 +25,7 @@ import { useDashboardState } from "../ProjectState/dashboardState";
 import * as d3 from "d3";
 import d3Tip from "d3-tip";
 
-import { data } from "./fitness2.js";
+import { data } from "./fitness.js";
 
 const spacingOffset = 200;
 const getScreenType = width => ({
@@ -30,6 +34,10 @@ const getScreenType = width => ({
   isSmallScreen: width < 1330,
   is1DPR: window.devicePixelRatio === 1
 });
+const lineGen = d3
+  .lineRadial()
+  .angle(d => d.x)
+  .radius(d => d.y);
 
 const Publications = ({ handleForwardStep }) => {
   const [{ selectedAnalysis }, dispatch] = useDashboardState();
@@ -54,7 +62,7 @@ const Publications = ({ handleForwardStep }) => {
     .attr("class", "d3-tipFitness")
     .offset([-10, 0])
     .html(function(d) {
-      return "<strong>" + d.data.name + "</strong> ";
+      return "<strong>" + d.name + "</strong> ";
     });
 
   function getOriginalPt(x, y, matrix) {
@@ -118,6 +126,7 @@ const Publications = ({ handleForwardStep }) => {
             { x1: x1, y1: y1, leaf: d, angle: angle }
           ];
         });
+
       setCurrentInnerNodes([...originalPoints]);
       setRadius({ prev: 100, current: 101 });
     }
@@ -169,6 +178,7 @@ const Publications = ({ handleForwardStep }) => {
             offset.scale +
             `)`
         );
+
       function getLinkText(tree) {
         if (!tree.hasOwnProperty("children")) {
           return "#link-" + tree.data.name + ", ";
@@ -189,6 +199,7 @@ const Publications = ({ handleForwardStep }) => {
           );
         }
       }
+
       d3.select("#nodes")
         .transition()
         .duration(easeDuration)
@@ -215,8 +226,21 @@ const Publications = ({ handleForwardStep }) => {
       const selectionList = selectionLinkText
         .substr(0, selectionLinkText.length - 1)
         .split(",");
+
       d3.selectAll(".highlightNode").classed("highlightNode", false);
       d3.selectAll(".highlightLink").classed("highlightLink", false);
+
+      if (radius.current !== 101) {
+        /*  d3.selectAll("#SA535X5XB02895, #SA039Mx2SA906b0")
+          .transition()
+          .duration(easeDuration)
+          .ease(ease)
+          .attr(
+            "transform",
+            `rotate(${-35},` + offset.x + `,` + offset.y + `)`
+          );*/
+        //  .attr("transform", "rotate(48.2,0,350)");
+      }
       var bboxList = [];
 
       var nodeTransform;
@@ -250,45 +274,52 @@ const Publications = ({ handleForwardStep }) => {
         .join(", ");
 
       d3.selectAll(".hidden").classed("hidden", false);
+
       d3.selectAll(selectionNodeText)
         .transition()
         .delay(easeDuration - 100)
         .attr("class", "hidden");
+
       d3.selectAll(selectionLink)
         .transition()
         .delay(easeDuration - 100)
         .attr("class", "hidden");
 
-      /*    d3.select("#nodes")
+      d3.select("#links")
+        .selectAll("path")
+        .data(dataTree.links())
+        .join("path")
+        .attr("id", d =>
+          d.target.depth === 0 ? "rootNode" : "link-" + d.target.data.name
+        )
+        .attr(
+          "d",
+          d3
+            .lineRadial()
+            .angle(d => (d.x * Math.PI) / 180)
+            .radius(d => d.y)
+        )
+        .attr("d", d => lineGen([d.source, d.target]));
+
+      d3.select("#nodes")
         .selectAll("circle")
         .data(dataTree.descendants())
         .join("circle")
         .attr(
           "transform",
           d => `
-            rotate(${(d.x * 180) / Math.PI - 90})
-            translate(${d.y},0)
-          `
+    rotate(${(d.x * 180) / Math.PI - 90})
+    translate(${d.y},0)
+  `
         )
         .attr("id", d => {
           return d.depth === 0
             ? "rootNode"
             : "node-" +
                 (d.data.name === undefined ? d.data.alhena_id : d.data.name);
-        });*/
-      /*  d3.selectAll(selectionNodeText)
-        .data(nodes.descendants())
-        .transition(t)
-        .attr("transform", null)
-        .attr("cx", d => d.y)
-        .attr("cy", d => d.x)
-        .attr("r", 2);
+        });
 
-      d3.selectAll(selectionLink)
-        .data(nodes.links())
-        .transition(t)
-        .attr("transform", null)
-        .attr("d", elbow);*/
+      const t = 700;
 
       function elbow(d, i) {
         return (
@@ -304,8 +335,96 @@ const Publications = ({ handleForwardStep }) => {
       }
       svg.selectAll(".straightLinks").remove("*");
       svg.selectAll(".straightNodes").remove("*");
-      if (closest["leaf"]["data"]["name"] !== "SA1101") {
-        var links = svg
+
+      d3.selectAll(".illistrator-show").classed("illistrator-show", false);
+
+      const illistratorSVG = d3.select(
+        "#" + closest["leaf"]["data"]["name"].replace(/\s/g, "")
+      );
+
+      illistratorSVG.call(tooltip);
+      const currNodes = illistratorSVG
+        .selectAll("*[id^=s-node]")
+        .on("mouseover", function(d) {
+          const selection = d3.select(this).attr("id");
+          tooltip.show({ name: selection.replace("s-node-", "") }, this);
+        })
+        .on("mouseout", tooltip.hide);
+
+      console.log(currNodes);
+      /*  const factor = 0.3;
+      const centerY = 350;
+      var tx = 0 * (factor - 1),
+        ty = -350 * (factor - 1);
+      console.log(closest["leaf"]);
+      console.log(angle);
+      //
+      const all = d3.select("#all");
+      const parentList = [
+        "#SA535X5XB02895",
+        "#SA039Mx2SA906b0",
+        "#SA1035X4XB02879"
+      ];
+
+      const parentString = parentList.join(",");
+      console.log(parentString);
+      const me = d3.select("#b-1").node();
+
+      var x1 = me.getBBox().x + me.getBBox().width / 2; //the center x about which you want to rotate
+      var y1 = me.getBBox().y + me.getBBox().height / 2; //the center y about which you want to rotate
+
+      d3.selectAll("#SA535X5XB02895, #SA039Mx2SA906b0, #SA1035X4XB02879")
+        .attr("transform", function(d, i) {
+          console.log(d);
+          console.log(i);
+          if (parentList[i] !== "#" + closest["leaf"]["data"]["name"]) {
+            return `rotate(${angle}, ${x1},${y1})`;
+            /*translate(` +
+            tx +
+            `,` +
+            ty +
+            `) scale(` +
+            factor +
+            `)
+          } else {
+            console.log("hello");
+            return `rotate(${angle}, ${x1},${y1})`;
+          }
+        })
+        .attr("class", function(d, i) {
+          if (parentList[i] !== "#" + closest["leaf"]["data"]["name"]) {
+            return "dim-lineage";
+          } else {
+            return;
+          }
+        });*/
+      //  .attr("transform", `rotate(${angle},` + 0 + `,` + 350 + `)`)
+      //  .attr(
+      //    "transform",
+      //    "translate(" + tx + "," + ty + ") scale(" + factor + ")"
+      //  ).
+      //  .attr("class", "dim-lineage");
+      console.log(offset);
+      if (!illistratorSVG.empty()) {
+        //  illistratorSVG.classed("dim-lineage", false);
+        const factor = 1.3;
+        const centerY = 350;
+        var tx = 0 * (factor - 1),
+          ty = -350 * (factor - 1);
+
+        illistratorSVG
+          .transition()
+          .delay(easeDuration)
+          .ease(d3.easeLinear)
+          /*  .attr(
+            "transform",
+            "translate(" + tx + "," + ty + ") scale(" + factor + ")"
+          )*/
+          .attr("class", "illistrator-show");
+      }
+      //  .classed("illistrator-show", true);
+      if (closest["leaf"]["data"]["name"] !== "SA1101" && false) {
+        const links = svg
           .append("g")
           .classed("straightLinks", true)
           .attr("transform", "translate(" + offset.x + "," + offset.y + ")")
@@ -323,7 +442,7 @@ const Publications = ({ handleForwardStep }) => {
           .attr("stroke-width", 1.5)
           .attr("transform", "scale(1.5,1.5)");
 
-        var circles = svg
+        const circles = svg
           .append("g")
           .classed("item-hints", true)
           .classed("straightNodes", true)
@@ -395,7 +514,7 @@ const Publications = ({ handleForwardStep }) => {
             .tickSize(10, 0)
         );
       }
-      console.log(closest["leaf"]["data"]["name"]);
+      /*  console.log(closest["leaf"]["data"]["name"]);
       console.log(closest["leaf"]["data"]["name"] === "SA1101");
       //  console.log(selectionLinkText);
       //  console.log(selectionNodeText);
@@ -436,7 +555,8 @@ const Publications = ({ handleForwardStep }) => {
         d3.select(".timepointAxis").classed("hidden", false);
         d3.select("#dashboardTitle").classed("hidden", false);
         d3.select("#lineage").classed("svg-hidden", true);
-      }
+      }*/
+
       setRadius({ prev: radius["current"], current: radius["current"] });
     }
   }, [radius]);
@@ -446,7 +566,7 @@ const Publications = ({ handleForwardStep }) => {
     if (checked) {
       offset = { x: dimensions.width / 2, y: dimensions.height / 2, scale: 1 };
     } else {
-      offset = { x: 0, y: dimensions.height / 2, scale: 2 };
+      offset = { x: 0, y: dimensions.height / 2, scale: 1 };
     }
     d3.select("#links")
       .transition()
@@ -501,7 +621,7 @@ const Publications = ({ handleForwardStep }) => {
 
   function useHookWithRefCallback() {
     const ref = useRef(null);
-    const setRef = useCallback(node => {
+    const setRef = useCallback(async node => {
       if (node && context === undefined) {
         const radius = 400;
         const tree = d3
@@ -525,11 +645,6 @@ const Publications = ({ handleForwardStep }) => {
 
         const svg = d3.select("#svg");
         //    .attr("viewBox", [0, 0, dimensions.width, dimensions.height]);
-
-        var lineGen = d3
-          .lineRadial()
-          .angle(d => d.x)
-          .radius(d => d.y);
 
         svg
           .append("g")
@@ -594,14 +709,24 @@ const Publications = ({ handleForwardStep }) => {
           .attr("opacity", d => (d.depth === 0 ? 0 : 0.7))
           .attr("fill", d => "#999")
           .attr("r", 2.5);
+        //d3.xml([lineageMixtureA, sA535X5XB02895])
+        /*  const lineages = await Promise.all([
+          d3.xml(lineageMixtureA),
+          d3.xml(sA535X5XB02895),
+          d3.xml(sa1035)
+        ]);*/
 
-        d3.xml(lineage).then(data => {
+        d3.xml(all).then(data => {
           const mainNode = document.getElementById("canvasGraph");
-
-          mainNode.appendChild(data.documentElement);
-          const neonTube = d3.select("#g-sa1101");
-          neonTube.attr("display", "none");
+          mainNode.insertBefore(data.documentElement, mainNode.childNodes[0]);
+          //    mainNode.appendChild(data.documentElement);
         });
+
+        /*    const mainNode = document.getElementById("canvasGraph");
+        lineages.map(data => {
+          mainNode.appendChild(data.documentElement);
+        });*/
+
         d3.select("#root").attr("class", "blackBackground");
         setInterval(function() {
           setPaintReady(true);
@@ -638,7 +763,8 @@ const Publications = ({ handleForwardStep }) => {
               pointerEvents: "none",
               width: dimensions.width + "px",
               height: dimensions.height + "px",
-              position: "absolute"
+              position: "absolute",
+              zIndex: 1
             }}
           />
         </div>
