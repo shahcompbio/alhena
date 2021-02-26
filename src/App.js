@@ -52,7 +52,7 @@ const App = () => {
           path="/"
           exact={true}
           component={() => {
-            history.replace("/login");
+            history.replace("/dashboards");
             return (
               <ApolloConsumer>
                 {client => <Unauthenticated client={client} />}
@@ -61,63 +61,16 @@ const App = () => {
           }}
         />
         <Route
-          path="/login"
-          exact={true}
-          component={() => (
-            <ApolloConsumer>
-              {client => <Unauthenticated client={client} />}
-            </ApolloConsumer>
-          )}
-        />
-        <Route
-          path="/NewAccount/:redisKey"
-          component={({ match }) => (
-            <NewUserUriVerification uri={match} dispatch={dispatch} />
-          )}
-        />
-        <Route
-          path="/resetPassword/:redisKey"
-          component={({ match }) => (
-            <UpdatePasswordVerification uri={match} dispatch={dispatch} />
-          )}
-        />
-        <Route
-          path="/forgotPassword"
-          component={() => (
-            <ApolloConsumer>
-              {client => (
-                <ForgotPasswordWrapper client={client} dispatch={dispatch} />
-              )}
-            </ApolloConsumer>
-          )}
+          key="dashbaordTicket"
+          path="/dashboards/:ticket"
+          component={({ match }) => <DashboardWrapper uri={match} />}
         />
         <Route
           key="dashboard"
           path="/dashboards"
           component={() => <DashboardWrapper ticket={null} />}
         />
-        <Route
-          key="dashbaordTicket"
-          path="/dashboards/:ticket"
-          component={({ match }) => <DashboardWrapper uri={match} />}
-        />
-        {authKeyID && [
-          <Route
-            key="ticketSandbox"
-            path="/sandbox"
-            component={({ match }) => {
-              var uri = match;
-              //  SC-3079
-              uri.params.ticket = "sc-2570";
-              //uri.params.ticket = "sc-2978";
-              return (
-                <ApolloConsumer>
-                  {client => <DashboardWrapper uri={uri} client={client} />}
-                </ApolloConsumer>
-              );
-            }}
-          />
-        ]}
+
         {authKeyID && isSuperUser && (
           <Route path="/admin" component={() => <AdminPanel />} />
         )}

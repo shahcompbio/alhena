@@ -36,7 +36,7 @@ const styles = theme => ({
 
 const DashboardContent = ({ classes, history }) => {
   const [{ selectedAnalysis }] = useDashboardState();
-
+  //history.push("/" + selectedAnalysis);
   return (
     <StatsProvider initialState={initialState} reducer={statsStateReducer}>
       {selectedAnalysis ? (

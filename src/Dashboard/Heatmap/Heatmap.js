@@ -99,6 +99,8 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
   const [indices, setIndices] = useState([]);
   useEffect(() => {
     if (allHeatmapOrder) {
+      setHoverCell({ cell: {} });
+      setSelectedCell({ cell: {} });
       setHeatmapOrder([...allHeatmapOrder]);
       setIndices([...getIndicesFromAllHeatmapOrder(allHeatmapOrder)]);
     }
@@ -241,7 +243,9 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
                 chromosomes={chromosomes}
                 chromMap={chromMap}
                 analysis={analysis}
-                cellId={hoverCell["cell"]["id"]}
+                cellId={
+                  hoverCell.hasOwnProperty("y") ? hoverCell["cell"]["id"] : null
+                }
                 key={"genomeProfile"}
               />
             </Grid>

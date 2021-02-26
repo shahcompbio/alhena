@@ -1,0 +1,128 @@
+.d3-tip {
+  z-index: 100;
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+#all {
+  z-index: 2;
+  position: absolute;
+}
+.showLight {
+  display: initial;
+}
+.hideLight {
+  display: none;
+}
+#light,
+#pinkLight,
+#redLight {
+  z-index: 3;
+}
+.illistrator,
+#SA039Mx2SA906b0,
+#SA535X5XB02895,
+#SA1035X4XB02879,
+#SA532X1XB00118,
+#CellLine,
+#SA609X3X8XB03076,
+#SA609X1XB00290,
+#SA609X3X8MB03073 {
+  z-index: 2;
+  display: none;
+  position: absolute;
+}
+.illistrator-show {
+  display: initial !important;
+}
+.dim-lineage {
+  opacity: 0.2;
+}
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  z-index: 100;
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  z-index: 100;
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+.d3-tipFitness {
+  z-index: 100;
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 1);
+  color: #fff;
+  border-radius: 5px;
+}
+.straightNodes {
+  pointer-events: all;
+}
+/* Creates a small triangle extender for the tooltip */
+.d3-tipFitness:after {
+  z-index: 100;
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 1);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tipFitness.n:after {
+  z-index: 100;
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+.svg-hidden {
+  display: none;
+}
+.svg-override-show {
+  display: all !important;
+}
+#dashboardTitle {
+  font: "MyFont";
+  font-size: 48px;
+  opacity: 0.8;
+  fill: #fbf7eb;
+  /*  background: #ceaa39;*/
+  color: #d6c17f;
+  text-shadow: 1px 1px 10px #dec679, 1px 1px 10px #dcb331;
+  text-align: center;
+}
+.timepointAxis text {
+  fill: #ffffff;
+  font-size: 15px;
+}
+.timepointAxis path,
+.timepointAxis line {
+  fill: none;
+  opacity: 0.7;
+  stroke: #ffffff;
+  shape-rendering: crispEdges;
+  stroke-width: 8px;
+}
+#g-sa1101 {
+  pointer-events: all;
+}

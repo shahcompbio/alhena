@@ -16,12 +16,14 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(5)
   },
   activeWhite: {
+    cursor: "pointer",
     color: "white !important"
   },
   activeBlack: {
     color: "#1b1919a3 !important"
   },
   activeBold: {
+    cursor: "pointer",
     fontWeight: "bold"
   },
   disabled: {
@@ -56,10 +58,16 @@ const useStyles = makeStyles(theme => ({
     float: "right",
     marginLeft: theme.spacing(2)
   },
+  isLongAnalysisName: {
+    cursor: "pointer"
+  },
+
   drawerLabelTwoLines: {
+    cursor: "pointer",
     marginBottom: theme.spacing(15)
   },
   drawerLabelOneLine: {
+    cursor: "pointer",
     marginBottom: theme.spacing(20)
   },
   line: {
@@ -84,7 +92,7 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
   const [stepperColour, setStepperColour] = useState(classes.activeWhite);
 
   useEffect(() => {
-    activeStep === 2
+    activeStep === 1
       ? setStepperColour(classes.activeBlack)
       : setStepperColour(classes.activeWhite);
   }, [activeStep]);
@@ -100,6 +108,8 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
   const moreDetailExit = () => {
     setDetailsDrawer(false);
   };
+  const isLongAnalysisName = value =>
+    value.length >= 10 && value.indexOf(" ") === -1;
   return (
     <div className={classes.root}>
       {steps.map((label, index) => (
@@ -145,15 +155,22 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
             return (
               <div
                 key={value}
+                onClick={() => handleStep(index)}
                 className={clsx(
                   value.length >= 10
-                    ? classes.drawerLabelTwoLines
+                    ? isLongAnalysisName(value)
+                      ? classes.isLongAnalysisName
+                      : classes.drawerLabelTwoLines
                     : classes.drawerLabelOneLine,
                   index <= activeStep ? stepperColour : classes.disabled,
                   index === activeStep ? classes.activeBold : ""
                 )}
               >
-                {value}
+                {isLongAnalysisName(value)
+                  ? value.substring(0, 9) +
+                    "- " +
+                    value.substring(9, value.length)
+                  : value}
               </div>
             );
           })}

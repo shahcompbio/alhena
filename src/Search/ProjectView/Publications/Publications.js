@@ -2,6 +2,11 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import "./publications.css";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
+import CircularProgress from "@material-ui/core/CircularProgress";
+
+import { makeStyles } from "@material-ui/styles";
+import { flattenDeep } from "lodash";
+import Search from "./Search.js";
 
 import {
   FormGroup,
@@ -11,16 +16,26 @@ import {
   Switch,
   SvgIcon
 } from "@material-ui/core";
+import voronoiData from "./illistrator/cords.js";
 
-//import { ReactSVG } from "react-svg";
 import lineageMixtureA from "./illistrator/mixtureA.svg";
 import sA535X5XB02895 from "./illistrator/SA535X5XB02895.svg";
-import sa1035 from "./illistrator/sa1035.svg";
-import all from "./illistrator/all.svg";
 
+import all from "./illistrator/light.svg";
+
+import CircularProgressWithLabel from "./CircularProgress.js";
+
+import Svg from "./illistrator/final.svg";
 import { useDashboardState } from "../ProjectState/dashboardState";
-//import { ReactComponent as UpArrow } from "./upArrow-2.svg";
-//import { ReactComponent as DownArrow } from "./downArrow-2.svg";
+import imgSA039Mx2SA906b0 from "./illistrator/SA039Mx2SA906b0.png";
+import imgSA1035X4XB02879 from "./illistrator/SA1035X4XB02879.png";
+import imgCellLine from "./illistrator/CellLine.png";
+import imgSA609X3X8MB03073 from "./illistrator/SA609X3X8MB03073.png";
+import imgSA609X1XB00290 from "./illistrator/SA609X1XB00290.png";
+import imgSA532X1XB00118 from "./illistrator/SA532X1XB00118.png";
+import imgSA535X5XB02895 from "./illistrator/SA535X5XB02895.png";
+import imgSA609X3X8XB03076 from "./illistrator/SA609X3X8XB03076.png";
+import title from "./illistrator/title.png";
 
 import * as d3 from "d3";
 import d3Tip from "d3-tip";
@@ -38,33 +53,76 @@ const lineGen = d3
   .lineRadial()
   .angle(d => d.x)
   .radius(d => d.y);
-
+var progress = 10;
+const imagesMapping = {
+  SA609X3X8MB03073: imgSA609X3X8MB03073,
+  SA532X1XB00118: imgSA532X1XB00118,
+  SA039Mx2SA906b0: imgSA039Mx2SA906b0,
+  SA535X5XB02895: imgSA535X5XB02895,
+  SA609X1XB00290: imgSA609X1XB00290,
+  SA609X3X8XB03076: imgSA609X3X8XB03076,
+  SA1035X4XB02879: imgSA1035X4XB02879,
+  CellLine: imgCellLine
+};
+const useClasses = makeStyles(theme => ({
+  iconContainer: {
+    padding: 25,
+    marginLeft: 10,
+    fontSize: "xxx-large",
+    color: "white",
+    background: "#293244",
+    textAlign: "center",
+    height: 50,
+    width: 50,
+    "&:hover": {
+      background: "#151a24"
+    }
+  }
+}));
 const Publications = ({ handleForwardStep }) => {
   const [{ selectedAnalysis }, dispatch] = useDashboardState();
   const [context, saveContext] = useState();
+  const [voronoi, saveVoronoi] = useState(null);
   const [checked, setChecked] = useState(false);
+  const [imgSource, setImgSource] = useState({
+    src: imgSA039Mx2SA906b0,
+    name: "SA039Mx2SA906b0"
+  });
   const [radius, setRadius] = useState({
     prev: 99,
     current: 100
   });
-
+  const [isButtonDisabled, setButtonDisabled] = useState(false);
   const [paintReady, setPaintReady] = useState(false);
   const [currentAngle, setCurrentAngle] = useState(0);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [dataTree, setTree] = useState(null);
+  const [flatAnalysisList, storeFlatAnalysisList] = useState([]);
   const [currentInnerNodes, setCurrentInnerNodes] = useState([]);
-
-  const dimensions = { width: 1000, height: 700 };
+  const classes = useClasses();
+  const dimensions = { width: 1000, height: 750 };
   const ease = d3.easePolyInOut.exponent(4.0);
   const easeDuration = 500;
 
   const tooltip = d3Tip()
     .attr("class", "d3-tipFitness")
-    .offset([-10, 0])
+    //  .offset([-100, -10])
     .html(function(d) {
-      return "<strong>" + d.name + "</strong> ";
+      return "Analysis: " + d.name + " </br>Library: " + d.library;
     });
-
+  function searchTree(element, matchingTitle) {
+    if (element.name === matchingTitle) {
+      return element;
+    } else if (element.children != null) {
+      var i;
+      var result = null;
+      for (i = 0; result == null && i < element.children.length; i++) {
+        result = searchTree(element.children[i], matchingTitle);
+      }
+      return result;
+    }
+    return null;
+  }
   function getOriginalPt(x, y, matrix) {
     var x1 = x * matrix.a + y * matrix.b + matrix.e,
       y1 = x * matrix.c + y * matrix.d + matrix.f;
@@ -126,7 +184,6 @@ const Publications = ({ handleForwardStep }) => {
             { x1: x1, y1: y1, leaf: d, angle: angle }
           ];
         });
-
       setCurrentInnerNodes([...originalPoints]);
       setRadius({ prev: 100, current: 101 });
     }
@@ -230,18 +287,11 @@ const Publications = ({ handleForwardStep }) => {
       d3.selectAll(".highlightNode").classed("highlightNode", false);
       d3.selectAll(".highlightLink").classed("highlightLink", false);
 
-      if (radius.current !== 101) {
-        /*  d3.selectAll("#SA535X5XB02895, #SA039Mx2SA906b0")
-          .transition()
-          .duration(easeDuration)
-          .ease(ease)
-          .attr(
-            "transform",
-            `rotate(${-35},` + offset.x + `,` + offset.y + `)`
-          );*/
-        //  .attr("transform", "rotate(48.2,0,350)");
-      }
       var bboxList = [];
+      setImgSource({
+        src: imagesMapping[closest["leaf"]["data"]["name"].replace(" ", "")],
+        name: closest["leaf"]["data"]["name"].replace(" ", "")
+      });
 
       var nodeTransform;
       d3.select("#nodes").each(function(d) {
@@ -251,6 +301,7 @@ const Publications = ({ handleForwardStep }) => {
       var dataChildrenCopy = data["children"].filter(
         child => child["name"] === closest["leaf"]["data"]["name"]
       );
+
       const curr = { name: "flare", children: [...dataChildrenCopy] };
       var cluster = data => {
         const root = d3
@@ -336,227 +387,126 @@ const Publications = ({ handleForwardStep }) => {
       svg.selectAll(".straightLinks").remove("*");
       svg.selectAll(".straightNodes").remove("*");
 
-      d3.selectAll(".illistrator-show").classed("illistrator-show", false);
-
-      const illistratorSVG = d3.select(
-        "#" + closest["leaf"]["data"]["name"].replace(/\s/g, "")
+      voronoi.call(tooltip);
+      d3.select("#img-" + closest["leaf"]["data"]["name"]).attr("opacity", 1);
+      const vData =
+        voronoiData[closest["leaf"]["data"]["name"].replace(" ", "")];
+      const currentDimensions = vData.map(
+        entry => entry[Object.keys(entry)[0]]
       );
+      const allXCords = currentDimensions.map(entry => entry[0]);
+      const allYCords = currentDimensions.map(entry => entry[1]);
 
-      illistratorSVG.call(tooltip);
-      const currNodes = illistratorSVG
-        .selectAll("*[id^=s-node]")
+      const voronoid = d3
+        .voronoi()
+        .x(d => d[Object.keys(d)[0]][0])
+        .y(d => d[Object.keys(d)[0]][1])
+        .extent([
+          [Math.min(...allXCords) - 50, Math.min(...allYCords) - 50],
+          [Math.max(...allXCords) + 50, Math.max(...allYCords) + 50]
+        ]);
+
+      const voronoiUpdate = voronoi
+        .selectAll("path")
+        .data(voronoid(vData).polygons(), d => {
+          if (!d) {
+            console.log(d);
+          }
+          return d;
+        });
+      voronoi.selectAll("circle").remove("*");
+      /*  voronoi
+        .selectAll("circle")
+        .data(vData)
+        .enter()
+        .append("circle")
+        .attr("r", 5)
+        .attr("cx", d => d[Object.keys(d)[0]][0])
+        .attr("cy", d => d[Object.keys(d)[0]][1])
+        .attr("id", d => "circle-" + Object.keys(d)[0]);*/
+
+      voronoiUpdate.exit().remove();
+      voronoiUpdate.attr("d", d => (d ? "M" + d.join("L") + "Z" : null));
+      voronoiUpdate
+        .enter()
+        .append("path")
+        //  .style("stroke", "#2074A0")
+        //  .style("stroke-width", 3)
+        .style("fill", "none")
+        .style("pointer-events", "all")
+        .attr("d", d => (d ? "M" + d.join("L") + "Z" : null))
+        .attr("class", d => {
+          if (d) {
+            return Object.keys(d.data)[0];
+          } else {
+            return null;
+          }
+          //  console.log(d.data.element);
+          //return d ? d.data.element.data.target + "-voronoi" : "";
+        })
         .on("mouseover", function(d) {
-          const selection = d3.select(this).attr("id");
-          tooltip.show({ name: selection.replace("s-node-", "") }, this);
-        })
-        .on("mouseout", tooltip.hide);
-
-      console.log(currNodes);
-      /*  const factor = 0.3;
-      const centerY = 350;
-      var tx = 0 * (factor - 1),
-        ty = -350 * (factor - 1);
-      console.log(closest["leaf"]);
-      console.log(angle);
-      //
-      const all = d3.select("#all");
-      const parentList = [
-        "#SA535X5XB02895",
-        "#SA039Mx2SA906b0",
-        "#SA1035X4XB02879"
-      ];
-
-      const parentString = parentList.join(",");
-      console.log(parentString);
-      const me = d3.select("#b-1").node();
-
-      var x1 = me.getBBox().x + me.getBBox().width / 2; //the center x about which you want to rotate
-      var y1 = me.getBBox().y + me.getBBox().height / 2; //the center y about which you want to rotate
-
-      d3.selectAll("#SA535X5XB02895, #SA039Mx2SA906b0, #SA1035X4XB02879")
-        .attr("transform", function(d, i) {
-          console.log(d);
-          console.log(i);
-          if (parentList[i] !== "#" + closest["leaf"]["data"]["name"]) {
-            return `rotate(${angle}, ${x1},${y1})`;
-            /*translate(` +
-            tx +
-            `,` +
-            ty +
-            `) scale(` +
-            factor +
-            `)
-          } else {
-            console.log("hello");
-            return `rotate(${angle}, ${x1},${y1})`;
-          }
-        })
-        .attr("class", function(d, i) {
-          if (parentList[i] !== "#" + closest["leaf"]["data"]["name"]) {
-            return "dim-lineage";
-          } else {
-            return;
-          }
-        });*/
-      //  .attr("transform", `rotate(${angle},` + 0 + `,` + 350 + `)`)
-      //  .attr(
-      //    "transform",
-      //    "translate(" + tx + "," + ty + ") scale(" + factor + ")"
-      //  ).
-      //  .attr("class", "dim-lineage");
-      console.log(offset);
-      if (!illistratorSVG.empty()) {
-        //  illistratorSVG.classed("dim-lineage", false);
-        const factor = 1.3;
-        const centerY = 350;
-        var tx = 0 * (factor - 1),
-          ty = -350 * (factor - 1);
-
-        illistratorSVG
-          .transition()
-          .delay(easeDuration)
-          .ease(d3.easeLinear)
-          /*  .attr(
-            "transform",
-            "translate(" + tx + "," + ty + ") scale(" + factor + ")"
-          )*/
-          .attr("class", "illistrator-show");
-      }
-      //  .classed("illistrator-show", true);
-      if (closest["leaf"]["data"]["name"] !== "SA1101" && false) {
-        const links = svg
-          .append("g")
-          .classed("straightLinks", true)
-          .attr("transform", "translate(" + offset.x + "," + offset.y + ")")
-          .attr("fill", "none")
-          .selectAll("path")
-          .data(nodes.links())
-          .join("path")
-          .attr("d", elbow)
-          .attr("id", d => "#S-link-" + d.source.data.name);
-
-        links
-          .transition()
-          .delay(easeDuration - 150)
-          .attr("stroke", "#555")
-          .attr("stroke-width", 1.5)
-          .attr("transform", "scale(1.5,1.5)");
-
-        const circles = svg
-          .append("g")
-          .classed("item-hints", true)
-          .classed("straightNodes", true)
-          .attr("transform", "translate(" + offset.x + "," + offset.y + ")")
-          .selectAll("circle")
-          .data(nodes.descendants())
-          .join("circle")
-          .attr("id", d => {
-            return "#S-node-" + d.data.name;
-          })
-          .attr("cx", d => d.y)
-          .attr("cy", d => d.x)
-          .on("mouseover", tooltip.show)
-          .on("mouseout", tooltip.hide);
-
-        circles.call(tooltip);
-
-        circles
-          .transition()
-          .delay(easeDuration - 150)
-          .attr("fill", d => "#999")
-          .attr("r", 5)
-          .attr("transform", "scale(1.5,1.5)");
-
-        svg.select("#dashboardTitle").remove("*");
-        svg
-          .append("text")
-          .attr("id", "dashboardTitle")
-          .text(function(d) {
-            return closest["leaf"]["data"]["name"];
-          })
-          .attr("x", (3 * dimensions.width) / 4)
-          .attr("y", dimensions.height / 2);
-
-        d3.selectAll(".straightNodes circle").each(function(d, i) {
+          const selection = Object.keys(d.data)[0];
+          const location = d.data[Object.keys(d.data)];
           const bb = d3
             .select(this)
             .node()
-            .getBBox();
-          bboxList = [...bboxList, bb];
+            .getBoundingClientRect();
+
+          const node = searchTree(
+            closest["leaf"]["data"],
+            selection.replace("s-node-", "")
+          );
+
+          if (node !== null) {
+            const light =
+              node["label"].indexOf("Holiday") !== -1
+                ? "#pinkLight"
+                : node["label"].indexOf("Rx") !== -1 &&
+                  node["label"].indexOf("UnRx") == -1
+                ? "#redLight"
+                : "#light";
+            d3.select(light)
+              .attr("class", "showLight")
+              .attr(
+                "transform",
+                "translate(" + location[0] + "," + location[1] + ")"
+              );
+
+            tooltip.show(
+              {
+                name: selection.replace("s-node-", ""),
+                library: node["library"],
+                location: selection
+              },
+              this
+            );
+            var coordinates = d3.mouse(this);
+            const circleLocation = d3.select("#circle-" + selection);
+            tooltip
+              .style("top", d => location[1] - 35 + "px")
+              .style("left", d => location[0] - 94.18 + "px");
+          }
+        })
+        .on("mouseout", function() {
+          d3.selectAll("#light, #pinkLight, #redLight").attr(
+            "class",
+            "hideLight"
+          );
+          tooltip.hide();
+        })
+        .on("mousedown", function(d) {
+          const selection = Object.keys(d.data)[0];
+          d3.select("#root").classed("blackBackground", false);
+          d3.select("#d3-tipFitness").classed("hideLight", true);
+          dispatch({
+            type: "ANALYSIS_SELECT",
+            value: { selectedAnalysis: selection.replace("s-node-", "") }
+            //value: { selectedAnalysis: data.data.element.data.target }
+          });
+          handleForwardStep();
         });
 
-        const allSelectedNodes = bboxList.sort((a, b) => a.x - b.x);
-
-        const getDepth = ({ children }) =>
-          1 + (children ? Math.max(...children.map(getDepth)) : 0);
-
-        const depth = getDepth(closest["leaf"]);
-
-        const timepointScale = d3
-          .scaleLinear()
-          .domain([1, depth])
-          .range([
-            allSelectedNodes[1].x * 1.5,
-            allSelectedNodes[allSelectedNodes.length - 1].x * 1.5
-          ]);
-
-        const axis = d3.select(".timepointAxis");
-        axis.selectAll("*").remove();
-
-        axis.append("g").call(
-          d3
-            .axisBottom(timepointScale)
-            .tickFormat(function(d) {
-              return d + "X";
-            })
-            .ticks(depth)
-            .tickPadding(15)
-            .tickSize(10, 0)
-        );
-      }
-      /*  console.log(closest["leaf"]["data"]["name"]);
-      console.log(closest["leaf"]["data"]["name"] === "SA1101");
-      //  console.log(selectionLinkText);
-      //  console.log(selectionNodeText);
-      if (closest["leaf"]["data"]["name"] === "SA1101") {
-        //  d3.select(selectionNodeText).classed("hidden", true);
-        //  d3.select(selectionLinkText).classed("hidden", true);
-
-        d3.select(".timepointAxis").classed("hidden", true);
-        d3.select("#dashboardTitle").classed("hidden", true);
-        const node = d3.select("#g-sa1101");
-        d3.select("#g-sa1101").attr("display", "all");
-
-        node
-          .transition()
-          .delay(100)
-          .ease(d3.easeLinear)
-          .attr("class", "svg-override-show");
-
-        console.log(d3.select("#g-sa1101"));
-        const neonNode = d3.selectAll("#neon-node-SA1101AX30 path");
-        neonNode.attr("pointerEvents", "all");
-        neonNode
-          .on("mouseover", function(d) {
-            //    d3.select(this).style("transform", "scale(1.1,1.1)");
-          })
-          .on("click", function() {
-            d3.select("#root").classed("blackBackground", false);
-            dispatch({
-              type: "ANALYSIS_SELECT",
-              value: { selectedAnalysis: "SA1101bX60" }
-            });
-
-            handleForwardStep();
-          });
-        //  d3.select("#neon-node-SA1101AX30").remove("*");
-      } else {
-        d3.select("#g-sa1101").attr("display", "none");
-        d3.select(".timepointAxis").classed("hidden", false);
-        d3.select("#dashboardTitle").classed("hidden", false);
-        d3.select("#lineage").classed("svg-hidden", true);
-      }*/
-
+      setButtonDisabled(false);
       setRadius({ prev: radius["current"], current: radius["current"] });
     }
   }, [radius]);
@@ -618,11 +568,20 @@ const Publications = ({ handleForwardStep }) => {
   }, [paintReady]);
 
   const [ref] = useHookWithRefCallback();
-
+  useEffect(() => {
+    d3.xml(all).then(data => {
+      const mainNode = document.getElementById("canvasGraph");
+      mainNode.insertBefore(data.documentElement, mainNode.childNodes[0]);
+      d3.selectAll("#light, #pinkLight, #redLight").attr("class", "hideLight");
+    });
+  }, [false]);
   function useHookWithRefCallback() {
     const ref = useRef(null);
+
     const setRef = useCallback(async node => {
       if (node && context === undefined) {
+        d3.select("#root").attr("class", "blackBackground");
+
         const radius = 400;
         const tree = d3
           .tree()
@@ -644,7 +603,6 @@ const Publications = ({ handleForwardStep }) => {
         setTree(root);
 
         const svg = d3.select("#svg");
-        //    .attr("viewBox", [0, 0, dimensions.width, dimensions.height]);
 
         svg
           .append("g")
@@ -674,13 +632,6 @@ const Publications = ({ handleForwardStep }) => {
               .radius(d => d.y)
           )
           .attr("d", d => lineGen([d.source, d.target]))
-          /*  .attr(
-            "d",
-            d3
-              .linkRadial()
-              .angle(d => d.x)
-              .radius(d => d.y)
-          )*/
           .attr("stroke-opacity", d => (d.source.depth === 0 ? 0.4 : 0.7));
 
         svg
@@ -709,25 +660,25 @@ const Publications = ({ handleForwardStep }) => {
           .attr("opacity", d => (d.depth === 0 ? 0 : 0.7))
           .attr("fill", d => "#999")
           .attr("r", 2.5);
-        //d3.xml([lineageMixtureA, sA535X5XB02895])
-        /*  const lineages = await Promise.all([
-          d3.xml(lineageMixtureA),
-          d3.xml(sA535X5XB02895),
-          d3.xml(sa1035)
-        ]);*/
 
-        d3.xml(all).then(data => {
-          const mainNode = document.getElementById("canvasGraph");
-          mainNode.insertBefore(data.documentElement, mainNode.childNodes[0]);
-          //    mainNode.appendChild(data.documentElement);
-        });
+        var voronoiSaved = d3
+          .select("#canvasSelection")
+          .append("g")
+          .attr("class", "voronoi-group");
+        saveVoronoi(voronoiSaved);
 
-        /*    const mainNode = document.getElementById("canvasGraph");
-        lineages.map(data => {
-          mainNode.appendChild(data.documentElement);
-        });*/
+        function flatten(into, node) {
+          if (node == null) return into;
+          if (Array.isArray(node)) return node.reduce(flatten, into);
+          into.push({ name: node["name"] });
+          return flatten(into, node.children);
+        }
 
-        d3.select("#root").attr("class", "blackBackground");
+        var result = flatten([], data["children"]);
+        storeFlatAnalysisList([
+          ...result.filter(row => row["name"] !== "Cell Line")
+        ]);
+
         setInterval(function() {
           setPaintReady(true);
         }, 1000);
@@ -736,9 +687,9 @@ const Publications = ({ handleForwardStep }) => {
 
     return [setRef];
   }
-
   return (
     <div style={{ marginTop: 45, height: "100%" }}>
+      {false && <CircularProgressWithLabel progress={progress} />}
       <div
         style={{
           width: dimensions.width + "px",
@@ -767,91 +718,91 @@ const Publications = ({ handleForwardStep }) => {
               zIndex: 1
             }}
           />
+          <svg
+            id="canvasSelection"
+            viewBox={"0 0 " + dimensions.width + " " + dimensions.height}
+            style={{
+              pointerEvents: "none",
+              width: dimensions.width + "px",
+              height: dimensions.height + "px",
+              position: "absolute",
+              zIndex: 10
+            }}
+          />
+          <img
+            src={imgSource.src}
+            width={1000}
+            height={750}
+            id={"img-" + imgSource.id}
+            style={{ zIndex: 2, position: "absolute" }}
+          />
         </div>
+      </div>
+      <div>
+        <img
+          src={title}
+          width={500}
+          height={125}
+          style={{ position: "absolute", float: "right", top: 20, right: 0 }}
+        />
       </div>
       <div
         style={{
           position: "absolute",
-          left: "80%",
-          top: "45vh"
+          zIndex: 100,
+          right: 100,
+          top: 0,
+          height: "100%",
+          marginLeft: 50
         }}
       >
-        <IconButton
-          style={{
-            padding: 25,
-            fontSize: "xxx-large",
-            fill: "rgb(251, 247, 235)",
-            color: "rgb(218, 215, 206)",
-            textShadow:
-              "rgb(222 198 121) 1px 1px 10px, rgb(220 179 49) 1px 1px 10px",
-            textAlign: "center"
-          }}
-        >
-          <ArrowUpwardIcon
-            fontSize="large"
-            onClick={() => {
-              setRadius({
-                current: radius["current"] - 1,
-                prev: radius["current"]
-              });
+        <div style={{ marginTop: "40vh" }}>
+          <IconButton
+            classes={{
+              root: classes.iconContainer
             }}
-          />
-        </IconButton>
-        <IconButton style={{ color: "white" }}>
-          <ArrowDownwardIcon
-            fontSize="large"
-            onClick={() => {
-              setRadius({
-                current: radius["current"] + 1,
-                prev: radius["current"]
-              });
+            style={{ marginRight: 150 }}
+            disabled={isButtonDisabled}
+          >
+            <ArrowUpwardIcon
+              fontSize="large"
+              onClick={() => {
+                setButtonDisabled(true);
+                setRadius({
+                  current: radius["current"] - 1,
+                  prev: radius["current"]
+                });
+              }}
+            />
+          </IconButton>
+          <IconButton
+            disabled={isButtonDisabled}
+            classes={{
+              root: classes.iconContainer
             }}
+          >
+            <ArrowDownwardIcon
+              fontSize="large"
+              onClick={() => {
+                setButtonDisabled(true);
+                setRadius({
+                  current: radius["current"] + 1,
+                  prev: radius["current"]
+                });
+              }}
+            />
+          </IconButton>
+        </div>
+        <div style={{ marginTop: "10vh" }}>
+          <Search
+            analysisList={flatAnalysisList}
+            dispatch={dispatch}
+            handleForwardStep={handleForwardStep}
           />
-        </IconButton>
+        </div>
       </div>
     </div>
   );
 };
-/*          <ReactSVG
-            wrapper="span"
-            src={lineage}
-            id="lineage"
-            viewBox={"0 0 " + dimensions.width + " " + dimensions.height}
-            style={{
-              width: dimensions.width + "px",
-              height: dimensions.height + "px",
-              //  position: "absolute",
-              pointerEvents: "all"
-            }}
-            className="svg-hidden"
-          />*/
 
-/*<ReactSVG
-  wrapper="span"
-  src={lineage}
-  id="lineage"
-  viewBox={"0 0 " + dimensions.width + " " + dimensions.height}
-  style={{
-    width: dimensions.width + "px",
-    height: dimensions.height + "px",
-    position: "absolute"
-  }}
-/>*
-/*        <svg
-          id="selectionLayer"
-          style={{
-            width: dimensions.width + "px",
-            height: dimensions.height + "px",
-            position: "relative"
-          }}
-        />*/
-/*{" "}
-<div style={{ paddingTop: 100 }}>
-  <TextField
-    id="outlined-helperText"
-    label="Search Groups"
-    defaultValue=""
-  />
-</div>
-*/
 export default Publications;

@@ -169,7 +169,12 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     .range([scatterplotDim.x1, scatterplotDim.x2])
     .nice();
 
-  const yMin = stats.yMax - stats.yMin > 1 ? stats.yMin - 1 : stats.yMin;
+  const yMin =
+    stats.yMax - stats.yMin > 1
+      ? stats.yMin - 1
+      : stats.yMin > 0.1
+      ? stats.yMin - 0.02
+      : stats.yMin;
   const yMax = stats.yMax - stats.yMin > 1 ? stats.yMax + 1 : stats.yMax;
   const y = d3
     .scaleLinear()
@@ -537,9 +542,6 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       ? x(data.xBuckets[1].key) - x(data.xBuckets[0].key) - barPadding.width
       : x(data.xBuckets[0].key) - barPadding.width;
 
-    console.log(x(data.xBuckets[1].key));
-    console.log(x(data.xBuckets[0].key));
-
     const xBucketCountMax = _.maxBy(data.xBuckets, "count").count;
 
     const yBucketCountMax = _.maxBy(data.yBuckets, "count").count;
@@ -644,20 +646,4 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     </div>
   );
 };
-/*      <svg
-        id="scatterSelection"
-        style={{
-          width: scatterplotDimension,
-          height: scatterplotDimension,
-          position: "unset"
-        }}
-      />*/
-/*        <svg
-          id="scatterSelection"
-          style={{
-            width: scatterplotDimension,
-            height: scatterplotDimension,
-            position: "relative"
-          }}
-        />*/
 export default withStyles(styles)(Scatterplot);

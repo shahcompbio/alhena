@@ -24,15 +24,15 @@ const initialState = {
   },
 
   scatterplotAxis: {
-    x: { label: "Total Mapped Reads", type: "total_mapped_reads" },
-    y: { label: "Mapped Reads", type: "total_reads" },
+    x: { label: "Total Reads", type: "total_reads" },
+    y: { label: "Quality", type: "quality" },
     popupFacadeIsOpen: false,
     selectedCellsDispatchFrom: null
   },
 
   violinAxis: {
     y: { label: "Quality", type: "quality" },
-    x: { label: "Experimental Condition", type: "experimental_condition" }
+    x: { label: "Clone ID", type: "clone_id" }
   },
 
   gcBiasAxis: {
@@ -202,8 +202,8 @@ const statsStateReducer = (state, action) => {
         selectedCellsDispatchFrom: null,
         subsetSelection: [],
         scatterplotAxis: {
-          x: { label: "Total Mapped Reads", type: "total_mapped_reads" },
-          y: { label: "Mapped Reads", type: "total_reads" },
+          x: { label: "Total Reads", type: "total_reads" },
+          y: { label: "Quality", type: "quality" },
           popupFacadeIsOpen: false,
           selectedCellsDispatchFrom: null
         }
