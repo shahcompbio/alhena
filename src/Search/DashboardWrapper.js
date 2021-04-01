@@ -21,7 +21,7 @@ const getDashboardByUser = gql`
   }
 `;
 
-const DashboardWrapper = ({ uri, classes, history }) => {
+const DashboardWrapper = ({ uri, classes, history, client }) => {
   const [{ authKeyID, uid }] = useAppState();
   const ticketFromUrl = uri ? uri.params.ticket : null;
   return (
@@ -50,7 +50,7 @@ const DashboardWrapper = ({ uri, classes, history }) => {
             initialState={intialStateUpdated}
             reducer={dashboardStateReducer}
           >
-            <Content />
+            <Content client={client} />
           </DashboardProvider>
         );
       }}
