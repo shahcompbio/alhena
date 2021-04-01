@@ -337,7 +337,6 @@ const CanvasGraph = ({
 
           if (currNode.parent !== null) {
             var nodeSelectionText = getSelectionPath(currNode, ",");
-            console.log(nodeSelectionText);
 
             const selectionLayer = d3.select("#canvasGraphSelection");
             var previousSelectionClasses = selectionLayer.attr("class");

@@ -115,7 +115,7 @@ const SettingsPanel = ({
   violinOptions,
   numericalDataFilters
 }) => {
-  const [{ selectedAnalysis }] = useDashboardState();
+  const [{ selectedAnalysis, selectedAnalysisMetadata }] = useDashboardState();
   const [
     {
       selectedCells,
@@ -161,6 +161,7 @@ const SettingsPanel = ({
             ? selectedCells.length
             : cellCount
         }
+        metaData={selectedAnalysisMetadata}
         analysis={selectedAnalysis}
       />
       {((selectedCells.length !== 0 && axisChange["datafilter"] == false) ||
@@ -339,7 +340,7 @@ const AccordianWrapper = ({
   </Accordion>
 );
 
-const MetaData = ({ classes, count, analysis, library }) => (
+const MetaData = ({ metaData, classes, count, analysis, library }) => (
   <Paper
     elevation={0}
     className={[classes.panel, classes.metaDataPanel].join(" ")}
@@ -358,11 +359,25 @@ const MetaData = ({ classes, count, analysis, library }) => (
       >
         Analysis: <b>{analysis}</b>
       </Typography>
+      <Typography
+        variant="h6"
+        fontWeight="fontWeightRegular"
+        style={{ color: "#a2a2a2" }}
+      >
+        Library: <b>{metaData["library_id"]}</b>
+      </Typography>
+      <Typography
+        variant="h6"
+        fontWeight="fontWeightRegular"
+        style={{ color: "#a2a2a2" }}
+      >
+        Sample: <b>{metaData["sample_id"]}</b>
+      </Typography>
       {count === null ? (
         <LoadingCircle />
       ) : (
         <Typography
-          variant="h5"
+          variant="h6"
           fontWeight="fontWeightRegular"
           style={{ color: "#a2a2a2" }}
         >

@@ -140,40 +140,83 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
         }
         if (loading) {
           return (
-            <Grid
-              container
-              className={classes.root}
-              spacing={2}
-              key={"grid-container"}
-            >
-              <Grid
-                item
-                xs={6}
-                sm={3}
-                style={{ height: "50vh" }}
-                key={"grid-search"}
+            <div>
+              <Slide
+                direction={getDirection(0)}
+                in={activeStep === 0}
+                mountOnEnter
+                unmountOnExit
+                timeout={slideTimeOut}
+                key={"slideTableContent"}
               >
-                <Search
-                  key={"search"}
-                  selectedOptions={null}
-                  filters={null}
-                  dashboards={[]}
-                  handleFilterChange={null}
-                  handleForwardStep={null}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
-                <CanvasGraph
-                  isLoading={true}
-                  key={"packing-circles"}
-                  filters={[]}
-                  analyses={{}}
-                  data={null}
-                  handleFilterChange={null}
-                  handleForwardStep={null}
-                />
-              </Grid>
-            </Grid>
+                <Grid
+                  item
+                  xs={6}
+                  sm={3}
+                  className={classes.tableWrapper}
+                  key={"grid-table"}
+                >
+                  <Table columns={[]} rows={[]} handleForwardStep={null} />
+                </Grid>
+              </Slide>
+              <Slide
+                timeout={slideTimeOut}
+                direction={getDirection(1)}
+                in={activeStep === 1}
+                mountOnEnter
+                key={"slideGraph"}
+              >
+                <Grid
+                  container
+                  className={classes.root}
+                  spacing={2}
+                  key={"grid-container"}
+                >
+                  <Grid
+                    item
+                    xs={6}
+                    sm={3}
+                    style={{ height: "50vh" }}
+                    key={"grid-search"}
+                  >
+                    <Search
+                      key={"search"}
+                      selectedOptions={null}
+                      filters={null}
+                      dashboards={[]}
+                      handleFilterChange={null}
+                      handleForwardStep={null}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
+                    <CanvasGraph
+                      isLoading={true}
+                      key={"packing-circles"}
+                      filters={[]}
+                      analyses={{}}
+                      data={null}
+                      handleFilterChange={null}
+                      handleForwardStep={null}
+                    />
+                  </Grid>
+                </Grid>
+              </Slide>
+              <div className={classes.stepper}>
+                {[0, 1].map((label, index) => {
+                  return activeStep === index ? (
+                    <RadioButtonCheckedIcon className={classes.activeWhite} />
+                  ) : (
+                    <FiberManualRecordIcon
+                      className={
+                        index === activeStep
+                          ? classes.activeWhite
+                          : classes.disabled
+                      }
+                    />
+                  );
+                })}
+              </div>
+            </div>
           );
         } else {
           if (data["analyses"] && data["analyses"]["error"]) {
@@ -202,6 +245,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
                     <Table
                       columns={data["analyses"]["analysesList"]}
                       rows={data["analyses"]["analysesRows"]}
+                      handleForwardStep={handleForwardStep}
                     />
                   </Grid>
                 </Slide>
@@ -261,10 +305,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
                             ? classes.activeWhite
                             : classes.disabled
                         }
-                        onClick={() => {
-                          console.log(index);
-                          setActiveStep(activeStep === 0 ? 1 : 0);
-                        }}
+                        onClick={() => setActiveStep(activeStep === 0 ? 1 : 0)}
                       />
                     );
                   })}

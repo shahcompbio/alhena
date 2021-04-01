@@ -61,6 +61,12 @@ const HEATMAP_ORDER = gql`
       heatmapOrderFromDataFilters {
         order
       }
+      analysisMetadata(analysis: $analysis) {
+        project
+        sample_id
+        library_id
+        jira_id
+      }
     }
   }
 `;
@@ -145,6 +151,8 @@ const QCDashboard = ({ analysis, classes, client }) => {
 
   if (!loading && data) {
     if (data.heatmapOrder) {
+      history.replace("/dashboards/" + analysis);
+
       var heatmapOrder;
       if (axisChange["datafilter"]) {
         const selection = data.numericalDataFilters.heatmapOrderFromDataFilters.map(
@@ -214,39 +222,6 @@ const QCDashboard = ({ analysis, classes, client }) => {
                     allHeatmapOrder={heatmapOrder}
                     categoryStats={data.categoriesStats}
                   />
-                </Paper>
-                <Paper
-                  key={"chipPaper"}
-                  className={[classes.chip, classes.paperContainer]}
-                >
-                  <Chip key={"chipPlot"} analysis={analysis} />
-                </Paper>
-                <Paper
-                  key={"violinPaper"}
-                  className={[classes.violinContent, classes.paperContainer]}
-                >
-                  <Violin
-                    key={"violinPlot"}
-                    analysis={analysis}
-                    allHeatmapOrder={heatmapOrder}
-                    categoryStats={data.categoriesStats}
-                  />
-                </Paper>
-                <Paper
-                  key={"gcBiasPaper"}
-                  className={[classes.gcBias, classes.paperContainer]}
-                >
-                  <GCBias
-                    key={"gcBiasPlot"}
-                    analysis={analysis}
-                    heatmapOrder={heatmapOrder}
-                  />
-                </Paper>
-                <Paper
-                  key={"scatterPaper"}
-                  className={[classes.scatterplot, classes.paperContainer]}
-                >
-                  <Scatterplot key={"scatterplot"} analysis={analysis} />
                 </Paper>
               </Grid>
             )}

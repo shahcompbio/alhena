@@ -13,7 +13,10 @@ import { DashboardProvider } from "./ProjectView/ProjectState/dashboardState";
 const getDashboardByUser = gql`
   query UserDashboard($user: ApiUser!) {
     getDashboardsByUser(auth: $user) {
-      name
+      dashboards {
+        name
+      }
+      defaultDashboard
     }
   }
 `;
@@ -32,13 +35,14 @@ const DashboardWrapper = ({ uri, classes, history }) => {
         if (loading) return null;
         if (error) return null;
 
-        const dashboards = data.getDashboardsByUser.map(
+        const dashboards = data["getDashboardsByUser"]["dashboards"].map(
           dashboard => dashboard.name
         );
+        const { defaultDashboard } = data["getDashboardsByUser"];
 
         const intialStateUpdated = initialState(
           dashboards,
-          dashboards[0],
+          defaultDashboard,
           ticketFromUrl
         );
         return (
