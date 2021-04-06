@@ -4,7 +4,7 @@ import React, {
   useState,
   useLayoutEffect
 } from "react";
-import { useAppState } from "./util/app-state";
+import { useAppState, PrivateRoute, AdminRoute } from "./util/app-state";
 import { ApolloConsumer } from "react-apollo";
 import { Route, Switch } from "react-router-dom";
 
@@ -29,33 +29,7 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 
 const App = () => {
   const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
-
-  //const [width, height] = useWindowSize();
   let history = useHistory();
-
-  /*  useEffect(() => {
-    if (height && width) {
-      /*  dispatch({
-        type: "SIZE_CHANGE",
-        width: width,
-        height: height
-      });
-    }
-  }, [height, width]);
-
-  function useWindowSize() {
-    const [size, setSize] = useState([0, 0]);
-    useLayoutEffect(() => {
-      function updateSize() {
-        setSize([window.innerWidth, window.innerHeight]);
-      }
-      window.addEventListener("resize", updateSize);
-      updateSize();
-
-      return () => window.removeEventListener("resize", updateSize);
-    }, []);
-    return size;
-  }*/
 
   return (
     <MuiThemeProvider theme={theme}>
@@ -118,63 +92,32 @@ const App = () => {
             </ApolloConsumer>
           )}
         />
-        {authKeyID && [
-          <Route
-            key="ticketSandbox"
-            path="/sandbox"
-            component={({ match }) => {
-              var uri = match;
-              uri.params.ticket = "sc-3792";
-              return (
-                <ApolloConsumer>
-                  {client => <DashboardWrapper uri={uri} client={client} />}
-                </ApolloConsumer>
-              );
-            }}
-          />,
-          <Route
-            key="graph"
-            path="/graph"
-            component={() => <ProjectViewContent />}
-          />,
-          <Route
-            key="dashbaordTicket"
-            path="/dashboards/:ticket"
-            component={({ match }) => {
-              return (
-                <ApolloConsumer>
-                  {client => <DashboardWrapper uri={match} client={client} />}
-                </ApolloConsumer>
-              );
-            }}
-          />,
-          <Route
-            key="dashboard"
-            path="/dashboards"
-            component={() => (
-              <ApolloConsumer>
-                {client => <DashboardWrapper ticket={null} client={client} />}
-              </ApolloConsumer>
-            )}
-          />,
-          <Route
-            exact
-            key="heatmap"
-            path="/heatmap"
-            render={() => <DashboardContent />}
-          />,
-          <Route
-            key="canvasGraph"
-            path="/canvasGraph"
-            component={() => <DashboardWrapper ticket={null} />}
-          />
-        ]}
-        {authKeyID && isSuperUser && (
-          <Route path="/admin" component={() => <AdminPanel />} />
-        )}
+        <PrivateRoute key="dashboard" path="/dashboards">
+          <ApolloConsumer>
+            {client => <DashboardWrapper ticket={null} client={client} />}
+          </ApolloConsumer>
+        </PrivateRoute>
+        <AdminRoute path="/admin">
+          <AdminPanel />
+        </AdminRoute>
       </Switch>
     </MuiThemeProvider>
   );
 };
-
+/*  <PrivateRoute>
+    <Route
+      key="ticketSandbox"
+      path="/sandbox"
+      component={({ match }) => {
+        var uri = match;
+        uri.params.ticket = "sc-3792";
+        return (
+          <ApolloConsumer>
+            {client => <DashboardWrapper uri={uri} client={client} />}
+          </ApolloConsumer>
+        );
+      }}
+    />
+  </PrivateRoute>
+*/
 export default withRouter(App);
