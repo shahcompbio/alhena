@@ -379,13 +379,13 @@ const CanvasGraph = ({
           }
         })
         .on("mousedown", (data, index, element) => {
+          console.log(data);
           if (data.data.element.height === 0) {
-            dispatch({
+            /*    dispatch({
               type: "ANALYSIS_SELECT",
-              value: { selectedAnalysis: data.data.element.data.target }
-            });
-
-            handleForwardStep();
+              value: { selectedAnalysis: data.data.element.data.target, metaData: { ...row } }
+            });*/
+            //  handleForwardStep();
           } else {
             var currNode = data.data.element;
             if (currNode.parent !== null && filters.length === 0) {

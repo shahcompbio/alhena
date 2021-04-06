@@ -6,7 +6,8 @@ import { useDashboardState } from "../ProjectState/dashboardState";
 
 const styles = {
   root: { color: "white" },
-  wrapper: { height: 500, width: 500 }
+  wrapper: { height: 530, width: 1200 },
+  header: { backgroundColor: "#afafafd9" }
 };
 
 const Table = ({ handleForwardStep, classes, columns, rows }) => {
@@ -18,18 +19,19 @@ const Table = ({ handleForwardStep, classes, columns, rows }) => {
         columns={columns.map(field => ({
           field: field["type"],
           headerName: field["label"],
-          width: 500 / columns.length
+          width: field["type"] === "jira_id" ? 800 : 150,
+          headerClassName: classes.header
         }))}
         onRowClick={({ row }) => {
           dispatch({
             type: "ANALYSIS_SELECT",
-            value: { selectedAnalysis: row["jira_id"], metaData: { ...row } }
+            value: { selectedAnalysis: row["jira_id"] }
           });
 
           handleForwardStep();
         }}
         className={classes.root}
-        pageSize={5}
+        pageSize={8}
       />
     </div>
   );

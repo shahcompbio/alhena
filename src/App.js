@@ -124,7 +124,7 @@ const App = () => {
             path="/sandbox"
             component={({ match }) => {
               var uri = match;
-              uri.params.ticket = "sc-3964";
+              uri.params.ticket = "sc-3792";
               return (
                 <ApolloConsumer>
                   {client => <DashboardWrapper uri={uri} client={client} />}
@@ -140,7 +140,13 @@ const App = () => {
           <Route
             key="dashbaordTicket"
             path="/dashboards/:ticket"
-            component={({ match }) => <DashboardWrapper uri={match} />}
+            component={({ match }) => {
+              return (
+                <ApolloConsumer>
+                  {client => <DashboardWrapper uri={match} client={client} />}
+                </ApolloConsumer>
+              );
+            }}
           />,
           <Route
             key="dashboard"

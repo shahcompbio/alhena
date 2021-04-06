@@ -35,10 +35,7 @@ const styles = {
   },
   stepper: { margin: "auto", position: "absolute", bottom: 50, left: "50vw" },
   tableWrapper: {
-    height: "90%",
-    width: "500px",
-    margin: "auto",
-    marginTop: "20vh"
+    marginTop: "15vh"
   }
 };
 const getAllAnalyses = gql`
@@ -242,9 +239,10 @@ const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
                   key={"slideTableContent"}
                 >
                   <Grid
-                    item
-                    xs={6}
-                    sm={3}
+                    container
+                    direction="column"
+                    justify="center"
+                    alignItems="center"
                     className={classes.tableWrapper}
                     key={"grid-table"}
                   >

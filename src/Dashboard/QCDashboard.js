@@ -45,6 +45,11 @@ const HEATMAP_ORDER = gql`
         label
       }
     }
+    analysisMetadata(analysis: $analysis) {
+      sample_id
+      library_id
+      jira_id
+    }
     numericalDataFilters(
       analysis: $analysis
       quality: $quality
@@ -60,12 +65,6 @@ const HEATMAP_ORDER = gql`
       }
       heatmapOrderFromDataFilters {
         order
-      }
-      analysisMetadata(analysis: $analysis) {
-        project
-        sample_id
-        library_id
-        jira_id
       }
     }
   }
@@ -136,11 +135,15 @@ const QCDashboard = ({ analysis, classes, client }) => {
   ] = useStatisticsState();
   let history = useHistory();
 
+  if (history.location.pathname !== "/dashboards/" + analysis) {
+    //  history.replace("/dashboards/" + analysis);
+  }
   const params = getQueryParams(
     isContaminated,
     expCondition,
     numericalDataFilters
   );
+
   const { loading, data } = useQuery(HEATMAP_ORDER, {
     variables: {
       analysis: analysis,
@@ -151,8 +154,6 @@ const QCDashboard = ({ analysis, classes, client }) => {
 
   if (!loading && data) {
     if (data.heatmapOrder) {
-      history.replace("/dashboards/" + analysis);
-
       var heatmapOrder;
       if (axisChange["datafilter"]) {
         const selection = data.numericalDataFilters.heatmapOrderFromDataFilters.map(
@@ -172,6 +173,7 @@ const QCDashboard = ({ analysis, classes, client }) => {
             ? selectedCells
             : data.heatmapOrder.map(order => order.order);
       }
+
       return (
         <div className={classes.root}>
           <Grid
@@ -191,6 +193,7 @@ const QCDashboard = ({ analysis, classes, client }) => {
               <SettingsPanel
                 key={"settingsPanel"}
                 client={client}
+                metaData={data.analysisMetadata}
                 numericalDataFilters={
                   data.numericalDataFilters.numericalDataFilters
                 }
@@ -205,7 +208,9 @@ const QCDashboard = ({ analysis, classes, client }) => {
             {heatmapOrder && heatmapOrder.length === 0 ? (
               <Grid item className={classes.plots} xs={9} key={"plotPanelGrid"}>
                 <Paper
-                  className={[classes.scatterplot, classes.paperContainer]}
+                  className={[classes.scatterplot, classes.paperContainer].join(
+                    " "
+                  )}
                 >
                   <div>NO CELLS SELECTED</div>
                 </Paper>
@@ -214,7 +219,10 @@ const QCDashboard = ({ analysis, classes, client }) => {
               <Grid item className={classes.plots} xs={9} key={"plotPanelGrid"}>
                 <Paper
                   key={"heatmapPaper"}
-                  className={[classes.heatmapContent, classes.paperContainer]}
+                  className={[
+                    classes.heatmapContent,
+                    classes.paperContainer
+                  ].join(" ")}
                 >
                   <Heatmap
                     key={"heatmapPlot"}
@@ -222,6 +230,44 @@ const QCDashboard = ({ analysis, classes, client }) => {
                     allHeatmapOrder={heatmapOrder}
                     categoryStats={data.categoriesStats}
                   />
+                </Paper>
+                <Paper
+                  key={"chipPaper"}
+                  className={[classes.chip, classes.paperContainer].join(" ")}
+                >
+                  <Chip key={"chipPlot"} analysis={analysis} />
+                </Paper>
+                <Paper
+                  key={"violinPaper"}
+                  className={[
+                    classes.violinContent,
+                    classes.paperContainer
+                  ].join(" ")}
+                >
+                  <Violin
+                    key={"violinPlot"}
+                    analysis={analysis}
+                    allHeatmapOrder={heatmapOrder}
+                    categoryStats={data.categoriesStats}
+                  />
+                </Paper>
+                <Paper
+                  key={"gcBiasPaper"}
+                  className={[classes.gcBias, classes.paperContainer].join(" ")}
+                >
+                  <GCBias
+                    key={"gcBiasPlot"}
+                    analysis={analysis}
+                    heatmapOrder={heatmapOrder}
+                  />
+                </Paper>
+                <Paper
+                  key={"scatterPaper"}
+                  className={[classes.scatterplot, classes.paperContainer].join(
+                    " "
+                  )}
+                >
+                  <Scatterplot key={"scatterplot"} analysis={analysis} />
                 </Paper>
               </Grid>
             )}
@@ -251,6 +297,7 @@ const QCDashboard = ({ analysis, classes, client }) => {
           >
             <SettingsPanel
               key={"settingsPanel"}
+              metaData={null}
               cellCount={null}
               categoryStats={[]}
               analysis={null}
@@ -261,31 +308,37 @@ const QCDashboard = ({ analysis, classes, client }) => {
           <Grid item className={classes.plots} xs={9} key={"plotPanelGrid"}>
             <Paper
               key={"heatmapPaper"}
-              className={[classes.heatmapContent, classes.paperContainer]}
+              className={[classes.heatmapContent, classes.paperContainer].join(
+                " "
+              )}
             >
               <LoadingCircle />
             </Paper>
             <Paper
               key={"chipPaper"}
-              className={[classes.chip, classes.paperContainer]}
+              className={[classes.chip, classes.paperContainer].join(" ")}
             >
               <LoadingCircle />
             </Paper>
             <Paper
               key={"violinPaper"}
-              className={[classes.violinContent, classes.paperContainer]}
+              className={[classes.violinContent, classes.paperContainer].join(
+                " "
+              )}
             >
               <LoadingCircle />
             </Paper>
             <Paper
               key={"gcBiasPaper"}
-              className={[classes.gcBias, classes.paperContainer]}
+              className={[classes.gcBias, classes.paperContainer].join(" ")}
             >
               <LoadingCircle />
             </Paper>
             <Paper
               key={"scatterPaper"}
-              className={[classes.scatterplot, classes.paperContainer]}
+              className={[classes.scatterplot, classes.paperContainer].join(
+                " "
+              )}
             >
               <LoadingCircle />
             </Paper>

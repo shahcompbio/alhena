@@ -43,7 +43,7 @@ const styles = theme => ({
   content: {
     flexGrow: 1,
     backgroundColor: "#FFFFFFF",
-    padding: theme.spacing.unit * 3
+    padding: theme.spacing(3)
   },
   container: {
     minHeight: "100vh"

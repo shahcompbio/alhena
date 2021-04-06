@@ -113,9 +113,10 @@ const SettingsPanel = ({
   cellCount,
   chipHeatmapOptions,
   violinOptions,
-  numericalDataFilters
+  numericalDataFilters,
+  metaData
 }) => {
-  const [{ selectedAnalysis, selectedAnalysisMetadata }] = useDashboardState();
+  const [{ selectedAnalysis, selectedDashboard }] = useDashboardState();
   const [
     {
       selectedCells,
@@ -127,6 +128,9 @@ const SettingsPanel = ({
     },
     dispatch
   ] = useStatisticsState();
+  console.log(selectedDashboard);
+  const meta = metaData ? metaData : {};
+
   const [openAccordian, setIsOpenAccordian] = useState({
     dataFilter: false,
     scatterplot: false,
@@ -151,7 +155,11 @@ const SettingsPanel = ({
       : false;
 
   return (
-    <Paper className={classes.settings} elevation={0}>
+    <Paper
+      key={"settingsPanelPaper"}
+      className={classes.settings}
+      elevation={0}
+    >
       <MetaData
         classes={classes}
         count={
@@ -161,7 +169,8 @@ const SettingsPanel = ({
             ? selectedCells.length
             : cellCount
         }
-        metaData={selectedAnalysisMetadata}
+        metaData={meta}
+        project={selectedDashboard}
         analysis={selectedAnalysis}
       />
       {((selectedCells.length !== 0 && axisChange["datafilter"] == false) ||
@@ -195,7 +204,7 @@ const SettingsPanel = ({
           resetFilter("DATA_FILTER_OFF");
         }}
       >
-        <ApolloConsumer>
+        <ApolloConsumer key={"dataFilterConsumer"}>
           {client =>
             categoryStats.length > 0 ? (
               <DataFilters
@@ -219,7 +228,6 @@ const SettingsPanel = ({
       </AccordianWrapper>
       <AccordianWrapper
         classes={classes}
-        key={"scatterplotAccordianWrapper"}
         name="scatterplot"
         title="Scatterplot"
         setIsOpenAccordian={setIsOpenAccordian}
@@ -315,14 +323,18 @@ const AccordianWrapper = ({
         [name]: !openAccordian[name]
       })
     }
+    key={name + "accordian"}
   >
     <AccordionSummary
+      key={name + "summary"}
       className={classes.AccordionSummary}
       expandIcon={<ExpandMoreIcon />}
       aria-controls={"panel-" + name + "-content"}
       id={"panel-" + name}
     >
-      <Typography variant="body1">{title}</Typography>
+      <Typography variant="body1" key={name + "title"}>
+        {title}
+      </Typography>
       {isResetPossible && (
         <AccordionActions style={{ width: "100%" }}>
           <Button size="small" onClick={resetFilter}>
@@ -332,6 +344,7 @@ const AccordianWrapper = ({
       )}
     </AccordionSummary>
     <AccordionDetails
+      key={name + "details"}
       id={"panel-" + name + "-content"}
       className={classes.panelDetails}
     >
@@ -340,7 +353,7 @@ const AccordianWrapper = ({
   </Accordion>
 );
 
-const MetaData = ({ metaData, classes, count, analysis, library }) => (
+const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
   <Paper
     elevation={0}
     className={[classes.panel, classes.metaDataPanel].join(" ")}
@@ -353,26 +366,51 @@ const MetaData = ({ metaData, classes, count, analysis, library }) => (
       alignItems="flex-start"
     >
       <Typography
-        variant="h5"
-        fontWeight="fontWeightRegular"
-        style={{ color: "#a2a2a2" }}
-      >
-        Analysis: <b>{analysis}</b>
-      </Typography>
-      <Typography
         variant="h6"
         fontWeight="fontWeightRegular"
-        style={{ color: "#a2a2a2" }}
+        style={{
+          color: "#a2a2a2"
+        }}
       >
-        Library: <b>{metaData["library_id"]}</b>
+        Analysis:
+        <span
+          style={{
+            width: 225,
+            display: "inline-block",
+            fontWeight: "bold",
+            wordBreak: "break-all"
+          }}
+        >
+          {analysis}
+        </span>
       </Typography>
-      <Typography
-        variant="h6"
-        fontWeight="fontWeightRegular"
-        style={{ color: "#a2a2a2" }}
-      >
-        Sample: <b>{metaData["sample_id"]}</b>
-      </Typography>
+      {project && (
+        <Typography
+          variant="h6"
+          fontWeight="fontWeightRegular"
+          style={{ color: "#a2a2a2" }}
+        >
+          Project: {project}
+        </Typography>
+      )}
+      {metaData && (
+        <Typography
+          variant="h6"
+          fontWeight="fontWeightRegular"
+          style={{ color: "#a2a2a2" }}
+        >
+          Library: {metaData["library_id"]}
+        </Typography>
+      )}
+      {metaData && (
+        <Typography
+          variant="h6"
+          fontWeight="fontWeightRegular"
+          style={{ color: "#a2a2a2" }}
+        >
+          Sample: {metaData["sample_id"]}
+        </Typography>
+      )}
       {count === null ? (
         <LoadingCircle />
       ) : (
