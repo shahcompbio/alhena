@@ -1,18 +1,5 @@
 import gql from "graphql-tag";
-export const DELETEDASHBOARD = gql`
-  query deleteDashboard($name: String!) {
-    deleteDashboard(name: $name) {
-      allDeleted
-    }
-  }
-`;
-export const UPDATEDASHBOARD = gql`
-  query updateDashboard($dashboard: DashboardInput!) {
-    updateDashboard(dashboard: $dashboard) {
-      updated
-    }
-  }
-`;
+
 export const CREATENEWDASHBOARD = gql`
   query createNewDashboard($dashboard: DashboardInput!) {
     createNewDashboard(dashboard: $dashboard) {
@@ -20,23 +7,7 @@ export const CREATENEWDASHBOARD = gql`
     }
   }
 `;
-export const GETINDICESBYDASHBOARD = gql`
-  query getIndex($dashboard: String!) {
-    getAllIndices {
-      name
-    }
-    getIndicesByDashboard(dashboard: $dashboard) {
-      name
-    }
-  }
-`;
-export const GETALLDASHBOARDOPTIONS = gql`
-  query getIndices {
-    getAllIndices {
-      name
-    }
-  }
-`;
+
 export const UPDATEUSERROLES = gql`
   query updateUserRoles(
     $username: String!
@@ -77,13 +48,6 @@ export const NEWUSER = gql`
   query createNewUser($user: NewUser!) {
     createNewUser(user: $user) {
       created
-    }
-  }
-`;
-export const DELETEUSERBYUSERNAME = gql`
-  query DeleteUser($username: String!) {
-    deleteUser(username: $username) {
-      isDeleted
     }
   }
 `;

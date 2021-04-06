@@ -1,10 +1,11 @@
-import React, { useRef, useCallback } from "react";
+import React, { useRef, useCallback, useState } from "react";
 
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
 import * as d3 from "d3";
 
 import Grid from "@material-ui/core/Grid";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 import { heatmapConfig } from "./config.js";
 import { getGenomeYScale } from "./utils.js";
@@ -36,6 +37,12 @@ const ProfileWrapper = ({
   const genomeYScale = getGenomeYScale(maxState);
   const axisDomain = Array.from(Array(maxState + 1).keys());
   const xOffset = categoryLength === 1 ? 12 : categoryLength === 2 ? 5 : 0;
+  const [isLoading, setIsLoading] = useState(false);
+
+  function setLoadingCircle(value) {
+    setIsLoading(value);
+  }
+
   function useHookWithRefCallback() {
     const ref = useRef(null);
     const setRef = useCallback(node => {
@@ -95,7 +102,7 @@ const ProfileWrapper = ({
 
   const [ref] = useHookWithRefCallback();
 
-  const ProfileWithData = () =>
+  const ProfileWithData = ({ resetLoadingCircle }) =>
     cellId ? (
       <Query
         query={BINS_QUERY}
@@ -105,10 +112,14 @@ const ProfileWrapper = ({
         }}
       >
         {({ loading, error, data }) => {
-          if (loading) return null;
+          if (loading) {
+            resetLoadingCircle(true);
+            return null;
+          }
           if (error) return null;
 
           const { bins } = data;
+          resetLoadingCircle(false);
           return (
             <Profile
               cellSegs={segs}
@@ -139,7 +150,7 @@ const ProfileWrapper = ({
           id="profileSvg"
           width={heatmapConfig.width}
           height={heatmapConfig.profile.height}
-          style={{ marginTop: 5 }}
+          style={{ marginTop: 5, position: "absolute" }}
         />
         <canvas
           id="profileCanvas"
@@ -150,8 +161,18 @@ const ProfileWrapper = ({
           width={heatmapConfig.width}
           height={heatmapConfig.profile.height}
         >
-          <ProfileWithData />
+          <ProfileWithData resetLoadingCircle={value => setIsLoading(value)} />
         </canvas>
+        {cellId && isLoading && (
+          <CircularProgress
+            size={70}
+            style={{
+              position: "relative",
+              marginLeft: heatmapConfig.width * 0.45,
+              marginTop: heatmapConfig.profile.height * 0.45
+            }}
+          />
+        )}
       </Grid>
     </Grid>
   );

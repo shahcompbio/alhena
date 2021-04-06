@@ -4,7 +4,6 @@ import Search from "./Filter/Search.js";
 import { useAppState } from "../../util/app-state";
 import { withStyles } from "@material-ui/styles";
 
-import Graph from "./Graph/Graph2.js";
 import CanvasGraph from "./Graph/CanvasGraph.js";
 
 import { Query } from "react-apollo";
@@ -80,6 +79,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
 
   const handleFilterChange = (filter, type) => {
     var options = selectedOptions;
+
     if (filter && type.localeCompare("clear") !== 0) {
       options[filter.label] = {
         value: filter.label,
@@ -91,6 +91,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
       var newFilters = filters.filter((value, i) => value.label !== filter);
       delete selectedOptions[filter];
 
+      setSelectedOptions(selectedOptions);
       setFilters([...newFilters]);
     }
   };
@@ -149,7 +150,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
             </Grid>
           );
         } else {
-          if (data["analyses"]["error"]) {
+          if (data["analyses"] && data["analyses"]["error"]) {
             dispatch({
               type: "LOGOUT"
             });
@@ -166,7 +167,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
                   item
                   xs={6}
                   sm={3}
-                  style={{ height: "50vh" }}
+                  style={{ height: "50vh", zIndex: 1000 }}
                   key={"grid-search"}
                 >
                   <Search

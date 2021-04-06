@@ -1,9 +1,11 @@
+import React, { useState, useEffect } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import React from "react";
+
 const strokeWidth = 2;
 const ProgressProvider = ({ values, children }) => {
-  const [valueIndex, setValueIndex] = React.useState(0);
-  React.useEffect(() => {
+  const [valueIndex, setValueIndex] = useState(0);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setValueIndex(valueIndex => (valueIndex + 1) % values.length);
     }, 1000);
@@ -11,12 +13,15 @@ const ProgressProvider = ({ values, children }) => {
       clearInterval(interval);
     };
   }, []);
+
   return children(valueIndex);
 };
+
 const LoadingCircle = ({ overRideStroke, isStopped }) => {
   const percentageValues = isStopped
     ? [100]
     : [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+
   return (
     <ProgressProvider values={percentageValues}>
       {valueIndex => (

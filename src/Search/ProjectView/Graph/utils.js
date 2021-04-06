@@ -2,7 +2,20 @@ import * as d3 from "d3";
 
 import { config } from "../config.js";
 const displayConfig = config.DisplayConfig;
-
+export const setLargerPanelFont = (context, screenType) => {
+  context.font = screenType.isBigScreen
+    ? "30px Lucida Console, Monaco, monospace"
+    : screenType.isMedScreen
+    ? "18px Lucida Console, Monaco, monospace"
+    : "15px Lucida Console, Monaco, monospace";
+};
+export const setSmallerPanelFont = (context, screenType) => {
+  context.font = screenType.isBigScreen
+    ? "15px Lucida Console, Monaco, monospace"
+    : screenType.isMedScreen
+    ? "12px Lucida Console, Monaco, monospace"
+    : "10px Lucida Console, Monaco, monospace";
+};
 export function originalRadiusCanvas(d) {
   if (d.depth === 0) {
     return 800;
@@ -41,7 +54,10 @@ export const voronoid = d3
   .voronoi()
   .x(d => d.x)
   .y(d => d.y)
-  .extent([[-4000, -4000], [4000, 4000]]);
+  .extent([
+    [-4000, -4000],
+    [4000, 4000]
+  ]);
 
 export const removeLegendLabels = () => {
   d3.selectAll(

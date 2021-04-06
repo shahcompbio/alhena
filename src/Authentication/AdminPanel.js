@@ -28,9 +28,11 @@ const styles = theme => ({
     backgroundColor: "#ffffff",
     margin: "auto",
     marginTop: "-80px",
-    width: "90%"
+    width: "90%",
+    zIndex: 10
   },
   icons: {
+    padding: 0,
     zIndex: 5
   },
   iconSvg: { width: "1.5em", height: "1.5em" },
@@ -47,6 +49,7 @@ const styles = theme => ({
   tabs: { alignSelf: "flex-end" },
   toolbar: { overflow: "hidden" }
 });
+
 const AdminPanel = ({ classes }) => {
   const theme = useTheme();
 

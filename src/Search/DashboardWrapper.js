@@ -31,6 +31,7 @@ const DashboardWrapper = ({ uri, classes, history }) => {
       {({ loading, error, data }) => {
         if (loading) return null;
         if (error) return null;
+
         const dashboards = data.getDashboardsByUser.map(
           dashboard => dashboard.name
         );

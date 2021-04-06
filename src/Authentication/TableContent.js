@@ -24,7 +24,9 @@ const rowLabels = {
   name: "Name",
   count: "Analyses Count"
 };
+
 const editableRows = { roles: true };
+
 const styles = theme => ({
   select: {
     "&:before": {
@@ -32,6 +34,7 @@ const styles = theme => ({
     }
   }
 });
+
 const TableContent = ({
   classes,
   history,

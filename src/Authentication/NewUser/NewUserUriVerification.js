@@ -37,7 +37,6 @@ const NewUserUriVerification = ({ uri, dispatch }) => {
           return <LoadingCircle />;
         } else {
           if (data.verifyNewUserUri.isValid) {
-            //
             return (
               <NewAccount
                 email={data.verifyNewUserUri.email}

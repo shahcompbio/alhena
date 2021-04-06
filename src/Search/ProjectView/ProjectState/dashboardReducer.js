@@ -1,14 +1,21 @@
 const initialState = (dashboards, selectedDashboard, selectedAnalysis) => {
   return {
     dashboards: dashboards,
-    selectedDashboard: "DLP",
-    selectedAnalysis: selectedAnalysis
+    selectedDashboard: selectedDashboard,
+    selectedAnalysis: selectedAnalysis,
+    filterMouseover: null,
+    dimensions: { width: 0, height: 0 }
   };
 };
 
 const statsStateReducer = (state, action) => {
-  console.log(action);
   switch (action.type) {
+    case "SIZE_CHANGE": {
+      return {
+        ...state,
+        dimensions: { width: action.width, height: action.height }
+      };
+    }
     case "DASHBOARD_SELECT": {
       return {
         ...state,
@@ -18,10 +25,16 @@ const statsStateReducer = (state, action) => {
     case "ANALYSIS_SELECT": {
       return {
         ...state,
-        //selectedAnalysis: action.value.selectedAnalysis
-        //  ? "sc-2602"
-        //  : action.value.selectedAnalysis
         selectedAnalysis: action.value.selectedAnalysis
+      };
+    }
+    case "FILTER_MOUSEOVER": {
+      return {
+        ...state,
+        filterMouseover: {
+          type: action.value.type,
+          value: action.value.value
+        }
       };
     }
     default:

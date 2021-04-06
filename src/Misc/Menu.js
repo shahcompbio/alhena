@@ -132,7 +132,10 @@ const Menu = ({ history, classes }) => {
 
   return (
     <div className={classes.root}>
-      <div className={classes.wrapper}>
+      <div
+        className={classes.wrapper}
+        style={{ pointerEvents: open ? "all" : "none" }}
+      >
         <SpeedDial
           ariaLabel="Alhena Menu"
           classes={{ root: classes.speedDial, fab: classes.fab }}

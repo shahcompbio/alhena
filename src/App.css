@@ -10,7 +10,11 @@
   height: 40vmin;
   pointer-events: none;
 }
-
+#title {
+  fill: #345c70;
+  font-kerning: 2px;
+  font-size: 120px;
+}
 .App-header {
   background-color: #2b2a2a;
   min-height: 100vh;
@@ -193,6 +197,12 @@
 
   top: 7px;
 }
+#categoryTip {
+  margin: 5px;
+  border: 1px solid #2e3131;
+  border-radius: 5px;
+  background: #2e3131;
+}
 .d3-tip {
   line-height: 1;
   padding: 6px;
@@ -224,7 +234,58 @@
   left: 0;
   text-align: center;
 }
+#violinTip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: white;
+  position: absolute;
+  pointer-events: none;
+}
+/* Style northward tooltips differently */
+#violinTip.w:after {
+  content: "\25B6";
+  margin: -4px 0 0 -1px;
+  top: 50%;
+  left: 100%;
+}
+#violinTip {
+  stroke: black;
+  stroke-width: 2;
+  background: #c2c0bf;
 
+  background-color: #c2c0bf;
+  opacity: 0.1;
+}
+
+.hoverViolin {
+  stroke-width: 10px;
+}
+#categoryChipTip {
+  fill: #ffffff;
+  color: #ffffff;
+  stroke-width: 2;
+
+  border: 1px solid #2e3131;
+  border-radius: 5px;
+  background: #2e3131;
+}
+/* Northward tooltips */
+#categoryChipTip.n:after {
+  content: "\25BC";
+
+  color: #2e3131;
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+  text-align: center;
+}
+.hoveredCategorySquare {
+  stroke: black;
+  stroke-width: 2;
+}
 @keyframes neon {
   from {
     text-shadow: 0 0 2px rgba(255, 255, 225, 0.92),

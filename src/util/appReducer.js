@@ -37,6 +37,12 @@ const appStateReducer = (state, action) => {
 
       return { ...state, authAttempted: false, authKeyID: null, uid: null };
     }
+    case "SIZE_CHANGE": {
+      return {
+        ...state,
+        dimensions: { width: action.width, height: action.height }
+      };
+    }
     default:
       return state;
   }

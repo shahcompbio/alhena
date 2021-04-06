@@ -89,12 +89,19 @@ const getIndicesFromAllHeatmapOrder = allHeatmapOrder =>
   );
 
 const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
-  const [{ quality }] = useStatisticsState();
-  const [heatmapOrder, setHeatmapOrder] = useState([...allHeatmapOrder]);
+  const [{ quality, selectedCells, subsetSelection }] = useStatisticsState();
+  const [heatmapOrder, setHeatmapOrder] = useState([]);
+
   const [hoverCell, setHoverCell] = useState({ cell: {} });
-  const [indices, setIndices] = useState([
-    ...getIndicesFromAllHeatmapOrder(allHeatmapOrder)
-  ]);
+  const [selectedCell, setSelectedCell] = useState({ cell: {} });
+
+  const [indices, setIndices] = useState([]);
+  useEffect(() => {
+    if (allHeatmapOrder) {
+      setHeatmapOrder([...allHeatmapOrder]);
+      setIndices([...getIndicesFromAllHeatmapOrder(allHeatmapOrder)]);
+    }
+  }, [allHeatmapOrder, selectedCells, subsetSelection]);
 
   const heatmapOrderToHeatmapIndex = scalePoint()
     .domain([...heatmapOrder])
@@ -171,6 +178,16 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
               </Grid>
               <Grid item>
                 <Plot
+                  setSelectedCell={(y, heatmapRow) => {
+                    const cell = segs[heatmapRow];
+                    if (cell !== undefined) {
+                      setHoverCell({
+                        y: yScale(heatmapRow),
+                        cell: segs[heatmapRow]
+                      });
+                    }
+                  }}
+                  selectedCell={selectedCell}
                   setHoverCellCoordinate={(y, heatmapRow) => {
                     const cell = segs[heatmapRow];
                     if (cell !== undefined) {
@@ -180,6 +197,7 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
                       });
                     }
                   }}
+                  indicator={hoverCell["y"]}
                   chromosomes={chromosomes}
                   analysisStats={analysisStats}
                   segs={segs}
@@ -215,6 +233,7 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
             </Grid>
             <Grid item style={{ marginTop: 5, marginLeft: 3 }}>
               <ProfileWrapper
+                loading={true}
                 categoryLength={categoryStats.length}
                 segs={hoverCell["cell"]}
                 maxState={analysisStats["maxState"]}
@@ -225,6 +244,11 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
                 key={"genomeProfile"}
               />
             </Grid>
+            <div id="heatmapCellID" style={{ height: 15, margin: 5 }}>
+              {Object.keys(hoverCell["cell"]).length !== 0 && (
+                <div>Cell ID: {hoverCell["cell"]["id"]}</div>
+              )}
+            </div>
           </Grid>
         );
       }}
@@ -236,13 +260,16 @@ const Plot = ({
   chromosomes,
   analysisStats,
   setHoverCellCoordinate,
+  setSelectedCell,
   segs,
-  categoryWidth
+  categoryWidth,
+  indicator
 }) => {
   const [context, saveContext] = useState();
 
   const [ref] = useHookWithRefCallback();
   const [rowHoverCordinates, setRowHoverCordinates] = useState(null);
+  const [selectedCellCoordinates, setRowSelectedCoordinates] = useState(null);
 
   const yScale = getYScale(heatmapConfig.height / heatmapConfig.rowHeight);
 
@@ -255,18 +282,32 @@ const Plot = ({
   const chromMap = getChromPixelMapping(chromosomes);
 
   useEffect(() => {
+    if (selectedCellCoordinates && rowHoverCordinates === null) {
+      const roundY = Math.max(selectedCellCoordinates[1], 0);
+      var heatmapRow = yScale.domain()[d3.bisect(invertYScale, roundY) - 1];
+      if (heatmapRow < segs.length) {
+        setSelectedCell(selectedCellCoordinates[1], heatmapRow);
+        drawHeatmap(segs, context, yScale(heatmapRow));
+      }
+    }
     if (rowHoverCordinates !== null) {
       const roundY = Math.max(rowHoverCordinates[1], 0);
       var heatmapRow = yScale.domain()[d3.bisect(invertYScale, roundY) - 1];
-      setHoverCellCoordinate(rowHoverCordinates[1], heatmapRow);
+      if (heatmapRow < segs.length) {
+        setHoverCellCoordinate(rowHoverCordinates[1], heatmapRow);
+        drawHeatmap(segs, context, yScale(heatmapRow));
+      } else {
+        setRowHoverCordinates(null);
+      }
     }
-  }, [rowHoverCordinates]);
+  }, [rowHoverCordinates, selectedCellCoordinates]);
 
   useEffect(() => {
     if (context) {
       drawHeatmap(segs, context);
     }
   }, [segs]);
+
   function useHookWithRefCallback() {
     const ref = useRef(null);
     const setRef = useCallback(node => {
@@ -277,28 +318,33 @@ const Plot = ({
           .attr("width", width)
           .attr("height", height - heatmapConfig.chromosome["height"])
           .attr("transform", "translate(" + 0 + "," + margin.top + ")");
+
         const context = initContext(canvas, width, height);
 
         saveContext(context);
         context.save();
-        drawHeatmap(segs, context);
-        d3.select("#heatSelection").on("mousemove", function() {
-          var coordinates = d3.mouse(this);
-          var alreadySelected = d3.select(this).attr("class");
-          if (
-            alreadySelected === null ||
-            parseInt(alreadySelected) !== coordinates[1]
-          ) {
+        drawHeatmap(segs, context, indicator);
+
+        d3.select("#heatSelection")
+          .on("mousemove", function() {
+            var coordinates = d3.mouse(this);
             setRowHoverCordinates(coordinates);
-            d3.select(this).attr("class", coordinates[1]);
-          }
-        });
+          })
+          .on("mousedown", function() {
+            var coordinates = d3.mouse(this);
+            setRowSelectedCoordinates(coordinates);
+          })
+          .on("mouseout", function() {
+            if (selectedCellCoordinates !== null) {
+              setRowHoverCordinates(null);
+            }
+          });
       }
     }, []);
 
     return [setRef];
   }
-  const drawHeatmap = (segs, context) => {
+  const drawHeatmap = (segs, context, indicator) => {
     context.clearRect(0, 0, width, height);
     segs.forEach((segRow, index) => {
       const y = yScale(index);
@@ -317,6 +363,20 @@ const Plot = ({
         );
         context.stroke();
       });
+
+      if (indicator) {
+        context.beginPath();
+        context.fillStyle = "black";
+
+        context.fillRect(
+          0,
+          indicator + heatmapConfig["rowHeight"],
+          heatmapConfig["width"] - categoryWidth,
+          0.8
+        );
+
+        context.stroke();
+      }
     });
   };
 

@@ -8,20 +8,27 @@ import React, {
 import * as d3 from "d3";
 
 import { createRoot, hierarchyColouring } from "./appendUtils.js";
-import { getSelectionPath, voronoid, originalRadiusCanvas } from "./utils";
+import {
+  getSelectionPath,
+  originalRadiusCanvas,
+  setSmallerPanelFont,
+  setLargerPanelFont
+} from "./utils";
 import { config } from "../config.js";
-
-import _ from "lodash";
 
 import { useDashboardState } from "../ProjectState/dashboardState";
 
+import { useAppState } from "../../../util/app-state";
+
 import { initContext } from "../../../Dashboard/utils.js";
-const graphDimension = 800;
+
 const spacingOffset = 200;
-const margin = {
-  left: 50,
-  top: 100
-};
+const getScreenType = width => ({
+  isBigScreen: width > 1700,
+  isMedScreen: width >= 1330 && width <= 1700,
+  isSmallScreen: width < 1330,
+  is1DPR: window.devicePixelRatio === 1
+});
 
 const CanvasGraph = ({
   isLoading,
@@ -30,17 +37,82 @@ const CanvasGraph = ({
   handleFilterChange,
   handleForwardStep
 }) => {
-  const [{}, dispatch] = useDashboardState();
+  const [
+    { filterMouseover, dimensions, selectedAnalysis },
+    dispatch
+  ] = useDashboardState();
   const [context, saveContext] = useState();
   const [nodes, setNodes] = useState();
   const [links, setLinks] = useState();
   const [currScale, setCurrScale] = useState(1);
 
   const [allCircleCords, setAllCircleCords] = useState([]);
+  const screenType = getScreenType(dimensions.width);
 
-  const graphRef = useRef(null);
+  useEffect(() => {
+    if (filterMouseover && context) {
+      if (filterMouseover.value === null) {
+        //clear
+        clearAll(context);
+        drawLinks(context, links, [], 0);
+        drawNodes(context, nodes, [], 0, null);
+      } else {
+        const graph = d3.select("#canvasGraphSelection");
+        const filterSelection = graph.select(
+          "#canvasGraphSelection .voronoi-" + filterMouseover.value
+        );
 
-  const [width, height] = useWindowSize();
+        if (!filterSelection.empty()) {
+          filterSelection.dispatch("mouseover");
+        }
+      }
+    }
+  }, [filterMouseover]);
+
+  const voronoid = screenType.is1DPR
+    ? d3
+        .voronoi()
+        .x(d => d.x)
+        .y(d => d.y)
+        .extent([
+          [-dimensions.width, -dimensions.height],
+          [dimensions.width, dimensions.height]
+        ])
+    : d3
+        .voronoi()
+        .x(d => d.x * 0.5 + dimensions.width / 6)
+        .y(d => d.y * 0.5 + dimensions.height / 4)
+        .extent([
+          [-dimensions.width, -dimensions.height],
+          [dimensions.width, dimensions.height]
+        ]);
+  useEffect(() => {
+    if (dimensions.width !== 0 && dimensions.height !== 0 && !context) {
+      const graph = d3.select("#canvasGraph");
+      const canvas = graph
+        .select("canvas")
+        .attr("width", dimensions.width)
+        .attr("height", dimensions.height);
+
+      //  setCurrScale(1);
+
+      const context = initContext(canvas, dimensions.width, dimensions.height);
+      saveContext(context);
+
+      d3.select("#canvasGraphSelection")
+        .attr("width", dimensions.width + "px")
+        .attr("height", dimensions.height + "px");
+    }
+    if (context && dimensions.width !== 0 && dimensions.height !== 0) {
+      const canvas = d3.select("#canvasGraph canvas").node();
+
+      let scale = window.devicePixelRatio;
+      canvas.style.width = dimensions.width + "px";
+      canvas.style.height = dimensions.height + "px";
+      canvas.width = dimensions.width * scale;
+      canvas.height = dimensions.height * scale;
+    }
+  }, [dimensions]);
 
   useEffect(() => {
     if (data && context) {
@@ -57,11 +129,43 @@ const CanvasGraph = ({
 
       context.restore();
       clearAll(context);
-      if (currScale !== 0.9) {
-        context.translate(graphDimension / 2, graphDimension / 2);
-        context.scale(0.09, 0.09);
-        context.save();
+      //if (currScale !== 0.9) {
+      context.setTransform(
+        window.devicePixelRatio,
+        0,
+        0,
+        window.devicePixelRatio,
+        0,
+        0
+      );
+
+      context.translate(dimensions.width / 3, dimensions.height / 2);
+
+      if (screenType.is1DPR) {
+        if (screenType.isBigScreen) {
+          context.scale(0.15, 0.15);
+        } else if (screenType.isMedScreen) {
+          //med screen 1dpr
+          context.scale(0.1, 0.1);
+        } else {
+          context.scale(0.1, 0.1);
+        }
+      } else {
+        if (screenType.isMedScreen || screenType.isBigScreen) {
+          //med screen 2dpr
+          if (data[0].children.length > 100) {
+            context.scale(0.12, 0.12);
+          } else {
+            context.scale(0.1, 0.1);
+          }
+        } else if (screenType.isSmallScreen) {
+          //small screen 2 dpr
+          context.scale(0.08, 0.08);
+        }
       }
+
+      context.save();
+      //}
       setCurrScale(0.9);
 
       var filterOffset = filters.length > 0 ? spacingOffset : 0;
@@ -75,13 +179,14 @@ const CanvasGraph = ({
       context.fill();
       setAllCircleCords([...allCords]);
     }
-  }, [data, context]);
+  }, [data, context, dimensions]);
 
   const drawLinks = (context, links, selectionText, filterOffset) => {
     context.strokeStyle = "white";
     context.lineWidth = 10;
     context.rotate(1.5708);
     links.forEach(link => {
+      context.beginPath();
       if (selectionText.length === 0) {
         context.strokeStyle = "white";
       } else if (selectionText.indexOf(link.target.data.target) !== -1) {
@@ -90,7 +195,7 @@ const CanvasGraph = ({
       } else {
         context.strokeStyle = "#bdc3c7";
       }
-      context.beginPath();
+
       d3
         .linkRadial()
         .angle(d => d.x)
@@ -130,10 +235,10 @@ const CanvasGraph = ({
       }
       //main node
       if (node.depth === 0) {
-        var gradient = context.createLinearGradient(0, 0, 0, height);
+        var gradient = context.createLinearGradient(0, 0, 0, dimensions.height);
         gradient.addColorStop(0, "#fff9de");
         gradient.addColorStop(1, "#f0f0d6");
-        context.shadowBlur = 10;
+        context.shadowBlur = 15;
         context.shadowColor = "white";
         context.fillStyle = gradient;
         xPos += 100 + filterOffset;
@@ -154,6 +259,7 @@ const CanvasGraph = ({
           context.fillStyle = "white";
         } else {
           //not hovered over
+          context.strokeStyle = "grey";
           context.fillStyle = "grey";
         }
       }
@@ -174,26 +280,56 @@ const CanvasGraph = ({
       if (!d3.select("#canvasGraphSelection g").empty()) {
         d3.select("#canvasGraphSelection g").remove();
       }
+      const rootNode = allCircleCords.filter(
+        node => node.element.depth === 0
+      )[0];
+
+      d3.select("#canvasGraphSelection")
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", "0 0 " + dimensions.width + "," + dimensions.height);
+
       var voronoi = d3
         .select("#canvasGraphSelection")
         .append("g")
-        .attr("class", "voronoi-group")
-        .attr("transform", `rotate(-90)scale(0.5,0.5)translate(-1200,400)`);
+        .attr("class", "voronoi-group");
+
+      if (screenType.is1DPR) {
+        voronoi.attr(
+          "transform",
+          "translate(" +
+            dimensions.width / 6 +
+            "," +
+            dimensions.height / 4 +
+            ") rotate(-90 " +
+            rootNode.x +
+            " " +
+            rootNode.y +
+            ")"
+        );
+      } else {
+        voronoi.attr(
+          "transform",
+          "rotate(-90 " + rootNode.x + " " + rootNode.y + ")"
+        );
+      }
 
       voronoi
         .selectAll("path")
         .data(voronoid(allCircleCords).polygons(), d => {
-          return d.data.element.data.target;
+          if (!d) {
+            console.log(d);
+          }
+          return d ? d.data.element.data.target : null;
         })
         .enter()
         .append("path")
-        //.style("stroke", "#2074A0")
-        //.style("stroke-width", 5)
+        //  .style("stroke", "#2074A0")
+        //.style("stroke-width", 3)
         .style("fill", "none")
         .style("pointer-events", "all")
         .attr("d", d => (d ? "M" + d.join("L") + "Z" : null))
         .attr("class", d => {
-          return d ? d.data.element.data.target + "-voronoi" : "";
+          return d ? "voronoi-" + d.data.element.data.target : "";
         })
         .on("mouseover", (data, index, element) => {
           var currNode = data.data.element;
@@ -201,6 +337,8 @@ const CanvasGraph = ({
 
           if (currNode.parent !== null) {
             var nodeSelectionText = getSelectionPath(currNode, ",");
+            console.log(nodeSelectionText);
+
             const selectionLayer = d3.select("#canvasGraphSelection");
             var previousSelectionClasses = selectionLayer.attr("class");
 
@@ -226,7 +364,12 @@ const CanvasGraph = ({
           } else {
             context.save();
             context.setTransform(1, 0, 0, 1, 0, 0);
-            context.clearRect(0, 0, graphDimension * 2, graphDimension * 2);
+            context.clearRect(
+              0,
+              0,
+              dimensions.width * 2,
+              dimensions.height * 2
+            );
             context.fill();
             context.restore();
             filterOffset = filters.length > 0 ? spacingOffset : 0;
@@ -269,7 +412,7 @@ const CanvasGraph = ({
   const clearAll = context => {
     context.save();
     context.setTransform(1, 0, 0, 1, 0, 0);
-    context.clearRect(0, 0, graphDimension * 2, graphDimension * 2);
+    context.clearRect(0, 0, dimensions.width * 2, dimensions.height * 2);
     context.fill();
     context.restore();
   };
@@ -301,7 +444,11 @@ const CanvasGraph = ({
         libraryText = "Library  | " + hoverNode.data.source;
         analysisText = "Analysis | " + hoverNode.data.target;
       }
-      context.font = "20px Lucida Console, Monaco, monospace";
+
+      screenType.is1DPR
+        ? setSmallerPanelFont(context, screenType)
+        : setLargerPanelFont(context, screenType);
+
       context.fillStyle = "grey";
       context.shadowColor = "grey";
       context.shadowBlur = 7;
@@ -309,47 +456,49 @@ const CanvasGraph = ({
 
       const yIncrementVar = 40;
       const xIncrementVar = 130;
-      context.fillText(
-        sampleText,
-        graphDimension - xIncrementVar,
-        graphDimension - yIncrementVar
-      );
-      context.fillText(
-        libraryText,
-        graphDimension - xIncrementVar,
-        graphDimension
-      );
-      context.fillText(
-        analysisText,
-        graphDimension - xIncrementVar,
-        graphDimension + yIncrementVar
-      );
+
+      const rootNode = allCircleCords.filter(
+        node => node.element.depth === 0
+      )[0];
+
+      const rootRadius = originalRadiusCanvas(rootNode["element"]);
+
+      var xPos = 0,
+        yPos = 0;
+      if (screenType.is1DPR) {
+        if (screenType.isSmallScreen) {
+          xPos = (2 * dimensions.width) / 3 / 2 - rootRadius / 16;
+          yPos = dimensions.height / 2;
+        } else if (screenType.isMedScreen) {
+          xPos = (2 * dimensions.width) / 3 / 2;
+          yPos = dimensions.height / 2;
+        } else {
+          xPos = (2 * dimensions.width) / 3 / 2 - rootRadius / 8;
+          yPos = dimensions.height / 2;
+        }
+      } else {
+        if (screenType.isSmallScreen) {
+          xPos = (2 * dimensions.width) / 3 - rootRadius / 8;
+          yPos = dimensions.height;
+        } else {
+          xPos = (2 * dimensions.width) / 3 - rootRadius / 8 - 10;
+          yPos = dimensions.height;
+        }
+      }
+
+      context.fillText(sampleText, xPos, yPos - yIncrementVar);
+      context.fillText(libraryText, xPos, yPos);
+      context.fillText(analysisText, xPos, yPos + yIncrementVar);
 
       context.shadowBlur = 0;
       context.fillStyle = "black";
-      context.fillText(
-        sampleText,
-        graphDimension - xIncrementVar,
-        graphDimension - yIncrementVar
-      );
+      context.fillText(sampleText, xPos, yPos - yIncrementVar);
 
       if (hoverNode.height === 1) {
-        context.fillText(
-          libraryText,
-          graphDimension - xIncrementVar,
-          graphDimension
-        );
+        context.fillText(libraryText, xPos, yPos);
       } else if (hoverNode.height === 0) {
-        context.fillText(
-          libraryText,
-          graphDimension - xIncrementVar,
-          graphDimension
-        );
-        context.fillText(
-          analysisText,
-          graphDimension - xIncrementVar,
-          graphDimension + yIncrementVar
-        );
+        context.fillText(libraryText, xPos, yPos);
+        context.fillText(analysisText, xPos, yPos + yIncrementVar);
       }
     }
     context.stroke();
@@ -368,41 +517,29 @@ const CanvasGraph = ({
     };
   }
 
-  function useWindowSize() {
-    const [size, setSize] = useState([0, 0]);
-    useLayoutEffect(() => {
-      function updateSize() {
-        setSize([window.innerWidth, window.innerHeight]);
-      }
-      window.addEventListener("resize", updateSize);
-      updateSize();
-
-      return () => window.removeEventListener("resize", updateSize);
-    }, []);
-    return size;
-  }
-
   const [ref] = useHookWithRefCallback();
 
   function useHookWithRefCallback() {
     const ref = useRef(null);
     const setRef = useCallback(node => {
       if (node && context === undefined) {
-        const graph = d3.select("#canvasGraph");
+        /*  const graph = d3.select("#canvasGraph");
         const canvas = graph
           .select("canvas")
-          .attr("width", graphDimension)
-          .attr("height", graphDimension)
-          .attr(
-            "transform",
-            "translate(" + margin.left + "," + margin.top + ")"
-          );
+          .attr("width", dimensions.width)
+          .attr("height", dimensions.height);
 
-        const context = initContext(canvas, graphDimension, graphDimension);
+
+        const context = initContext(
+          canvas,
+          dimensions.width,
+          dimensions.height
+        );
         saveContext(context);
+
         d3.select("#canvasGraphSelection")
-          .attr("width", graphDimension)
-          .attr("height", graphDimension);
+          .attr("width", dimensions.width + "px")
+          .attr("height", dimensions.height + "px");*/
       }
     }, []);
 
@@ -412,8 +549,8 @@ const CanvasGraph = ({
   return (
     <div
       style={{
-        width: graphDimension,
-        height: graphDimension,
+        width: dimensions.width + "px",
+        height: dimensions.height + "px",
         position: "relative"
       }}
       ref={ref}
@@ -421,8 +558,8 @@ const CanvasGraph = ({
       <div
         id="canvasGraph"
         style={{
-          width: graphDimension,
-          height: graphDimension,
+          width: dimensions.width + "px",
+          height: dimensions.height + "px",
           position: "absolute",
           pointerEvents: "all"
         }}
@@ -431,9 +568,15 @@ const CanvasGraph = ({
       </div>
       <svg
         id="canvasGraphSelection"
+        viewBox={
+          "0 0 " +
+          dimensions.width / window.devicePixelRatio +
+          " " +
+          dimensions.height / window.devicePixelRatio
+        }
         style={{
-          width: 3200,
-          height: 3200,
+          width: dimensions.width + "px",
+          height: dimensions.height + "px",
           position: "relative"
         }}
       />

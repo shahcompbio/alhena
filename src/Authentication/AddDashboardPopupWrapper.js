@@ -2,9 +2,16 @@ import React from "react";
 
 import PopUpContent from "./PopUpContent.js";
 
+import gql from "graphql-tag";
 import { Query } from "react-apollo";
-import { GETALLDASHBOARDOPTIONS } from "../Queries/queries.js";
 
+export const GETALLDASHBOARDOPTIONS = gql`
+  query getIndices {
+    getAllIndices {
+      name
+    }
+  }
+`;
 const AddDashboardPopupWrapper = ({ isOpen, handleClose, dashboardAction }) => {
   return (
     <Query query={GETALLDASHBOARDOPTIONS}>

@@ -1,9 +1,18 @@
 import React from "react";
-
+import gql from "graphql-tag";
 import PopUpContent from "./PopUpContent.js";
 
 import { Query } from "react-apollo";
-import { GETINDICESBYDASHBOARD } from "../Queries/queries.js";
+export const GETINDICESBYDASHBOARD = gql`
+  query getIndex($dashboard: String!) {
+    getAllIndices {
+      name
+    }
+    getIndicesByDashboard(dashboard: $dashboard) {
+      name
+    }
+  }
+`;
 
 const EditDashboardPopupWrapper = ({
   isOpen,
@@ -19,6 +28,7 @@ const EditDashboardPopupWrapper = ({
       {({ loading, error, data }) => {
         if (loading) return null;
         if (error) return null;
+
         return (
           <PopUpContent
             isOpen={isOpen}

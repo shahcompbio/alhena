@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useAppState } from "../util/app-state";
 
+import gql from "graphql-tag";
 import { Query } from "react-apollo";
+
 import TableContent from "./TableContent.js";
 import EditDashboardPopupWrapper from "./EditDashboardPopupWrapper.js";
 import Paper from "@material-ui/core/Paper";
@@ -12,13 +14,35 @@ import Grid from "@material-ui/core/Grid";
 import { ApolloConsumer } from "react-apollo";
 import {
   updateDashboard,
-  deleteDashboard,
   deleteUserByUsername,
   updateUserRoles
 } from "../util/utils.js";
 
 import { getAllDashboards, getUsers } from "../Queries/queries.js";
 import { withStyles, useTheme } from "@material-ui/styles";
+
+export const UPDATEDASHBOARD = gql`
+  query updateDashboard($dashboard: DashboardInput!) {
+    updateDashboard(dashboard: $dashboard) {
+      updated
+    }
+  }
+`;
+export const DELETEDASHBOARD = gql`
+  query deleteDashboard($name: String!) {
+    deleteDashboard(name: $name) {
+      allDeleted
+    }
+  }
+`;
+export const DELETEUSERBYUSERNAME = gql`
+  query DeleteUser($username: String!) {
+    deleteUser(username: $username) {
+      isDeleted
+    }
+  }
+`;
+
 const styles = (theme, tabIndex) => ({
   root: {
     width: "95%",
@@ -27,8 +51,6 @@ const styles = (theme, tabIndex) => ({
     borderRadius: 20,
     zIndex: 20,
     marginTop: 25
-    //  boxShadow:
-    //  "0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 1px 4px 3px 0px rgba(0,0,0,0.12)"
   },
   grid: {
     marginTop: "-60px"
@@ -86,7 +108,7 @@ const styles = (theme, tabIndex) => ({
 
 const TabContentWrapper = ({ tabIndex, classes }) => {
   const theme = useTheme();
-  const [{ authKeyID, uid }] = useAppState();
+  const [{ authKeyID, uid }, dispatch] = useAppState();
 
   const [isLoading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -107,6 +129,7 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
   };
   const handleClose = () => {
     setIsEditing(false);
+    setSelected(null);
   };
 
   const handleRowClick = name => {
@@ -117,10 +140,37 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
       clearAll();
     }
   };
+  const deleteUserByUsername = async (username, client) => {
+    const { data } = await client.query({
+      query: DELETEUSERBYUSERNAME,
+      variables: {
+        username: username
+      }
+    });
+    return data.deleteUser.isDeleted;
+  };
+  const deleteDashboard = async (name, client) => {
+    const { data } = await client.query({
+      query: DELETEDASHBOARD,
+      variables: {
+        name: name
+      }
+    });
+
+    if (data.deleteDashboard.allDeleted) {
+      window.location.reload();
+    }
+    return data.deleteDashboard.allDeleted;
+  };
   const updateDashboards = async (client, name, selectedIndices) => {
-    const updated = await updateDashboard(client, name, selectedIndices);
+    const updated = await client.query({
+      query: UPDATEDASHBOARD,
+      variables: {
+        dashboard: { name: name, indices: selectedIndices }
+      }
+    });
     clearAll();
-    if (updated) {
+    if (updated.data.updateDashboard.updated) {
       window.location.reload();
     }
   };
@@ -177,16 +227,7 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
           : await deleteUserByUsername(selected, client);
     } catch (error) {
     } finally {
-      if (confirmed) {
-        actionCompleteReset(modifiedData);
-        if (tabIndex === 1) {
-          setData(
-            modifiedData.filter(dashboard => dashboard.name !== selected)
-          );
-        } else {
-          setData(modifiedData.filter(user => user.username !== selected));
-        }
-      } else {
+      if (!confirmed) {
         //error
       }
     }
@@ -203,7 +244,9 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
       tableKey: "usersContentKey"
     }
   };
+
   const tableConfig = config[tabIndex];
+
   return (
     <Query
       query={tableConfig.query}
@@ -212,14 +255,27 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
       }}
     >
       {({ loading, error, data }) => {
-        if (loading) return null;
+        if (loading)
+          return (
+            <Paper
+              className={classes.root}
+              style={{
+                background:
+                  tabIndex === 1
+                    ? theme.palette.primary.main
+                    : theme.palette.primary.dark
+              }}
+            >
+              <div />
+            </Paper>
+          );
         if (error) {
-          console.log(error);
-          //  dispatch({
-          //    type: "LOGOUT"
-          //  });
-          //  return null;
+          dispatch({
+            type: "LOGOUT"
+          });
+          return null;
         }
+
         const modifiedData =
           data.length > 0 ? data : data[tableConfig.dataReturnName];
 

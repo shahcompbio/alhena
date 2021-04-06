@@ -1,4 +1,9 @@
-import React from "react";
+import React, {
+  useWindowSize,
+  useEffect,
+  useState,
+  useLayoutEffect
+} from "react";
 import { useAppState } from "./util/app-state";
 import { ApolloConsumer } from "react-apollo";
 import { Route, Switch } from "react-router-dom";
@@ -24,7 +29,33 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 
 const App = () => {
   const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
+
+  //const [width, height] = useWindowSize();
   let history = useHistory();
+
+  /*  useEffect(() => {
+    if (height && width) {
+      /*  dispatch({
+        type: "SIZE_CHANGE",
+        width: width,
+        height: height
+      });
+    }
+  }, [height, width]);
+
+  function useWindowSize() {
+    const [size, setSize] = useState([0, 0]);
+    useLayoutEffect(() => {
+      function updateSize() {
+        setSize([window.innerWidth, window.innerHeight]);
+      }
+      window.addEventListener("resize", updateSize);
+      updateSize();
+
+      return () => window.removeEventListener("resize", updateSize);
+    }, []);
+    return size;
+  }*/
 
   return (
     <MuiThemeProvider theme={theme}>
@@ -88,6 +119,21 @@ const App = () => {
           )}
         />
         {authKeyID && [
+          <Route
+            key="ticketSandbox"
+            path="/sandbox"
+            component={({ match }) => {
+              var uri = match;
+              //  SC-3079
+              uri.params.ticket = "sc-3964";
+              //uri.params.ticket = "sc-2978";
+              return (
+                <ApolloConsumer>
+                  {client => <DashboardWrapper uri={uri} client={client} />}
+                </ApolloConsumer>
+              );
+            }}
+          />,
           <Route
             key="graph"
             path="/graph"

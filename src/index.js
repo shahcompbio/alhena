@@ -18,9 +18,7 @@ require("dotenv").config();
 ReactDOM.render(
   <ApolloProvider client={client}>
     <ApolloHooksProvider client={client}>
-      <BrowserRouter
-        basename={process.env.NODE_ENV === "production" ? "/alhena" : ""}
-      >
+      <BrowserRouter basename={process.env.REACT_APP_BASENAME || "/"}>
         <AppStateProvider initialState={initialState} reducer={appStateReducer}>
           <App />
         </AppStateProvider>

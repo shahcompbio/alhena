@@ -57,6 +57,7 @@ const PopUpContent = ({
       setIsDisabled(true);
     }
   }, [name, selectedIndices]);
+
   return (
     <Dialog
       open={isOpen}
@@ -137,7 +138,7 @@ const PopUpContent = ({
     </Dialog>
   );
 };
-const LoadingContent = (classes, isSent) => (
+const LoadingContent = ({ classes, isSent }) => (
   <div className={classes.dialogWrapper}>
     {isSent && (
       <IconButton className={classes.iconButton}>

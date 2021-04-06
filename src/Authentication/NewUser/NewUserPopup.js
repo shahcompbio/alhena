@@ -100,121 +100,109 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
               <DialogContent
                 style={{
                   width: 450,
-                  height: 150
+                  height: 150,
+                  textAlign: "center"
                 }}
               >
+                <Typography variant="body">
+                  Please send this link to the user you are trying to create.
+                </Typography>
+                <div style={{ marginTop: "10" }}>
+                  <Typography variant="h7">
+                    <b>{newUserLink}</b>
+                  </Typography>
+                </div>
                 <div
                   style={{
-                    height: 200,
-                    margin: "auto",
-                    position: "absolute"
+                    marginTop: "25px"
                   }}
                 >
-                  <Typography variant="body">
-                    Please send this link to the user you are trying to create.
-                  </Typography>
-                  <div style={{ marginTop: "10" }}>
-                    <Typography variant="h7">
-                      <b>{newUserLink}</b>
-                    </Typography>
-                  </div>
-                  <div
-                    style={{
-                      marginLeft: "35%",
-                      marginTop: "25px"
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      copy(newUserLink);
                     }}
                   >
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => {
-                        copy(newUserLink);
-                      }}
-                    >
-                      Copy
-                    </Button>
-                  </div>
+                    Copy
+                  </Button>
                 </div>
               </DialogContent>
             ) : (
-              [
-                <ValidatorForm ref="form" style={{ maxWidth: 450 }}>
-                  <DialogTitle id="form-dialog-title">
-                    Create New User
-                  </DialogTitle>
-                  ,
-                  <DialogContent>
-                    <DialogContentText>
-                      To create a new user please enter their name and email and
-                      select what dashboards they are allowed to view.
-                    </DialogContentText>
-                    <TextValidator
-                      autoFocus
-                      margin="dense"
-                      id="name"
-                      label="Name"
-                      type="text"
-                      value={name}
-                      onChange={handleNameChange}
-                      validators={["required"]}
-                      errorMessages={["This field is required"]}
-                      required
-                      fullWidth
-                    />
-                    <TextValidator
-                      margin="dense"
-                      id="name"
-                      label="Email Address"
-                      required
-                      fullWidth
-                      value={email}
-                      onChange={handleEmailChange}
-                      validators={["required", "isEmail"]}
-                      errorMessages={[
-                        "This field is required",
-                        "Email is not valid"
-                      ]}
-                    />
-                    <DropDownSelect
-                      selectedRoles={selectedRoles}
-                      handleRoleChange={handleRoleChange}
-                      handleRoleDelete={(event, value) =>
-                        handleRoleDelete(event, value)
-                      }
-                      roleNames={data.getAllDashboards.map(
-                        dashboard => dashboard.name
-                      )}
-                    />
-                  </DialogContent>
-                  ,
-                  <DialogActions>
-                    <Button
-                      onClick={handleClose}
-                      color="secondary"
-                      variant="outlined"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={async ev => {
-                        var link = await generateNewUserLink(
-                          ev,
-                          client,
-                          email,
-                          name,
-                          selectedRoles
-                        );
-                        setNewUserLink(link);
-                      }}
-                      color="primary"
-                      variant="contained"
-                      disabled={isSubmitDisabled}
-                    >
-                      Generate
-                    </Button>
-                  </DialogActions>
-                </ValidatorForm>
-              ]
+              <ValidatorForm ref="form" style={{ maxWidth: 450 }}>
+                <DialogTitle id="form-dialog-title">
+                  Create New User
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText>
+                    To create a new user please enter their name and email and
+                    select what dashboards they are allowed to view.
+                  </DialogContentText>
+                  <TextValidator
+                    autoFocus
+                    margin="dense"
+                    id="name"
+                    label="Name"
+                    type="text"
+                    value={name}
+                    onChange={handleNameChange}
+                    validators={["required"]}
+                    errorMessages={["This field is required"]}
+                    required
+                    fullWidth
+                  />
+                  <TextValidator
+                    margin="dense"
+                    id="name"
+                    label="Email Address"
+                    required
+                    fullWidth
+                    value={email}
+                    onChange={handleEmailChange}
+                    validators={["required", "isEmail"]}
+                    errorMessages={[
+                      "This field is required",
+                      "Email is not valid"
+                    ]}
+                  />
+                  <DropDownSelect
+                    selectedRoles={selectedRoles}
+                    handleRoleChange={handleRoleChange}
+                    handleRoleDelete={(event, value) =>
+                      handleRoleDelete(event, value)
+                    }
+                    roleNames={data.getAllDashboards.map(
+                      dashboard => dashboard.name
+                    )}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    onClick={handleClose}
+                    color="secondary"
+                    variant="outlined"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={async ev => {
+                      var link = await generateNewUserLink(
+                        ev,
+                        client,
+                        email,
+                        name,
+                        selectedRoles
+                      );
+                      setNewUserLink(link);
+                    }}
+                    color="primary"
+                    variant="contained"
+                    disabled={isSubmitDisabled}
+                  >
+                    Generate
+                  </Button>
+                </DialogActions>
+              </ValidatorForm>
             )}
           </Dialog>
         );

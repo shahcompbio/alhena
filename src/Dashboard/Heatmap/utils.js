@@ -1,6 +1,8 @@
 import { config, heatmapConfig } from "./config.js";
 import { scalePoint, scaleLinear } from "d3";
 
+import { scaleOrdinal } from "d3";
+
 export const cleanUpPreviousContent = wrapper =>
   wrapper.selectAll("*").remove();
 /**
@@ -131,3 +133,8 @@ export const getAnnotationsX = chromosomes => {
   const heatmapX = 0;
   return chromosomeX + heatmapX + config["spacing"];
 };
+
+export const getColourScale = (types, index) =>
+  scaleOrdinal()
+    .domain(types)
+    .range(heatmapConfig.categories.colours[index]);
