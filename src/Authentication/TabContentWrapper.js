@@ -12,11 +12,7 @@ import TableToolbar from "./TableToolBar.js";
 import Grid from "@material-ui/core/Grid";
 
 import { ApolloConsumer } from "react-apollo";
-import {
-  updateDashboard,
-  deleteUserByUsername,
-  updateUserRoles
-} from "../util/utils.js";
+import { updateDashboard, deleteUserByUsername } from "../util/utils.js";
 
 import { getAllDashboards, getUsers } from "../Queries/queries.js";
 import { withStyles, useTheme } from "@material-ui/styles";
@@ -42,7 +38,25 @@ export const DELETEUSERBYUSERNAME = gql`
     }
   }
 `;
-
+export const UPDATEUSER = gql`
+  query updateUser(
+    $username: String!
+    $newRoles: [String!]
+    $email: String!
+    $name: String!
+    $isAdmin: Boolean!
+  ) {
+    updateUser(
+      username: $username
+      newRoles: $newRoles
+      email: $email
+      name: $name
+      isAdmin: $isAdmin
+    ) {
+      created
+    }
+  }
+`;
 const styles = (theme, tabIndex) => ({
   root: {
     width: "95%",
@@ -94,6 +108,12 @@ const styles = (theme, tabIndex) => ({
     wordWrap: "break-word",
     maxWidth: "100px"
   },
+  selectedTableCell: {
+    whiteSpace: "normal",
+    wordWrap: "break-word",
+    maxWidth: "100px",
+    backgroundColor: "#11151d40"
+  },
   tableHeader: {
     fontWeight: "bold"
   },
@@ -115,12 +135,17 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
   const [actionComplete, setActionComplete] = useState(null);
 
   const [selected, setSelected] = useState(null);
-  const [data, setData] = useState([]);
+  const [tableData, setData] = useState([]);
 
   const [selectedUserRoles, setSelectedUserRoles] = useState([]);
+  const [selectedUserAdmin, setSelectedUserAdmin] = useState(null);
 
   useEffect(() => {
-    clearAll();
+    setIsEditing(null);
+    setSelected(null);
+    setData([]);
+    setSelectedUserRoles([]);
+    setSelectedUserAdmin(null);
   }, [tabIndex]);
 
   const clearAll = () => {
@@ -139,6 +164,26 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
       //unselect
       clearAll();
     }
+  };
+  const updateUser = async (
+    username,
+    roles,
+    email,
+    full_name,
+    isAdmin,
+    client
+  ) => {
+    const { data } = await client.query({
+      query: UPDATEUSER,
+      variables: {
+        email: email,
+        name: full_name,
+        username: username,
+        newRoles: [...roles],
+        isAdmin: true
+      }
+    });
+    return data.updateUser.created;
   };
   const deleteUserByUsername = async (username, client) => {
     const { data } = await client.query({
@@ -182,6 +227,8 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
     setTimeout(() => {
       setActionComplete(null);
       setSelected(null);
+      setSelectedUserAdmin(null);
+      setSelectedUserRoles([]);
     }, 3000);
   };
 
@@ -194,26 +241,41 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
       return final;
     });
     try {
-      const confirmed = await updateUserRoles(
-        selected,
-        selectedUserRoles,
-        selectedUserObj.email,
-        selectedUserObj.full_name,
-        client
-      );
-      if (confirmed === false) {
-        //has updated
-        setData(
-          modifiedUsers.map(user => {
-            if (user.username === selected) {
-              user.roles = selectedUserRoles;
-            }
-            return user;
-          })
+      if (selectedUserRoles.length !== 0 || selectedUserAdmin !== null) {
+        const roles =
+          selectedUserRoles.length > 0
+            ? selectedUserRoles
+            : selectedUserObj["roles"];
+
+        const isAdmin =
+          selectedUserAdmin !== null
+            ? selectedUserAdmin
+            : selectedUserObj["isAdmin"];
+
+        const confirmed = await updateUser(
+          selected,
+          roles,
+          selectedUserObj.email,
+          selectedUserObj.full_name,
+          isAdmin,
+          client
         );
-        actionCompleteReset();
-      } else {
-        //error
+
+        if (confirmed === false) {
+          //has updated
+          setData(
+            modifiedUsers.map(user => {
+              if (user.username === selected) {
+                user.roles = roles;
+                user.isAdmin = isAdmin;
+              }
+              return user;
+            })
+          );
+          actionCompleteReset();
+        } else {
+          //error
+        }
       }
     } catch (error) {}
   };
@@ -277,10 +339,10 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
         }
 
         const modifiedData =
-          data.length > 0 ? data : data[tableConfig.dataReturnName];
+          tableData.length > 0 ? tableData : data[tableConfig.dataReturnName];
 
         return (
-          <div className={classes.root}>
+          <div className={classes.root} key={"adminTable" + tabIndex}>
             <Grid
               className={classes.grid}
               direction="column"
@@ -288,12 +350,13 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
               alignItems="center"
               container
               spacing={2}
-              key={"permissions-grid"}
+              key={"adminGrid"}
             >
               <ApolloConsumer>
                 {client => (
                   <Paper
                     className={classes.root}
+                    key={"adminTablePaper" + tabIndex}
                     style={{
                       background:
                         tabIndex === 1
@@ -316,7 +379,7 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
                     )}
                     <TableContent
                       key={tableConfig.key}
-                      modifiedData={modifiedData}
+                      data={modifiedData}
                       classes={classes}
                       tabIndex={tabIndex}
                       isEditing={isEditing}
@@ -329,6 +392,9 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
                       }
                       setSelectedUserRoles={userRoles =>
                         setSelectedUserRoles(userRoles)
+                      }
+                      setSelectedUserAdmin={isAdmin =>
+                        setSelectedUserAdmin(isAdmin)
                       }
                       selected={selected}
                       handleRowClick={name => handleRowClick(name)}

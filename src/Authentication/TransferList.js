@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 
 import {
@@ -16,10 +16,11 @@ import AutoSizer from "react-virtualized-auto-sizer";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    margin: "auto"
+    margin: "auto",
+    width: 800
   },
   paper: {
-    width: 200,
+    width: 350,
     height: 230,
     overflow: "auto"
   },
@@ -31,17 +32,35 @@ const useStyles = makeStyles(theme => ({
 const not = (a, b) => a.filter(value => b.indexOf(value) === -1);
 const intersection = (a, b) => a.filter(value => b.indexOf(value) !== -1);
 
-const TransferList = ({ allIndices, setSelectedIndices, alreadyChoosen }) => {
+const TransferList = ({
+  allIndices,
+  setSelectedIndices,
+  alreadyChoosen,
+  searchValue
+}) => {
   const classes = useStyles();
-  const [checked, setChecked] = React.useState([]);
-  const [left, setLeft] = React.useState(
+  const [checked, setChecked] = useState([]);
+
+  const [left, setLeft] = useState(
     alreadyChoosen !== undefined
       ? [...not(allIndices, alreadyChoosen)]
       : [...allIndices]
   );
-  const [right, setRight] = React.useState(
+
+  const [right, setRight] = useState(
     alreadyChoosen !== undefined ? [...alreadyChoosen] : []
   );
+
+  useEffect(() => {
+    const newList =
+      searchValue !== ""
+        ? allIndices.filter(row =>
+            row.toLowerCase().includes(searchValue.toLowerCase())
+          )
+        : allIndices;
+
+    setLeft([...not(newList, right)]);
+  }, [searchValue]);
 
   const leftChecked = intersection(checked, left);
   const rightChecked = intersection(checked, right);

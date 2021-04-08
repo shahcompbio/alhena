@@ -3,7 +3,6 @@ import {
   NEWUSER,
   VERIFYNEWUSERAUTHKEY,
   DELETEUSERBYUSERNAME,
-  UPDATEUSERROLES,
   CREATENEWDASHBOARD
 } from "../Queries/queries.js";
 
@@ -15,25 +14,6 @@ export const createNewDashboard = async (client, name, selectedIndices) => {
     }
   });
   return data.created;
-};
-
-export const updateUserRoles = async (
-  username,
-  roles,
-  email,
-  full_name,
-  client
-) => {
-  const { data } = await client.query({
-    query: UPDATEUSERROLES,
-    variables: {
-      email: email,
-      name: full_name,
-      username: username,
-      newRoles: [...roles]
-    }
-  });
-  return data.updateUserRoles.created;
 };
 
 export const verifyNewUserSecureUrl = async (key, client) => {

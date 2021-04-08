@@ -104,13 +104,16 @@ const Menu = ({ history, classes }) => {
   const [direction] = useState("up");
   const [open, setOpen] = useState(false);
 
-  const handleClose = () => {
-    setOpen(false);
+  const handleClose = (event, reason) => {
+    if (reason !== "toggle") {
+      setOpen(false);
+    }
   };
 
-  const handleOpen = () => {
+  const handleOpen = (event, reason) => {
     setOpen(true);
   };
+
   const handleAction = (name, history, dispatch) => {
     switch (name) {
       case "Back":

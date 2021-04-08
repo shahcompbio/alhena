@@ -13,6 +13,9 @@ import {
   DialogActions
 } from "@material-ui/core";
 
+import ListItemText from "@material-ui/core/ListItemText";
+import Checkbox from "@material-ui/core/Checkbox";
+
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -28,6 +31,7 @@ import { withRouter } from "react-router";
 import { Query } from "react-apollo";
 import { getAllDashboards } from "../../Queries/queries.js";
 const copy = require("clipboard-copy");
+
 const createNewUserLink = gql`
   query generateNewUserLink($newUser: NewUserLink!) {
     newUserLink(newUser: $newUser) {
@@ -72,8 +76,10 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
   const handleEmailChange = event => {
     setEmail(event.target.value);
   };
-  const handleRoleChange = event => {
-    setSelectedRoles(event.target.value);
+  const handleRoleChange = (event, allRoles) => {
+    const newRoles =
+      event.target.value.indexOf("All") !== -1 ? allRoles : event.target.value;
+    setSelectedRoles(newRoles);
   };
 
   const handleRoleDelete = (event, value) =>
@@ -89,7 +95,9 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
       {({ loading, error, data }) => {
         if (loading) return null;
         if (error) return null;
-
+        const allDashboards = data.getAllDashboards.map(
+          dashboard => dashboard.name
+        );
         return (
           <Dialog
             open={isOpen}
@@ -120,9 +128,7 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => {
-                      copy(newUserLink);
-                    }}
+                    onClick={copy(newUserLink)}
                   >
                     Copy
                   </Button>
@@ -167,13 +173,13 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
                   />
                   <DropDownSelect
                     selectedRoles={selectedRoles}
-                    handleRoleChange={handleRoleChange}
+                    handleRoleChange={event =>
+                      handleRoleChange(event, allDashboards)
+                    }
                     handleRoleDelete={(event, value) =>
                       handleRoleDelete(event, value)
                     }
-                    roleNames={data.getAllDashboards.map(
-                      dashboard => dashboard.name
-                    )}
+                    roleNames={["All", ...allDashboards]}
                   />
                 </DialogContent>
                 <DialogActions>
@@ -273,7 +279,12 @@ const DropDownSelect = ({
           <div className={classes.chips}>
             {selected.map(value => (
               <Chip
-                onDelete={event => handleRoleDelete(event, value)}
+                onMouseDown={event => {
+                  event.stopPropagation();
+                }}
+                onDelete={event => {
+                  handleRoleDelete(event, value);
+                }}
                 key={value}
                 label={value}
                 className={classes.chip}
@@ -289,10 +300,11 @@ const DropDownSelect = ({
             value={name}
             style={getStyles(name, selectedRoles, theme)}
           >
-            {name}
+            <Checkbox checked={selectedRoles.indexOf(name) > -1} />
+            <ListItemText primary={name} />
           </MenuItem>
         ))}
-      </Select>{" "}
+      </Select>
     </FormControl>
   );
 };
