@@ -43,7 +43,8 @@ const DataFilters = ({
   client,
   experimentalConditions,
   numericalDataFilters,
-  isDisabled
+  isDisabled,
+  key
 }) => {
   const [
     { quality, isContaminated, axisChange, expCondition },
@@ -88,17 +89,19 @@ const DataFilters = ({
       justify="flex-start"
       alignItems="flex-start"
       style={{ width: "100%" }}
+      key={key + "grid"}
     >
-      <Grid item className={classes.gridSlider}>
+      <Grid item className={classes.gridSlider} key={key + "gridSlider"}>
         <Typography
           id="discrete-slider"
           gutterBottom
           style={{ marginBottom: 0 }}
+          key={key + "qualityTitle"}
         >
           Quality
         </Typography>
         <Slider
-          key={"quality-slider"}
+          key={key + "qualitySlider"}
           className={classes.slider}
           color={"secondary"}
           value={qualityMenuValue}
@@ -122,11 +125,12 @@ const DataFilters = ({
           max={1.0}
         />
       </Grid>
-      <Grid item className={classes.gridSlider}>
+      <Grid item className={classes.gridSlider} key={key + "filterGrid"}>
         <Typography
           id="discrete-slider"
           gutterBottom
           style={{ marginBottom: 0 }}
+          key={key + "filterTitle"}
         >
           Filter Contaminated
         </Typography>
@@ -135,6 +139,7 @@ const DataFilters = ({
           variant="outlined"
           key="contaminatedFormControll"
           className={classes.formControl}
+          key={key + "filterFormControl"}
         >
           <FormControlLabel
             control={
@@ -158,23 +163,27 @@ const DataFilters = ({
           />
         </FormControl>
       </Grid>
-      <Grid item className={classes.gridSlider}>
+      <Grid
+        item
+        className={classes.gridSlider}
+        key={key + "experimentalCondition"}
+      >
         <Typography
           id="discrete-slider"
-          key={"quality-slider"}
+          key={key + "experimentalConditionTitle"}
           gutterBottom
           style={{ marginBottom: 0 }}
         >
           Experimental Conditions
         </Typography>
         <FormControl
+          key={key + "expConditionFormControl"}
           variant="outlined"
-          key="experimentalCondition-FormControl"
           className={classes.formControl}
           disabled={isDisabled}
         >
           <Select
-            key="experimentalCondition-Select"
+            key={key + "expConditionSelect"}
             value={experimentalMenuValue || []}
             name="experimentalConditionSelection"
             displayEmpty

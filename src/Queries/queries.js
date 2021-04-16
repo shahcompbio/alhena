@@ -8,24 +8,6 @@ export const CREATENEWDASHBOARD = gql`
   }
 `;
 
-export const UPDATEUSERROLES = gql`
-  query updateUserRoles(
-    $username: String!
-    $newRoles: [String!]
-    $email: String!
-    $name: String!
-  ) {
-    updateUserRoles(
-      username: $username
-      newRoles: $newRoles
-      email: $email
-      name: $name
-    ) {
-      created
-    }
-  }
-`;
-
 export const getAllDashboards = gql`
   query getAllDashboards($user: ApiUser!) {
     getAllDashboards(auth: $user) {
@@ -44,22 +26,6 @@ export const VERIFYNEWUSERAUTHKEY = gql`
   }
 `;
 
-export const NEWUSER = gql`
-  query createNewUser($user: NewUser!) {
-    createNewUser(user: $user) {
-      created
-    }
-  }
-`;
-export const LOGIN = gql`
-  query Login($user: User!) {
-    login(user: $user) {
-      statusCode
-      authKeyID
-      role
-    }
-  }
-`;
 export const getUsers = gql`
   query AdminPanel($user: ApiUser!) {
     getUsers(auth: $user) {
@@ -67,6 +33,7 @@ export const getUsers = gql`
       roles
       full_name
       email
+      isAdmin
     }
     getAllDashboards(auth: $user) {
       name

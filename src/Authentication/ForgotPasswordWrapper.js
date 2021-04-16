@@ -11,9 +11,12 @@ import gql from "graphql-tag";
 import styled from "styled-components";
 import { withStyles } from "@material-ui/styles";
 
+import { useHistory } from "react-router-dom";
+
 const styles = theme => ({
   button: {
-    backgroundColor: theme.palette.primary.main
+    backgroundColor: theme.palette.primary.main,
+    marginRight: 10
   },
   paperTitle: {
     paddingBottom: theme.spacing.unit * 5,
@@ -46,11 +49,12 @@ const styles = theme => ({
 const VERIFYUSER = gql`
   query($username: String!, $email: String!) {
     doesUserExist(username: $username, email: $email) {
-      confirmed
+      confirmReset
     }
   }
 `;
 const checkUser = async (client, username, email) => {
+  console.log(username);
   const { data } = await client.query({
     query: VERIFYUSER,
     variables: {
@@ -59,9 +63,11 @@ const checkUser = async (client, username, email) => {
     }
   });
 
-  return data["doesUserExist"]["confirmed"];
+  return data.doesUserExist.confirmReset;
 };
 const ForgotPasswordWrapper = ({ dispatch, classes, client }) => {
+  let history = useHistory();
+
   const [error, setError] = useState(null);
   const [isVerified, setIsVerified] = useState(false);
   const [verifiedUsername, setVerifiedUsername] = useState();
@@ -107,12 +113,12 @@ const ForgotPasswordWrapper = ({ dispatch, classes, client }) => {
             dispatch={dispatch}
           />
         ) : (
-          [
+          <div>
             <Paper rounded="true" className={classes.paperTitle}>
               <Typography variant="h6">
                 Verify User to Reset Password
               </Typography>
-            </Paper>,
+            </Paper>
             <Paper rounded="true" className={classes.paperForm}>
               <form id="resetPassword">
                 {fields.map(field => (
@@ -135,6 +141,15 @@ const ForgotPasswordWrapper = ({ dispatch, classes, client }) => {
                   <Button
                     className={classes.button}
                     variant="contained"
+                    onClick={() => {
+                      history.replace("/login");
+                    }}
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    className={classes.button}
+                    variant="contained"
                     onClick={async () => {
                       const queryResults = await checkUser(
                         client,
@@ -149,7 +164,7 @@ const ForgotPasswordWrapper = ({ dispatch, classes, client }) => {
                 </ComponentWrapper>
               </form>
             </Paper>
-          ]
+          </div>
         )}
       </div>
     </Grid>

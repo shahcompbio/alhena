@@ -104,13 +104,16 @@ const Menu = ({ history, classes }) => {
   const [direction] = useState("up");
   const [open, setOpen] = useState(false);
 
-  const handleClose = () => {
-    setOpen(false);
+  const handleClose = (event, reason) => {
+    if (reason !== "toggle") {
+      setOpen(false);
+    }
   };
 
-  const handleOpen = () => {
+  const handleOpen = (event, reason) => {
     setOpen(true);
   };
+
   const handleAction = (name, history, dispatch) => {
     switch (name) {
       case "Back":
@@ -139,11 +142,7 @@ const Menu = ({ history, classes }) => {
         <SpeedDial
           ariaLabel="Alhena Menu"
           classes={{ root: classes.speedDial, fab: classes.fab }}
-          icon={
-            <Fab classes={{ root: classes.fab }} elevation={0}>
-              <MenuIcon className={classes.menu} />
-            </Fab>
-          }
+          icon={<MenuIcon className={classes.menu} />}
           onClose={handleClose}
           transitionDuration={{ exit: 100 }}
           onOpen={handleOpen}

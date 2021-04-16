@@ -4,6 +4,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import RadioButtonCheckedIcon from "@material-ui/icons/RadioButtonChecked";
 import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
 import Drawer from "@material-ui/core/Drawer";
+import Tooltip from "@material-ui/core/Tooltip";
+
 const drawerWidth = 90;
 const useStyles = makeStyles(theme => ({
   root: {
@@ -115,23 +117,60 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
   return (
     <div className={classes.root}>
       {steps.map((label, index) => (
-        <div
-          key={index}
-          className={classes.button}
-          onMouseEnter={moreDetailOpen}
-          onMouseLeave={moreDetailExit}
-        >
-          {activeStep === index ? (
-            <RadioButtonCheckedIcon className={stepperColour} />
+        <span key={"span-wrapper" + label}>
+          <Tooltip
+            key={"tooltip" + label}
+            title={label}
+            aria-label={label}
+            arrow
+            placement="left"
+          >
+            <div
+              key={"step-wrapper" + label}
+              className={classes.button}
+              onMouseEnter={moreDetailOpen}
+              onMouseLeave={moreDetailExit}
+            >
+              {activeStep === index ? (
+                <RadioButtonCheckedIcon className={stepperColour} />
+              ) : (
+                <FiberManualRecordIcon
+                  className={
+                    index < activeStep ? stepperColour : classes.disabled
+                  }
+                  onClick={() => handleStep(index)}
+                />
+              )}
+            </div>
+          </Tooltip>
+          {activeStep > index ? (
+            <div
+              key={"step-wrapper" + label}
+              className={stepperColour}
+              style={{
+                marginTop: -75,
+                marginLeft: 5,
+                color: "white",
+                fontWeight: "bold"
+              }}
+            >
+              ﹀
+            </div>
           ) : (
-            <FiberManualRecordIcon
-              className={index < activeStep ? stepperColour : classes.disabled}
-              onClick={() => handleStep(index)}
+            <div
+              style={{
+                marginTop: -75
+              }}
             />
           )}
-        </div>
+        </span>
       ))}
-      <Drawer
+    </div>
+  );
+};
+export default SearchStepper;
+
+/*      <Drawer
         variant="permanent"
         className={clsx(classes.drawer, {
           [classes.drawerOpen]: detailsDrawer,
@@ -171,8 +210,4 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
             );
           })}
         </div>
-      </Drawer>
-    </div>
-  );
-};
-export default SearchStepper;
+      </Drawer>*/

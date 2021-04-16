@@ -12,11 +12,7 @@ import TableToolbar from "./TableToolBar.js";
 import Grid from "@material-ui/core/Grid";
 
 import { ApolloConsumer } from "react-apollo";
-import {
-  updateDashboard,
-  deleteUserByUsername,
-  updateUserRoles
-} from "../util/utils.js";
+import { updateDashboard, deleteUserByUsername } from "../util/utils.js";
 
 import { getAllDashboards, getUsers } from "../Queries/queries.js";
 import { withStyles, useTheme } from "@material-ui/styles";
@@ -42,7 +38,25 @@ export const DELETEUSERBYUSERNAME = gql`
     }
   }
 `;
-
+export const UPDATEUSER = gql`
+  query updateUser(
+    $username: String!
+    $newRoles: [String!]
+    $email: String!
+    $name: String!
+    $isAdmin: Boolean!
+  ) {
+    updateUser(
+      username: $username
+      newRoles: $newRoles
+      email: $email
+      name: $name
+      isAdmin: $isAdmin
+    ) {
+      created
+    }
+  }
+`;
 const styles = (theme, tabIndex) => ({
   root: {
     width: "95%",
@@ -54,55 +68,6 @@ const styles = (theme, tabIndex) => ({
   },
   grid: {
     marginTop: "-60px"
-  },
-
-  table: {
-    width: "90%",
-    margin: "auto",
-    minWidth: 650,
-    marginTop: 25
-  },
-  tableRowIndex0: {
-    backgroundColor: theme.palette.primary.dark,
-    color: "white",
-    "&$selected, &$selected:hover": {
-      backgroundColor: "#ffffff"
-    }
-  },
-  checkBox0: {
-    color: "white !important",
-    "$selected &": {
-      color: "white"
-    }
-  },
-  checkBox1: {
-    color: "#000000 !important",
-    "$selected &": {
-      color: "#000000"
-    }
-  },
-  tableRowIndex1: {
-    backgroundColor: theme.palette.primary.main,
-    color: "#000000",
-    "&$selected, &$selected:hover": {
-      backgroundColor: "rgba(232, 232, 232, 0.43)"
-    }
-  },
-  selected: {},
-  tableCell: {
-    whiteSpace: "normal",
-    wordWrap: "break-word",
-    maxWidth: "100px"
-  },
-  tableHeader: {
-    fontWeight: "bold"
-  },
-  tablePagination: {
-    fontWeight: "bold"
-  },
-  toolbar: {},
-  hide: {
-    display: "none"
   }
 });
 
@@ -115,12 +80,17 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
   const [actionComplete, setActionComplete] = useState(null);
 
   const [selected, setSelected] = useState(null);
-  const [data, setData] = useState([]);
+  const [tableData, setData] = useState([]);
 
   const [selectedUserRoles, setSelectedUserRoles] = useState([]);
+  const [selectedUserAdmin, setSelectedUserAdmin] = useState(null);
 
   useEffect(() => {
-    clearAll();
+    setIsEditing(null);
+    setSelected(null);
+    setData([]);
+    setSelectedUserRoles([]);
+    setSelectedUserAdmin(null);
   }, [tabIndex]);
 
   const clearAll = () => {
@@ -139,6 +109,26 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
       //unselect
       clearAll();
     }
+  };
+  const updateUser = async (
+    username,
+    roles,
+    email,
+    full_name,
+    isAdmin,
+    client
+  ) => {
+    const { data } = await client.query({
+      query: UPDATEUSER,
+      variables: {
+        email: email,
+        name: full_name,
+        username: username,
+        newRoles: [...roles],
+        isAdmin: isAdmin
+      }
+    });
+    return data.updateUser.created;
   };
   const deleteUserByUsername = async (username, client) => {
     const { data } = await client.query({
@@ -182,6 +172,8 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
     setTimeout(() => {
       setActionComplete(null);
       setSelected(null);
+      setSelectedUserAdmin(null);
+      setSelectedUserRoles([]);
     }, 3000);
   };
 
@@ -194,43 +186,67 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
       return final;
     });
     try {
-      const confirmed = await updateUserRoles(
-        selected,
-        selectedUserRoles,
-        selectedUserObj.email,
-        selectedUserObj.full_name,
-        client
-      );
-      if (confirmed === false) {
-        //has updated
-        setData(
-          modifiedUsers.map(user => {
-            if (user.username === selected) {
-              user.roles = selectedUserRoles;
-            }
-            return user;
-          })
+      if (selectedUserRoles.length !== 0 || selectedUserAdmin !== null) {
+        const roles =
+          selectedUserRoles.length > 0
+            ? selectedUserRoles
+            : selectedUserObj["roles"];
+
+        const isAdmin =
+          selectedUserAdmin !== null
+            ? selectedUserAdmin
+            : selectedUserObj["isAdmin"];
+
+        const confirmed = await updateUser(
+          selected,
+          roles,
+          selectedUserObj.email,
+          selectedUserObj.full_name,
+          isAdmin,
+          client
         );
+
+        if (confirmed === false) {
+          //has updated
+          setData(
+            modifiedUsers.map(user => {
+              if (user.username === selected) {
+                user.roles = roles;
+                user.isAdmin = isAdmin;
+              }
+              return user;
+            })
+          );
+          actionCompleteReset();
+        } else {
+          //error
+        }
+      }
+    } catch (error) {}
+  };
+  const sortAlpha = list =>
+    list.sort((a, b) => {
+      var textA = a.name ? a.name.toUpperCase() : a.username.toUpperCase();
+      var textB = b.name ? b.name.toUpperCase() : b.username.toUpperCase();
+      return textA < textB ? -1 : textA > textB ? 1 : 0;
+    });
+
+  const deleteByName = async (client, users, tabIndex) => {
+    setLoading(true);
+    try {
+      const confirmed =
+        tabIndex === 1
+          ? await deleteDashboard(selected, client)
+          : await deleteUserByUsername(selected, client);
+
+      if (confirmed) {
+        //has updated
+        setData(users.filter(user => user.username !== selected));
         actionCompleteReset();
       } else {
         //error
       }
     } catch (error) {}
-  };
-
-  const deleteByName = async (client, modifiedData, tabIndex) => {
-    setLoading(true);
-    try {
-      var confirmed =
-        tabIndex === 1
-          ? await deleteDashboard(selected, client)
-          : await deleteUserByUsername(selected, client);
-    } catch (error) {
-    } finally {
-      if (!confirmed) {
-        //error
-      }
-    }
   };
   const config = {
     1: {
@@ -277,10 +293,12 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
         }
 
         const modifiedData =
-          data.length > 0 ? data : data[tableConfig.dataReturnName];
+          tableData.length > 0
+            ? sortAlpha(tableData)
+            : sortAlpha(data[tableConfig.dataReturnName]);
 
         return (
-          <div className={classes.root}>
+          <div className={classes.root} key={"adminTable" + tabIndex}>
             <Grid
               className={classes.grid}
               direction="column"
@@ -288,12 +306,13 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
               alignItems="center"
               container
               spacing={2}
-              key={"permissions-grid"}
+              key={"adminGrid"}
             >
               <ApolloConsumer>
                 {client => (
                   <Paper
                     className={classes.root}
+                    key={"adminTablePaper" + tabIndex}
                     style={{
                       background:
                         tabIndex === 1
@@ -315,9 +334,8 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
                       />
                     )}
                     <TableContent
-                      key={tableConfig.key}
-                      modifiedData={modifiedData}
-                      classes={classes}
+                      key={"tableContent"}
+                      data={modifiedData}
                       tabIndex={tabIndex}
                       isEditing={isEditing}
                       allRoles={
@@ -329,6 +347,9 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
                       }
                       setSelectedUserRoles={userRoles =>
                         setSelectedUserRoles(userRoles)
+                      }
+                      setSelectedUserAdmin={isAdmin =>
+                        setSelectedUserAdmin(isAdmin)
                       }
                       selected={selected}
                       handleRowClick={name => handleRowClick(name)}
