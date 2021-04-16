@@ -1,8 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import { ApolloConsumer } from "react-apollo";
-
-import { queryCreateNewUser } from "../../util/utils.js";
+import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
 
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
@@ -13,10 +12,12 @@ import SnackbarContentWrapper from "../../Misc/SnackBarPopup.js";
 
 import styled from "styled-components";
 import { withStyles } from "@material-ui/styles";
+import gql from "graphql-tag";
 
 const styles = theme => ({
   button: {
-    backgroundColor: theme.palette.primary.main
+    backgroundColor: theme.palette.primary.main,
+    textAlign: "center"
   },
   paperTitle: {
     paddingBottom: theme.spacing.unit * 5,
@@ -40,83 +41,67 @@ const styles = theme => ({
     display: "inline-block"
   },
   textField: {
-    marginLeft: theme.spacing(1),
+    marginLeft: 10,
     marginRight: theme.spacing(1),
-    width: 300
+    width: 300,
+    margin: 10
   }
 });
+export const NEWUSER = gql`
+  query createNewUser($user: NewUser!) {
+    createNewUser(user: $user) {
+      created
+    }
+  }
+`;
+const queryCreateNewUser = async (user, client) => {
+  const { data } = await client.query({
+    query: NEWUSER,
+    variables: {
+      user: {
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        password: user.password
+      }
+    }
+  });
+  return data.createNewUser.created;
+};
 const NewAccount = ({ email, dispatch, classes }) => {
   const [error, setError] = useState(null);
-  const [userEmail] = useState(email);
+  const [user, setUser] = useState({
+    name: "",
+    username: "",
+    email: email,
+    password: "",
+    passwordVerify: ""
+  });
+  const handleChange = event => {
+    var newUser = user;
+    newUser[event.target.name] = event.target.value;
+    setUser({ ...newUser });
+  };
 
-  const nameRef = useRef();
-  const usernameRef = useRef();
-  const emailRef = useRef();
-  const passwordRef = useRef();
-  const verifyPasswordRef = useRef();
+  useEffect(() => {
+    ValidatorForm.addValidationRule("isPasswordMatch", value =>
+      user["password"] === value ? true : false
+    );
+  }, [user]);
 
-  const fields = [
-    {
-      id: "newUser:name",
-      label: "Full Name:",
-      ref: nameRef,
-      type: "text",
-      placeholder: "Your Name"
-    },
-    {
-      id: "newUser:username",
-      label: "Username:",
-      ref: usernameRef,
-      type: "text",
-      placeholder: "Username"
-    },
-    {
-      id: "newUser:email",
-      label: "Email:",
-      ref: emailRef,
-      type: "text",
-      value: userEmail,
-      placeholder: "Email"
-    },
-    {
-      id: "newUser:password",
-      label: "Password:",
-      ref: passwordRef,
-      type: "password",
-      placeholder: "Password"
-    },
-    {
-      id: "newUser:passwordVerify",
-      label: "Verify Password:",
-      ref: verifyPasswordRef,
-      type: "password",
-      placeholder: "Verify Password"
-    }
-  ];
-
-  const createNewUser = async (event, client, dispatch) => {
-    if (verifyPasswordRef.current.value === passwordRef.current.value) {
-      var user = {
-        email: emailRef.current.value,
-        username: usernameRef.current.value,
-        password: passwordRef.current.value,
-        name: nameRef.current.value
-      };
-      event.preventDefault();
-      try {
-        var acknowledgement = await queryCreateNewUser(user, client);
-        if (acknowledgement) {
-          dispatch({
-            type: "LOGOUT"
-          });
-        } else {
-          setError(10);
-        }
-      } catch (error) {
-        setError(error);
+  const createNewUser = async (event, client, dispatch, user) => {
+    event.preventDefault();
+    try {
+      var acknowledgement = await queryCreateNewUser(user, client);
+      if (acknowledgement) {
+        dispatch({
+          type: "LOGOUT"
+        });
+      } else {
+        setError(10);
       }
-    } else {
-      setError(11);
+    } catch (error) {
+      setError(error);
     }
   };
 
@@ -143,35 +128,93 @@ const NewAccount = ({ email, dispatch, classes }) => {
               </Typography>
             </Paper>
             <Paper rounded className={classes.paperForm}>
-              <form
-                onSubmit={ev => createNewUser(ev, client, dispatch)}
-                id="newUser"
+              <ValidatorForm
+                instantValidate={false}
+                autoComplete="off"
+                onError={errors => console.log(errors)}
+                onSubmit={ev => {
+                  //createNewUser(ev, client, dispatch)
+                }}
               >
-                {fields.map(field => (
-                  <ComponentWrapper>
-                    <TextField
-                      className={classes.textField}
-                      margin="normal"
-                      inputRef={field.ref}
-                      id={field.id}
-                      required
-                      fullWidth
-                      value={field.value}
-                      label={field.placeholder}
-                      type={field.type}
-                    />
-                  </ComponentWrapper>
-                ))}
-                <ComponentWrapper style={{ textAlign: "center" }}>
+                <TextValidator
+                  className={classes.textField}
+                  key={"newUserName"}
+                  onChange={handleChange}
+                  value={user["name"]}
+                  name={"name"}
+                  fullWidth
+                  label={"Name:"}
+                  type={"text"}
+                  validators={["required"]}
+                  errorMessages={["This field is required"]}
+                />
+                <TextValidator
+                  className={classes.textField}
+                  key={"newUserUsername"}
+                  onChange={handleChange}
+                  value={user["username"]}
+                  name={"username"}
+                  fullWidth
+                  label={"Username:"}
+                  type={"text"}
+                  validators={["required", "minStringLength:3"]}
+                  errorMessages={[
+                    "This field is required",
+                    "Field must be longer than 3 characters long"
+                  ]}
+                />
+                <TextValidator
+                  className={classes.textField}
+                  key={"newUserEmail"}
+                  onChange={handleChange}
+                  value={user["email"]}
+                  fullWidth
+                  label={"Email:"}
+                  type={"text"}
+                  validators={["This field is required"]}
+                  errorMessages={["This field is required"]}
+                />
+                <TextValidator
+                  className={classes.textField}
+                  key={"newUserPassword"}
+                  onChange={handleChange}
+                  name={"password"}
+                  value={user["password"]}
+                  fullWidth
+                  label={"Password:"}
+                  type={"password"}
+                  validators={["required", "minStringLength:10"]}
+                  errorMessages={[
+                    "This field is required",
+                    "Field must be longer than 10 characters long"
+                  ]}
+                />
+                <TextValidator
+                  className={classes.textField}
+                  key={"newUserPasswordVerify"}
+                  name={"passwordVerify"}
+                  onChange={handleChange}
+                  value={user["passwordVerify"]}
+                  fullWidth
+                  label={"Verify Password:"}
+                  type={"password"}
+                  validators={["required", "isPasswordMatch"]}
+                  errorMessages={[
+                    "This field is required",
+                    "Mismatched passwords"
+                  ]}
+                />
+                <div style={{ textAlign: "center" }}>
                   <Button
+                    type="submit"
                     className={classes.button}
                     variant="contianed"
-                    onClick={ev => createNewUser(ev, client, dispatch)}
+                    onClick={ev => createNewUser(ev, client, dispatch, user)}
                   >
                     Create
                   </Button>
-                </ComponentWrapper>
-              </form>
+                </div>
+              </ValidatorForm>
             </Paper>
           </div>
         </Grid>
@@ -179,7 +222,6 @@ const NewAccount = ({ email, dispatch, classes }) => {
     </ApolloConsumer>
   );
 };
-
 const ComponentWrapper = styled.div`
   margin: 10px;
 `;

@@ -31,7 +31,7 @@ const useStyles = makeStyles(theme => ({
   iconButton: { top: "65%", left: "45%" },
   textField: {
     width: 350,
-    left: 15,
+    left: 10,
     marginBottom: 10,
     "&$.MuiOutlinedInput-input": { padding: "15px 12px" }
   },
@@ -61,6 +61,7 @@ const PopUpContent = ({
   const handleNameChange = event => {
     setName(event.target.value);
   };
+
   useEffect(() => {
     if (name && selectedIndices.length > 0) {
       setIsDisabled(false);
@@ -89,7 +90,7 @@ const PopUpContent = ({
           <LoadingContent classes={classes} isSent={isSent} />
         </DialogContent>
       ) : (
-        <ValidatorForm key={"validForm"}>
+        <ValidatorForm key={"validForm"} onSubmit={() => {}}>
           <DialogTitle
             id="form-dialog-title"
             className={classes.dialogTitle}
@@ -101,6 +102,7 @@ const PopUpContent = ({
             <TextValidator
               key={"dialogName"}
               autoFocus
+              disabled={isEdit}
               margin="dense"
               id="name"
               label="Name"
@@ -113,6 +115,7 @@ const PopUpContent = ({
               fullWidth
               className={classes.textValidator}
             />
+
             <TextField
               id="outlined-search"
               label="Search Analyses"

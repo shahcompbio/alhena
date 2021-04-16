@@ -26,22 +26,6 @@ export const VERIFYNEWUSERAUTHKEY = gql`
   }
 `;
 
-export const NEWUSER = gql`
-  query createNewUser($user: NewUser!) {
-    createNewUser(user: $user) {
-      created
-    }
-  }
-`;
-export const LOGIN = gql`
-  query Login($user: User!) {
-    login(user: $user) {
-      statusCode
-      authKeyID
-      role
-    }
-  }
-`;
 export const getUsers = gql`
   query AdminPanel($user: ApiUser!) {
     getUsers(auth: $user) {

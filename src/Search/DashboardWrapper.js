@@ -21,9 +21,9 @@ const getDashboardByUser = gql`
   }
 `;
 
-const DashboardWrapper = ({ uri, classes, history, client }) => {
+const DashboardWrapper = ({ uri, classes, history, client, props }) => {
   const [{ authKeyID, uid }] = useAppState();
-  const ticketFromUrl = uri ? uri.params.ticket : null;
+  const ticketFromUrl = uri.params.ticket ? uri.params.ticket : null;
 
   return (
     <Query
@@ -43,7 +43,7 @@ const DashboardWrapper = ({ uri, classes, history, client }) => {
           ticketFromUrl !== null
             ? null
             : data["getDashboardsByUser"]["defaultDashboard"];
-        console.log(ticketFromUrl);
+
         const intialStateUpdated = initialState(
           dashboards,
           defaultDashboard,

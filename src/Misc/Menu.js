@@ -142,11 +142,7 @@ const Menu = ({ history, classes }) => {
         <SpeedDial
           ariaLabel="Alhena Menu"
           classes={{ root: classes.speedDial, fab: classes.fab }}
-          icon={
-            <Fab classes={{ root: classes.fab }} elevation={0}>
-              <MenuIcon className={classes.menu} />
-            </Fab>
-          }
+          icon={<MenuIcon className={classes.menu} />}
           onClose={handleClose}
           transitionDuration={{ exit: 100 }}
           onOpen={handleOpen}

@@ -68,61 +68,6 @@ const styles = (theme, tabIndex) => ({
   },
   grid: {
     marginTop: "-60px"
-  },
-
-  table: {
-    width: "90%",
-    margin: "auto",
-    minWidth: 650,
-    marginTop: 25
-  },
-  tableRowIndex0: {
-    backgroundColor: theme.palette.primary.dark,
-    color: "white",
-    "&$selected, &$selected:hover": {
-      backgroundColor: "#ffffff"
-    }
-  },
-  checkBox0: {
-    color: "white !important",
-    "$selected &": {
-      color: "white"
-    }
-  },
-  checkBox1: {
-    color: "#000000 !important",
-    "$selected &": {
-      color: "#000000"
-    }
-  },
-  tableRowIndex1: {
-    backgroundColor: theme.palette.primary.main,
-    color: "#000000",
-    "&$selected, &$selected:hover": {
-      backgroundColor: "rgba(232, 232, 232, 0.43)"
-    }
-  },
-  selected: {},
-  tableCell: {
-    whiteSpace: "normal",
-    wordWrap: "break-word",
-    maxWidth: "100px"
-  },
-  selectedTableCell: {
-    whiteSpace: "normal",
-    wordWrap: "break-word",
-    maxWidth: "100px",
-    backgroundColor: "#11151d40"
-  },
-  tableHeader: {
-    fontWeight: "bold"
-  },
-  tablePagination: {
-    fontWeight: "bold"
-  },
-  toolbar: {},
-  hide: {
-    display: "none"
   }
 });
 
@@ -180,7 +125,7 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
         name: full_name,
         username: username,
         newRoles: [...roles],
-        isAdmin: true
+        isAdmin: isAdmin
       }
     });
     return data.updateUser.created;
@@ -279,20 +224,29 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
       }
     } catch (error) {}
   };
+  const sortAlpha = list =>
+    list.sort((a, b) => {
+      var textA = a.name ? a.name.toUpperCase() : a.username.toUpperCase();
+      var textB = b.name ? b.name.toUpperCase() : b.username.toUpperCase();
+      return textA < textB ? -1 : textA > textB ? 1 : 0;
+    });
 
-  const deleteByName = async (client, modifiedData, tabIndex) => {
+  const deleteByName = async (client, users, tabIndex) => {
     setLoading(true);
     try {
-      var confirmed =
+      const confirmed =
         tabIndex === 1
           ? await deleteDashboard(selected, client)
           : await deleteUserByUsername(selected, client);
-    } catch (error) {
-    } finally {
-      if (!confirmed) {
+
+      if (confirmed) {
+        //has updated
+        setData(users.filter(user => user.username !== selected));
+        actionCompleteReset();
+      } else {
         //error
       }
-    }
+    } catch (error) {}
   };
   const config = {
     1: {
@@ -339,7 +293,9 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
         }
 
         const modifiedData =
-          tableData.length > 0 ? tableData : data[tableConfig.dataReturnName];
+          tableData.length > 0
+            ? sortAlpha(tableData)
+            : sortAlpha(data[tableConfig.dataReturnName]);
 
         return (
           <div className={classes.root} key={"adminTable" + tabIndex}>
@@ -378,9 +334,8 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
                       />
                     )}
                     <TableContent
-                      key={tableConfig.key}
+                      key={"tableContent"}
                       data={modifiedData}
-                      classes={classes}
                       tabIndex={tabIndex}
                       isEditing={isEditing}
                       allRoles={

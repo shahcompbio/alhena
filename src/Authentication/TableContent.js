@@ -30,10 +30,64 @@ const rowLabels = {
 const editableRows = { roles: true, isAdmin: true };
 
 const styles = theme => ({
+  table: {
+    width: "90%",
+    margin: "auto",
+    minWidth: 650,
+    marginTop: 25
+  },
   select: {
     "&:before": {
       borderColor: "#ffffff"
     }
+  },
+  tableRowIndex0: {
+    backgroundColor: theme.palette.primary.dark,
+    color: "white",
+    "&$selected, &$selected:hover": {
+      backgroundColor: "#ffffff"
+    }
+  },
+  checkBox0: {
+    color: "white !important",
+    "$selected &": {
+      color: "white"
+    }
+  },
+  checkBox1: {
+    color: "#000000 !important",
+    "$selected &": {
+      color: "#000000"
+    }
+  },
+  tableRowIndex1: {
+    backgroundColor: theme.palette.primary.main,
+    color: "#000000",
+    "&$selected, &$selected:hover": {
+      backgroundColor: "rgba(232, 232, 232, 0.43)"
+    }
+  },
+  selected: {},
+  tableCell: {
+    whiteSpace: "normal",
+    wordWrap: "break-word",
+    maxWidth: "100px"
+  },
+  selectedTableCell: {
+    whiteSpace: "normal",
+    wordWrap: "break-word",
+    maxWidth: "100px",
+    backgroundColor: "#11151d40"
+  },
+  tableHeader: {
+    fontWeight: "bold"
+  },
+  tablePagination: {
+    fontWeight: "bold"
+  },
+  toolbar: {},
+  hide: {
+    display: "none"
   }
 });
 const adminMapping = { false: "", true: "Yes" };
@@ -52,10 +106,6 @@ const TableContent = ({
   const [page, setPage] = useState(0);
   const rowsPerPage = 10;
 
-  const isSelected = name => selected === name;
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
   const tableConfig =
     tabIndex === 0 ? { rowType: "username" } : { rowType: "name" };
 
@@ -85,122 +135,126 @@ const TableContent = ({
     }
   };
 
-  return [
-    <Table className={classes.table} size="small" key={"table-" + tabIndex}>
-      <TableHead key={"tableHead-" + tabIndex}>
-        <TableRow key={"tableHeaderRow-" + tabIndex}>
-          <TableCell
-            key={"tableHeaderRowCell-" + tabIndex}
-            padding="checkbox"
-          ></TableCell>
-          <TableHeadings
-            classes={classes}
-            tableHeadings={tableHeadings}
-            colorClass={colorClass}
-          />
-        </TableRow>
-      </TableHead>
-      <TableBody key={"tableBody-" + tabIndex}>
-        {data.length === 0
-          ? []
-          : data
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, index) => {
-                const name = row[tableConfig.rowType];
+  return (
+    <span>
+      <Table className={classes.table} size="small" key={"table-" + tabIndex}>
+        <TableHead key={"tableHead-" + tabIndex}>
+          <TableRow key={"tableHeaderRow-" + tabIndex}>
+            <TableCell
+              key={"tableHeaderRowCell-" + tabIndex}
+              padding="checkbox"
+            ></TableCell>
+            <TableHeadings
+              key={"tableHeadings"}
+              classes={classes}
+              tableHeadings={tableHeadings}
+              colorClass={colorClass}
+            />
+          </TableRow>
+        </TableHead>
+        <TableBody key={"tableBody-" + tabIndex}>
+          {data.length === 0
+            ? []
+            : data
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row, index) => {
+                  const name = row[tableConfig.rowType];
 
-                const labelId = `enhanced-table-checkbox-${index}`;
-                const isItemSelected = isSelected(name);
-                const rowClass = isItemSelected
-                  ? classes.selectedTableCell
-                  : classes.tableCell;
-                return (
-                  <TableRow
-                    className={colorClass}
-                    classes={{ selected: classes.selected }}
-                    key={"tableBodyRowCheck-" + name}
-                  >
-                    <TableCell
-                      padding="checkbox"
-                      className={rowClass}
-                      key={"tableBodyCellCheck-" + name}
+                  const labelId = `enhanced-table-checkbox-${index}`;
+                  const isItemSelected = selected === name;
+                  const rowClass = isItemSelected
+                    ? classes.selectedTableCell
+                    : classes.tableCell;
+                  return (
+                    <TableRow
+                      className={colorClass}
+                      classes={{ selected: classes.selected }}
+                      key={"tableBodyRowCheck-" + name}
                     >
-                      <Checkbox
-                        className={
-                          tabIndex === 0 ? classes.checkBox0 : classes.checkBox1
-                        }
-                        key={"tableBodyCheckbox-" + name}
-                        id="check"
-                        checked={isItemSelected}
-                        onClick={event => handleRowClick(name)}
-                        inputProps={{ "aria-labelledby": labelId }}
-                      />
-                    </TableCell>
-                    {tableHeadings.map((heading, headingIndex) => {
-                      return (
-                        <TableCell
-                          key={"tableBodyCell-" + name}
-                          align={headingIndex === 0 ? "left" : "right"}
-                          component="th"
-                          scope="row"
-                          id={labelId}
-                          className={[rowClass, colorClass]}
-                        >
-                          <div>
-                            {isSelectedForEditing(
-                              row[tableConfig.rowType],
-                              heading
-                            ) ? (
-                              <DropDownEdit
-                                setUserField={options =>
-                                  heading === "isAdmin"
-                                    ? setSelectedUserAdmin(
-                                        options === "Yes" ? true : false
-                                      )
-                                    : setSelectedUserRoles([...options])
-                                }
-                                currentSelection={
-                                  Array.isArray(row[heading])
-                                    ? row[heading]
-                                    : adminMapping.hasOwnProperty(row[heading])
-                                }
-                                isMultiple={Array.isArray(row[heading])}
-                                allOptions={
-                                  heading === "isAdmin"
-                                    ? ["Yes", "No"]
-                                    : allRoles
-                                }
-                                classes={classes}
-                                user={row["username"]}
-                              />
-                            ) : (
-                              editTextRows(row, heading, allRoles.length)
-                            )}
-                          </div>
-                        </TableCell>
-                      );
-                    })}
-                  </TableRow>
-                );
-              })}
-      </TableBody>
-    </Table>,
-    <TablePagination
-      component="div"
-      count={data.length}
-      rowsPerPage={rowsPerPage}
-      page={page}
-      rowsPerPageOptions={[]}
-      backIconButtonProps={{
-        "aria-label": "previous page"
-      }}
-      nextIconButtonProps={{
-        "aria-label": "next page"
-      }}
-      className={clsx(classes.tablePagination, colorClass)}
-      onChangePage={handleChangePage}
-    />
-  ];
+                      <TableCell
+                        padding="checkbox"
+                        className={rowClass}
+                        key={"tableBodyCellCheck-" + name}
+                      >
+                        <Checkbox
+                          className={colorClass}
+                          key={"tableBodyCheckbox-" + name}
+                          id="check"
+                          checked={isItemSelected}
+                          onClick={event => handleRowClick(name)}
+                          inputProps={{ "aria-labelledby": labelId }}
+                        />
+                      </TableCell>
+                      {tableHeadings.map((heading, headingIndex) => {
+                        return (
+                          <TableCell
+                            key={"tableBodyCell-" + heading + name}
+                            align={headingIndex === 0 ? "left" : "right"}
+                            component="th"
+                            scope="row"
+                            id={labelId}
+                            className={clsx(rowClass, colorClass)}
+                          >
+                            <div key={"tableCellWrapper-" + name}>
+                              {isSelectedForEditing(
+                                row[tableConfig.rowType],
+                                heading
+                              ) ? (
+                                <DropDownEdit
+                                  setUserField={options =>
+                                    heading === "isAdmin"
+                                      ? setSelectedUserAdmin(
+                                          options === "Yes" ? true : false
+                                        )
+                                      : setSelectedUserRoles([...options])
+                                  }
+                                  currentSelection={
+                                    Array.isArray(row[heading])
+                                      ? row[heading]
+                                      : adminMapping.hasOwnProperty(
+                                          row[heading]
+                                        )
+                                  }
+                                  isMultiple={Array.isArray(row[heading])}
+                                  allOptions={
+                                    heading === "isAdmin"
+                                      ? ["Yes", "No"]
+                                      : allRoles
+                                  }
+                                  classes={classes}
+                                  user={row["username"]}
+                                />
+                              ) : (
+                                editTextRows(row, heading, allRoles.length)
+                              )}
+                            </div>
+                          </TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  );
+                })}
+        </TableBody>
+      </Table>
+      <TablePagination
+        component="div"
+        count={data.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        rowsPerPageOptions={[]}
+        backIconButtonProps={{
+          "aria-label": "previous page"
+        }}
+        nextIconButtonProps={{
+          "aria-label": "next page"
+        }}
+        className={clsx(classes.tablePagination, colorClass)}
+        onChangePage={(event, newPage) => setPage(newPage)}
+      />
+    </span>
+  );
 };
+
 const TableHeadings = ({ classes, tableHeadings, colorClass }) =>
   tableHeadings.map((heading, headingIndex) => {
     var aligned = headingIndex === 0 ? "left" : "right";
@@ -214,6 +268,7 @@ const TableHeadings = ({ classes, tableHeadings, colorClass }) =>
       </TableCell>
     );
   });
+
 const DropDownEdit = ({
   currentSelection,
   isMultiple,

@@ -33,6 +33,7 @@ const styles = {
     cursor: "pointer",
     color: "white !important"
   },
+  disabled: { cursor: "pointer" },
   stepper: { margin: "auto", position: "absolute", bottom: 50, left: "50vw" },
   tableWrapper: {
     marginTop: "15vh"
@@ -153,7 +154,6 @@ const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
                 direction={getDirection(0)}
                 in={true}
                 mountOnEnter
-                unmountOnExit
                 timeout={slideTimeOut}
                 key={"slideTableContent"}
               >

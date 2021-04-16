@@ -22,8 +22,9 @@ const useToolbarStyles = makeStyles(theme => ({
     backgroundColor: "#c9e2ea"
   },
   deleteHighlight: {
-    color: theme.palette.secondary.main,
-    backgroundColor: lighten(theme.palette.secondary.light, 0.85)
+    color: "black",
+    fontWeight: "bold",
+    backgroundColor: "#f1a9a0"
   },
   editHighlight: {
     backgroundColor: "#c9e2ea"

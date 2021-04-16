@@ -4,7 +4,12 @@ import React, {
   useState,
   useLayoutEffect
 } from "react";
-import { useAppState, PrivateRoute, AdminRoute } from "./util/app-state";
+import {
+  useAppState,
+  PrivateRoute,
+  AdminRoute,
+  UnauthenticatedRoute
+} from "./util/app-state";
 import { ApolloConsumer } from "react-apollo";
 import { Route, Switch } from "react-router-dom";
 
@@ -82,20 +87,14 @@ const App = () => {
             <UpdatePasswordVerification uri={match} dispatch={dispatch} />
           )}
         />
-        <Route
-          path="/forgotPassword"
-          component={() => (
-            <ApolloConsumer>
-              {client => (
-                <ForgotPasswordWrapper client={client} dispatch={dispatch} />
-              )}
-            </ApolloConsumer>
-          )}
-        />
+        <UnauthenticatedRoute path="/forgotPassword">
+          <ForgotPasswordWrapper />
+        </UnauthenticatedRoute>
+        <PrivateRoute key="ticket" path="/dashboards/:ticket">
+          <DashboardWrapper />
+        </PrivateRoute>
         <PrivateRoute key="dashboard" path="/dashboards">
-          <ApolloConsumer>
-            {client => <DashboardWrapper ticket={null} client={client} />}
-          </ApolloConsumer>
+          <DashboardWrapper ticket={null} />
         </PrivateRoute>
         <AdminRoute path="/admin">
           <AdminPanel />
@@ -104,20 +103,5 @@ const App = () => {
     </MuiThemeProvider>
   );
 };
-/*  <PrivateRoute>
-    <Route
-      key="ticketSandbox"
-      path="/sandbox"
-      component={({ match }) => {
-        var uri = match;
-        uri.params.ticket = "sc-3792";
-        return (
-          <ApolloConsumer>
-            {client => <DashboardWrapper uri={uri} client={client} />}
-          </ApolloConsumer>
-        );
-      }}
-    />
-  </PrivateRoute>
-*/
+
 export default withRouter(App);

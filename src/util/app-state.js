@@ -1,5 +1,8 @@
 import React, { createContext, useReducer, useContext } from "react";
 import { Route, Redirect } from "react-router-dom";
+
+import { ApolloConsumer } from "react-apollo";
+
 const StateContext = createContext();
 
 export function AppStateProvider({ reducer, initialState, children }) {
@@ -14,15 +17,41 @@ export function AppStateProvider({ reducer, initialState, children }) {
 export function useAppState() {
   return useContext(StateContext);
 }
+export function UnauthenticatedRoute({ children, ...rest }) {
+  const [{ authKeyID }, dispatch] = useAppState();
 
-export function PrivateRoute({ children, ...rest }) {
-  const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
   return (
     <Route
       {...rest}
-      component={() => {
+      component={({ match }) => {
+        if (!authKeyID) {
+          return (
+            <ApolloConsumer>
+              {client =>
+                React.cloneElement(children, { uri: match, client: client })
+              }
+            </ApolloConsumer>
+          );
+        }
+      }}
+    />
+  );
+}
+export function PrivateRoute({ children, ...rest }) {
+  const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
+
+  return (
+    <Route
+      {...rest}
+      component={({ match }) => {
         if (authKeyID) {
-          return children;
+          return (
+            <ApolloConsumer>
+              {client =>
+                React.cloneElement(children, { uri: match, client: client })
+              }
+            </ApolloConsumer>
+          );
         } else {
           dispatch({
             type: "LOGOUT"
@@ -34,6 +63,7 @@ export function PrivateRoute({ children, ...rest }) {
 }
 export function AdminRoute({ children, ...rest }) {
   const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
+
   return (
     <Route
       {...rest}
