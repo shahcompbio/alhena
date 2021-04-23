@@ -5,7 +5,7 @@ import { withStyles } from "@material-ui/styles";
 import { useDashboardState } from "../ProjectState/dashboardState";
 
 const styles = {
-  root: { color: "white" },
+  root: { color: "white", cursor: "pointer" },
   wrapper: { height: 530, width: 1200 },
   header: { backgroundColor: "#afafafd9" }
 };

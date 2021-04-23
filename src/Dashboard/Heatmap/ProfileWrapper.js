@@ -48,10 +48,6 @@ const ProfileWrapper = ({
     const setRef = useCallback(node => {
       if (node) {
         const container = d3.select(node).select("#profileSvg");
-        container.attr(
-          "transform",
-          "translate(" + heatmapConfig.paddingLeft + ", " + 0 + ")"
-        );
 
         container
           .append("g")
@@ -143,20 +139,26 @@ const ProfileWrapper = ({
       width={heatmapConfig.wrapperWidth}
     >
       <Grid item>
-        <ProfileAxis genomeYScale={genomeYScale} />
+        <canvas
+          id="genomeAxis"
+          style={{ marginTop: -7 }}
+          width={heatmapConfig.profile.axisWidth}
+          height={heatmapConfig.profile.height}
+        >
+          <ProfileAxis genomeYScale={genomeYScale} />
+        </canvas>
       </Grid>
       <Grid item>
         <svg
           id="profileSvg"
           width={heatmapConfig.width}
           height={heatmapConfig.profile.height}
-          style={{ marginTop: 5, position: "absolute" }}
+          style={{ position: "absolute" }}
         />
         <canvas
           id="profileCanvas"
           style={{
-            marginLeft: heatmapConfig.profile.axisWidth,
-            paddingTop: heatmapConfig.profile.axisTextYOffset - 1
+            marginLeft: heatmapConfig.profile.axisWidth
           }}
           width={heatmapConfig.width}
           height={heatmapConfig.profile.height}

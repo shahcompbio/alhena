@@ -54,7 +54,6 @@ const VERIFYUSER = gql`
   }
 `;
 const checkUser = async (client, username, email) => {
-  console.log(username);
   const { data } = await client.query({
     query: VERIFYUSER,
     variables: {

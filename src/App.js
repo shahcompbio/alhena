@@ -22,6 +22,7 @@ import DashboardWrapper from "./Search/DashboardWrapper";
 import DashboardContent from "./Dashboard/DashboardContent.js";
 import ProjectViewContent from "./Search/ProjectView/ProjectViewContent";
 
+import ExportPopup from "./Misc/ExportPopup.js";
 import Unauthenticated from "./Authentication/Unauthenticated.js";
 import ForgotPasswordWrapper from "./Authentication/ForgotPasswordWrapper.js";
 import NewUserUriVerification from "./Authentication/NewUser/NewUserUriVerification.js";
@@ -87,9 +88,16 @@ const App = () => {
             <UpdatePasswordVerification uri={match} dispatch={dispatch} />
           )}
         />
+        <Route
+          path="/exportTest"
+          component={() => <ExportPopup dispatch={dispatch} />}
+        />
         <UnauthenticatedRoute path="/forgotPassword">
           <ForgotPasswordWrapper />
         </UnauthenticatedRoute>
+        <PrivateRoute key="ticket" path="/dashboards/:ticket/:copyLink">
+          <DashboardWrapper />
+        </PrivateRoute>
         <PrivateRoute key="ticket" path="/dashboards/:ticket">
           <DashboardWrapper />
         </PrivateRoute>

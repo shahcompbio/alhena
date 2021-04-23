@@ -11,7 +11,10 @@ import dashboardStateReducer, {
 import { DashboardProvider } from "./ProjectView/ProjectState/dashboardState";
 
 const getDashboardByUser = gql`
-  query UserDashboard($user: ApiUser!) {
+  query UserDashboard($user: ApiUser!, $fragment: String) {
+    getQueryParams(fragment: $fragment) {
+      paramsFromLink
+    }
     getDashboardsByUser(auth: $user) {
       dashboards {
         name
@@ -24,11 +27,13 @@ const getDashboardByUser = gql`
 const DashboardWrapper = ({ uri, classes, history, client, props }) => {
   const [{ authKeyID, uid }] = useAppState();
   const ticketFromUrl = uri.params.ticket ? uri.params.ticket : null;
+  const fragment = uri.params.copyLink ? uri.params.copyLink : null;
 
   return (
     <Query
       query={getDashboardByUser}
       variables={{
+        fragment: fragment,
         user: { authKeyID: authKeyID, uid: uid }
       }}
     >
@@ -43,11 +48,17 @@ const DashboardWrapper = ({ uri, classes, history, client, props }) => {
           ticketFromUrl !== null
             ? null
             : data["getDashboardsByUser"]["defaultDashboard"];
+        const linkParams = data.getQueryParams
+          ? data.getQueryParams.paramsFromLink
+              .split("||")
+              .map(paramString => JSON.parse(paramString))
+          : null;
 
         const intialStateUpdated = initialState(
           dashboards,
           defaultDashboard,
-          ticketFromUrl
+          ticketFromUrl,
+          linkParams
         );
         return (
           <DashboardProvider
