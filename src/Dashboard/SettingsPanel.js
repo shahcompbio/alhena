@@ -70,8 +70,13 @@ const styles = theme => ({
     margin: theme.spacing(3)
   },
   exportButton: {
+    width: 130,
     marginBottom: 10,
-    marginRight: 10
+    marginRight: 12
+  },
+  shareButton: {
+    width: 135,
+    marginBottom: 10
   },
   fieldComponent: {
     margin: theme.spacing(2, 0, 0, 0)
@@ -218,7 +223,7 @@ const SettingsPanel = ({
         <Button
           variant="outlined"
           color="default"
-          className={classes.exportButton}
+          className={classes.shareButton}
           onClick={() => setOpenSharePopup()}
           startIcon={<ShareIcon />}
         >
@@ -405,7 +410,6 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
           color: "#a2a2a2"
         }}
       >
-        Analysis:
         <span
           style={{
             width: 225,
@@ -414,12 +418,12 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
             wordBreak: "break-all"
           }}
         >
-          {analysis}
+          Analysis: {analysis}
         </span>
       </Typography>
       {project && (
         <Typography
-          variant="h6"
+          variant="h7"
           fontWeight="fontWeightRegular"
           style={{ color: "#a2a2a2" }}
         >
@@ -428,7 +432,7 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
       )}
       {metaData && (
         <Typography
-          variant="h6"
+          variant="h7"
           fontWeight="fontWeightRegular"
           style={{ color: "#a2a2a2" }}
         >
@@ -437,7 +441,7 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
       )}
       {metaData && (
         <Typography
-          variant="h6"
+          variant="h7"
           fontWeight="fontWeightRegular"
           style={{ color: "#a2a2a2" }}
         >
@@ -448,7 +452,7 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
         <LoadingCircle />
       ) : (
         <Typography
-          variant="h6"
+          variant="h7"
           fontWeight="fontWeightRegular"
           style={{ color: "#a2a2a2" }}
         >

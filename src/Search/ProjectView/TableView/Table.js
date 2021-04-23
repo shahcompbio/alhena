@@ -19,7 +19,12 @@ const Table = ({ handleForwardStep, classes, columns, rows }) => {
         columns={columns.map(field => ({
           field: field["type"],
           headerName: field["label"],
-          width: field["type"] === "jira_id" ? 800 : 150,
+          width:
+            field["type"] === "jira_id"
+              ? 700
+              : field["type"] === "sample_id"
+              ? 200
+              : 150,
           headerClassName: classes.header
         }))}
         onRowClick={({ row }) => {
