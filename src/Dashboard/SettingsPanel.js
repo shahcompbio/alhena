@@ -70,8 +70,13 @@ const styles = theme => ({
     margin: theme.spacing(3)
   },
   exportButton: {
+    width: 130,
     marginBottom: 10,
-    marginRight: 10
+    marginRight: 12
+  },
+  shareButton: {
+    width: 135,
+    marginBottom: 10
   },
   fieldComponent: {
     margin: theme.spacing(2, 0, 0, 0)
@@ -212,7 +217,7 @@ const SettingsPanel = ({
         <Button
           variant="outlined"
           color="default"
-          className={classes.exportButton}
+          className={classes.shareButton}
           onClick={() => setOpenSharePopup()}
           startIcon={<ShareIcon />}
         >
@@ -373,13 +378,49 @@ const MetaData = ({ classes, count, analysis, library }) => (
         fontWeight="fontWeightRegular"
         style={{ color: "#a2a2a2" }}
       >
-        Analysis: <b>{analysis}</b>
+        <span
+          style={{
+            width: 225,
+            display: "inline-block",
+            fontWeight: "bold",
+            wordBreak: "break-all"
+          }}
+        >
+          Analysis: {analysis}
+        </span>
       </Typography>
+      {project && (
+        <Typography
+          variant="h7"
+          fontWeight="fontWeightRegular"
+          style={{ color: "#a2a2a2" }}
+        >
+          Project: {project}
+        </Typography>
+      )}
+      {metaData && (
+        <Typography
+          variant="h7"
+          fontWeight="fontWeightRegular"
+          style={{ color: "#a2a2a2" }}
+        >
+          Library: {metaData["library_id"]}
+        </Typography>
+      )}
+      {metaData && (
+        <Typography
+          variant="h7"
+          fontWeight="fontWeightRegular"
+          style={{ color: "#a2a2a2" }}
+        >
+          Sample: {metaData["sample_id"]}
+        </Typography>
+      )}
       {count === null ? (
         <LoadingCircle />
       ) : (
         <Typography
-          variant="h5"
+          variant="h7"
           fontWeight="fontWeightRegular"
           style={{ color: "#a2a2a2" }}
         >
@@ -408,24 +449,5 @@ const SelectedCellsPanel = ({
     </Grid>
   </Paper>
 );
-/*      <AccordianWrapper
-        classes={classes}
-        key={"chipAccordianWrapper"}
-        name="chip"
-        title="Chip"
-        setIsOpenAccordian={setIsOpenAccordian}
-        openAccordian={openAccordian}
-        isResetPossible={axisChange["chip"]}
-        resetFilter={() => {
-          resetFilter("CHIP_AXIS_RESET");
-        }}
-      >
-        <ChipHeatmapSettings
-          classes={classes}
-          axisOptions={chipHeatmapOptions}
-          currentlySelectedAxis={chipHeatmapAxis}
-          setAxisOption={value => update(value, "CHIPHEATMAP_AXIS_UPDATE")}
-          isDisabled={isDisabled}
-        />
-      </AccordianWrapper>*/
+
 export default withStyles(styles)(SettingsPanel);
