@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import gql from "graphql-tag";
 import { useQuery } from "react-apollo-hooks";
@@ -11,6 +11,9 @@ import Chip from "./ChipHeatmap/Chip.js";
 import GCBias from "./GCBias/GCBias.js";
 import Scatterplot from "./Scatterplot/Scatterplot.js";
 import Violin from "./Violin/Violin.js";
+
+import ExportPopup from "../Misc/ExportPopup.js";
+import SharePopup from "../Misc/SharePopup.js";
 
 import SettingsPanel from "./SettingsPanel.js";
 
@@ -44,6 +47,11 @@ const HEATMAP_ORDER = gql`
         type
         label
       }
+    }
+    analysisMetadata(analysis: $analysis) {
+      sample_id
+      library_id
+      jira_id
     }
     numericalDataFilters(
       analysis: $analysis
@@ -129,13 +137,14 @@ const QCDashboard = ({ analysis, classes, client }) => {
     dispatch
   ] = useStatisticsState();
   let history = useHistory();
+  const [openExportPopup, setOpenExportPopup] = useState(false);
+  const [openSharePopup, setOpenSharePopup] = useState(false);
 
   const params = getQueryParams(
     isContaminated,
     expCondition,
     numericalDataFilters
   );
-
   const { loading, data } = useQuery(HEATMAP_ORDER, {
     variables: {
       analysis: analysis,
@@ -192,9 +201,25 @@ const QCDashboard = ({ analysis, classes, client }) => {
                 violinOptions={data.violinAxisOptions}
                 categoryStats={data.categoriesStats}
                 analysis={analysis}
+                setOpenSharePopup={() => setOpenSharePopup(!openSharePopup)}
+                setOpenExportPopup={() => setOpenExportPopup(!openExportPopup)}
               />
             </Grid>
-
+            {openExportPopup && (
+              <ExportPopup
+                setOpenExportPopup={setOpenExportPopup}
+                openExportPopup={openExportPopup}
+              />
+            )}
+            {openSharePopup && (
+              <SharePopup
+                client={client}
+                params={params}
+                analysis={analysis}
+                setOpenSharePopup={setOpenSharePopup}
+                openSharePopup={openSharePopup}
+              />
+            )}
             {heatmapOrder && heatmapOrder.length === 0 ? (
               <Grid item className={classes.plots} xs={9} key={"plotPanelGrid"}>
                 <Paper
@@ -215,33 +240,6 @@ const QCDashboard = ({ analysis, classes, client }) => {
                     allHeatmapOrder={heatmapOrder}
                     categoryStats={data.categoriesStats}
                   />
-                </Paper>
-                <Paper
-                  key={"violinPaper"}
-                  className={[classes.violinContent, classes.paperContainer]}
-                >
-                  <Violin
-                    key={"violinPlot"}
-                    analysis={analysis}
-                    allHeatmapOrder={heatmapOrder}
-                    categoryStats={data.categoriesStats}
-                  />
-                </Paper>
-                <Paper
-                  key={"gcBiasPaper"}
-                  className={[classes.gcBias, classes.paperContainer]}
-                >
-                  <GCBias
-                    key={"gcBiasPlot"}
-                    analysis={analysis}
-                    heatmapOrder={heatmapOrder}
-                  />
-                </Paper>
-                <Paper
-                  key={"scatterPaper"}
-                  className={[classes.scatterplot, classes.paperContainer]}
-                >
-                  <Scatterplot key={"scatterplot"} analysis={analysis} />
                 </Paper>
               </Grid>
             )}
@@ -318,7 +316,10 @@ const QCDashboard = ({ analysis, classes, client }) => {
 /*
 <Paper
   key={"heatmapPaper"}
-  className={[classes.heatmapContent, classes.paperContainer]}
+  className={[
+    classes.heatmapContent,
+    classes.paperContainer
+  ].join(" ")}
 >
   <Heatmap
     key={"heatmapPlot"}
@@ -359,5 +360,6 @@ const QCDashboard = ({ analysis, classes, client }) => {
   className={[classes.scatterplot, classes.paperContainer]}
 >
   <Scatterplot key={"scatterplot"} analysis={analysis} />
-</Paper>*/
+</Paper>
+*/
 export default withStyles(styles)(QCDashboard);

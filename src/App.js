@@ -17,6 +17,7 @@ import DashboardWrapper from "./Search/DashboardWrapper";
 import DashboardContent from "./Dashboard/DashboardContent.js";
 import ProjectViewContent from "./Search/ProjectView/ProjectViewContent";
 
+import ExportPopup from "./Misc/ExportPopup.js";
 import Unauthenticated from "./Authentication/Unauthenticated.js";
 import ForgotPasswordWrapper from "./Authentication/ForgotPasswordWrapper.js";
 import NewUserUriVerification from "./Authentication/NewUser/NewUserUriVerification.js";
@@ -66,9 +67,14 @@ const App = () => {
           component={({ match }) => <DashboardWrapper uri={match} />}
         />
         <Route
+          key="ticket"
+          path="/dashboards/:ticket/:copyLink"
+          component={({ match }) => <DashboardWrapper uri={match} />}
+        />
+        <Route
           key="dashboard"
           path="/dashboards"
-          component={() => <DashboardWrapper ticket={null} />}
+          component={() => <DashboardWrapper uri={null} />}
         />
 
         {authKeyID && isSuperUser && (

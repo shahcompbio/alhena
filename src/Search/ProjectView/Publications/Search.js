@@ -39,7 +39,7 @@ const Search = ({
   handleForwardStep
 }) => {
   const classes = useStyles();
-  console.log(sampleList);
+
   return (
     <span>
       <Autocomplete

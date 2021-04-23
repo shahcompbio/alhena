@@ -19,6 +19,8 @@ import ViolinSettings from "./Settings/ViolinSettings.js";
 import GCBiasSettings from "./Settings/GCBiasSettings.js";
 import DataFilters from "./Settings/DataFilters.js";
 
+import ShareIcon from "@material-ui/icons/Share";
+import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import BackspaceTwoToneIcon from "@material-ui/icons/BackspaceTwoTone";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
@@ -67,6 +69,10 @@ const styles = theme => ({
   button: {
     margin: theme.spacing(3)
   },
+  exportButton: {
+    marginBottom: 10,
+    marginRight: 10
+  },
   fieldComponent: {
     margin: theme.spacing(2, 0, 0, 0)
   },
@@ -113,7 +119,10 @@ const SettingsPanel = ({
   cellCount,
   chipHeatmapOptions,
   violinOptions,
-  numericalDataFilters
+  numericalDataFilters,
+  metaData,
+  setOpenExportPopup,
+  setOpenSharePopup
 }) => {
   const [{ selectedAnalysis }] = useDashboardState();
   const [
@@ -127,6 +136,9 @@ const SettingsPanel = ({
     },
     dispatch
   ] = useStatisticsState();
+
+  const meta = metaData ? metaData : {};
+
   const [openAccordian, setIsOpenAccordian] = useState({
     dataFilter: false,
     scatterplot: false,
@@ -182,6 +194,31 @@ const SettingsPanel = ({
           }
         />
       )}
+      <Grid
+        container
+        direction="row"
+        justify="flex-start"
+        alignItems="flex-start"
+      >
+        <Button
+          variant="outlined"
+          color="default"
+          className={classes.exportButton}
+          onClick={() => setOpenExportPopup()}
+          startIcon={<CloudDownloadIcon />}
+        >
+          Export
+        </Button>
+        <Button
+          variant="outlined"
+          color="default"
+          className={classes.exportButton}
+          onClick={() => setOpenSharePopup()}
+          startIcon={<ShareIcon />}
+        >
+          Share
+        </Button>
+      </Grid>
       <AccordianWrapper
         classes={classes}
         name="dataFilter"

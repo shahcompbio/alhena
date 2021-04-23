@@ -123,7 +123,11 @@ const UnauthenticatedApp = ({ client, classes }) => {
     <Grid container direction="row" justify="center" alignItems="center">
       <div className={classes.circleImg}>
         {error && (
-          <SnackbarContentWrapper variant="error" errorNumber={error} />
+          <SnackbarContentWrapper
+            variant="error"
+            errorNumber={error}
+            setError={setError}
+          />
         )}
       </div>
       <div

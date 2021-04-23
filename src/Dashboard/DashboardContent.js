@@ -34,13 +34,17 @@ const styles = theme => ({
   }
 });
 
-const DashboardContent = ({ classes, history }) => {
-  const [{ selectedAnalysis }] = useDashboardState();
-  //history.push("/" + selectedAnalysis);
+const DashboardContent = ({ classes, history, client }) => {
+  const [{ selectedAnalysis, linkParams }] = useDashboardState();
+  const modifiedInitialState = linkParams ? linkParams[0] : initialState;
+
   return (
-    <StatsProvider initialState={initialState} reducer={statsStateReducer}>
+    <StatsProvider
+      initialState={modifiedInitialState}
+      reducer={statsStateReducer}
+    >
       {selectedAnalysis ? (
-        <QCDashboard analysis={selectedAnalysis} item xs={8} />
+        <QCDashboard analysis={selectedAnalysis} item xs={8} client={client} />
       ) : (
         [
           <Grid className={classes.settings} item xs={4}>

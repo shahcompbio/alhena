@@ -463,54 +463,6 @@ const Publications = ({ handleForwardStep }) => {
   }, [radius]);
 
   useEffect(() => {
-    var offset = { x: 0, y: 0 };
-
-    offset = { x: 0, y: dimensions.height / 2, scale: 1 };
-
-    d3.select("#links")
-      .transition()
-      .duration(easeDuration)
-      .ease(ease)
-      .attr(
-        "transform",
-        "rotate(" +
-          currentAngle +
-          "," +
-          offset.x +
-          `,` +
-          offset.y +
-          ") translate(" +
-          offset.x +
-          "," +
-          offset.y +
-          ") scale(" +
-          offset.scale +
-          ")"
-      );
-    d3.select("#nodes")
-      .transition()
-      .duration(easeDuration)
-      .ease(ease)
-      .attr(
-        "transform",
-        "rotate(" +
-          currentAngle +
-          "," +
-          offset.x +
-          `,` +
-          offset.y +
-          ") translate(" +
-          offset.x +
-          "," +
-          offset.y +
-          ") scale(" +
-          offset.scale +
-          ")"
-      );
-    setOffset({ ...offset });
-  }, []);
-
-  useEffect(() => {
     if (paintReady) {
       setRadius({ prev: 0, current: 0 });
     }
@@ -520,6 +472,7 @@ const Publications = ({ handleForwardStep }) => {
   useEffect(() => {
     d3.xml(all).then(data => {
       const mainNode = document.getElementById("canvasGraph");
+      console.log(d3.select("#canvasGraph"));
       mainNode.insertBefore(data.documentElement, mainNode.childNodes[0]);
       d3.selectAll("#light, #pinkLight, #redLight").attr("class", "hideLight");
     });
@@ -630,6 +583,50 @@ const Publications = ({ handleForwardStep }) => {
         storeFlatAnalysisList([
           ...result.filter(row => row["name"] !== "Cell Line")
         ]);
+
+        var offset = { x: 0, y: dimensions.height / 2, scale: 1 };
+
+        d3.select("#links")
+          .transition()
+          .duration(easeDuration)
+          .ease(ease)
+          .attr(
+            "transform",
+            "rotate(" +
+              currentAngle +
+              "," +
+              offset.x +
+              `,` +
+              offset.y +
+              ") translate(" +
+              offset.x +
+              "," +
+              offset.y +
+              ") scale(" +
+              offset.scale +
+              ")"
+          );
+        d3.select("#nodes")
+          .transition()
+          .duration(easeDuration)
+          .ease(ease)
+          .attr(
+            "transform",
+            "rotate(" +
+              currentAngle +
+              "," +
+              offset.x +
+              `,` +
+              offset.y +
+              ") translate(" +
+              offset.x +
+              "," +
+              offset.y +
+              ") scale(" +
+              offset.scale +
+              ")"
+          );
+        setOffset({ ...offset });
 
         setInterval(function() {
           setPaintReady(true);

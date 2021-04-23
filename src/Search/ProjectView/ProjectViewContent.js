@@ -92,90 +92,34 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
   };
 
   return selectedDashboard !== null ? (
-    <Query
-      query={getAllAnalyses}
-      variables={{
-        filter: [...filters],
-        dashboardName: selectedDashboard
-      }}
-    >
-      {({ loading, error, data }) => {
-        if (error) {
-          //  dispatch({
-          //    type: "LOGOUT"
-          //  });
-          return null;
-        }
-        if (loading) {
-          return (
-            <Grid
-              container
-              className={classes.root}
-              spacing={2}
-              key={"grid-container"}
-            >
-              <Grid
-                item
-                xs={6}
-                sm={3}
-                style={{ height: "50vh" }}
-                key={"grid-search"}
-              ></Grid>
-              <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
-                <Publications
-                  isLoading={true}
-                  key={"packing-circles"}
-                  filters={[]}
-                  analyses={{}}
-                  data={null}
-                  handleFilterChange={null}
-                  handleForwardStep={null}
-                />
-              </Grid>
-            </Grid>
-          );
-        } else {
-          if (data["analyses"]["error"]) {
-            dispatch({
-              type: "LOGOUT"
-            });
-            return null;
-          } else {
-            return (
-              <Grid
-                container
-                className={classes.root}
-                spacing={2}
-                key={"grid-container"}
-              >
-                <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
-                  <Publications
-                    graphDim={graphDim}
-                    isLoading={false}
-                    key={"packing-circles"}
-                    filters={filters}
-                    data={data.analyses.analysesTree.children}
-                    handleFilterChange={(filters, type) =>
-                      handleFilterChange(filters, type)
-                    }
-                    handleForwardStep={handleForwardStep}
-                  />
-                </Grid>
-              </Grid>
-            );
+    <Grid container className={classes.root} spacing={2} key={"grid-container"}>
+      <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
+        <Publications
+          isLoading={true}
+          key={"packing-circles"}
+          filters={[]}
+          analyses={{}}
+          handleFilterChange={null}
+          handleForwardStep={null}
+        />
+      </Grid>
+    </Grid>
+  ) : (
+    <Grid container className={classes.root} spacing={2} key={"grid-container"}>
+      <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
+        <Publications
+          graphDim={graphDim}
+          isLoading={false}
+          key={"packing-circles"}
+          filters={filters}
+          handleFilterChange={(filters, type) =>
+            handleFilterChange(filters, type)
           }
-        }
-      }}
-    </Query>
-  ) : null;
+          handleForwardStep={handleForwardStep}
+        />
+      </Grid>
+    </Grid>
+  );
 };
-/*                  <Search
-                    key={"search"}
-                    selectedOptions={selectedOptions}
-                    filters={data.analyses.analysesList}
-                    handleFilterChange={(selection, type) =>
-                      handleFilterChange(selection, type)
-                    }
-                    handleForwardStep={handleForwardStep}
-                  />*/
+
 export default withStyles(styles)(ProjectViewContent);

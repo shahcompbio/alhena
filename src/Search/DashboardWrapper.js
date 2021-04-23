@@ -3,6 +3,7 @@ import { useAppState } from "../util/app-state";
 
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
+import useQuery from "graphql-tag";
 import Content from "./Content.js";
 
 import dashboardStateReducer, {
@@ -10,48 +11,46 @@ import dashboardStateReducer, {
 } from "./ProjectView/ProjectState/dashboardReducer";
 import { DashboardProvider } from "./ProjectView/ProjectState/dashboardState";
 
-const getDashboardByUser = gql`
-  query UserDashboard($user: ApiUser!) {
-    getDashboardsByUser(auth: $user) {
-      name
+const getQueryParams = gql`
+  query UserDashboard($fragment: String) {
+    getQueryParams(fragment: $fragment) {
+      paramsFromLink
     }
   }
 `;
 
-const DashboardWrapper = ({ uri, classes, history }) => {
+const DashboardWrapper = ({ uri, classes, history, client }) => {
   const [{ authKeyID, uid }] = useAppState();
-  const ticketFromUrl = uri ? uri.params.ticket : null;
+  const ticketFromUrl = uri && uri.params.ticket ? uri.params.ticket : null;
+  const fragment = uri && uri.params.copyLink ? uri.params.copyLink : null;
+  var linkParams = null;
+  console.log(uri);
+  if (fragment !== null) {
+    const { loading, error, data } = useQuery(getQueryParams, {
+      variables: { fragment }
+    });
 
-  /*  <Query
-      query={getDashboardByUser}
-      variables={{
-        user: { authKeyID: authKeyID, uid: uid }
-      }}
-    >
-      {({ loading, error, data }) => {
-        if (loading) return null;
-        if (error) return null;
-
-        const dashboards = data.getDashboardsByUser.map(
-          dashboard => dashboard.name
-        );
-*/
+    linkParams = data.getQueryParams
+      ? data.getQueryParams.paramsFromLink
+          .split("||")
+          .map(paramString => JSON.parse(paramString))
+      : null;
+  }
 
   const intialStateUpdated = initialState(
     ["Fitness"],
     "Fitness",
-    ticketFromUrl
+    ticketFromUrl,
+    linkParams
   );
   return (
     <DashboardProvider
       initialState={intialStateUpdated}
       reducer={dashboardStateReducer}
     >
-      <Content />
+      <Content client={client} />
     </DashboardProvider>
   );
-  //  }}
-  //  </Query>
 };
 
 export default DashboardWrapper;
