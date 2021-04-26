@@ -363,53 +363,5 @@ const QCDashboard = ({ analysis, classes, client }) => {
     );
   }
 };
-/*
-<Paper
-  key={"heatmapPaper"}
-  className={[
-    classes.heatmapContent,
-    classes.paperContainer
-  ].join(" ")}
->
-  <Heatmap
-    key={"heatmapPlot"}
-    analysis={analysis}
-    allHeatmapOrder={heatmapOrder}
-    categoryStats={data.categoriesStats}
-  />
-</Paper>
-<Paper
-  key={"chipPaper"}
-  className={[classes.chip, classes.paperContainer]}
->
-  <Chip key={"chipPlot"} analysis={analysis} />
-</Paper>
-<Paper
-  key={"violinPaper"}
-  className={[classes.violinContent, classes.paperContainer]}
->
-  <Violin
-    key={"violinPlot"}
-    analysis={analysis}
-    allHeatmapOrder={heatmapOrder}
-    categoryStats={data.categoriesStats}
-  />
-</Paper>
-<Paper
-  key={"gcBiasPaper"}
-  className={[classes.gcBias, classes.paperContainer]}
->
-  <GCBias
-    key={"gcBiasPlot"}
-    analysis={analysis}
-    heatmapOrder={heatmapOrder}
-  />
-</Paper>
-<Paper
-  key={"scatterPaper"}
-  className={[classes.scatterplot, classes.paperContainer]}
->
-  <Scatterplot key={"scatterplot"} analysis={analysis} />
-</Paper>
-*/
+
 export default withStyles(styles)(QCDashboard);
