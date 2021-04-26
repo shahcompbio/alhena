@@ -14,9 +14,14 @@ const Profile = ({ bins, chromosomes, genomeYScale, cellSegs }) => {
 
   useEffect(() => {
     if (bins !== null) {
-      var canvas = d3.select("#profileCanvas");
-
-      let context = canvas.node().getContext("2d");
+      var canvas = d3.select("#profileCanvas").node();
+      let scale = window.devicePixelRatio;
+      canvas.style.width = heatmapConfig.width + "px";
+      canvas.style.height = heatmapConfig.profile.height + "px";
+      canvas.width = heatmapConfig.width * scale;
+      canvas.height = heatmapConfig.profile.height * scale;
+      var context = canvas.getContext("2d");
+      context.scale(scale, scale);
 
       context.clearRect(
         0,

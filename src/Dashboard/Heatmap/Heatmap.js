@@ -43,7 +43,7 @@ const styles = theme => ({
   content: {
     flexGrow: 1,
     backgroundColor: "#FFFFFFF",
-    padding: theme.spacing.unit * 3
+    padding: theme.spacing(3)
   },
   container: {
     minHeight: "100vh"
@@ -219,8 +219,9 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
                 />
               </Grid>
             </Grid>
-            <Grid item style={{ marginTop: "-12px" }}>
-              <svg
+            <Grid item style={{ marginTop: "-6px" }}>
+              <canvas
+                id="chromAxis"
                 height={heatmapConfig.chromosome["height"]}
                 width={heatmapConfig.wrapperWidth}
               >
@@ -229,9 +230,9 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
                   chromosomes={chromosomes}
                   chromMap={chromMap}
                 />
-              </svg>
+              </canvas>
             </Grid>
-            <Grid item style={{ marginTop: 5, marginLeft: 3 }}>
+            <Grid item style={{ marginTop: -5, marginLeft: 3 }}>
               <ProfileWrapper
                 loading={true}
                 categoryLength={categoryStats.length}
@@ -398,7 +399,7 @@ const Plot = ({
           pointerEvents: "all"
         }}
       >
-        <canvas />
+        <canvas id="heatmapCanvas" />
       </div>
       <svg
         id="heatSelection"

@@ -8,6 +8,8 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import TextField from "@material-ui/core/TextField";
+import Input from "@material-ui/core/Input";
 
 import LoadingCircle from "./ProgressCircle.js";
 import IconButton from "@material-ui/core/IconButton";
@@ -27,6 +29,15 @@ const useStyles = makeStyles(theme => ({
   },
   icon: { fontSize: "6em", position: "absolute" },
   iconButton: { top: "65%", left: "45%" },
+  textField: {
+    width: 350,
+    left: 10,
+    marginBottom: 10,
+    "&$.MuiOutlinedInput-input": { padding: "15px 12px" }
+  },
+  searchInput: {
+    padding: "15px 12px"
+  },
   textValidator: { paddingBottom: 20 }
 }));
 
@@ -45,10 +56,12 @@ const PopUpContent = ({
   const [isLoading, setLoading] = useState(false);
   const [isSent, setIsSent] = useState(null);
   const [isActionDisabled, setIsDisabled] = useState(true);
+  const [searchValue, setSearchValue] = useState("");
 
   const handleNameChange = event => {
     setName(event.target.value);
   };
+
   useEffect(() => {
     if (name && selectedIndices.length > 0) {
       setIsDisabled(false);
@@ -63,6 +76,8 @@ const PopUpContent = ({
       open={isOpen}
       onClose={handleClose}
       aria-labelledby="form-dialog-title"
+      maxWidth={"md"}
+      PaperProps={{ style: { padding: 20 } }}
     >
       {isLoading ? (
         <DialogContent
@@ -75,7 +90,7 @@ const PopUpContent = ({
           <LoadingContent classes={classes} isSent={isSent} />
         </DialogContent>
       ) : (
-        <ValidatorForm key={"validForm"}>
+        <ValidatorForm key={"validForm"} onSubmit={() => {}}>
           <DialogTitle
             id="form-dialog-title"
             className={classes.dialogTitle}
@@ -87,6 +102,7 @@ const PopUpContent = ({
             <TextValidator
               key={"dialogName"}
               autoFocus
+              disabled={isEdit}
               margin="dense"
               id="name"
               label="Name"
@@ -99,9 +115,21 @@ const PopUpContent = ({
               fullWidth
               className={classes.textValidator}
             />
+
+            <TextField
+              id="outlined-search"
+              label="Search Analyses"
+              type="search"
+              variant="outlined"
+              value={searchValue}
+              className={classes.textField}
+              InputProps={{ classes: { input: classes.searchInput } }}
+              onChange={event => setSearchValue(event.target.value)}
+            />
             <TransferList
               key={"transferList"}
               allIndices={allIndices}
+              searchValue={searchValue}
               setSelectedIndices={indices => setSelectedIndices(indices)}
               alreadyChoosen={alreadySelectedIndices}
             />

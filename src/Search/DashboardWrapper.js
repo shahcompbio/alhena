@@ -11,20 +11,29 @@ import dashboardStateReducer, {
 import { DashboardProvider } from "./ProjectView/ProjectState/dashboardState";
 
 const getDashboardByUser = gql`
-  query UserDashboard($user: ApiUser!) {
+  query UserDashboard($user: ApiUser!, $fragment: String) {
+    getQueryParams(fragment: $fragment) {
+      paramsFromLink
+    }
     getDashboardsByUser(auth: $user) {
-      name
+      dashboards {
+        name
+      }
+      defaultDashboard
     }
   }
 `;
 
-const DashboardWrapper = ({ uri, classes, history }) => {
+const DashboardWrapper = ({ uri, classes, history, client, props }) => {
   const [{ authKeyID, uid }] = useAppState();
-  const ticketFromUrl = uri ? uri.params.ticket : null;
+  const ticketFromUrl = uri.params.ticket ? uri.params.ticket : null;
+  const fragment = uri.params.copyLink ? uri.params.copyLink : null;
+
   return (
     <Query
       query={getDashboardByUser}
       variables={{
+        fragment: fragment,
         user: { authKeyID: authKeyID, uid: uid }
       }}
     >
@@ -32,21 +41,31 @@ const DashboardWrapper = ({ uri, classes, history }) => {
         if (loading) return null;
         if (error) return null;
 
-        const dashboards = data.getDashboardsByUser.map(
+        const dashboards = data["getDashboardsByUser"]["dashboards"].map(
           dashboard => dashboard.name
         );
+        const defaultDashboard =
+          ticketFromUrl !== null
+            ? null
+            : data["getDashboardsByUser"]["defaultDashboard"];
+        const linkParams = data.getQueryParams
+          ? data.getQueryParams.paramsFromLink
+              .split("||")
+              .map(paramString => JSON.parse(paramString))
+          : null;
 
         const intialStateUpdated = initialState(
           dashboards,
-          dashboards[0],
-          ticketFromUrl
+          defaultDashboard,
+          ticketFromUrl,
+          linkParams
         );
         return (
           <DashboardProvider
             initialState={intialStateUpdated}
             reducer={dashboardStateReducer}
           >
-            <Content />
+            <Content client={client} />
           </DashboardProvider>
         );
       }}

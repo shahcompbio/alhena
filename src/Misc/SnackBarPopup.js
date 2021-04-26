@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import clsx from "clsx";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import ErrorIcon from "@material-ui/icons/Error";
@@ -43,10 +43,14 @@ const useSnackBarStyles = makeStyles(theme => ({
   }
 }));
 
-const SnackbarContentWrapper = props => {
+const SnackbarContentWrapper = ({
+  className,
+  errorNumber,
+  setError,
+  variant
+}) => {
   const [isOpen, setOpen] = useState(true);
   const classes = useSnackBarStyles();
-  const { className, errorNumber, setError, variant, ...other } = props;
   const Icon = variantIcon[variant];
 
   return (
@@ -54,8 +58,8 @@ const SnackbarContentWrapper = props => {
       autoHideDuration={2000}
       open={isOpen}
       onClose={() => {
-        //setError(null);
         setOpen(false);
+        setError(null);
       }}
       anchorOrigin={{
         vertical: "bottom",
@@ -71,17 +75,6 @@ const SnackbarContentWrapper = props => {
             {errorMessages[errorNumber]}
           </span>
         }
-        /*  action={[
-          <IconButton
-            key="close"
-            aria-label="close"
-            color="inherit"
-            onClick={onClose}
-          >
-            <CloseIcon className={classes.icon} />
-          </IconButton>
-        ]}*/
-        {...other}
       />
     </Snackbar>
   );

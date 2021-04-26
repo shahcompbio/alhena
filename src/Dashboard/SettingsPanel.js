@@ -19,6 +19,8 @@ import ViolinSettings from "./Settings/ViolinSettings.js";
 import GCBiasSettings from "./Settings/GCBiasSettings.js";
 import DataFilters from "./Settings/DataFilters.js";
 
+import ShareIcon from "@material-ui/icons/Share";
+import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
 import BackspaceTwoToneIcon from "@material-ui/icons/BackspaceTwoTone";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
@@ -67,6 +69,15 @@ const styles = theme => ({
   button: {
     margin: theme.spacing(3)
   },
+  exportButton: {
+    width: 130,
+    marginBottom: 10,
+    marginRight: 12
+  },
+  shareButton: {
+    width: 135,
+    marginBottom: 10
+  },
   fieldComponent: {
     margin: theme.spacing(2, 0, 0, 0)
   },
@@ -113,9 +124,12 @@ const SettingsPanel = ({
   cellCount,
   chipHeatmapOptions,
   violinOptions,
-  numericalDataFilters
+  numericalDataFilters,
+  metaData,
+  setOpenExportPopup,
+  setOpenSharePopup
 }) => {
-  const [{ selectedAnalysis }] = useDashboardState();
+  const [{ selectedAnalysis, selectedDashboard }] = useDashboardState();
   const [
     {
       selectedCells,
@@ -127,6 +141,9 @@ const SettingsPanel = ({
     },
     dispatch
   ] = useStatisticsState();
+
+  const meta = metaData ? metaData : {};
+
   const [openAccordian, setIsOpenAccordian] = useState({
     dataFilter: false,
     scatterplot: false,
@@ -151,7 +168,11 @@ const SettingsPanel = ({
       : false;
 
   return (
-    <Paper className={classes.settings} elevation={0}>
+    <Paper
+      key={"settingsPanelPaper"}
+      className={classes.settings}
+      elevation={0}
+    >
       <MetaData
         classes={classes}
         count={
@@ -161,6 +182,8 @@ const SettingsPanel = ({
             ? selectedCells.length
             : cellCount
         }
+        metaData={meta}
+        project={selectedDashboard}
         analysis={selectedAnalysis}
       />
       {((selectedCells.length !== 0 && axisChange["datafilter"] == false) ||
@@ -182,6 +205,31 @@ const SettingsPanel = ({
           }
         />
       )}
+      <Grid
+        container
+        direction="row"
+        justify="flex-start"
+        alignItems="flex-start"
+      >
+        <Button
+          variant="outlined"
+          color="default"
+          className={classes.exportButton}
+          onClick={() => setOpenExportPopup()}
+          startIcon={<CloudDownloadIcon />}
+        >
+          Export
+        </Button>
+        <Button
+          variant="outlined"
+          color="default"
+          className={classes.shareButton}
+          onClick={() => setOpenSharePopup()}
+          startIcon={<ShareIcon />}
+        >
+          Share
+        </Button>
+      </Grid>
       <AccordianWrapper
         classes={classes}
         name="dataFilter"
@@ -194,7 +242,7 @@ const SettingsPanel = ({
           resetFilter("DATA_FILTER_OFF");
         }}
       >
-        <ApolloConsumer>
+        <ApolloConsumer key={"dataFilterConsumer"}>
           {client =>
             categoryStats.length > 0 ? (
               <DataFilters
@@ -218,7 +266,6 @@ const SettingsPanel = ({
       </AccordianWrapper>
       <AccordianWrapper
         classes={classes}
-        key={"scatterplotAccordianWrapper"}
         name="scatterplot"
         title="Scatterplot"
         setIsOpenAccordian={setIsOpenAccordian}
@@ -314,14 +361,18 @@ const AccordianWrapper = ({
         [name]: !openAccordian[name]
       })
     }
+    key={name + "accordian"}
   >
     <AccordionSummary
+      key={name + "summary"}
       className={classes.AccordionSummary}
       expandIcon={<ExpandMoreIcon />}
       aria-controls={"panel-" + name + "-content"}
       id={"panel-" + name}
     >
-      <Typography variant="body1">{title}</Typography>
+      <Typography variant="body1" key={name + "title"}>
+        {title}
+      </Typography>
       {isResetPossible && (
         <AccordionActions style={{ width: "100%" }}>
           <Button size="small" onClick={resetFilter}>
@@ -331,6 +382,7 @@ const AccordianWrapper = ({
       )}
     </AccordionSummary>
     <AccordionDetails
+      key={name + "details"}
       id={"panel-" + name + "-content"}
       className={classes.panelDetails}
     >
@@ -339,7 +391,7 @@ const AccordianWrapper = ({
   </Accordion>
 );
 
-const MetaData = ({ classes, count, analysis, library }) => (
+const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
   <Paper
     elevation={0}
     className={[classes.panel, classes.metaDataPanel].join(" ")}
@@ -352,17 +404,55 @@ const MetaData = ({ classes, count, analysis, library }) => (
       alignItems="flex-start"
     >
       <Typography
-        variant="h5"
+        variant="h6"
         fontWeight="fontWeightRegular"
-        style={{ color: "#a2a2a2" }}
+        style={{
+          color: "#a2a2a2"
+        }}
       >
-        Analysis: <b>{analysis}</b>
+        <span
+          style={{
+            width: 225,
+            display: "inline-block",
+            fontWeight: "bold",
+            wordBreak: "break-all"
+          }}
+        >
+          Analysis: {analysis}
+        </span>
       </Typography>
+      {project && (
+        <Typography
+          variant="h7"
+          fontWeight="fontWeightRegular"
+          style={{ color: "#a2a2a2" }}
+        >
+          Project: {project}
+        </Typography>
+      )}
+      {metaData && (
+        <Typography
+          variant="h7"
+          fontWeight="fontWeightRegular"
+          style={{ color: "#a2a2a2" }}
+        >
+          Library: {metaData["library_id"]}
+        </Typography>
+      )}
+      {metaData && (
+        <Typography
+          variant="h7"
+          fontWeight="fontWeightRegular"
+          style={{ color: "#a2a2a2" }}
+        >
+          Sample: {metaData["sample_id"]}
+        </Typography>
+      )}
       {count === null ? (
         <LoadingCircle />
       ) : (
         <Typography
-          variant="h5"
+          variant="h7"
           fontWeight="fontWeightRegular"
           style={{ color: "#a2a2a2" }}
         >

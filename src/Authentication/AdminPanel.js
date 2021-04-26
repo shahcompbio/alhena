@@ -36,10 +36,16 @@ const styles = theme => ({
     zIndex: 5
   },
   iconSvg: { width: "1.5em", height: "1.5em" },
-  root: { flexGrow: 1, width: "80vw", margin: "auto", paddingTop: 50 },
+  root: {
+    flexGrow: 1,
+    width: "80vw",
+    margin: "auto",
+    paddingTop: 50,
+    marginBottom: 80
+  },
   paper: {
-    paddingBottom: theme.spacing.unit * 5,
-    padding: theme.spacing.unit * 3,
+    paddingBottom: theme.spacing(5),
+    padding: theme.spacing(3),
     height: 125,
     width: "90%",
     borderRadius: 10,

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import gql from "graphql-tag";
 import { useQuery } from "react-apollo-hooks";
@@ -11,6 +11,9 @@ import Chip from "./ChipHeatmap/Chip.js";
 import GCBias from "./GCBias/GCBias.js";
 import Scatterplot from "./Scatterplot/Scatterplot.js";
 import Violin from "./Violin/Violin.js";
+
+import ExportPopup from "../Misc/ExportPopup.js";
+import SharePopup from "../Misc/SharePopup.js";
 
 import SettingsPanel from "./SettingsPanel.js";
 
@@ -44,6 +47,11 @@ const HEATMAP_ORDER = gql`
         type
         label
       }
+    }
+    analysisMetadata(analysis: $analysis) {
+      sample_id
+      library_id
+      jira_id
     }
     numericalDataFilters(
       analysis: $analysis
@@ -129,7 +137,12 @@ const QCDashboard = ({ analysis, classes, client }) => {
     dispatch,
   ] = useStatisticsState();
   let history = useHistory();
+  const [openExportPopup, setOpenExportPopup] = useState(false);
+  const [openSharePopup, setOpenSharePopup] = useState(false);
 
+  if (history.location.pathname !== "/dashboards/" + analysis) {
+    //  history.replace("/dashboards/" + analysis);
+  }
   const params = getQueryParams(
     isContaminated,
     expCondition,
@@ -164,6 +177,7 @@ const QCDashboard = ({ analysis, classes, client }) => {
             ? selectedCells
             : data.heatmapOrder.map((order) => order.order);
       }
+
       return (
         <div className={classes.root}>
           <Grid
@@ -183,6 +197,7 @@ const QCDashboard = ({ analysis, classes, client }) => {
               <SettingsPanel
                 key={"settingsPanel"}
                 client={client}
+                metaData={data.analysisMetadata}
                 numericalDataFilters={
                   data.numericalDataFilters.numericalDataFilters
                 }
@@ -191,13 +206,31 @@ const QCDashboard = ({ analysis, classes, client }) => {
                 violinOptions={data.violinAxisOptions}
                 categoryStats={data.categoriesStats}
                 analysis={analysis}
+                setOpenSharePopup={() => setOpenSharePopup(!openSharePopup)}
+                setOpenExportPopup={() => setOpenExportPopup(!openExportPopup)}
               />
             </Grid>
-
+            {openExportPopup && (
+              <ExportPopup
+                setOpenExportPopup={setOpenExportPopup}
+                openExportPopup={openExportPopup}
+              />
+            )}
+            {openSharePopup && (
+              <SharePopup
+                client={client}
+                params={params}
+                analysis={analysis}
+                setOpenSharePopup={setOpenSharePopup}
+                openSharePopup={openSharePopup}
+              />
+            )}
             {heatmapOrder && heatmapOrder.length === 0 ? (
               <Grid item className={classes.plots} xs={9} key={"plotPanelGrid"}>
                 <Paper
-                  className={[classes.scatterplot, classes.paperContainer]}
+                  className={[classes.scatterplot, classes.paperContainer].join(
+                    " "
+                  )}
                 >
                   <div>NO CELLS SELECTED</div>
                 </Paper>
@@ -206,7 +239,10 @@ const QCDashboard = ({ analysis, classes, client }) => {
               <Grid item className={classes.plots} xs={9} key={"plotPanelGrid"}>
                 <Paper
                   key={"heatmapPaper"}
-                  className={[classes.heatmapContent, classes.paperContainer]}
+                  className={[
+                    classes.heatmapContent,
+                    classes.paperContainer
+                  ].join(" ")}
                 >
                   <Heatmap
                     key={"heatmapPlot"}
@@ -276,6 +312,7 @@ const QCDashboard = ({ analysis, classes, client }) => {
           >
             <SettingsPanel
               key={"settingsPanel"}
+              metaData={null}
               cellCount={null}
               categoryStats={[]}
               analysis={null}
@@ -286,31 +323,37 @@ const QCDashboard = ({ analysis, classes, client }) => {
           <Grid item className={classes.plots} xs={9} key={"plotPanelGrid"}>
             <Paper
               key={"heatmapPaper"}
-              className={[classes.heatmapContent, classes.paperContainer]}
+              className={[classes.heatmapContent, classes.paperContainer].join(
+                " "
+              )}
             >
               <LoadingCircle />
             </Paper>
             <Paper
               key={"chipPaper"}
-              className={[classes.chip, classes.paperContainer]}
+              className={[classes.chip, classes.paperContainer].join(" ")}
             >
               <LoadingCircle />
             </Paper>
             <Paper
               key={"violinPaper"}
-              className={[classes.violinContent, classes.paperContainer]}
+              className={[classes.violinContent, classes.paperContainer].join(
+                " "
+              )}
             >
               <LoadingCircle />
             </Paper>
             <Paper
               key={"gcBiasPaper"}
-              className={[classes.gcBias, classes.paperContainer]}
+              className={[classes.gcBias, classes.paperContainer].join(" ")}
             >
               <LoadingCircle />
             </Paper>
             <Paper
               key={"scatterPaper"}
-              className={[classes.scatterplot, classes.paperContainer]}
+              className={[classes.scatterplot, classes.paperContainer].join(
+                " "
+              )}
             >
               <LoadingCircle />
             </Paper>

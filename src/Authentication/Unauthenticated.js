@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import * as d3 from "d3";
 import logo from "../config/LoginTitle.png";
-import { login } from "../util/utils.js";
 import { useAppState } from "../util/app-state";
 import { useHistory } from "react-router-dom";
+import gql from "graphql-tag";
 
 import {
   Button,
@@ -64,6 +64,42 @@ const styles = theme => ({
     width: 300
   }
 });
+export const LOGIN = gql`
+  query Login($user: User!) {
+    login(user: $user) {
+      statusCode
+      authKeyID
+      role
+      isAdmin
+    }
+  }
+`;
+const login = async (uid, password, client, dispatch) => {
+  const { data, loading } = await client.query({
+    query: LOGIN,
+    variables: {
+      user: { uid: uid, password: password }
+    }
+  });
+
+  if (loading) {
+    dispatch({
+      type: "LOADING",
+      response: data.login.response,
+      authKeyID: data.login.authKeyID,
+      uid: uid
+    });
+  }
+  if (data) {
+    dispatch({
+      type: "AUTH_CHANGE",
+      response: data.login.response,
+      authKeyID: data.login.authKeyID,
+      uid: uid,
+      isSuperUser: data.login.isAdmin
+    });
+  }
+};
 const UnauthenticatedApp = ({ client, classes }) => {
   let history = useHistory();
   const [_, dispatch] = useAppState();
@@ -73,31 +109,6 @@ const UnauthenticatedApp = ({ client, classes }) => {
   const passwordRef = useRef();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [ref] = useHookWithRefCallback();
-  function useHookWithRefCallback() {
-    const ref = useRef(null);
-    const setRef = useCallback(node => {
-      if (node) {
-        const title = d3.select("#title");
-        title
-          .append("text")
-          .attr("x", 10)
-          .attr("y", 100)
-          .attr("dy", ".35em")
-          .text(function(d) {
-            return "ALHENA";
-          });
-        /*  title
-          .transition()
-          .duration(2000)
-          .delay(2000)
-          .attr("d", "M75,300 A125,125 0 0,1 325,300");*/
-      }
-    }, []);
-
-    return [setRef];
-  }
-
   const handleLogin = async (event, client, dispatch) => {
     setError(null);
     event.preventDefault();
@@ -118,12 +129,35 @@ const UnauthenticatedApp = ({ client, classes }) => {
       setLoading(false);
     }
   };
+  const [ref] = useHookWithRefCallback();
+  function useHookWithRefCallback() {
+    const ref = useRef(null);
+    const setRef = useCallback(node => {
+      if (node) {
+        const title = d3.select("#title");
+        title
+          .append("text")
+          .attr("x", 10)
+          .attr("y", 100)
+          .attr("dy", ".35em")
+          .text(function(d) {
+            return "ALHENA";
+          });
+      }
+    }, []);
+
+    return [setRef];
+  }
 
   return (
     <Grid container direction="row" justify="center" alignItems="center">
       <div className={classes.circleImg}>
         {error && (
-          <SnackbarContentWrapper variant="error" errorNumber={error} />
+          <SnackbarContentWrapper
+            variant="error"
+            errorNumber={error}
+            setError={setError}
+          />
         )}
       </div>
       <div

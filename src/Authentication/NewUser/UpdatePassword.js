@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-
+import React, { useState, useRef, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import { ApolloConsumer } from "react-apollo";
 
 import Grid from "@material-ui/core/Grid";
@@ -7,7 +7,11 @@ import { Typography } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
+
 import SnackbarContentWrapper from "../../Misc/SnackBarPopup.js";
+
+import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
+
 import gql from "graphql-tag";
 import styled from "styled-components";
 import { withStyles } from "@material-ui/styles";
@@ -38,8 +42,7 @@ const styles = theme => ({
     display: "inline-block"
   },
   textField: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
+    margin: 10,
     width: "20vw"
   }
 });
@@ -63,52 +66,24 @@ export const queryNewPassword = async (client, username, password) => {
 };
 
 const UpdatePassword = ({ username, dispatch, classes }) => {
+  let history = useHistory();
   const [error, setError] = useState(null);
+  const [user, setUser] = useState({ password: "", passwordVerify: "" });
 
   const passwordRef = useRef();
   const verifyPasswordRef = useRef();
 
-  const fields = [
-    {
-      id: "updatePassword:username",
-      label: "Username:",
-      value: username,
-      type: "text",
-      placeholder: "Username"
-    },
-    {
-      id: "updatePassword:password",
-      label: "Password:",
-      ref: passwordRef,
-      type: "password",
-      placeholder: "Password"
-    },
-    {
-      id: "updatePassword:passwordVerify",
-      label: "Verify Password:",
-      ref: verifyPasswordRef,
-      type: "password",
-      placeholder: "Verify Password"
-    }
-  ];
-
   const updatePassword = async (event, client, dispatch) => {
-    if (verifyPasswordRef.current.value === passwordRef.current.value) {
-      var user = {
-        username: username,
-        password: passwordRef.current.value
-      };
-      event.preventDefault();
+    event.preventDefault();
+    if (user.password === user.passwordVerify) {
       try {
         var acknowledgement = await queryNewPassword(
           client,
           username,
-          passwordRef.current.value
+          user.password
         );
         if (acknowledgement) {
-          dispatch({
-            type: "LOGOUT"
-          });
+          history.push("/login");
         } else {
           setError(10);
         }
@@ -116,9 +91,21 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
         setError(error);
       }
     } else {
-      setError(12);
+      setError(11);
     }
   };
+
+  const handleChange = event => {
+    var newUser = user;
+    newUser[event.target.name] = event.target.value;
+    setUser({ ...newUser });
+  };
+
+  useEffect(() => {
+    ValidatorForm.addValidationRule("isPasswordMatch", value =>
+      user["password"] === value ? true : false
+    );
+  }, [user]);
 
   return (
     <ApolloConsumer>
@@ -143,25 +130,52 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
               </Typography>
             </Paper>
             <Paper rounded className={classes.paperForm}>
-              <form
-                onSubmit={ev => updatePassword(ev, client, dispatch)}
-                id="updatePassword"
+              <TextField
+                className={classes.textField}
+                margin="normal"
+                id={"updatePassword:username"}
+                required
+                fullWidth
+                value={username}
+                label={"Username"}
+                type={"text"}
+              />
+              <ValidatorForm
+                instantValidate={false}
+                autoComplete="off"
+                onError={errors => console.log(errors)}
+                onSubmit={ev => {}}
               >
-                {fields.map(field => (
-                  <ComponentWrapper>
-                    <TextField
-                      className={classes.textField}
-                      margin="normal"
-                      inputRef={field.ref}
-                      id={field.id}
-                      required
-                      fullWidth
-                      value={field.value}
-                      label={field.placeholder}
-                      type={field.type}
-                    />
-                  </ComponentWrapper>
-                ))}
+                <TextValidator
+                  className={classes.textField}
+                  key={"updatePassword"}
+                  onChange={handleChange}
+                  name={"password"}
+                  value={user["password"]}
+                  fullWidth
+                  label={"Password:"}
+                  type={"password"}
+                  validators={["required", "minStringLength:10"]}
+                  errorMessages={[
+                    "This field is required",
+                    "Field must be longer than 10 characters long"
+                  ]}
+                />
+                <TextValidator
+                  className={classes.textField}
+                  key={"updatePasswordVerify"}
+                  name={"passwordVerify"}
+                  onChange={handleChange}
+                  value={user["passwordVerify"]}
+                  fullWidth
+                  label={"Verify Password:"}
+                  type={"password"}
+                  validators={["required", "isPasswordMatch"]}
+                  errorMessages={[
+                    "This field is required",
+                    "Mismatched passwords"
+                  ]}
+                />
                 <ComponentWrapper style={{ textAlign: "center" }}>
                   <Button
                     className={classes.button}
@@ -171,7 +185,7 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
                     Update
                   </Button>
                 </ComponentWrapper>
-              </form>
+              </ValidatorForm>
             </Paper>
           </div>
         </Grid>

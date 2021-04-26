@@ -19,14 +19,15 @@ const useToolbarStyles = makeStyles(theme => ({
     borderRadius: "10px 10px 0px 0px"
   },
   highlight: {
-    backgroundColor: "#CFD2D3"
+    backgroundColor: "#c9e2ea"
   },
   deleteHighlight: {
-    color: theme.palette.secondary.main,
-    backgroundColor: lighten(theme.palette.secondary.light, 0.85)
+    color: "black",
+    fontWeight: "bold",
+    backgroundColor: "#f1a9a0"
   },
   editHighlight: {
-    backgroundColor: "rgb(218, 255, 241)"
+    backgroundColor: "#c9e2ea"
   },
   completeHighlight: {
     color: "#03a678",
@@ -57,11 +58,11 @@ const TableToolbar = ({
         [classes.deleteHighlight]: selectedAction === "Delete",
         [classes.editHighlight]: selectedAction === "Edit"
       })}
-      dense
+      key={name + "Toolbar"}
     >
       {selectedAction === null ? (
         [
-          <Tooltip title="Delete">
+          <Tooltip title="Delete" key={name + "ToolbarDelete"}>
             <IconButton
               aria-label="delete"
               onClick={ev => setSelectedAction("Delete")}
@@ -69,7 +70,7 @@ const TableToolbar = ({
               <DeleteIcon />
             </IconButton>
           </Tooltip>,
-          <Tooltip title="Edit">
+          <Tooltip title="Edit" key={name + "ToolbarEdit"}>
             <IconButton
               aria-label="edit"
               onClick={ev => {
@@ -78,6 +79,11 @@ const TableToolbar = ({
               }}
             >
               <EditIcon />
+            </IconButton>
+          </Tooltip>,
+          <Tooltip title="Cancel" style={{ float: "right" }}>
+            <IconButton aria-label="Cancel" onClick={ev => clear(true)}>
+              <ClearIcon />
             </IconButton>
           </Tooltip>
         ]

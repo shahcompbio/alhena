@@ -1,39 +1,58 @@
 import React from "react";
-
+import * as d3 from "d3";
 import { heatmapConfig } from "./config.js";
 
 const ChromAxis = ({ chromosomes, chromMap, categoryWidth }) => {
-  const axisText = chromosomes.map((chromosome, i) => (
-    <ChromAxisItem
-      key={chromosome.id}
-      chromosome={chromosome.id}
-      data={chromMap[chromosome.id]}
-      index={i}
-      categoryWidth={categoryWidth}
-    />
-  ));
-  return <g className="chromAxis">{axisText}</g>;
+  function handleCanvas(context, chromosomes, chromMap, categoryWidth) {
+    chromosomes.map((chromosome, index) => {
+      const data = chromMap[chromosome.id];
+      context.fillStyle = heatmapConfig.chromosome["color"][index % 2];
+      context.fillRect(
+        data["x"] + categoryWidth,
+        0,
+        data["width"],
+        heatmapConfig.chromosome["height"]
+      );
+      context.fillStyle = "black";
+      context.font = context.font.replace(/\d+px/, "8px");
+      const textX =
+        data["width"] < 26
+          ? data["x"] + data["width"] / 3 + categoryWidth
+          : data["x"] + data["width"] / 2 + categoryWidth;
+
+      context.fillText(
+        chromosome.id,
+        textX,
+        heatmapConfig.chromosome["height"] - 2
+      );
+    });
+
+    context.fill();
+  }
+
+  // set up the mutation observer
+  var observer = new MutationObserver(function(mutations, me) {
+    const parentCanvas = d3.select("#chromAxis").node();
+
+    if (parentCanvas) {
+      let scale = window.devicePixelRatio;
+      parentCanvas.style.width = heatmapConfig.wrapperWidth + "px";
+      parentCanvas.style.height = heatmapConfig.chromosome["height"] + "px";
+      parentCanvas.width = heatmapConfig.wrapperWidth * scale;
+      parentCanvas.height = heatmapConfig.chromosome["height"] * scale;
+      var parentContext = parentCanvas.getContext("2d");
+      parentContext.scale(scale, scale);
+      handleCanvas(parentContext, chromosomes, chromMap, categoryWidth);
+      me.disconnect(); // stop observing
+      return;
+    }
+  });
+
+  // start observing
+  observer.observe(document, {
+    childList: true,
+    subtree: true
+  });
+  return null;
 };
-
-const ChromAxisItem = ({ chromosome, data, index, categoryWidth }) => (
-  <g>
-    <rect
-      x={data["x"] + categoryWidth}
-      y={0}
-      width={data["width"]}
-      height={heatmapConfig.chromosome["height"]}
-      fill={heatmapConfig.chromosome["color"][index % 2]}
-    />
-    <text
-      x={data["x"] + data["width"] / 2 + categoryWidth}
-      y={heatmapConfig.chromosome["height"]}
-      fontSize={"10px"}
-      textAnchor={"middle"}
-      fill={"#000000"}
-    >
-      {chromosome}
-    </text>
-  </g>
-);
-
 export default ChromAxis;
