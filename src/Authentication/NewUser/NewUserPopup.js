@@ -15,6 +15,7 @@ import {
   Switch
 } from "@material-ui/core";
 
+import FilledInput from "@material-ui/core/FilledInput";
 import ListItemText from "@material-ui/core/ListItemText";
 import Checkbox from "@material-ui/core/Checkbox";
 
@@ -23,7 +24,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import Select from "@material-ui/core/Select";
 
-import { makeStyles, useTheme } from "@material-ui/core/styles";
+import { withStyles, makeStyles, useTheme } from "@material-ui/core/styles";
 
 import { Typography } from "@material-ui/core";
 
@@ -78,7 +79,42 @@ const doesUserExistQuery = async (client, email) => {
   });
   return data.data.doesUserExist.userAlreadyExists;
 };
-const NewUserPopup = ({ isOpen, handleClose, client }) => {
+const styles = theme => ({
+  dialogContent: {
+    width: "700px",
+    display: "flex",
+    textAlign: "center"
+  },
+  dialogGrid: { width: "80%" },
+  shareButton: {
+    marginTop: 7,
+    right: 100,
+    position: "absolute",
+    backgroundColor: "#e5f3f3",
+    color: "#2b5d65"
+    //  marginTop: "25px"
+  },
+  button: {
+    backgroundColor: "#e5f3f3",
+    color: "#2b5d65"
+  },
+  closeButton: {
+    marginTop: 7,
+    right: 20,
+    position: "absolute",
+    color: "#350800",
+    backgroundColor: "#efcfc5"
+  },
+  dialog: {
+    padding: 10
+  },
+  urlInput: {
+    width: 500,
+    paddingTop: 20
+  }
+});
+
+const NewUserPopup = ({ isOpen, handleClose, client, classes }) => {
   const [{ authKeyID, uid }] = useAppState();
   const [newUserLink, setNewUserLink] = useState(null);
   const [isSubmitDisabled, setIsDisabled] = useState(true);
@@ -144,38 +180,40 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
           <Dialog
             open={isOpen}
             onClose={handleClose}
+            maxWidth={"lg"}
             aria-labelledby="form-dialog-title"
           >
             {newUserLink ? (
-              <DialogContent
-                style={{
-                  width: 450,
-                  height: 150,
-                  textAlign: "center"
-                }}
-              >
+              <span style={{ margin: 10 }}>
                 <Typography variant="body">
                   Please send this link to the user you are trying to create.
                 </Typography>
-                <div style={{ marginTop: "10" }}>
-                  <Typography variant="h7">
-                    <b>{newUserLink}</b>
-                  </Typography>
-                </div>
-                <div
-                  style={{
-                    marginTop: "25px"
-                  }}
-                >
+                <DialogContent className={classes.dialogContent}>
+                  <FilledInput
+                    style={{ width: "75%" }}
+                    classes={{ input: classes.urlInput }}
+                    id="copyUrl"
+                    value={newUserLink}
+                    readonly
+                  />
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     color="primary"
+                    className={classes.shareButton}
                     onClick={copy(newUserLink)}
                   >
                     Copy
                   </Button>
-                </div>
-              </DialogContent>
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    className={classes.closeButton}
+                    onClick={handleClose}
+                  >
+                    Close
+                  </Button>
+                </DialogContent>
+              </span>
             ) : (
               <div style={{ maxWidth: 550, padding: 15 }}>
                 <DialogTitle id="form-dialog-title">
@@ -255,13 +293,6 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
 
                 <DialogActions>
                   <Button
-                    onClick={handleClose}
-                    color="secondary"
-                    variant="outlined"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
                     onClick={async ev => {
                       const response = await generateNewUserLink(
                         ev,
@@ -274,11 +305,20 @@ const NewUserPopup = ({ isOpen, handleClose, client }) => {
 
                       setNewUserLink(response.newUserLink);
                     }}
+                    variant="outlined"
                     color="primary"
-                    variant="contained"
                     disabled={isSubmitDisabled}
+                    className={classes.button}
                   >
                     Generate
+                  </Button>
+                  <Button
+                    onClick={handleClose}
+                    variant="outlined"
+                    color="primary"
+                    className={classes.button}
+                  >
+                    Cancel
                   </Button>
                 </DialogActions>
               </div>
@@ -383,4 +423,4 @@ const DropDownSelect = ({
   );
 };
 
-export default withRouter(NewUserPopup);
+export default withStyles(styles)(withRouter(NewUserPopup));
