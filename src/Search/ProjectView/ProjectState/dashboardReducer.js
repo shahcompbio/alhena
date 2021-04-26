@@ -1,10 +1,16 @@
-const initialState = (dashboards, selectedDashboard, selectedAnalysis) => {
+const initialState = (
+  dashboards,
+  selectedDashboard,
+  selectedAnalysis,
+  linkParams
+) => {
   return {
     dashboards: dashboards,
     selectedDashboard: selectedDashboard,
     selectedAnalysis: selectedAnalysis,
     filterMouseover: null,
-    dimensions: { width: 0, height: 0 }
+    dimensions: { width: 0, height: 0 },
+    linkParams: linkParams
   };
 };
 

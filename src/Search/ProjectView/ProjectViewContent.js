@@ -100,7 +100,7 @@ const SET_CACHE_SETTING = gql`
 `;
 const slideTimeOut = 1500;
 const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
-  const [{ selectedDashboard }] = useDashboardState();
+  const [{ selectedDashboard, copyLink }] = useDashboardState();
 
   const [{ authKeyID, uid }, dispatch] = useAppState();
   const [selectedOptions, setSelectedOptions] = useState({});

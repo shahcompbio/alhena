@@ -35,7 +35,6 @@ const dashboardPathname = "/dashboards";
 const slideTimeOut = 1500;
 const Content = ({ classes, client }) => {
   let history = useHistory();
-
   const [
     { selectedDashboard, selectedAnalysis },
     dispatch
@@ -174,7 +173,7 @@ const Content = ({ classes, client }) => {
         key={"slideDashboard"}
       >
         <div className={classes.sliderContent}>
-          <DashboardContent />
+          <DashboardContent client={client} />
         </div>
       </Slide>
       <Slide

@@ -5,7 +5,7 @@ import { withStyles } from "@material-ui/styles";
 import { useDashboardState } from "../ProjectState/dashboardState";
 
 const styles = {
-  root: { color: "white" },
+  root: { color: "white", cursor: "pointer" },
   wrapper: { height: 530, width: 1200 },
   header: { backgroundColor: "#afafafd9" }
 };
@@ -19,7 +19,12 @@ const Table = ({ handleForwardStep, classes, columns, rows }) => {
         columns={columns.map(field => ({
           field: field["type"],
           headerName: field["label"],
-          width: field["type"] === "jira_id" ? 800 : 150,
+          width:
+            field["type"] === "jira_id"
+              ? 700
+              : field["type"] === "sample_id"
+              ? 200
+              : 150,
           headerClassName: classes.header
         }))}
         onRowClick={({ row }) => {

@@ -311,6 +311,10 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
       return (num / 100000).toFixed(0) + "M";
     } else if (absNum < 900 && absNum > 10) {
       return Math.ceil(num);
+    } else if (absNum < 10) {
+      var absString = absNum.toString();
+      absString = absString.slice(0, absString.indexOf(".") + 3);
+      return parseFloat(absString);
     } else {
       return num;
     }

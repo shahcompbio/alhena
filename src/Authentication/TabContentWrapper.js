@@ -64,7 +64,8 @@ const styles = (theme, tabIndex) => ({
     flexGrow: 1,
     borderRadius: 20,
     zIndex: 20,
-    marginTop: 25
+    marginTop: 25,
+    marginBottom: 80
   },
   grid: {
     marginTop: "-60px"

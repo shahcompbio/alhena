@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import gql from "graphql-tag";
 import { useQuery } from "react-apollo-hooks";
@@ -11,6 +11,9 @@ import Chip from "./ChipHeatmap/Chip.js";
 import GCBias from "./GCBias/GCBias.js";
 import Scatterplot from "./Scatterplot/Scatterplot.js";
 import Violin from "./Violin/Violin.js";
+
+import ExportPopup from "../Misc/ExportPopup.js";
+import SharePopup from "../Misc/SharePopup.js";
 
 import SettingsPanel from "./SettingsPanel.js";
 
@@ -134,6 +137,8 @@ const QCDashboard = ({ analysis, classes, client }) => {
     dispatch,
   ] = useStatisticsState();
   let history = useHistory();
+  const [openExportPopup, setOpenExportPopup] = useState(false);
+  const [openSharePopup, setOpenSharePopup] = useState(false);
 
   if (history.location.pathname !== "/dashboards/" + analysis) {
     //  history.replace("/dashboards/" + analysis);
@@ -143,7 +148,6 @@ const QCDashboard = ({ analysis, classes, client }) => {
     expCondition,
     numericalDataFilters
   );
-
   const { loading, data } = useQuery(HEATMAP_ORDER, {
     variables: {
       analysis: analysis,
@@ -202,9 +206,25 @@ const QCDashboard = ({ analysis, classes, client }) => {
                 violinOptions={data.violinAxisOptions}
                 categoryStats={data.categoriesStats}
                 analysis={analysis}
+                setOpenSharePopup={() => setOpenSharePopup(!openSharePopup)}
+                setOpenExportPopup={() => setOpenExportPopup(!openExportPopup)}
               />
             </Grid>
-
+            {openExportPopup && (
+              <ExportPopup
+                setOpenExportPopup={setOpenExportPopup}
+                openExportPopup={openExportPopup}
+              />
+            )}
+            {openSharePopup && (
+              <SharePopup
+                client={client}
+                params={params}
+                analysis={analysis}
+                setOpenSharePopup={setOpenSharePopup}
+                openSharePopup={openSharePopup}
+              />
+            )}
             {heatmapOrder && heatmapOrder.length === 0 ? (
               <Grid item className={classes.plots} xs={9} key={"plotPanelGrid"}>
                 <Paper
@@ -233,16 +253,13 @@ const QCDashboard = ({ analysis, classes, client }) => {
                 </Paper>
                 <Paper
                   key={"chipPaper"}
-                  className={[classes.chip, classes.paperContainer].join(" ")}
+                  className={[classes.chip, classes.paperContainer]}
                 >
                   <Chip key={"chipPlot"} analysis={analysis} />
                 </Paper>
                 <Paper
                   key={"violinPaper"}
-                  className={[
-                    classes.violinContent,
-                    classes.paperContainer
-                  ].join(" ")}
+                  className={[classes.violinContent, classes.paperContainer]}
                 >
                   <Violin
                     key={"violinPlot"}
@@ -253,7 +270,7 @@ const QCDashboard = ({ analysis, classes, client }) => {
                 </Paper>
                 <Paper
                   key={"gcBiasPaper"}
-                  className={[classes.gcBias, classes.paperContainer].join(" ")}
+                  className={[classes.gcBias, classes.paperContainer]}
                 >
                   <GCBias
                     key={"gcBiasPlot"}
@@ -263,9 +280,7 @@ const QCDashboard = ({ analysis, classes, client }) => {
                 </Paper>
                 <Paper
                   key={"scatterPaper"}
-                  className={[classes.scatterplot, classes.paperContainer].join(
-                    " "
-                  )}
+                  className={[classes.scatterplot, classes.paperContainer]}
                 >
                   <Scatterplot key={"scatterplot"} analysis={analysis} />
                 </Paper>
