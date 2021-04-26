@@ -2,30 +2,17 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import "./publications.css";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
-import CircularProgress from "@material-ui/core/CircularProgress";
 
 import { makeStyles } from "@material-ui/styles";
-import { flattenDeep } from "lodash";
 import Search from "./Search.js";
 
-import {
-  FormGroup,
-  FormControlLabel,
-  IconButton,
-  TextField,
-  Switch,
-  SvgIcon
-} from "@material-ui/core";
+import { IconButton, Switch } from "@material-ui/core";
 import voronoiData from "./illistrator/cords.js";
-
-import lineageMixtureA from "./illistrator/mixtureA.svg";
-import sA535X5XB02895 from "./illistrator/SA535X5XB02895.svg";
 
 import all from "./illistrator/light.svg";
 
 import CircularProgressWithLabel from "./CircularProgress.js";
 
-import Svg from "./illistrator/final.svg";
 import { useDashboardState } from "../ProjectState/dashboardState";
 import imgSA039Mx2SA906b0 from "./illistrator/SA039Mx2SA906b0.png";
 import imgSA1035X4XB02879 from "./illistrator/SA1035X4XB02879.png";
@@ -42,17 +29,11 @@ import d3Tip from "d3-tip";
 
 import { data } from "./fitness.js";
 
-const spacingOffset = 200;
-const getScreenType = width => ({
-  isBigScreen: width > 1700,
-  isMedScreen: width >= 1330 && width <= 1700,
-  isSmallScreen: width < 1330,
-  is1DPR: window.devicePixelRatio === 1
-});
 const lineGen = d3
   .lineRadial()
   .angle(d => d.x)
   .radius(d => d.y);
+
 var progress = 10;
 const imagesMapping = {
   SA609X3X8MB03073: imgSA609X3X8MB03073,
@@ -80,10 +61,9 @@ const useClasses = makeStyles(theme => ({
   }
 }));
 const Publications = ({ handleForwardStep }) => {
-  const [{ selectedAnalysis }, dispatch] = useDashboardState();
+  const [{}, dispatch] = useDashboardState();
   const [context, saveContext] = useState();
   const [voronoi, saveVoronoi] = useState(null);
-  const [checked, setChecked] = useState(false);
   const [imgSource, setImgSource] = useState({
     src: imgSA039Mx2SA906b0,
     name: "SA039Mx2SA906b0"
@@ -98,6 +78,7 @@ const Publications = ({ handleForwardStep }) => {
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [dataTree, setTree] = useState(null);
   const [flatAnalysisList, storeFlatAnalysisList] = useState([]);
+  const [sampleList, storeSampleList] = useState([]);
   const [currentInnerNodes, setCurrentInnerNodes] = useState([]);
   const classes = useClasses();
   const dimensions = { width: 1000, height: 750 };
@@ -190,13 +171,14 @@ const Publications = ({ handleForwardStep }) => {
 
     //all consecutive times around
     if (radius.prev !== radius.current && dataTree) {
+      const choosenNode = radius.current - radius.prev;
       var nodes = [];
       const modifiedNodes = currentInnerNodes.sort((a, b) => a.angle - b.angle);
 
       const isClockwise = radius.prev < radius.current;
       const closest = isClockwise
         ? modifiedNodes[0].angle === 0
-          ? modifiedNodes[1]
+          ? modifiedNodes[choosenNode]
           : modifiedNodes[0]
         : modifiedNodes[modifiedNodes.length - 1];
 
@@ -370,20 +352,6 @@ const Publications = ({ handleForwardStep }) => {
                 (d.data.name === undefined ? d.data.alhena_id : d.data.name);
         });
 
-      const t = 700;
-
-      function elbow(d, i) {
-        return (
-          "M" +
-          d.source.y +
-          "," +
-          d.source.x +
-          "V" +
-          d.target.x +
-          "H" +
-          d.target.y
-        );
-      }
       svg.selectAll(".straightLinks").remove("*");
       svg.selectAll(".straightNodes").remove("*");
 
@@ -415,15 +383,6 @@ const Publications = ({ handleForwardStep }) => {
           return d;
         });
       voronoi.selectAll("circle").remove("*");
-      /*  voronoi
-        .selectAll("circle")
-        .data(vData)
-        .enter()
-        .append("circle")
-        .attr("r", 5)
-        .attr("cx", d => d[Object.keys(d)[0]][0])
-        .attr("cy", d => d[Object.keys(d)[0]][1])
-        .attr("id", d => "circle-" + Object.keys(d)[0]);*/
 
       voronoiUpdate.exit().remove();
       voronoiUpdate.attr("d", d => (d ? "M" + d.join("L") + "Z" : null));
@@ -441,16 +400,10 @@ const Publications = ({ handleForwardStep }) => {
           } else {
             return null;
           }
-          //  console.log(d.data.element);
-          //return d ? d.data.element.data.target + "-voronoi" : "";
         })
         .on("mouseover", function(d) {
           const selection = Object.keys(d.data)[0];
           const location = d.data[Object.keys(d.data)];
-          const bb = d3
-            .select(this)
-            .node()
-            .getBoundingClientRect();
 
           const node = searchTree(
             closest["leaf"]["data"],
@@ -480,8 +433,7 @@ const Publications = ({ handleForwardStep }) => {
               },
               this
             );
-            var coordinates = d3.mouse(this);
-            const circleLocation = d3.select("#circle-" + selection);
+
             tooltip
               .style("top", d => location[1] - 35 + "px")
               .style("left", d => location[0] - 94.18 + "px");
@@ -501,7 +453,6 @@ const Publications = ({ handleForwardStep }) => {
           dispatch({
             type: "ANALYSIS_SELECT",
             value: { selectedAnalysis: selection.replace("s-node-", "") }
-            //value: { selectedAnalysis: data.data.element.data.target }
           });
           handleForwardStep();
         });
@@ -513,11 +464,9 @@ const Publications = ({ handleForwardStep }) => {
 
   useEffect(() => {
     var offset = { x: 0, y: 0 };
-    if (checked) {
-      offset = { x: dimensions.width / 2, y: dimensions.height / 2, scale: 1 };
-    } else {
-      offset = { x: 0, y: dimensions.height / 2, scale: 1 };
-    }
+
+    offset = { x: 0, y: dimensions.height / 2, scale: 1 };
+
     d3.select("#links")
       .transition()
       .duration(easeDuration)
@@ -559,7 +508,7 @@ const Publications = ({ handleForwardStep }) => {
           ")"
       );
     setOffset({ ...offset });
-  }, [checked]);
+  }, []);
 
   useEffect(() => {
     if (paintReady) {
@@ -575,6 +524,7 @@ const Publications = ({ handleForwardStep }) => {
       d3.selectAll("#light, #pinkLight, #redLight").attr("class", "hideLight");
     });
   }, [false]);
+
   function useHookWithRefCallback() {
     const ref = useRef(null);
 
@@ -675,6 +625,8 @@ const Publications = ({ handleForwardStep }) => {
         }
 
         var result = flatten([], data["children"]);
+
+        storeSampleList(data["children"]);
         storeFlatAnalysisList([
           ...result.filter(row => row["name"] !== "Cell Line")
         ]);
@@ -730,6 +682,7 @@ const Publications = ({ handleForwardStep }) => {
             }}
           />
           <img
+            alt="dashboard selection tool"
             src={imgSource.src}
             width={1000}
             height={750}
@@ -740,6 +693,7 @@ const Publications = ({ handleForwardStep }) => {
       </div>
       <div>
         <img
+          alt="dashboard selection tool"
           src={title}
           width={500}
           height={125}
@@ -798,6 +752,20 @@ const Publications = ({ handleForwardStep }) => {
             analysisList={flatAnalysisList}
             dispatch={dispatch}
             handleForwardStep={handleForwardStep}
+            sampleList={sampleList}
+            goToSample={selectedSample => {
+              const numberOfNodesForward = currentInnerNodes
+                .sort((a, b) => a.angle - b.angle)
+                .map(node => node.leaf.data.name)
+                .indexOf(selectedSample);
+              if (numberOfNodesForward !== 0) {
+                setButtonDisabled(true);
+                setRadius({
+                  current: radius["current"] + numberOfNodesForward,
+                  prev: radius["prev"]
+                });
+              }
+            }}
           />
         </div>
       </div>
