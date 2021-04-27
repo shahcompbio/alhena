@@ -62,19 +62,31 @@ const App = () => {
           }}
         />
         <Route
-          key="dashbaordTicket"
-          path="/dashboards/:ticket"
-          component={({ match }) => <DashboardWrapper uri={match} />}
-        />
-        <Route
           key="ticket"
           path="/dashboards/:ticket/:copyLink"
-          component={({ match }) => <DashboardWrapper uri={match} />}
+          component={({ match }) => (
+            <ApolloConsumer>
+              {client => <DashboardWrapper uri={match} client={client} />}
+            </ApolloConsumer>
+          )}
+        />
+        <Route
+          key="dashbaordTicket"
+          path="/dashboards/:ticket"
+          component={({ match }) => (
+            <ApolloConsumer>
+              {client => <DashboardWrapper uri={match} client={client} />}
+            </ApolloConsumer>
+          )}
         />
         <Route
           key="dashboard"
           path="/dashboards"
-          component={() => <DashboardWrapper uri={null} />}
+          component={() => (
+            <ApolloConsumer>
+              {client => <DashboardWrapper uri={null} client={client} />}
+            </ApolloConsumer>
+          )}
         />
 
         {authKeyID && isSuperUser && (

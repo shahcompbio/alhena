@@ -119,8 +119,10 @@ const ExportPopup = ({
   };
   const exportSelected = selected => {
     var doc = new jsPDF("p", "pt", "a4");
-    doc = assembleHeatmapExport(doc);
-    doc.save("test.pdf");
+    if (selected.indexOf("Heatmap") !== -1) {
+      doc = assembleHeatmapExport(doc);
+      doc.save("test.pdf");
+    }
   };
 
   return (
@@ -192,6 +194,7 @@ const ExportPopup = ({
               className={classes.exportButton}
               onClick={() => {
                 exportSelected(selected);
+                setOpenExportPopup();
               }}
             >
               Export

@@ -124,20 +124,7 @@ const Content = ({ classes, client }) => {
       : isBackwards
       ? "up"
       : "down";
-  /*      <Slide
-        timeout={slideTimeOut}
-        direction={getDirection(0)}
-        in={activeStep === 0}
-        mountOnEnter
-        unmountOnExit
-        key={"slideOverviewContent"}
-      >
-        <div className={classes.sliderContent}>
-          <OverviewContent
-            handleForwardStep={() => handleForwardStep(activeStep + 1)}
-          />
-        </div>
-      </Slide>*/
+
   return (
     <Grid className={classes.root}>
       <Slide

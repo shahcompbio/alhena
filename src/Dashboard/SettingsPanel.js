@@ -129,7 +129,7 @@ const SettingsPanel = ({
   setOpenExportPopup,
   setOpenSharePopup
 }) => {
-  const [{ selectedAnalysis }] = useDashboardState();
+  const [{ selectedAnalysis, selectedDashboard }] = useDashboardState();
   const [
     {
       selectedCells,
@@ -178,6 +178,8 @@ const SettingsPanel = ({
             ? selectedCells.length
             : cellCount
         }
+        metaData={meta}
+        project={selectedDashboard}
         analysis={selectedAnalysis}
       />
       {((selectedCells.length !== 0 && axisChange["datafilter"] == false) ||
@@ -361,7 +363,7 @@ const AccordianWrapper = ({
   </Accordion>
 );
 
-const MetaData = ({ classes, count, analysis, library }) => (
+const MetaData = ({ classes, count, analysis, library, project, metaData }) => (
   <Paper
     elevation={0}
     className={[classes.panel, classes.metaDataPanel].join(" ")}
@@ -386,7 +388,7 @@ const MetaData = ({ classes, count, analysis, library }) => (
             wordBreak: "break-all"
           }}
         >
-          Analysis: {analysis}
+          Analysis: {analysis.toUpperCase()}
         </span>
       </Typography>
       {project && (

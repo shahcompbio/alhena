@@ -193,6 +193,7 @@ const QCDashboard = ({ analysis, classes, client }) => {
               <SettingsPanel
                 key={"settingsPanel"}
                 client={client}
+                metaData={data.analysisMetadata}
                 numericalDataFilters={
                   data.numericalDataFilters.numericalDataFilters
                 }

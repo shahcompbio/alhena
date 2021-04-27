@@ -90,7 +90,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
       setFilters([...newFilters]);
     }
   };
-
+  console.log(handleForwardStep);
   return selectedDashboard !== null ? (
     <Grid container className={classes.root} spacing={2} key={"grid-container"}>
       <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
@@ -100,7 +100,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
           filters={[]}
           analyses={{}}
           handleFilterChange={null}
-          handleForwardStep={null}
+          handleForwardStep={() => handleForwardStep()}
         />
       </Grid>
     </Grid>
@@ -115,7 +115,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
           handleFilterChange={(filters, type) =>
             handleFilterChange(filters, type)
           }
-          handleForwardStep={handleForwardStep}
+          handleForwardStep={() => handleForwardStep()}
         />
       </Grid>
     </Grid>

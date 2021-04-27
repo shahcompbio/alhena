@@ -68,6 +68,7 @@ const Publications = ({ handleForwardStep }) => {
     src: imgSA039Mx2SA906b0,
     name: "SA039Mx2SA906b0"
   });
+  console.log(handleForwardStep);
   const [radius, setRadius] = useState({
     prev: 99,
     current: 100

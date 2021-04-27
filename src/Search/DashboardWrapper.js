@@ -20,36 +20,42 @@ const getQueryParams = gql`
 `;
 
 const DashboardWrapper = ({ uri, classes, history, client }) => {
-  const [{ authKeyID, uid }] = useAppState();
   const ticketFromUrl = uri && uri.params.ticket ? uri.params.ticket : null;
-  const fragment = uri && uri.params.copyLink ? uri.params.copyLink : null;
-  var linkParams = null;
-  console.log(uri);
-  if (fragment !== null) {
-    const { loading, error, data } = useQuery(getQueryParams, {
-      variables: { fragment }
-    });
+  const fragment = uri && uri.params.copyLink ? uri.params.copyLink : "";
 
-    linkParams = data.getQueryParams
-      ? data.getQueryParams.paramsFromLink
-          .split("||")
-          .map(paramString => JSON.parse(paramString))
-      : null;
-  }
-
-  const intialStateUpdated = initialState(
-    ["Fitness"],
-    "Fitness",
-    ticketFromUrl,
-    linkParams
-  );
   return (
-    <DashboardProvider
-      initialState={intialStateUpdated}
-      reducer={dashboardStateReducer}
+    <Query
+      query={getQueryParams}
+      variables={{
+        fragment: fragment
+      }}
     >
-      <Content client={client} />
-    </DashboardProvider>
+      {({ loading, error, data }) => {
+        if (loading) return null;
+        if (error) return null;
+
+        const linkParams = data.getQueryParams
+          ? data.getQueryParams.paramsFromLink
+              .split("||")
+              .map(paramString => JSON.parse(paramString))
+          : null;
+
+        const intialStateUpdated = initialState(
+          ["Fitness"],
+          "Fitness",
+          ticketFromUrl,
+          linkParams
+        );
+        return (
+          <DashboardProvider
+            initialState={intialStateUpdated}
+            reducer={dashboardStateReducer}
+          >
+            <Content client={client} />
+          </DashboardProvider>
+        );
+      }}
+    </Query>
   );
 };
 
