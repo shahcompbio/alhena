@@ -56,7 +56,7 @@ const App = () => {
             history.replace("/dashboards");
             return (
               <ApolloConsumer>
-                {client => <Unauthenticated client={client} />}
+                {client => <DashboardWrapper uri={null} client={client} />}
               </ApolloConsumer>
             );
           }}
@@ -88,10 +88,17 @@ const App = () => {
             </ApolloConsumer>
           )}
         />
-
-        {authKeyID && isSuperUser && (
-          <Route path="/admin" component={() => <AdminPanel />} />
-        )}
+        <Route
+          path="/*"
+          component={() => {
+            history.replace("/dashboards");
+            return (
+              <ApolloConsumer>
+                {client => <DashboardWrapper uri={null} client={client} />}
+              </ApolloConsumer>
+            );
+          }}
+        />
       </Switch>
     </MuiThemeProvider>
   );
