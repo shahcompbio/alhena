@@ -24,44 +24,7 @@ const styles = {
     paddingLeft: 50
   }
 };
-const getAllAnalyses = gql`
-  query Sunburst($filter: [Term]!, $dashboardName: String!) {
-    analyses(filters: $filter, dashboardName: $dashboardName) {
-      error
-      analysesStats {
-        label
-        value
-      }
-      analysesList {
-        label
-        values
-        type
-      }
-      analysesTree {
-        source
-        children {
-          ... on ParentType {
-            source
-            target
-            children {
-              ... on ParentType {
-                source
-                target
-                children {
-                  ... on ChildType {
-                    source
-                    target
-                    value
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
+
 const ProjectViewContent = ({ classes, handleForwardStep }) => {
   const [{ selectedDashboard }] = useDashboardState();
 
@@ -90,7 +53,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
       setFilters([...newFilters]);
     }
   };
-  console.log(handleForwardStep);
+
   return selectedDashboard !== null ? (
     <Grid container className={classes.root} spacing={2} key={"grid-container"}>
       <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>

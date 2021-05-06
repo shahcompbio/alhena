@@ -7,6 +7,7 @@ import React, {
 import Menu from "../Misc/Menu.js";
 import ProjectViewContent from "./ProjectView/ProjectViewContent.js";
 import Publications from "./ProjectView/Publications/Publications.js";
+import Splash from "./ProjectView/Publications/Splash.js";
 
 import Stepper from "./Stepper.js";
 import Slide from "@material-ui/core/Slide";
@@ -28,7 +29,11 @@ const styles = ({ theme }) => ({
   },
   sliderContent: { position: "absolute", width: "95%", height: "100%" }
 });
-const defaultStepperText = ["Analysis Selection", "View Dashboard"];
+const defaultStepperText = [
+  "Project Selection",
+  "Analysis Selection",
+  "View Dashboard"
+];
 const dashboardPathname = "/dashboards";
 const slideTimeOut = 1500;
 const Content = ({ classes, client }) => {
@@ -73,21 +78,23 @@ const Content = ({ classes, client }) => {
   ) {
     history.replace(dashboardPathname);
   }
-
-  const [activeStep, setActiveStep] = useState(selectedAnalysis ? 1 : 0);
+  /*  const [activeStep, setActiveStep] = useState(
+    selectedAnalysis ? 2 : selectedDashboard ? 1 : 0
+  );*/
+  const [activeStep, setActiveStep] = useState(selectedAnalysis ? 2 : 1);
   const [stepTextValues, setStepTextValues] = useState(defaultStepperText);
   const [isBackwards, setIsBackwards] = useState(false);
 
   const handleBackStep = index => {
     setIsBackwards(true);
     setActiveStep(index);
-    /*  if (index === 0) {
+    if (index === 0) {
       dispatch({
         type: "DASHBOARD_SELECT",
         value: { selectedDashboard: null }
       });
-    }*/
-    if (index === 0) {
+    }
+    if (index === 1) {
       dispatch({
         type: "ANALYSIS_SELECT",
         value: { selectedAnalysis: null }
@@ -102,14 +109,16 @@ const Content = ({ classes, client }) => {
 
   useEffect(() => {
     const newStepperTextValues = stepTextValues.map((text, i) => {
-      if (selectedAnalysis && i === 1) {
+      if (selectedDashboard && i === 0) {
+        return selectedDashboard;
+      } else if (selectedAnalysis && i === 1) {
         return selectedAnalysis;
       } else {
         return defaultStepperText[i];
       }
     });
     setStepTextValues([...newStepperTextValues]);
-  }, [selectedAnalysis]);
+  }, [selectedDashboard, selectedAnalysis]);
 
   const handleForwardStep = index => {
     setIsBackwards(false);
@@ -136,14 +145,26 @@ const Content = ({ classes, client }) => {
         key={"slideProjectViewContent"}
       >
         <div className={classes.sliderContent}>
+          <Splash handleForwardStep={() => handleForwardStep(activeStep + 1)} />
+        </div>
+      </Slide>
+      <Slide
+        direction={getDirection(1)}
+        in={activeStep === 1}
+        mountOnEnter
+        unmountOnExit
+        timeout={slideTimeOut}
+        key={"slideProjectViewContent"}
+      >
+        <div className={classes.sliderContent}>
           <ProjectViewContent
             handleForwardStep={() => handleForwardStep(activeStep + 1)}
           />
         </div>
       </Slide>
       <Slide
-        direction={getDirection(1)}
-        in={activeStep === 1}
+        direction={getDirection(2)}
+        in={activeStep === 2}
         mountOnEnter
         unmountOnExit
         timeout={400}

@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
+
 import RadioButtonCheckedIcon from "@material-ui/icons/RadioButtonChecked";
 import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
 import Drawer from "@material-ui/core/Drawer";
+import Tooltip from "@material-ui/core/Tooltip";
+
 const drawerWidth = 90;
 const useStyles = makeStyles(theme => ({
   root: {
@@ -82,22 +85,26 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function getSteps() {
-  return ["Analysis Search", "Dashboard"];
+  return ["Project Select", "Analysis Search", "Dashboard"];
 }
-
 const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
   const classes = useStyles();
   const steps = getSteps();
-  const [detailsDrawer, setDetailsDrawer] = useState(false);
+  const [detailsDrawer, setDetailsDrawer] = useState(
+    activeStep === 1 ? true : false
+  );
   const [stepperColour, setStepperColour] = useState(classes.activeWhite);
 
   useEffect(() => {
-    activeStep === 1
+    activeStep === 2
       ? setStepperColour(classes.activeBlack)
       : setStepperColour(classes.activeWhite);
   }, [activeStep]);
 
   const handleStep = step => {
+    if (activeStep === 1) {
+      setDetailsDrawer(true);
+    }
     if (step < activeStep) {
       handleBackStep(step);
     }
@@ -106,76 +113,61 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
     setDetailsDrawer(true);
   };
   const moreDetailExit = () => {
-    setDetailsDrawer(false);
+    if (activeStep !== 1) {
+      setDetailsDrawer(false);
+    }
   };
-  const isLongAnalysisName = value =>
-    value.length >= 10 && value.indexOf(" ") === -1;
   return (
     <div className={classes.root}>
       {steps.map((label, index) => (
-        <div
-          key={index}
-          className={classes.button}
-          onMouseEnter={moreDetailOpen}
-          onMouseLeave={moreDetailExit}
-        >
-          {activeStep === index ? (
-            <RadioButtonCheckedIcon className={stepperColour} />
+        <span key={"span-wrapper" + label}>
+          <Tooltip
+            key={"tooltip" + label}
+            title={label}
+            aria-label={label}
+            arrow
+            placement="left"
+          >
+            <div
+              key={"step-wrapper" + label}
+              className={classes.button}
+              onMouseEnter={moreDetailOpen}
+              onMouseLeave={moreDetailExit}
+            >
+              {activeStep === index ? (
+                <RadioButtonCheckedIcon className={stepperColour} />
+              ) : (
+                <FiberManualRecordIcon
+                  className={
+                    index < activeStep ? stepperColour : classes.disabled
+                  }
+                  onClick={() => handleStep(index)}
+                />
+              )}
+            </div>
+          </Tooltip>
+          {activeStep > index ? (
+            <div
+              key={"step-wrapper" + label}
+              className={stepperColour}
+              style={{
+                marginTop: -75,
+                marginLeft: 5,
+                color: "white",
+                fontWeight: "bold"
+              }}
+            >
+              ﹀
+            </div>
           ) : (
-            <FiberManualRecordIcon
-              className={index < activeStep ? stepperColour : classes.disabled}
-              onClick={() => handleStep(index)}
+            <div
+              style={{
+                marginTop: -75
+              }}
             />
           )}
-        </div>
+        </span>
       ))}
-      <Drawer
-        variant="permanent"
-        className={clsx(classes.drawer, {
-          [classes.drawerOpen]: detailsDrawer,
-          [classes.drawerClose]: !detailsDrawer
-        })}
-        classes={{
-          paper: clsx({
-            [classes.drawerOpen]: detailsDrawer,
-            [classes.drawerClose]: !detailsDrawer
-          })
-        }}
-        anchor={"right"}
-        open={detailsDrawer}
-        onMouseEnter={moreDetailOpen}
-        onMouseLeave={moreDetailExit}
-        onClose={() => setDetailsDrawer(false)}
-        ModalProps={{
-          keepMounted: true
-        }}
-      >
-        <div className={classes.drawerContent}>
-          {stepTextValues.map((value, index) => {
-            return (
-              <div
-                key={value}
-                onClick={() => handleStep(index)}
-                className={clsx(
-                  value.length >= 10
-                    ? isLongAnalysisName(value)
-                      ? classes.isLongAnalysisName
-                      : classes.drawerLabelTwoLines
-                    : classes.drawerLabelOneLine,
-                  index <= activeStep ? stepperColour : classes.disabled,
-                  index === activeStep ? classes.activeBold : ""
-                )}
-              >
-                {isLongAnalysisName(value)
-                  ? value.substring(0, 9) +
-                    "- " +
-                    value.substring(9, value.length)
-                  : value}
-              </div>
-            );
-          })}
-        </div>
-      </Drawer>
     </div>
   );
 };
