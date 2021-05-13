@@ -36,7 +36,7 @@ const styles = {
   disabled: { cursor: "pointer" },
   stepper: { margin: "auto", position: "absolute", bottom: 50, left: "50vw" },
   tableWrapper: {
-    marginTop: "15vh"
+    marginTop: "5vh"
   }
 };
 const getAllAnalyses = gql`
@@ -248,7 +248,9 @@ const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
                   >
                     <Table
                       key={"project-view-table"}
-                      columns={data["analyses"]["analysesList"]}
+                      columns={data["analyses"]["analysesList"].filter(
+                        column => column.type !== "project"
+                      )}
                       rows={data["analyses"]["analysesRows"]}
                       handleForwardStep={handleForwardStep}
                     />
