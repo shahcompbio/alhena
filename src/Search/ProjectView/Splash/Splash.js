@@ -14,6 +14,8 @@ import * as d3 from "d3";
 
 const useClasses = makeStyles(theme => ({}));
 const Splash = ({ handleForwardStep }) => {
+  const [{}, dispatch] = useDashboardState();
+
   const [context, saveContext] = useState();
 
   const dimensions = { width: 1900, height: 1000 };
@@ -40,7 +42,11 @@ const Splash = ({ handleForwardStep }) => {
             d3.select(this).attr("opacity", 0);
           })
           .on("mousedown", function() {
-            //go to cellmine
+            handleForwardStep();
+            dispatch({
+              type: "DASHBOARD_SELECT",
+              value: { selectedDashboard: "cellmine" }
+            });
           })
           .attr("opacity", 0);
 
@@ -50,6 +56,10 @@ const Splash = ({ handleForwardStep }) => {
           })
           .on("mousedown", function() {
             handleForwardStep();
+            dispatch({
+              type: "DASHBOARD_SELECT",
+              value: { selectedDashboard: "fitness" }
+            });
           })
           .on("mouseout", function() {
             d3.select(this).attr("opacity", 0);

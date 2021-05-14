@@ -6,8 +6,7 @@ import React, {
 } from "react";
 import Menu from "../Misc/Menu.js";
 import ProjectViewContent from "./ProjectView/ProjectViewContent.js";
-import Publications from "./ProjectView/Publications/Publications.js";
-import Splash from "./ProjectView/Publications/Splash.js";
+import Splash from "./ProjectView/Splash/Splash.js";
 
 import Stepper from "./Stepper.js";
 import Slide from "@material-ui/core/Slide";
@@ -142,7 +141,7 @@ const Content = ({ classes, client }) => {
         mountOnEnter
         unmountOnExit
         timeout={slideTimeOut}
-        key={"slideProjectViewContent"}
+        key={"splashProjectViewContent"}
       >
         <div className={classes.sliderContent}>
           <Splash handleForwardStep={() => handleForwardStep(activeStep + 1)} />

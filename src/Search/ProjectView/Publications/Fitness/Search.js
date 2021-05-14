@@ -3,6 +3,7 @@ import * as d3 from "d3";
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 import { makeStyles } from "@material-ui/core/styles";
+
 const svgLabelMatching = {
   SA609X3X8MB03073: "SA609 Mixture A",
   SA532X1XB00118: "SA532",

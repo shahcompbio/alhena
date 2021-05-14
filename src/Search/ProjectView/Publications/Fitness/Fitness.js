@@ -7,27 +7,27 @@ import { makeStyles } from "@material-ui/styles";
 import Search from "./Search.js";
 
 import { IconButton, Switch } from "@material-ui/core";
-import voronoiData from "./illistrator/cords.js";
+import voronoiData from "../illistrator/cords.js";
 
-import all from "./illistrator/light.svg";
+import all from "../illistrator/light.svg";
 
-import CircularProgressWithLabel from "./CircularProgress.js";
+import CircularProgressWithLabel from "../CircularProgress.js";
 
-import { useDashboardState } from "../ProjectState/dashboardState";
-import imgSA039Mx2SA906b0 from "./illistrator/SA039Mx2SA906b0.png";
-import imgSA1035X4XB02879 from "./illistrator/SA1035X4XB02879.png";
-import imgCellLine from "./illistrator/CellLine.png";
-import imgSA609X3X8MB03073 from "./illistrator/SA609X3X8MB03073.png";
-import imgSA609X1XB00290 from "./illistrator/SA609X1XB00290.png";
-import imgSA532X1XB00118 from "./illistrator/SA532X1XB00118.png";
-import imgSA535X5XB02895 from "./illistrator/SA535X5XB02895.png";
-import imgSA609X3X8XB03076 from "./illistrator/SA609X3X8XB03076.png";
-import title from "./illistrator/title.png";
+import { useDashboardState } from "../../ProjectState/dashboardState";
+import imgSA039Mx2SA906b0 from "../illistrator/SA039Mx2SA906b0.png";
+import imgSA1035X4XB02879 from "../illistrator/SA1035X4XB02879.png";
+import imgCellLine from "../illistrator/CellLine.png";
+import imgSA609X3X8MB03073 from "../illistrator/SA609X3X8MB03073.png";
+import imgSA609X1XB00290 from "../illistrator/SA609X1XB00290.png";
+import imgSA532X1XB00118 from "../illistrator/SA532X1XB00118.png";
+import imgSA535X5XB02895 from "../illistrator/SA535X5XB02895.png";
+import imgSA609X3X8XB03076 from "../illistrator/SA609X3X8XB03076.png";
+import title from "../illistrator/title.png";
 
 import * as d3 from "d3";
 import d3Tip from "d3-tip";
 
-import { data } from "./fitness.js";
+import { data } from "./data.js";
 
 const lineGen = d3
   .lineRadial()
@@ -60,7 +60,7 @@ const useClasses = makeStyles(theme => ({
     }
   }
 }));
-const Publications = ({ handleForwardStep }) => {
+const Fitness = ({ handleForwardStep }) => {
   const [{}, dispatch] = useDashboardState();
   const [context, saveContext] = useState();
   const [voronoi, saveVoronoi] = useState(null);
@@ -473,7 +473,6 @@ const Publications = ({ handleForwardStep }) => {
   useEffect(() => {
     d3.xml(all).then(data => {
       const mainNode = document.getElementById("canvasGraph");
-      console.log(d3.select("#canvasGraph"));
       mainNode.insertBefore(data.documentElement, mainNode.childNodes[0]);
       d3.selectAll("#light, #pinkLight, #redLight").attr("class", "hideLight");
     });
@@ -771,4 +770,4 @@ const Publications = ({ handleForwardStep }) => {
   );
 };
 
-export default Publications;
+export default Fitness;

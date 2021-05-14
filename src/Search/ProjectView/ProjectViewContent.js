@@ -5,12 +5,15 @@ import { useAppState } from "../../util/app-state";
 import { withStyles } from "@material-ui/styles";
 
 import CanvasGraph from "./Graph/CanvasGraph.js";
-import Publications from "./Publications/Publications.js";
+import Fitness from "./Publications/Fitness/Fitness.js";
+import Cellmine from "./Publications/Cellmine/Cellmine.js";
 
 import { Query } from "react-apollo";
 import gql from "graphql-tag";
 import { useDashboardState } from "./ProjectState/dashboardState";
 import { Grid } from "@material-ui/core";
+
+import fetchFileData from "./Publications/Cellmine/data/api";
 
 const styles = {
   root: { flexGrow: 1, background: "#586773" },
@@ -34,7 +37,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
 
   const [graphDim, setDim] = useState(0);
   const dimRef = useRef(0);
-
+  const packingData = fetchFileData();
   const handleFilterChange = (filter, type) => {
     var options = selectedOptions;
 
@@ -57,7 +60,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
   return selectedDashboard !== null ? (
     <Grid container className={classes.root} spacing={2} key={"grid-container"}>
       <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
-        <Publications
+        <Fitness
           isLoading={true}
           key={"packing-circles"}
           filters={[]}
@@ -70,16 +73,20 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
   ) : (
     <Grid container className={classes.root} spacing={2} key={"grid-container"}>
       <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
-        <Publications
-          graphDim={graphDim}
-          isLoading={false}
-          key={"packing-circles"}
-          filters={filters}
-          handleFilterChange={(filters, type) =>
-            handleFilterChange(filters, type)
-          }
-          handleForwardStep={() => handleForwardStep()}
-        />
+        {selectedDashboard === "fitness" ? (
+          <Fitness
+            graphDim={graphDim}
+            isLoading={false}
+            key={"packing-circles"}
+            filters={filters}
+            handleFilterChange={(filters, type) =>
+              handleFilterChange(filters, type)
+            }
+            handleForwardStep={() => handleForwardStep()}
+          />
+        ) : (
+          <Cellmine data={packingData} />
+        )}
       </Grid>
     </Grid>
   );

@@ -6,10 +6,9 @@ COPY package*.json ./
 RUN yarn install
 
 COPY . .
-RUN if [ "$BUILD_ENV" = "staging" ]; \
-    then yarn build:staging; \
-    else yarn build; \
-    fi
+
+RUN yarn install
+RUN ./node_modules/.bin/env-cmd -f ".spectrum.prod.env" ./node_modules/.bin/react-scripts build
 
 FROM ubuntu
   RUN apt-get update && apt-get install -y nginx
