@@ -57,8 +57,15 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
     }
   };
 
-  return selectedDashboard !== null ? (
+  return (
     <Grid container className={classes.root} spacing={2} key={"grid-container"}>
+      <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
+        <Cellmine data={packingData} />
+      </Grid>
+    </Grid>
+  );
+};
+/*   <Grid container className={classes.root} spacing={2} key={"grid-container"}>
       <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
         <Fitness
           isLoading={true}
@@ -73,7 +80,12 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
   ) : (
     <Grid container className={classes.root} spacing={2} key={"grid-container"}>
       <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
-        {selectedDashboard === "fitness" ? (
+        <Cellmine data={packingData} />
+      </Grid>
+    </Grid>
+  );*/
+
+/*        {selectedDashboard !== "fitness" ? (
           <Fitness
             graphDim={graphDim}
             isLoading={false}
@@ -86,10 +98,5 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
           />
         ) : (
           <Cellmine data={packingData} />
-        )}
-      </Grid>
-    </Grid>
-  );
-};
-
+        )}*/
 export default withStyles(styles)(ProjectViewContent);

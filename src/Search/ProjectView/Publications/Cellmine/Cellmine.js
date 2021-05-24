@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import "./index.css";
 
@@ -26,7 +26,14 @@ const getDataByKey = (data, key) => [
 const Cellmine = ({ data }) => {
   const [selected, setSelected] = useState({});
 
-  const [modifiedData, setModifiedData] = useState([...data]);
+  const [modifiedData, setModifiedData] = useState([]);
+
+  useEffect(() => {
+    if (data.length > 0) {
+      setModifiedData(data);
+    }
+  }, [data]);
+
   console.log(modifiedData);
   console.log(data);
   const handleFilterChange = (data, value, type) => {
@@ -131,19 +138,6 @@ const Cellmine = ({ data }) => {
               )
             }
           />
-          <RadioOptions
-            options={[...getDataByKey(data, "taxonomy_id")]}
-            filterOptions={filterOptions}
-            type="taxonomy_id"
-            title="Taxonomy"
-            selectOption={option => {
-              return filterOptions(
-                modifiedData,
-                { inputValue: option },
-                "taxonomy_id"
-              );
-            }}
-          />
         </Grid>
         {modifiedData.length && (
           <PackingCircles
@@ -158,6 +152,19 @@ const Cellmine = ({ data }) => {
     </Grid>
   );
 };
+/*          <RadioOptions
+            options={[...getDataByKey(modifiedData, "taxonomy_id")]}
+            filterOptions={filterOptions}
+            type="taxonomy_id"
+            title="Taxonomy"
+            selectOption={option => {
+              return filterOptions(
+                modifiedData,
+                { inputValue: option },
+                "taxonomy_id"
+              );
+            }}
+          />*/
 const useStyles = makeStyles(theme => ({
   inputRoot: {
     marginBottom: 15,
