@@ -17,7 +17,7 @@ import { initContext, isSelectionAllowed, getSelection } from "../utils.js";
 
 const scatterplotDimension = 550;
 const histogramMaxHeight = 55;
-
+const radius = 4;
 const margin = {
   left: 75,
   top: 37,
@@ -198,7 +198,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       drawAxis(context, x, y);
       drawAxisLabels(context, x, y, stats, scatterplotAxis);
 
-      drawHistogram(context, histogram, stats, x, y);
+      drawHistogram(context, histogram, stats, x, y, scatterplotAxis);
     }
   }, [selectedCells, subsetSelection]);
 
@@ -246,7 +246,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       drawAxis(context, x, y);
       drawAxisLabels(context, x, y, stats, scatterplotAxis);
       if (selectedCells.length !== 1) {
-        drawHistogram(context, histogram, stats, x, y);
+        drawHistogram(context, histogram, stats, x, y, scatterplotAxis);
       }
       appendEventListenersToCanvas(context);
       if (!selectionAllowed || subsetSelection.length > 0) {
@@ -321,7 +321,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
         drawAxis(context, x, y);
         drawAxisLabels(context, x, y, stats, scatterplotAxis);
 
-        drawHistogram(context, histogram, stats, x, y);
+        drawHistogram(context, histogram, stats, x, y, scatterplotAxis);
         scatterSelection.call(tooltip);
       }
     }, []);
@@ -513,7 +513,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
 
     data.map(point => {
       context.beginPath();
-      context.arc(x(point.x), y(point.y), 4, 0, Math.PI * 2, true);
+      context.arc(x(point.x), y(point.y), radius, 0, Math.PI * 2, true);
       if (!highlightedCells) {
         context.fillStyle = "#3498db";
       } else if (
@@ -535,7 +535,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       return final;
     }, {});
 
-  const drawHistogram = (context, data, stats, x, y) => {
+  const drawHistogram = (context, data, stats, x, y, axis) => {
     const barPadding = { width: 5, height: 2, margin: 10 };
 
     const xBarWidth = data.xBuckets[1]
@@ -564,6 +564,31 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
         scatterplotDim.y2 + histogramMaxHeight + barPadding.margin
       ])
       .nice();
+    var extraYLength = 0;
+    var extraXLength = 0;
+
+    //  const extraYLength = data.yBuckets.filter(row => row["key"] >= 0.99).length;
+
+    if (axis.y.type === "quality") {
+      const yShift = data.yBuckets.filter(row => row["key"] >= 0.99).length;
+      const has1Quality = data.yBuckets.filter(row => row["key"] === 1).length;
+
+      extraYLength = has1Quality
+        ? yBarHeight + radius
+        : yShift
+        ? yBarHeight / 2 + radius
+        : 0;
+    }
+    if (axis.x.type === "quality") {
+      const xShift = data.xBuckets.filter(row => row["key"] >= 0.99).length;
+      const has1Quality = data.xBuckets.filter(row => row["key"] === 1).length;
+
+      extraXLength = has1Quality
+        ? xBarWidth + radius
+        : xShift
+        ? xBarWidth / 2 + radius
+        : 0;
+    }
 
     const xBucketZero = xBucketHeightScale(0);
     const yBucketZero = yBucketWidthScale(0);
@@ -572,46 +597,48 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       const width = yBucketWidthScale(bucket.count);
       context.beginPath();
       context.fillStyle = "#e8ecf1";
-      context.fillRect(
+      context.strokeStyle = "#6c7a89";
+      context.rect(
         scatterplotDim.x2 + barPadding.margin,
-        y(bucket.key) + barPadding.height,
+        y(bucket.key) - extraYLength,
         width - yBucketZero,
         yBarHeight + barPadding.width
       );
+      context.fill();
       context.stroke();
 
-      context.fillStyle = "#6c7a89";
+      /*  context.fillStyle = "#6c7a89";
       context.rect(
         scatterplotDim.x2 + barPadding.margin,
         y(bucket.key),
         width - yBucketZero,
         yBarHeight + barPadding.width
       );
-      context.stroke();
+      context.stroke();*/
     });
 
     data.xBuckets.forEach((bucket, i) => {
-      console.log("b", bucket);
-      console.log(x(bucket.key));
-
       const y1 = xBucketHeightScale(bucket.count);
       context.beginPath();
       context.fillStyle = "#e8ecf1";
-      context.fillRect(
+      context.strokeStyle = "#6c7a89";
+      context.rect(
         x(bucket.key),
         y1 - barPadding.margin,
-        xBarWidth,
+        xBarWidth - extraXLength,
         xBucketZero - y1
       );
+      context.fill();
       context.stroke();
-      context.fillStyle = "#6c7a89";
+
+      /*context.fillStyle = "#6c7a89";
       context.rect(
         x(bucket.key),
         y1 - barPadding.margin,
         xBarWidth,
         xBucketZero - y1
       );
-      context.stroke();
+      context.stroke();*/
     });
   };
 
