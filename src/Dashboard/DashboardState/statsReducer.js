@@ -32,7 +32,7 @@ const initialState = {
 
   violinAxis: {
     y: { label: "Quality", type: "quality" },
-    x: { label: "Clone ID", type: "clone_id" }
+    x: { label: "Experimental Condition", type: "experimental_condition" }
   },
 
   gcBiasAxis: {

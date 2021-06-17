@@ -13,12 +13,13 @@ import splash from "./Splash.png";
 import * as d3 from "d3";
 
 const useClasses = makeStyles(theme => ({}));
+
 const Splash = ({ handleForwardStep }) => {
   const [{}, dispatch] = useDashboardState();
 
   const [context, saveContext] = useState();
 
-  const dimensions = { width: 1900, height: 1000 };
+  const dimensions = { width: 1500, height: 790 };
   const [imgSource, setImgSource] = useState({
     src: splash,
     name: "splash"
@@ -28,7 +29,10 @@ const Splash = ({ handleForwardStep }) => {
   const easeDuration = 500;
 
   const [ref] = useHookWithRefCallback();
-
+  useEffect(() => {
+    d3.selectAll("#root").classed("whiteBackground", false);
+    d3.selectAll("#root").classed("blackBackground", true);
+  }, []);
   function useHookWithRefCallback() {
     const ref = useRef(null);
 
@@ -45,7 +49,7 @@ const Splash = ({ handleForwardStep }) => {
             handleForwardStep();
             dispatch({
               type: "DASHBOARD_SELECT",
-              value: { selectedDashboard: "cellmine" }
+              value: { selectedDashboard: "fitness" }
             });
           })
           .attr("opacity", 0);
@@ -58,7 +62,7 @@ const Splash = ({ handleForwardStep }) => {
             handleForwardStep();
             dispatch({
               type: "DASHBOARD_SELECT",
-              value: { selectedDashboard: "fitness" }
+              value: { selectedDashboard: "cellmine" }
             });
           })
           .on("mouseout", function() {
@@ -93,8 +97,8 @@ const Splash = ({ handleForwardStep }) => {
           <img
             alt="splash page image"
             src={imgSource.src}
-            width={1900}
-            height={1000}
+            width={1500}
+            height={790}
             id={"img-" + imgSource.id}
             style={{ zIndex: 2, position: "absolute", pointerEvents: "none" }}
           />

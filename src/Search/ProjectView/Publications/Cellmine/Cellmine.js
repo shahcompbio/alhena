@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import * as d3 from "d3";
 import "./index.css";
 
 import TextField from "@material-ui/core/TextField";
@@ -18,13 +18,20 @@ import Grid from "@material-ui/core/Grid";
 import { PackingCircles } from "@shahlab/planetarium";
 
 import { matchSorter } from "match-sorter";
+import cellCount from "./cellCount.png";
 
-const getDataByKey = (data, key) => [
-  ...new Set(data.map(row => row[key]).flat(1))
-];
+const getDataByKey = (data, key) =>
+  [...new Set(data.map(row => row[key]).flat(1))].sort((a, b) =>
+    a.localeCompare(b, "en", { numeric: true })
+  );
 
-const Cellmine = ({ data }) => {
+const Cellmine = ({ data, handleForwardStep, dispatch }) => {
   const [selected, setSelected] = useState({});
+  useEffect(() => {
+    console.log(d3.selectAll("#root"));
+    d3.selectAll("#root").classed("whiteBackground", false);
+    d3.selectAll("#root").classed("blackBackground", true);
+  }, []);
 
   const [modifiedData, setModifiedData] = useState([]);
 
@@ -34,11 +41,10 @@ const Cellmine = ({ data }) => {
     }
   }, [data]);
 
-  console.log(modifiedData);
-  console.log(data);
   const handleFilterChange = (data, value, type) => {
     setSelected({ ...selected, [type]: value });
   };
+
   const filter = (data, keys, { inputValue }) => {
     return matchSorter(data, inputValue, {
       keys: [...keys]
@@ -78,82 +84,66 @@ const Cellmine = ({ data }) => {
   return (
     <Grid
       container
-      direction="column"
+      direction="row"
       justify="flex-start"
       alignItems="flex-start"
+      spacing={1}
+      style={{ width: "100%", height: "100%" }}
     >
-      <Grid
-        item
-        container
-        direction="row"
-        justify="flex-start"
-        alignItems="flex-start"
-      >
-        <Grid style={{ margin: 15 }}>
-          <Typography variant="h5" component="h2">
-            Filter:
-          </Typography>
+      <Grid style={{ margin: 50 }} xs={3} item>
+        <Typography variant="h5" component="h2" style={{ color: "white" }}>
+          Filter:
+        </Typography>
 
-          <Search
-            data={[...getDataByKey(modifiedData, "jira_ticket")]}
-            selectedOption={selected["jira_ticket"] || null}
-            filterOptions={filterOptions}
-            type="jira_ticket"
-            title="Analysis Ticket"
-            selectOption={option =>
-              handleFilterChange(modifiedData, option, "jira_ticket")
-            }
-          />
-          <Search
-            data={[...getDataByKey(modifiedData, "pathology_disease_name")]}
-            filterOptions={filterOptions}
-            type="pathology_disease_name"
-            title="Tumour Type"
-            selectedOption={selected["pathology_disease_name"] || null}
-            selectOption={option =>
-              handleFilterChange(modifiedData, option, "pathology_disease_name")
-            }
-          />
-          <Search
-            data={[...getDataByKey(modifiedData, "pool_id")]}
-            filterOptions={filterOptions}
-            type="pool_id"
-            title="Library"
-            selectedOption={selected["pool_id"] || null}
-            selectOption={option =>
-              handleFilterChange(modifiedData, option, "pool_id")
-            }
-          />
-          <Search
-            data={[...getDataByKey(modifiedData, "additional_pathology_info")]}
-            filterOptions={filterOptions}
-            type="additional_pathology_info"
-            title="Subtype"
-            selectedOption={selected["additional_pathology_info"] || null}
-            selectOption={option =>
-              handleFilterChange(
-                modifiedData,
-                option,
-                "additional_pathology_info"
-              )
-            }
-          />
-        </Grid>
+        <Search
+          data={[...getDataByKey(modifiedData, "jira_ticket")]}
+          selectedOption={selected["jira_ticket"] || null}
+          filterOptions={filterOptions}
+          type="jira_ticket"
+          title="Analysis Ticket"
+          selectOption={option =>
+            handleFilterChange(modifiedData, option, "jira_ticket")
+          }
+        />
+        <Search
+          data={[
+            ...getDataByKey(modifiedData, "pathology_disease_name")
+          ].sort((a, b) => a.localeCompare(b))}
+          filterOptions={filterOptions}
+          type="pathology_disease_name"
+          title="Tumour Type"
+          selectedOption={selected["pathology_disease_name"] || null}
+          selectOption={option =>
+            handleFilterChange(modifiedData, option, "pathology_disease_name")
+          }
+        />
+        <Search
+          data={[...getDataByKey(modifiedData, "pool_id")]}
+          filterOptions={filterOptions}
+          type="pool_id"
+          title="Library"
+          selectedOption={selected["pool_id"] || null}
+          selectOption={option =>
+            handleFilterChange(modifiedData, option, "pool_id")
+          }
+        />
+        <Search
+          data={[...getDataByKey(modifiedData, "additional_pathology_info")]}
+          filterOptions={filterOptions}
+          type="additional_pathology_info"
+          title="Subtype"
+          selectedOption={selected["additional_pathology_info"] || null}
+          selectOption={option =>
+            handleFilterChange(
+              modifiedData,
+              option,
+              "additional_pathology_info"
+            )
+          }
+        />
         {modifiedData.length && (
-          <PackingCircles
-            modifiedData={modifiedData}
-            chartDim={{
-              height: 800,
-              width: 950
-            }}
-          />
-        )}
-      </Grid>
-    </Grid>
-  );
-};
-/*          <RadioOptions
-            options={[...getDataByKey(modifiedData, "taxonomy_id")]}
+          <RadioOptions
+            options={[...getDataByKey(data, "taxonomy_id")]}
             filterOptions={filterOptions}
             type="taxonomy_id"
             title="Taxonomy"
@@ -164,23 +154,78 @@ const Cellmine = ({ data }) => {
                 "taxonomy_id"
               );
             }}
-          />*/
+          />
+        )}
+        <div style={{ marginTop: 45 }}>
+          <FormLabel style={{ paddingLeft: 15, color: "white" }}>
+            Cell Count
+          </FormLabel>
+        </div>
+        <img
+          src={cellCount}
+          width={300}
+          height={156}
+          style={{ transform: "scale(0.8)", width: 300, height: 156 }}
+        />
+      </Grid>
+      <Grid
+        style={{ marginTop: 100, textAlign: "center", margin: "auto" }}
+        xs={7}
+        item
+      >
+        <div style={{ position: "relative", margin: "auto" }}>
+          {modifiedData.length && (
+            <PackingCircles
+              modifiedData={modifiedData}
+              chartDim={{
+                height: 600,
+                width: 750
+              }}
+              selectAnalysis={d => {
+                dispatch({
+                  type: "ANALYSIS_SELECT",
+                  value: { selectedAnalysis: d.jira_ticket }
+                });
+                handleForwardStep();
+              }}
+            />
+          )}
+        </div>
+        <div>
+          <Typography
+            variant="h2"
+            style={{
+              position: "absolute",
+              float: "right",
+              top: 20,
+              right: 0,
+              color: "white"
+            }}
+          >
+            Cellmine
+          </Typography>
+        </div>
+      </Grid>
+    </Grid>
+  );
+};
+
 const useStyles = makeStyles(theme => ({
   inputRoot: {
     marginBottom: 15,
-    "& .MuiAutocomplete-popupIndicator": { color: "black" },
-    color: "black",
+    "& .MuiAutocomplete-popupIndicator": { color: "white" },
+    color: "white",
     "& .MuiOutlinedInput-notchedOutline": {
-      borderColor: "black"
+      borderColor: "white"
     },
     "&:hover .MuiOutlinedInput-notchedOutline": {
-      borderColor: "black"
+      borderColor: "white"
     },
     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-      borderColor: "black"
+      borderColor: "white"
     },
     "& .MuiInputLabel-formControl": {
-      color: "black"
+      color: "white"
     }
   }
 }));
@@ -197,13 +242,20 @@ const RadioOptions = ({ options, title, selectOption }) => {
     }
   };
   return (
-    <FormControl component="fieldset">
-      <FormLabel component="legend">{title}</FormLabel>
+    <FormControl
+      component="fieldset"
+      style={{ paddingLeft: 15, color: "white" }}
+    >
+      <FormLabel component="legend" style={{ color: "white" }}>
+        {title}
+      </FormLabel>
       <RadioGroup key={title + "-radio"} value={value}>
         {options.map(option => (
           <FormControlLabel
             value={option}
-            control={<Radio onClick={handleChange} />}
+            control={
+              <Radio style={{ color: "white" }} onClick={handleChange} />
+            }
             label={option}
           />
         ))}
@@ -224,10 +276,10 @@ const Search = ({
   return (
     <Autocomplete
       classes={classes}
-      options={data}
+      options={[...data]}
       value={selectedOption}
       getOptionLabel={option => option}
-      style={{ width: 300 }}
+      style={{ width: 300, color: "white" }}
       renderOption={option => option}
       onChange={(event, option) => {
         filterOptions(data, { inputValue: option }, type);
@@ -237,7 +289,7 @@ const Search = ({
         <TextField
           {...params}
           InputLabelProps={{
-            style: { color: "#black" }
+            style: { color: "white" }
           }}
           label={title}
           variant="outlined"

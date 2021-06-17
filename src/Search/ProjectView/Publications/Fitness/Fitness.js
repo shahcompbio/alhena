@@ -10,6 +10,7 @@ import { IconButton, Switch } from "@material-ui/core";
 import voronoiData from "../illistrator/cords.js";
 
 import all from "../illistrator/light.svg";
+import { ReactSVG } from "react-svg";
 
 import CircularProgressWithLabel from "../CircularProgress.js";
 
@@ -92,6 +93,10 @@ const Fitness = ({ handleForwardStep }) => {
     .html(function(d) {
       return "Analysis: " + d.name + " </br>Library: " + d.library;
     });
+  useEffect(() => {
+    d3.selectAll("#root").classed("whiteBackground", false);
+    d3.selectAll("#root").classed("blackBackground", true);
+  }, []);
   function searchTree(element, matchingTitle) {
     if (element.name === matchingTitle) {
       return element;
@@ -449,7 +454,7 @@ const Fitness = ({ handleForwardStep }) => {
         })
         .on("mousedown", function(d) {
           const selection = Object.keys(d.data)[0];
-          d3.select("#root").classed("blackBackground", false);
+
           d3.select("#d3-tipFitness").classed("hideLight", true);
           dispatch({
             type: "ANALYSIS_SELECT",
@@ -470,20 +475,29 @@ const Fitness = ({ handleForwardStep }) => {
   }, [paintReady]);
 
   const [ref] = useHookWithRefCallback();
+
   useEffect(() => {
-    d3.xml(all).then(data => {
-      const mainNode = document.getElementById("canvasGraph");
-      mainNode.insertBefore(data.documentElement, mainNode.childNodes[0]);
-      d3.selectAll("#light, #pinkLight, #redLight").attr("class", "hideLight");
-    });
-  }, [false]);
+    d3.selectAll("#light, #pinkLight, #redLight").attr("class", "hideLight");
+    if (d3.selectAll("#light, #pinkLight, #redLight").size() === 0) {
+      /*  d3.xml(all).then(data => {
+        const mainNode = document.getElementById("canvasGraph");
+        console.log(mainNode);
+        mainNode.insertBefore(data.documentElement, mainNode.childNodes[0]);
+        console.log(d3.selectAll("#light, #pinkLight, #redLight"));
+
+      });*/
+    }
+  }, [handleForwardStep]);
 
   function useHookWithRefCallback() {
     const ref = useRef(null);
 
     const setRef = useCallback(async node => {
       if (node && context === undefined) {
-        d3.select("#root").attr("class", "blackBackground");
+        d3.selectAll("#light, #pinkLight, #redLight").attr(
+          "class",
+          "hideLight"
+        );
 
         const radius = 400;
         const tree = d3
@@ -636,6 +650,7 @@ const Fitness = ({ handleForwardStep }) => {
 
     return [setRef];
   }
+
   return (
     <div style={{ marginTop: 45, height: "100%" }}>
       {false && <CircularProgressWithLabel progress={progress} />}

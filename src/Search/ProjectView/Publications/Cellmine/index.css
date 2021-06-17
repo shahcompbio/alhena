@@ -11,11 +11,13 @@ body {
   background: rgb(148 173 173) !important;
 }
 #circleTip {
-  background: #525252a6;
-  font-size: 18px;
+  background: white;
+  font-size: 12px;
   max-width: 300px;
   border-radius: 10px;
+  padding: 15px;
 }
+
 /* Creates a small triangle extender for the tooltip */
 .d3-tip:after {
   color: #525252a6;

@@ -1,8 +1,11 @@
 import React from "react";
+import * as d3 from "d3";
 
 import { withStyles } from "@material-ui/core/styles";
 
 import QCDashboard from "./QCDashboard.js";
+import CellmineDashboard from "./CellmineDashboard.js";
+
 import LoadingCircle from "./CommonModules/LoadingCircle.js";
 
 import { Grid, Paper } from "@material-ui/core";
@@ -35,7 +38,9 @@ const styles = theme => ({
 });
 
 const DashboardContent = ({ classes, history, client }) => {
-  const [{ selectedAnalysis, linkParams }] = useDashboardState();
+  const [
+    { selectedAnalysis, selectedDashboard, linkParams }
+  ] = useDashboardState();
   const modifiedInitialState = linkParams ? linkParams[0] : initialState;
 
   return (
@@ -44,7 +49,21 @@ const DashboardContent = ({ classes, history, client }) => {
       reducer={statsStateReducer}
     >
       {selectedAnalysis ? (
-        <QCDashboard analysis={selectedAnalysis} item xs={8} client={client} />
+        selectedDashboard.toLowerCase() === "fitness" ? (
+          <QCDashboard
+            analysis={selectedAnalysis}
+            item
+            xs={8}
+            client={client}
+          />
+        ) : (
+          <CellmineDashboard
+            analysis={selectedAnalysis}
+            item
+            xs={8}
+            client={client}
+          />
+        )
       ) : (
         [
           <Grid className={classes.settings} item xs={4}>

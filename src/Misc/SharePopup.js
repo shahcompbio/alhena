@@ -60,7 +60,7 @@ const SharePopup = ({
 }) => {
   const [state, dispatch] = useStatisticsState();
   const [url, setUrl] = useState(
-    window.location.origin + "/alhena/dashboards/" + analysis
+    window.location.origin + "/dashboards/" + analysis
   );
   useEffect(() => {
     (async () => {

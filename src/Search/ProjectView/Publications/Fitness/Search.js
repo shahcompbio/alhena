@@ -14,6 +14,7 @@ const svgLabelMatching = {
   SA1035X4XB02879: "SA1035",
   "Cell Line": "Cell Line"
 };
+
 const useStyles = makeStyles(theme => ({
   inputRoot: {
     "& .MuiAutocomplete-popupIndicator": { color: "white" },
@@ -32,6 +33,9 @@ const useStyles = makeStyles(theme => ({
     }
   }
 }));
+const sortAlphaNum = (a, b) =>
+  a["name"].localeCompare(b["name"], "en", { numeric: true });
+
 const Search = ({
   analysisList,
   sampleList,
@@ -45,11 +49,10 @@ const Search = ({
     <span>
       <Autocomplete
         classes={classes}
-        options={analysisList}
+        options={analysisList.sort(sortAlphaNum)}
         getOptionLabel={option => option.name}
         style={{ width: 300, marginBottom: 10 }}
         onChange={(event, option) => {
-          d3.select("#root").classed("blackBackground", false);
           dispatch({
             type: "ANALYSIS_SELECT",
             value: { selectedAnalysis: option.name }
@@ -69,7 +72,7 @@ const Search = ({
       />
       <Autocomplete
         classes={classes}
-        options={sampleList}
+        options={sampleList.sort(sortAlphaNum)}
         getOptionLabel={option => svgLabelMatching[option.name]}
         style={{ width: 300 }}
         onChange={(event, option) => {

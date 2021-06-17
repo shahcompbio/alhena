@@ -298,24 +298,26 @@ const SettingsPanel = ({
           isDisabled={isDisabled}
         />
       </AccordianWrapper>
-      <AccordianWrapper
-        key={"gcbiasAccordianWrapper"}
-        classes={classes}
-        name="GCBias"
-        title="GC Bias"
-        setIsOpenAccordian={setIsOpenAccordian}
-        openAccordian={openAccordian}
-        isResetPossible={false}
-        resetFilter={() => {
-          resetFilter("GCBIAS_AXIS_RESET");
-        }}
-      >
-        <GCBiasSettings
+      {selectedDashboard.toLowerCase() === "fitness" && (
+        <AccordianWrapper
+          key={"gcbiasAccordianWrapper"}
           classes={classes}
-          setAxisOption={value => update(value, "GCBIAS_IS_GROUPED")}
-          isDisabled={isDisabled}
-        />
-      </AccordianWrapper>
+          name="GCBias"
+          title="GC Bias"
+          setIsOpenAccordian={setIsOpenAccordian}
+          openAccordian={openAccordian}
+          isResetPossible={false}
+          resetFilter={() => {
+            resetFilter("GCBIAS_AXIS_RESET");
+          }}
+        >
+          <GCBiasSettings
+            classes={classes}
+            setAxisOption={value => update(value, "GCBIAS_IS_GROUPED")}
+            isDisabled={isDisabled}
+          />
+        </AccordianWrapper>
+      )}
     </Paper>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
+import * as d3 from "d3";
 
 import RadioButtonCheckedIcon from "@material-ui/icons/RadioButtonChecked";
 import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
@@ -104,6 +105,12 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
   const handleStep = step => {
     if (activeStep === 1) {
       setDetailsDrawer(true);
+    }
+
+    if (step === 0 || step === 1) {
+      //  d3.selectAll("#root").style("background", "#20262b");
+    } else {
+      //  d3.selectAll("#root").style("background", "#f7f7f7");
     }
     if (step < activeStep) {
       handleBackStep(step);

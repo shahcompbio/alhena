@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import Search from "./Filter/Search.js";
-
+import * as d3 from "d3";
 import { useAppState } from "../../util/app-state";
 import { withStyles } from "@material-ui/styles";
 
@@ -16,7 +16,7 @@ import { Grid } from "@material-ui/core";
 import fetchFileData from "./Publications/Cellmine/data/api";
 
 const styles = {
-  root: { flexGrow: 1, background: "#586773" },
+  root: { flexGrow: 1, background: "#586773", height: "100%" },
   hide: {
     display: "none"
   },
@@ -29,9 +29,9 @@ const styles = {
 };
 
 const ProjectViewContent = ({ classes, handleForwardStep }) => {
-  const [{ selectedDashboard }] = useDashboardState();
+  const [{ selectedDashboard }, dispatch] = useDashboardState();
 
-  const [{ authKeyID, uid }, dispatch] = useAppState();
+  //const [{ authKeyID, uid }, dispatch] = useAppState();
   const [selectedOptions, setSelectedOptions] = useState({});
   const [filters, setFilters] = useState([]);
 
@@ -56,15 +56,39 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
       setFilters([...newFilters]);
     }
   };
-
   return (
     <Grid container className={classes.root} spacing={2} key={"grid-container"}>
-      <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
-        <Cellmine data={packingData} />
-      </Grid>
+      {selectedDashboard === null ? null : selectedDashboard === "fitness" ? (
+        <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
+          <Fitness
+            graphDim={graphDim}
+            isLoading={false}
+            key={"packing-circles"}
+            filters={filters}
+            handleFilterChange={(filters, type) =>
+              handleFilterChange(filters, type)
+            }
+            dispatch={dispatch}
+            handleForwardStep={() => handleForwardStep()}
+          />
+        </Grid>
+      ) : (
+        <Grid key={"grid-content"} ref={dimRef} style={{ width: "100%" }}>
+          <Cellmine
+            data={packingData}
+            dispatch={dispatch}
+            handleForwardStep={() => handleForwardStep()}
+          />
+        </Grid>
+      )}
     </Grid>
   );
 };
+/*    <Grid container className={classes.root} spacing={2} key={"grid-container"}>
+      <Grid key={"grid-content"} ref={dimRef}>
+        <Cellmine data={packingData} />
+      </Grid>
+    </Grid>*/
 /*   <Grid container className={classes.root} spacing={2} key={"grid-container"}>
       <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
         <Fitness

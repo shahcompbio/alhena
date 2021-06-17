@@ -4,6 +4,7 @@ import React, {
   useWindowSize,
   useLayoutEffect
 } from "react";
+import * as d3 from "d3";
 import Menu from "../Misc/Menu.js";
 import ProjectViewContent from "./ProjectView/ProjectViewContent.js";
 import Splash from "./ProjectView/Splash/Splash.js";
@@ -25,6 +26,12 @@ const styles = ({ theme }) => ({
   root: { flexGrow: 1, height: "100vh" },
   hide: {
     display: "none"
+  },
+  dashboardContent: {
+    position: "absolute",
+    width: "95%",
+    height: "100%",
+    background: "#f7f7f7"
   },
   sliderContent: { position: "absolute", width: "95%", height: "100%" }
 });
@@ -80,7 +87,8 @@ const Content = ({ classes, client }) => {
   /*  const [activeStep, setActiveStep] = useState(
     selectedAnalysis ? 2 : selectedDashboard ? 1 : 0
   );*/
-  const [activeStep, setActiveStep] = useState(selectedAnalysis ? 2 : 1);
+
+  const [activeStep, setActiveStep] = useState(selectedAnalysis ? 2 : 0);
   const [stepTextValues, setStepTextValues] = useState(defaultStepperText);
   const [isBackwards, setIsBackwards] = useState(false);
 
@@ -88,6 +96,12 @@ const Content = ({ classes, client }) => {
     setIsBackwards(true);
     setActiveStep(index);
     if (index === 0) {
+      if (activeStep === 2) {
+        dispatch({
+          type: "ANALYSIS_SELECT",
+          value: { selectedAnalysis: null }
+        });
+      }
       dispatch({
         type: "DASHBOARD_SELECT",
         value: { selectedDashboard: null }
@@ -120,6 +134,13 @@ const Content = ({ classes, client }) => {
   }, [selectedDashboard, selectedAnalysis]);
 
   const handleForwardStep = index => {
+    if (index === 0 || index === 1) {
+      d3.selectAll("#root").classed("whiteBackground", false);
+      d3.selectAll("#root").classed("blackBackground", true);
+    } else {
+      d3.selectAll("#root").classed("whiteBackground", true);
+      d3.selectAll("#root").classed("blackBackground", false);
+    }
     setIsBackwards(false);
     setActiveStep(index);
   };
@@ -141,7 +162,7 @@ const Content = ({ classes, client }) => {
         mountOnEnter
         unmountOnExit
         timeout={slideTimeOut}
-        key={"splashProjectViewContent"}
+        key={"splashProject"}
       >
         <div className={classes.sliderContent}>
           <Splash handleForwardStep={() => handleForwardStep(activeStep + 1)} />
@@ -169,19 +190,9 @@ const Content = ({ classes, client }) => {
         timeout={400}
         key={"slideDashboard"}
       >
-        <div className={classes.sliderContent}>
+        <div className={classes.dashboardContent}>
           <DashboardContent client={client} />
         </div>
-      </Slide>
-      <Slide
-        direction={activeStep !== 1 ? "up" : "down"}
-        in={activeStep !== 1}
-        mountOnEnter
-        unmountOnExit
-        timeout={activeStep !== 1 ? 100 : 1000}
-        key={"slideBackdrop"}
-      >
-        <Backdrop open={true}></Backdrop>
       </Slide>
       <Stepper
         activeStep={activeStep}
