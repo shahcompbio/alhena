@@ -52,6 +52,7 @@ const HEATMAP_ORDER = gql`
       sample_id
       library_id
       jira_id
+      dashboard
     }
     numericalDataFilters(
       analysis: $analysis
@@ -174,6 +175,7 @@ const QCDashboard = ({ analysis, classes, client }) => {
             ? selectedCells
             : data.heatmapOrder.map(order => order.order);
       }
+
       return (
         <div className={classes.root}>
           <Grid
@@ -241,6 +243,39 @@ const QCDashboard = ({ analysis, classes, client }) => {
                     allHeatmapOrder={heatmapOrder}
                     categoryStats={data.categoriesStats}
                   />
+                </Paper>
+                <Paper
+                  key={"chipPaper"}
+                  className={[classes.chip, classes.paperContainer]}
+                >
+                  <Chip key={"chipPlot"} analysis={analysis} />
+                </Paper>
+                <Paper
+                  key={"violinPaper"}
+                  className={[classes.violinContent, classes.paperContainer]}
+                >
+                  <Violin
+                    key={"violinPlot"}
+                    analysis={analysis}
+                    allHeatmapOrder={heatmapOrder}
+                    categoryStats={data.categoriesStats}
+                  />
+                </Paper>
+                <Paper
+                  key={"gcBiasPaper"}
+                  className={[classes.gcBias, classes.paperContainer]}
+                >
+                  <GCBias
+                    key={"gcBiasPlot"}
+                    analysis={analysis}
+                    heatmapOrder={heatmapOrder}
+                  />
+                </Paper>
+                <Paper
+                  key={"scatterPaper"}
+                  className={[classes.scatterplot, classes.paperContainer]}
+                >
+                  <Scatterplot key={"scatterplot"} analysis={analysis} />
                 </Paper>
               </Grid>
             )}
