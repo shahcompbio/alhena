@@ -251,6 +251,7 @@ const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
                       columns={data["analyses"]["analysesList"].filter(
                         column => column.type !== "project"
                       )}
+                      project={data["analyses"]["analysesRows"][0]["project"]}
                       rows={data["analyses"]["analysesRows"]}
                       handleForwardStep={handleForwardStep}
                     />

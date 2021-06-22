@@ -1,6 +1,6 @@
 import React from "react";
 
-import PopUpContent from "./PopUpContent.js";
+import PopUpContent from "./NewDashboard/PopupContent.js";
 
 import gql from "graphql-tag";
 import { Query } from "react-apollo";

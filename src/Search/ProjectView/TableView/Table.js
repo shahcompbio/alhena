@@ -3,6 +3,7 @@ import * as d3 from "d3";
 import { DataGrid } from "@material-ui/data-grid";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
 import { matchSorter } from "match-sorter";
 
 import Autocomplete, {
@@ -23,18 +24,27 @@ const styles = {
     overflowY: "scroll",
     borderRight: "1px solid"
   },
+  title: {
+    float: "left",
+    color: "white",
+    margin: 0,
+    padding: 0,
+    marginLeft: 50
+  },
   input: { color: "#23bbbb !important" },
   wrapper: { height: 750, width: 1200 },
   header: { backgroundColor: "#afafafd9" },
   search: {
-    float: "right",
-    marginLeft: 900,
-    marginBottom: 10,
-    right: 0
+    marginRight: "100vw-1200px/2",
+    marginBottom: 10
+    //float: "right",
+    //  marginLeft: 900,
+    //  marginBottom: 10,
+    //  right: 0
   }
 };
 
-const Table = ({ handleForwardStep, classes, columns, rows }) => {
+const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
   const [{}, dispatch] = useDashboardState();
   const [searchValue, setValue] = useState(null);
   const [tableRows, setTableRows] = useState([]);
@@ -51,50 +61,61 @@ const Table = ({ handleForwardStep, classes, columns, rows }) => {
   };
   return (
     <Grid container direction="column" justify="flex-start" alignItems="center">
-      <Autocomplete
-        className={classes.search}
-        value={searchValue}
-        onChange={(event, newValue) => {
-          if (typeof newValue === "string") {
-            setValue({
-              title: newValue
-            });
-          } else {
-            setValue(newValue);
-          }
-        }}
-        filterOptions={(options, params) => {
-          const filtered = filterOptions(options, params);
-          if (filtered.length !== tableRows.length) {
-            setTableRows([...filtered]);
-          }
-          return filtered;
-        }}
-        selectOnFocus
-        clearOnBlur
-        handleHomeEndKeys
-        id="search"
-        options={rows}
-        getOptionLabel={option => {
-          return null;
-        }}
-        PopperComponent={() => null}
-        renderOption={option => {
-          return;
-        }}
-        style={{ width: 300 }}
-        freeSolo
-        renderInput={params => (
-          <TextField
-            {...params}
-            label="Search"
-            variant="outlined"
-            InputProps={{
-              className: classes.input
-            }}
-          />
-        )}
-      />
+      <Grid
+        item
+        container
+        direction="row"
+        justify="space-between"
+        alignItems="center"
+      >
+        <Typography variant={"h3"} className={classes.title}>
+          {project}
+        </Typography>
+        <Autocomplete
+          className={classes.search}
+          value={searchValue}
+          onChange={(event, newValue) => {
+            if (typeof newValue === "string") {
+              setValue({
+                title: newValue
+              });
+            } else {
+              setValue(newValue);
+            }
+          }}
+          filterOptions={(options, params) => {
+            const filtered = filterOptions(options, params);
+            if (filtered.length !== tableRows.length) {
+              setTableRows([...filtered]);
+            }
+            return filtered;
+          }}
+          selectOnFocus
+          clearOnBlur
+          handleHomeEndKeys
+          id="search"
+          options={rows}
+          getOptionLabel={option => {
+            return null;
+          }}
+          PopperComponent={() => null}
+          renderOption={option => {
+            return;
+          }}
+          style={{ width: 300 }}
+          freeSolo
+          renderInput={params => (
+            <TextField
+              {...params}
+              label="Search"
+              variant="outlined"
+              InputProps={{
+                className: classes.input
+              }}
+            />
+          )}
+        />
+      </Grid>
       <div className={classes.wrapper}>
         <DataGrid
           rows={tableRows.map(row => ({ ...row, id: row["jira_id"] }))}
@@ -113,9 +134,9 @@ const Table = ({ handleForwardStep, classes, columns, rows }) => {
                 <a
                   id={
                     "link-" +
-                    params.getValue("jira_id") +
+                    params["row"]["jira_id"] +
                     "-" +
-                    params.getValue("sample_id")
+                    params["row"]["sample_id"]
                   }
                   style={{ color: "white" }}
                   href={"javascript:;"}
@@ -139,12 +160,10 @@ const Table = ({ handleForwardStep, classes, columns, rows }) => {
                     handleForwardStep();
                   }}
                 >
-                  {params.getValue("sample_id")}
+                  {params["row"]["sample_id"]}
                 </a>
               ) : (
-                <p style={{ cursor: "text" }}>
-                  {params.getValue(field["type"])}
-                </p>
+                <p style={{ cursor: "text" }}>{params["row"][field["type"]]}</p>
               );
             },
             headerClassName: classes.header
