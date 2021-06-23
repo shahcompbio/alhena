@@ -15,7 +15,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 
 import Grid from "@material-ui/core/Grid";
-import { PackingCircles } from "@shahlab/planetarium";
+//import { PackingCircles } from "@shahlab/planetarium";
+import PackingCircles from "./PackingCircles.js";
 
 import { matchSorter } from "match-sorter";
 import cellCount from "./cellCount.png";
@@ -28,7 +29,6 @@ const getDataByKey = (data, key) =>
 const Cellmine = ({ data, handleForwardStep, dispatch }) => {
   const [selected, setSelected] = useState({});
   useEffect(() => {
-    console.log(d3.selectAll("#root"));
     d3.selectAll("#root").classed("whiteBackground", false);
     d3.selectAll("#root").classed("blackBackground", true);
   }, []);
@@ -51,30 +51,39 @@ const Cellmine = ({ data, handleForwardStep, dispatch }) => {
     });
   };
 
-  const filterOptions = (options, params, key) => {
+  const filterOptions = (d, params, key) => {
     if (params.inputValue === null) {
-      const newSelected = { ...selected, [key]: null };
+      const newSelected = selected;
+      delete newSelected[key];
       setSelected({ ...newSelected });
-      const searchParams = Object.keys(newSelected)
-        .map(key => newSelected[key])
-        .filter(key => key !== null);
-      if (searchParams.length === 0) {
-        setModifiedData([...data]);
+
+      if (Object.keys(newSelected).length === 0) {
+        setModifiedData(data);
       } else {
-        const filtered = filter(data, Object.keys(newSelected), searchParams);
-        if (filtered.length !== modifiedData.length) {
-          setModifiedData([...filtered]);
-        }
+        const filtered = Object.keys(newSelected).reduce(
+          (final, key) =>
+            filter(final, [key], {
+              inputValue: newSelected[key]
+            }),
+          [...data]
+        );
+        setModifiedData(filtered);
       }
+      return getDataByKey(data, key);
     } else if (params.inputValue !== "") {
       const newSelected = { ...selected, [key]: params.inputValue };
+
       setSelected({ ...newSelected });
 
-      const filtered = filter(modifiedData, [key], params);
+      const filtered = Object.keys(newSelected).reduce(
+        (final, key) =>
+          filter(final, [key], {
+            inputValue: newSelected[key]
+          }),
+        [...data]
+      );
 
-      if (filtered.length !== modifiedData.length) {
-        setModifiedData([...filtered]);
-      }
+      setModifiedData(filtered);
       return getDataByKey(filtered, key);
     } else {
       return getDataByKey(modifiedData, key);
@@ -148,11 +157,7 @@ const Cellmine = ({ data, handleForwardStep, dispatch }) => {
             type="taxonomy_id"
             title="Taxonomy"
             selectOption={option => {
-              return filterOptions(
-                modifiedData,
-                { inputValue: option },
-                "taxonomy_id"
-              );
+              return filterOptions(data, { inputValue: option }, "taxonomy_id");
             }}
           />
         )}
@@ -174,9 +179,9 @@ const Cellmine = ({ data, handleForwardStep, dispatch }) => {
         item
       >
         <div style={{ position: "relative", margin: "auto" }}>
-          {modifiedData.length && (
+          {modifiedData && modifiedData.length && (
             <PackingCircles
-              modifiedData={modifiedData}
+              modifiedData={modifiedData ? modifiedData : []}
               chartDim={{
                 height: 600,
                 width: 750
