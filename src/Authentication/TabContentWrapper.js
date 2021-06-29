@@ -18,15 +18,15 @@ import { getAllDashboards, getUsers } from "../Queries/queries.js";
 import { withStyles, useTheme } from "@material-ui/styles";
 
 export const UPDATEDASHBOARD = gql`
-  query updateDashboard($dashboard: DashboardInput!) {
-    updateDashboard(dashboard: $dashboard) {
+  query updateDashboardByName($dashboard: DashboardInput!) {
+    updateDashboardByName(dashboard: $dashboard) {
       updated
     }
   }
 `;
 export const DELETEDASHBOARD = gql`
-  query deleteDashboard($name: String!) {
-    deleteDashboard(name: $name) {
+  query deleteDashboardByNames($name: String!) {
+    deleteDashboardByName(name: $name) {
       allDeleted
     }
   }
@@ -148,20 +148,33 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
       }
     });
 
-    if (data.deleteDashboard.allDeleted) {
+    if (data.deleteDashboardByName.allDeleted) {
       window.location.reload();
     }
-    return data.deleteDashboard.allDeleted;
+    return data.deleteDashboardByName.allDeleted;
   };
-  const updateDashboards = async (client, name, selectedIndices) => {
+  const updateDashboards = async (
+    client,
+    name,
+    selectedIndices,
+    selectedColumns,
+    selectedUsers,
+    deletedUsers
+  ) => {
     const updated = await client.query({
       query: UPDATEDASHBOARD,
       variables: {
-        dashboard: { name: name, indices: selectedIndices }
+        dashboard: {
+          name: name,
+          indices: selectedIndices,
+          columns: selectedColumns,
+          users: selectedUsers,
+          deletedUsers: deletedUsers
+        }
       }
     });
     clearAll();
-    if (updated.data.updateDashboard.updated) {
+    if (updated.data.updateDashboardByName.updated) {
       window.location.reload();
     }
   };
@@ -360,8 +373,21 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
                         key={"editDashboardPopup" + selected}
                         isOpen={true}
                         handleClose={handleClose}
-                        dashboardAction={(name, selectedIndices) =>
-                          updateDashboards(client, name, selectedIndices)
+                        dashboardAction={(
+                          name,
+                          selectedIndices,
+                          selectedColumns,
+                          selectedUsers,
+                          deletedUsers
+                        ) =>
+                          updateDashboards(
+                            client,
+                            name,
+                            selectedIndices,
+                            selectedColumns,
+                            selectedUsers,
+                            deletedUsers
+                          )
                         }
                         dashboardName={selected}
                       />
