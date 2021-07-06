@@ -155,7 +155,7 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
                   onClick={() => {
                     dispatch({
                       type: "ANALYSIS_SELECT",
-                      value: { selectedAnalysis: params.getValue("jira_id") }
+                      value: { selectedAnalysis: params["row"]["jira_id"] }
                     });
                     handleForwardStep();
                   }}

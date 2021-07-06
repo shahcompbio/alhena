@@ -17,7 +17,7 @@ import { initContext, isSelectionAllowed, getSelection } from "../utils.js";
 
 const scatterplotDimension = 550;
 const histogramMaxHeight = 55;
-
+const radius = 4;
 const margin = {
   left: 75,
   top: 37,
@@ -161,16 +161,32 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
   var lassPath = "";
 
   var mousePos = { x: 0, y: 0 };
+
   const xMin = stats.xMax - stats.xMin > 1 ? stats.xMin - 1 : stats.xMin;
-  const xMax = stats.xMax - stats.xMin > 1 ? stats.xMax + 1 : stats.xMax;
+  const xMax =
+    stats.xMax - stats.xMin > 1
+      ? stats.xMax + 1
+      : stats.xMax >= 0.95 && stats.xMax <= 1
+      ? 1.01
+      : stats.xMax;
   const x = d3
     .scaleLinear()
     .domain([xMin, xMax])
     .range([scatterplotDim.x1, scatterplotDim.x2])
     .nice();
 
-  const yMin = stats.yMax - stats.yMin > 1 ? stats.yMin - 1 : stats.yMin;
-  const yMax = stats.yMax - stats.yMin > 1 ? stats.yMax + 1 : stats.yMax;
+  const yMin =
+    stats.yMax - stats.yMin > 1
+      ? stats.yMin - 1
+      : stats.yMin > 0.1
+      ? stats.yMin - 0.02
+      : stats.yMin;
+  const yMax =
+    stats.yMax - stats.yMin > 1
+      ? stats.yMax + 1
+      : stats.yMax >= 0.95 && stats.yMax <= 1
+      ? 1.01
+      : stats.yMax;
   const y = d3
     .scaleLinear()
     .domain([yMax, yMin])
@@ -193,7 +209,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       drawAxis(context, x, y);
       drawAxisLabels(context, x, y, stats, scatterplotAxis);
 
-      drawHistogram(context, histogram, stats, x, y);
+      drawHistogram(context, histogram, stats, x, y, scatterplotAxis);
     }
   }, [selectedCells, subsetSelection]);
 
@@ -241,7 +257,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       drawAxis(context, x, y);
       drawAxisLabels(context, x, y, stats, scatterplotAxis);
       if (selectedCells.length !== 1) {
-        drawHistogram(context, histogram, stats, x, y);
+        drawHistogram(context, histogram, stats, x, y, scatterplotAxis);
       }
       appendEventListenersToCanvas(context);
       if (!selectionAllowed || subsetSelection.length > 0) {
@@ -316,7 +332,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
         drawAxis(context, x, y);
         drawAxisLabels(context, x, y, stats, scatterplotAxis);
 
-        drawHistogram(context, histogram, stats, x, y);
+        drawHistogram(context, histogram, stats, x, y, scatterplotAxis);
         scatterSelection.call(tooltip);
       }
     }, []);
@@ -508,7 +524,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
 
     data.map(point => {
       context.beginPath();
-      context.arc(x(point.x), y(point.y), 4, 0, Math.PI * 2, true);
+      context.arc(x(point.x), y(point.y), radius, 0, Math.PI * 2, true);
       if (!highlightedCells) {
         context.fillStyle = "#3498db";
       } else if (
@@ -530,7 +546,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       return final;
     }, {});
 
-  const drawHistogram = (context, data, stats, x, y) => {
+  const drawHistogram = (context, data, stats, x, y, axis) => {
     const barPadding = { width: 5, height: 2, margin: 10 };
 
     const xBarWidth = data.xBuckets[1]
@@ -559,6 +575,31 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
         scatterplotDim.y2 + histogramMaxHeight + barPadding.margin
       ])
       .nice();
+    var extraYLength = 0;
+    var extraXLength = 0;
+
+    //  const extraYLength = data.yBuckets.filter(row => row["key"] >= 0.99).length;
+
+    if (axis.y.type === "quality") {
+      const yShift = data.yBuckets.filter(row => row["key"] >= 0.99).length;
+      const has1Quality = data.yBuckets.filter(row => row["key"] === 1).length;
+
+      extraYLength = has1Quality
+        ? yBarHeight + radius
+        : yShift
+        ? yBarHeight / 2 + radius
+        : 0;
+    }
+    if (axis.x.type === "quality") {
+      const xShift = data.xBuckets.filter(row => row["key"] >= 0.99).length;
+      const has1Quality = data.xBuckets.filter(row => row["key"] === 1).length;
+
+      extraXLength = has1Quality
+        ? xBarWidth + radius
+        : xShift
+        ? xBarWidth / 2 + radius
+        : 0;
+    }
 
     const xBucketZero = xBucketHeightScale(0);
     const yBucketZero = yBucketWidthScale(0);
@@ -567,42 +608,38 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       const width = yBucketWidthScale(bucket.count);
       context.beginPath();
       context.fillStyle = "#e8ecf1";
-      context.fillRect(
+      context.strokeStyle = "#6c7a89";
+      context.rect(
         scatterplotDim.x2 + barPadding.margin,
-        y(bucket.key) + barPadding.height,
+        y(bucket.key) - extraYLength,
         width - yBucketZero,
         yBarHeight + barPadding.width
       );
+      context.fill();
       context.stroke();
 
-      context.fillStyle = "#6c7a89";
+      /*  context.fillStyle = "#6c7a89";
       context.rect(
         scatterplotDim.x2 + barPadding.margin,
         y(bucket.key),
         width - yBucketZero,
         yBarHeight + barPadding.width
       );
-      context.stroke();
+      context.stroke();*/
     });
 
     data.xBuckets.forEach((bucket, i) => {
-      const y1 = xBucketHeightScale(bucket.count);
+      var y1 = xBucketHeightScale(bucket.count);
       context.beginPath();
       context.fillStyle = "#e8ecf1";
-      context.fillRect(
-        x(bucket.key),
-        y1 - barPadding.margin,
-        xBarWidth,
-        xBucketZero - y1
-      );
-      context.stroke();
-      context.fillStyle = "#6c7a89";
+      context.strokeStyle = "#6c7a89";
       context.rect(
         x(bucket.key),
         y1 - barPadding.margin,
         xBarWidth,
         xBucketZero - y1
       );
+      context.fill();
       context.stroke();
     });
   };
@@ -638,20 +675,4 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     </div>
   );
 };
-/*      <svg
-        id="scatterSelection"
-        style={{
-          width: scatterplotDimension,
-          height: scatterplotDimension,
-          position: "unset"
-        }}
-      />*/
-/*        <svg
-          id="scatterSelection"
-          style={{
-            width: scatterplotDimension,
-            height: scatterplotDimension,
-            position: "relative"
-          }}
-        />*/
 export default withStyles(styles)(Scatterplot);

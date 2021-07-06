@@ -3,6 +3,8 @@ import { useDashboardState } from "../../Search/ProjectView/ProjectState/dashboa
 
 import gql from "graphql-tag";
 import { useQuery } from "react-apollo-hooks";
+import _ from "lodash";
+
 import {
   Checkbox,
   FormControl,
@@ -82,6 +84,7 @@ const DataFilters = ({
       setQualityMenuValue(quality);
     }
   }, [quality]);
+
   return [
     <Grid
       container
@@ -267,17 +270,34 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
     { axisChange, absoluteMinMaxDataFilters, selectedCells },
     dispatch
   ] = useStatisticsState();
-  const [defaultValues, setDefualtValues] = useState(
-    filters.reduce((final, curr) => {
-      final[curr["name"]] = [curr["localMin"], curr["localMax"]];
-      return final;
-    }, {})
-  );
 
-  const [prevDefaultValues, setPrevDefaultValues] = useState({
-    ...defaultValues
-  });
+  const [defaultValues, setDefualtValues] = useState({});
+  const [prevDefaultValues, setPrevDefaultValues] = useState({});
+  useEffect(() => {
+    if (_.isEmpty(defaultValues)) {
+      const originalDefaultValues = filters.reduce((final, curr) => {
+        final[curr["name"]] = [curr["min"], curr["max"]];
+        return final;
+      }, {});
+      setDefualtValues({ ...originalDefaultValues });
+      setPrevDefaultValues({ ...originalDefaultValues });
+    }
+  }, [filters]);
 
+  useEffect(() => {
+    if (
+      !_.isEmpty(defaultValues) &&
+      _.isEmpty(absoluteMinMaxDataFilters) &&
+      axisChange["datafilter"] === false
+    ) {
+      const originalDefaultValues = filters.reduce((final, curr) => {
+        final[curr["name"]] = [curr["min"], curr["max"]];
+        return final;
+      }, {});
+      setDefualtValues({ ...originalDefaultValues });
+      setPrevDefaultValues({ ...originalDefaultValues });
+    }
+  }, [axisChange, absoluteMinMaxDataFilters]);
   useEffect(() => {
     if (
       axisChange["datafilter"] === false &&
@@ -319,86 +339,86 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
       return num;
     }
   };
-  return filters.map(filter => {
-    const formattedMin = numFormatter(filter["min"]);
-    const formattedMax = numFormatter(filter["max"]);
 
-    return (
-      <Grid item key={filter["name"] + "-grid"} style={{ width: "100%" }}>
-        <Typography
-          id={filter["name"] + "range-slider-title"}
-          key={filter["name"] + "range-slider-title"}
-          gutterBottom
-        >
-          {filter["label"]}
-        </Typography>
-        <Slider
-          key={filter["name"] + "-slider"}
-          value={defaultValues[filter["name"]]}
-          className={classes.slider}
-          color={"secondary"}
-          disabled={isDisabled}
-          marks={[
-            {
-              value: filter["min"],
-              label: formattedMin
-            },
-            {
-              label: formattedMax,
-              value: filter["max"]
-            }
-          ]}
-          onChangeCommitted={event => {
-            if (checkValidCommit(filter["name"])) {
-              dispatch({
-                type: "NUMERICAL_DATA_FILTER_UPDATE",
-                value: {
-                  name: filter["name"],
-                  params: [
-                    {
-                      param: filter["name"],
-                      value: defaultValues[filter["name"]][1].toString(),
-                      operator: "lte"
-                    },
-                    {
-                      param: filter["name"],
-                      value: defaultValues[filter["name"]][0].toString(),
-                      operator: "gte"
-                    }
-                  ],
-                  absoluteMinMax: [...prevDefaultValues[filter["name"]]]
+  return filters.length > 0 && Object.keys(defaultValues).length > 0
+    ? filters.map(filter => {
+        const formattedMin = numFormatter(defaultValues[filter["name"]][0]);
+        const formattedMax = numFormatter(defaultValues[filter["name"]][1]);
+
+        return (
+          <Grid item key={filter["name"] + "-grid"} style={{ width: "100%" }}>
+            <Typography
+              id={filter["name"] + "range-slider-title"}
+              key={filter["name"] + "range-slider-title"}
+              gutterBottom
+            >
+              {filter["label"]}
+            </Typography>
+            <Slider
+              key={filter["name"] + "-slider"}
+              value={defaultValues[filter["name"]]}
+              className={classes.slider}
+              color={"secondary"}
+              disabled={isDisabled}
+              marks={[
+                {
+                  value: defaultValues[filter["name"]][0],
+                  label: formattedMin
+                },
+                {
+                  value: defaultValues[filter["name"]][1],
+                  label: formattedMax
                 }
-              });
-              setPrevDefaultValues({ ...defaultValues });
-            }
-          }}
-          onChange={(event, value) => {
-            var newValues = defaultValues;
-            if (
-              value[0] >= filter["localMin"] &&
-              value[1] <= filter["localMax"]
-            ) {
-              newValues[filter["name"]] = value;
-              setDefualtValues({ ...newValues });
-            }
-          }}
-          valueLabelFormat={numFormatter}
-          step={
-            filter["max"] - filter["min"] < 10
-              ? (filter["max"] - filter["min"]) / 10
-              : 1
-          }
-          min={filter["min"]}
-          max={filter["max"]}
-          valueLabelDisplay="auto"
-          aria-labelledby="range-slider"
-          getAriaValueText={value => value}
-          valueLabelDisplay="auto"
-          label={filter["name"]}
-          getAriaValueText={value => numFormatter(value)}
-        />
-      </Grid>
-    );
-  });
+              ]}
+              onChangeCommitted={event => {
+                if (checkValidCommit(filter["name"])) {
+                  dispatch({
+                    type: "NUMERICAL_DATA_FILTER_UPDATE",
+                    value: {
+                      name: filter["name"],
+                      params: [
+                        {
+                          param: filter["name"],
+                          value: defaultValues[filter["name"]][1].toString(),
+                          operator: "lte"
+                        },
+                        {
+                          param: filter["name"],
+                          value: defaultValues[filter["name"]][0].toString(),
+                          operator: "gte"
+                        }
+                      ],
+                      absoluteMinMax: [...prevDefaultValues[filter["name"]]]
+                    }
+                  });
+                  setPrevDefaultValues({ ...defaultValues });
+                }
+              }}
+              onChange={(event, value) => {
+                var newValues = defaultValues;
+                if (value[0] >= filter["min"] && value[1] <= filter["max"]) {
+                  newValues[filter["name"]] = value;
+                  setDefualtValues({ ...newValues });
+                }
+              }}
+              valueLabelFormat={numFormatter}
+              step={
+                filter["max"] - filter["min"] < 10
+                  ? (filter["max"] - filter["min"]) / 10
+                  : 1
+              }
+              min={filter["min"]}
+              max={filter["max"]}
+              valueLabelDisplay="auto"
+              aria-labelledby="range-slider"
+              getAriaValueText={value => value}
+              valueLabelDisplay="auto"
+              label={filter["name"]}
+              getAriaValueText={value => numFormatter(value)}
+            />
+          </Grid>
+        );
+      })
+    : null;
 };
 export default DataFilters;

@@ -54,6 +54,7 @@ const CHROMOSOME_SEGS_QUERY = gql`
     $analysis: String!
     $indices: [Int!]!
     $quality: String!
+    $heatmapWidth: Int!
   ) {
     analysisStats(analysis: $analysis, indices: $indices) {
       maxState
@@ -70,7 +71,12 @@ const CHROMOSOME_SEGS_QUERY = gql`
       start
       end
     }
-    segs(analysis: $analysis, indices: $indices, quality: $quality) {
+    segs(
+      analysis: $analysis
+      indices: $indices
+      quality: $quality
+      heatmapWidth: $heatmapWidth
+    ) {
       id
       name
       index
@@ -107,10 +113,20 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
     .domain([...heatmapOrder])
     .range([0, heatmapOrder.length - 1]);
 
+  const categoryWidth =
+    categoryStats.length * heatmapConfig.categories.squareSize +
+    categoryStats.length * heatmapConfig.categories.squareSpacing;
+  const heatmapWidth = width - categoryWidth;
+
   return (
     <Query
       query={CHROMOSOME_SEGS_QUERY}
-      variables={{ analysis, indices, quality }}
+      variables={{
+        analysis,
+        indices,
+        quality,
+        heatmapWidth
+      }}
     >
       {({ loading, error, data }) => {
         if (error) return null;
@@ -119,10 +135,6 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
         }
 
         const { chromosomes, segs, analysisStats } = data;
-
-        const categoryWidth =
-          categoryStats.length * heatmapConfig.categories.squareSize +
-          categoryStats.length * heatmapConfig.categories.squareSpacing;
 
         const yScale = getYScale(
           heatmapConfig.height / heatmapConfig.rowHeight

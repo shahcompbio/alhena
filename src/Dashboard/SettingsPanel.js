@@ -260,7 +260,16 @@ const SettingsPanel = ({
                 }}
                 isDisabled={isDisabled}
               />
-            ) : null
+            ) : (
+              <DataFilters
+                key={"dataFilterWrapper"}
+                client={client}
+                numericalDataFilters={[]}
+                experimentalConditions={[]}
+                analysis={""}
+                classes={classes}
+              />
+            )
           }
         </ApolloConsumer>
       </AccordianWrapper>

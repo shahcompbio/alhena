@@ -356,6 +356,7 @@ const DynamicColumnsContent = ({
             >
               <ListItemIcon key={"addColumnToDashboardIconCheck-" + value.type}>
                 <Checkbox
+                  disabled={value.type === "jira_id"}
                   edge="start"
                   key={"addColumnToDashboardCheck-" + value.type}
                   checked={checked.indexOf(value.type) !== -1}

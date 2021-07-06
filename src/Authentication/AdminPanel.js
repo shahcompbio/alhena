@@ -81,7 +81,7 @@ const createNewDashboard = async (
       }
     }
   });
-  return data.created;
+  return data.createNewDashboard.created;
 };
 
 const AdminPanel = ({ classes }) => {
