@@ -1,14 +1,9 @@
-FROM node:12 as builder
+FROM alhena-test as builder
 
 WORKDIR /usr/src/app
-ARG BUILD_FILE
 
-COPY package*.json ./
-RUN yarn install
-
-COPY . .
-RUN yarn install
-RUN ./node_modules/.bin/env-cmd -f "$BUILD_FILE" ./node_modules/.bin/react-scripts build
+COPY .msk.staging.env .env
+RUN ./node_modules/.bin/env-cmd ./node_modules/.bin/react-scripts build
 
 FROM ubuntu
   RUN apt-get update && apt-get install -y nginx
@@ -17,7 +12,7 @@ FROM ubuntu
   RUN rm -rf /etc/nginx/sites-enabled/default
 
   COPY --from=builder /usr/src/app/build /usr/share/nginx/html
-  COPY nginx.conf /etc/nginx/conf.d/default.conf
+  COPY --from=builder /usr/src/app/nginx.conf /etc/nginx/conf.d/default.conf
 
   EXPOSE 80
   CMD ["nginx", "-g", "daemon off;"]
