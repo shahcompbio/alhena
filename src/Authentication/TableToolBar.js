@@ -19,7 +19,7 @@ const useToolbarStyles = makeStyles(theme => ({
     borderRadius: "10px 10px 0px 0px"
   },
   highlight: {
-    backgroundColor: "#c9e2ea"
+    backgroundColor: "#eac9cc"
   },
   deleteHighlight: {
     color: "black",

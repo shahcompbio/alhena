@@ -36,11 +36,15 @@ const styles = {
   disabled: { cursor: "pointer" },
   stepper: { margin: "auto", position: "absolute", bottom: 50, left: "50vw" },
   tableWrapper: {
-    marginTop: "15vh"
+    marginTop: "5vh"
   }
 };
 const getAllAnalyses = gql`
   query Sunburst($filter: [Term]!, $user: ApiUser!, $dashboardName: String!) {
+    getDashboardColumnsByDashboard(dashboard: $dashboardName) {
+      type
+      label
+    }
     analyses(filters: $filter, auth: $user, dashboardName: $dashboardName) {
       error
       defaultProjectView
@@ -248,7 +252,8 @@ const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
                   >
                     <Table
                       key={"project-view-table"}
-                      columns={data["analyses"]["analysesList"]}
+                      columns={data["getDashboardColumnsByDashboard"]}
+                      project={data["analyses"]["analysesRows"][0]["project"]}
                       rows={data["analyses"]["analysesRows"]}
                       handleForwardStep={handleForwardStep}
                     />

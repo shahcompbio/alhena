@@ -1,13 +1,5 @@
 import gql from "graphql-tag";
 
-export const CREATENEWDASHBOARD = gql`
-  query createNewDashboard($dashboard: DashboardInput!) {
-    createNewDashboard(dashboard: $dashboard) {
-      created
-    }
-  }
-`;
-
 export const getAllDashboards = gql`
   query getAllDashboards($user: ApiUser!) {
     getAllDashboards(auth: $user) {

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import gql from "graphql-tag";
 
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
@@ -16,8 +17,6 @@ import Menu from "../Misc/Menu.js";
 
 import { ApolloConsumer } from "react-apollo";
 import TabContentWrapper from "./TabContentWrapper.js";
-
-import { createNewDashboard } from "../util/utils.js";
 
 import { withStyles, useTheme } from "@material-ui/styles";
 const styles = theme => ({
@@ -55,6 +54,35 @@ const styles = theme => ({
   tabs: { alignSelf: "flex-end" },
   toolbar: { overflow: "hidden" }
 });
+const CREATENEWDASHBOARD = gql`
+  query createNewDashboard($dashboard: DashboardInput!) {
+    createNewDashboard(dashboard: $dashboard) {
+      created
+    }
+  }
+`;
+const createNewDashboard = async (
+  client,
+  name,
+  selectedIndices,
+  selectedColumns,
+  selectedUsers,
+  deletedUsers
+) => {
+  const { data } = await client.query({
+    query: CREATENEWDASHBOARD,
+    variables: {
+      dashboard: {
+        name: name,
+        indices: selectedIndices,
+        columns: selectedColumns,
+        users: selectedUsers,
+        deletedUsers: []
+      }
+    }
+  });
+  return data.createNewDashboard.created;
+};
 
 const AdminPanel = ({ classes }) => {
   const theme = useTheme();
@@ -69,24 +97,41 @@ const AdminPanel = ({ classes }) => {
   const handleCloseAdd = () => {
     setOpenPopup(false);
   };
-  const addDashboard = async (client, name, selectedIndices) => {
-    const created = createNewDashboard(client, name, selectedIndices);
+  const addDashboard = async (
+    client,
+    name,
+    selectedIndices,
+    selectedColumns,
+    selectedUsers
+  ) => {
+    const created = await createNewDashboard(
+      client,
+      name,
+      selectedIndices,
+      selectedColumns,
+      selectedUsers,
+      []
+    );
     if (created) {
       window.location.reload();
     }
   };
-
+  const keyType = tabIndex === 0 ? "-users" : "-dashboards";
   return (
     <div style={{ flexGrow: 1, height: "100vh" }}>
       <div className={classes.root}>
-        <Paper rounded={"true"} className={classes.paper}>
+        <Paper
+          rounded={"true"}
+          className={classes.paper}
+          key={"rootPaper" + keyType}
+        >
           <Grid
             container
             direction="row"
             spacing={3}
-            key={"adminpanel-container"}
+            key={"adminpanel-container" + keyType}
           >
-            <Grid item xs={6} key={"admin-title"}>
+            <Grid item xs={6} key={"admin-title" + keyType}>
               <Typography variant="h5">Admin Settings</Typography>
             </Grid>
             <Grid item xs={6} key={"icon-container"}>
@@ -97,10 +142,10 @@ const AdminPanel = ({ classes }) => {
                 alignItems="center"
                 className={classes.actions}
               >
-                <ApolloConsumer key={"add-consumer"}>
+                <ApolloConsumer key={"add-consumer" + keyType}>
                   {client => [
                     <IconButton
-                      key={"add-button"}
+                      key={"add-button" + keyType}
                       variant="outlined"
                       color="secondary"
                       className={classes.icons}
@@ -121,8 +166,19 @@ const AdminPanel = ({ classes }) => {
                         key={"newDashboardPopup"}
                         isOpen={openPopup}
                         handleClose={handleCloseAdd}
-                        dashboardAction={(name, selectedIndices) =>
-                          addDashboard(client, name, selectedIndices)
+                        dashboardAction={(
+                          name,
+                          selectedIndices,
+                          selectedColumns,
+                          selectedUsers
+                        ) =>
+                          addDashboard(
+                            client,
+                            name,
+                            selectedIndices,
+                            selectedColumns,
+                            selectedUsers
+                          )
                         }
                       />
                     )
