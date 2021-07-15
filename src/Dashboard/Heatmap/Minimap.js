@@ -18,8 +18,18 @@ import {
 } from "./utils.js";
 
 const MINI_MAP_QUERY = gql`
-  query mini_map($analysis: String!, $indices: [Int!]!, $quality: String!) {
-    segs(analysis: $analysis, indices: $indices, quality: $quality) {
+  query mini_map(
+    $analysis: String!
+    $indices: [Int!]!
+    $quality: String!
+    $heatmapWidth: Int!
+  ) {
+    segs(
+      analysis: $analysis
+      indices: $indices
+      quality: $quality
+      heatmapWidth: $heatmapWidth
+    ) {
       id
       name
       index
@@ -138,8 +148,17 @@ const Minimap = ({
       ]);
     }
   }, [data, paintReady]);
+  const heatmapWidth = heatmapConfig.minimap.width;
   return (
-    <Query query={MINI_MAP_QUERY} variables={{ analysis, indices, quality }}>
+    <Query
+      query={MINI_MAP_QUERY}
+      variables={{
+        analysis,
+        indices,
+        quality,
+        heatmapWidth
+      }}
+    >
       {({ loading, error, data }) => {
         if (loading) return <LoadingCircle />;
         if (error) return null;

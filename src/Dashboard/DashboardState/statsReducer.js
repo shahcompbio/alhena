@@ -24,8 +24,8 @@ const initialState = {
   },
 
   scatterplotAxis: {
-    x: { label: "Total Mapped Reads", type: "total_mapped_reads" },
-    y: { label: "Mapped Reads", type: "total_reads" },
+    x: { label: "Quality", type: "quality" },
+    y: { label: "Total Reads", type: "total_reads" },
     popupFacadeIsOpen: false,
     selectedCellsDispatchFrom: null
   },
@@ -69,6 +69,7 @@ const statsStateReducer = (state, action) => {
         quality: heatmapConfig.defaultQuality,
         isContaminated: false,
         numericalDataFilters: [],
+        absoluteMinMaxDataFilters: {},
         selectedCells: [],
         selectedCellsDispatchFrom: null,
         subsetSelection: []
@@ -202,8 +203,8 @@ const statsStateReducer = (state, action) => {
         selectedCellsDispatchFrom: null,
         subsetSelection: [],
         scatterplotAxis: {
-          x: { label: "Total Mapped Reads", type: "total_mapped_reads" },
-          y: { label: "Mapped Reads", type: "total_reads" },
+          x: { label: "Quality", type: "quality" },
+          y: { label: "Total Reads", type: "total_reads" },
           popupFacadeIsOpen: false,
           selectedCellsDispatchFrom: null
         }

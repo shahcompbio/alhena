@@ -1,6 +1,6 @@
 import React from "react";
 import gql from "graphql-tag";
-import PopUpContent from "./PopUpContent.js";
+import PopUpContent from "./Dashboard/PopupContent.js";
 
 import { Query } from "react-apollo";
 export const GETINDICESBYDASHBOARD = gql`
@@ -10,6 +10,22 @@ export const GETINDICESBYDASHBOARD = gql`
     }
     getIndicesByDashboard(dashboard: $dashboard) {
       name
+    }
+    getDashboardColumnsByDashboard(dashboard: $dashboard) {
+      type
+      label
+    }
+    getAvailableDashboardColumns {
+      type
+      label
+    }
+    getDashboardUsers(name: $dashboard) {
+      username
+    }
+    getAllUsers {
+      username
+      full_name
+      isAdmin
     }
   }
 `;
@@ -36,10 +52,14 @@ const EditDashboardPopupWrapper = ({
             alreadySelectedIndices={data.getIndicesByDashboard.map(
               option => option.name
             )}
+            allDashboardColumns={data.getAvailableDashboardColumns}
+            selectedDashboardColumns={data.getDashboardColumnsByDashboard}
             handleClose={handleClose}
             isEdit={true}
             dashboardName={dashboardName}
             dashboardAction={dashboardAction}
+            selectedDashboardUsers={data.getDashboardUsers}
+            allDashboardsUsers={data.getAllUsers}
           />
         );
       }}
