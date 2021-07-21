@@ -63,7 +63,6 @@ export function PrivateRoute({ children, ...rest }) {
 }
 export function AdminRoute({ children, ...rest }) {
   const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
-
   return (
     <Route
       {...rest}
