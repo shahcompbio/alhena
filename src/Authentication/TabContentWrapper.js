@@ -257,6 +257,7 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
         //has updated
         setData(users.filter(user => user.username !== selected));
         actionCompleteReset();
+        window.location.reload();
       } else {
         //error
       }
