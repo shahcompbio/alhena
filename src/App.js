@@ -36,7 +36,6 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 const App = () => {
   const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
   let history = useHistory();
-
   return (
     <MuiThemeProvider theme={theme}>
       <CssBaseline />
@@ -57,7 +56,10 @@ const App = () => {
           <Route
             key="dashboardUnauth"
             path="/dashboards"
-            component={() => {
+            component={({ location, match }) => {
+              if (location.pathname !== match.path) {
+                localStorage.setItem("linkAttempt", location.pathname);
+              }
               history.replace("/login");
               return (
                 <ApolloConsumer>

@@ -5,6 +5,8 @@ import { useAppState } from "../util/app-state";
 import { useHistory } from "react-router-dom";
 import gql from "graphql-tag";
 
+import title from "./titleicon.png";
+
 import {
   Button,
   Grid,
@@ -39,7 +41,7 @@ const styles = theme => ({
   },
   inputWrapper: {
     position: "absolute",
-    top: "40vh",
+    top: "50vh",
     marginLeft: 10
   },
   logo: {
@@ -134,7 +136,7 @@ const UnauthenticatedApp = ({ client, classes }) => {
     const ref = useRef(null);
     const setRef = useCallback(node => {
       if (node) {
-        const title = d3.select("#title");
+        /*    const title = d3.select("#title");
         title
           .append("text")
           .attr("x", 10)
@@ -142,7 +144,7 @@ const UnauthenticatedApp = ({ client, classes }) => {
           .attr("dy", ".35em")
           .text(function(d) {
             return "ALHENA";
-          });
+          });*/
       }
     }, []);
 
@@ -170,20 +172,21 @@ const UnauthenticatedApp = ({ client, classes }) => {
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
           imageRendering: "-webkit-optimize-contrast",
-          height: "191px",
-          width: "528px"
+          height: 425,
+          width: 500,
+          marginTop: -55,
+          marginLeft: 85
         }}
         className={classes.logo}
         height={"191px"}
         width={"528px"}
       >
-        <svg
+        <img
           id="title"
+          src={title}
           style={{
-            pointerEvents: "all",
-            width: 500,
-            height: 200,
-            position: "relative"
+            width: 400,
+            height: 325
           }}
         />
       </div>
