@@ -1,7 +1,5 @@
 import React, { useState, useRef } from "react";
 
-import { ApolloConsumer } from "react-apollo";
-
 import { Button, Grid, Paper, TextField, Typography } from "@material-ui/core";
 
 import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
@@ -13,10 +11,10 @@ import { withStyles } from "@material-ui/styles";
 
 import { useHistory } from "react-router-dom";
 
-const styles = theme => ({
+const styles = (theme) => ({
   button: {
     backgroundColor: theme.palette.primary.main,
-    marginRight: 10
+    marginRight: 10,
   },
   paperTitle: {
     paddingBottom: theme.spacing.unit * 5,
@@ -27,7 +25,7 @@ const styles = theme => ({
     width: "25vw",
     color: "white",
     textAlign: "center",
-    background: theme.palette.primary.main
+    background: theme.palette.primary.main,
   },
   paperForm: {
     overflowX: "auto",
@@ -37,13 +35,13 @@ const styles = theme => ({
     width: "25vw",
     marginBottom: theme.spacing.unit,
     marginTop: "-70px",
-    display: "inline-block"
+    display: "inline-block",
   },
   textField: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
-    width: "20vw"
-  }
+    width: "20vw",
+  },
 });
 
 const VERIFYUSER = gql`
@@ -58,8 +56,8 @@ const checkUser = async (client, username, email) => {
     query: VERIFYUSER,
     variables: {
       username: username,
-      email: email
-    }
+      email: email,
+    },
   });
 
   return data.doesUserExist.confirmReset;
@@ -69,7 +67,6 @@ const ForgotPasswordWrapper = ({ dispatch, classes, client }) => {
 
   const [error, setError] = useState(null);
   const [isVerified, setIsVerified] = useState(false);
-  const [verifiedUsername, setVerifiedUsername] = useState();
 
   const usernameRef = useRef();
   const emailRef = useRef();
@@ -80,15 +77,15 @@ const ForgotPasswordWrapper = ({ dispatch, classes, client }) => {
       label: "Username:",
       ref: usernameRef,
       type: "text",
-      placeholder: "Username"
+      placeholder: "Username",
     },
     {
       id: "resetPassword:email",
       label: "Email:",
       ref: emailRef,
       type: "text",
-      placeholder: "Email"
-    }
+      placeholder: "Email",
+    },
   ];
 
   return (
@@ -96,7 +93,7 @@ const ForgotPasswordWrapper = ({ dispatch, classes, client }) => {
       <div
         style={{
           position: "absolute",
-          top: "15%"
+          top: "15%",
         }}
       >
         {error && (
@@ -120,7 +117,7 @@ const ForgotPasswordWrapper = ({ dispatch, classes, client }) => {
             </Paper>
             <Paper rounded="true" className={classes.paperForm}>
               <form id="resetPassword">
-                {fields.map(field => (
+                {fields.map((field) => (
                   <ComponentWrapper key={"componentWrapper" + field.id}>
                     <TextField
                       key={"textField" + field.id}

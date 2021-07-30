@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { ApolloConsumer } from "react-apollo";
 
@@ -16,9 +16,9 @@ import gql from "graphql-tag";
 import styled from "styled-components";
 import { withStyles } from "@material-ui/styles";
 
-const styles = theme => ({
+const styles = (theme) => ({
   button: {
-    backgroundColor: theme.palette.primary.main
+    backgroundColor: theme.palette.primary.main,
   },
   paperTitle: {
     paddingBottom: theme.spacing.unit * 5,
@@ -29,7 +29,7 @@ const styles = theme => ({
     width: "25vw",
     color: "white",
     textAlign: "center",
-    background: theme.palette.primary.main
+    background: theme.palette.primary.main,
   },
   paperForm: {
     overflowX: "auto",
@@ -39,12 +39,12 @@ const styles = theme => ({
     width: "25vw",
     marginBottom: theme.spacing.unit,
     marginTop: "-70px",
-    display: "inline-block"
+    display: "inline-block",
   },
   textField: {
     margin: 10,
-    width: "20vw"
-  }
+    width: "20vw",
+  },
 });
 
 const UPDATEPASSWORD = gql`
@@ -59,8 +59,8 @@ export const queryNewPassword = async (client, username, password) => {
     query: UPDATEPASSWORD,
     variables: {
       username: username,
-      newPassword: password
-    }
+      newPassword: password,
+    },
   });
   return data.changePassword.confirmed;
 };
@@ -69,9 +69,6 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
   let history = useHistory();
   const [error, setError] = useState(null);
   const [user, setUser] = useState({ password: "", passwordVerify: "" });
-
-  const passwordRef = useRef();
-  const verifyPasswordRef = useRef();
 
   const updatePassword = async (event, client, dispatch) => {
     event.preventDefault();
@@ -95,26 +92,26 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
     }
   };
 
-  const handleChange = event => {
+  const handleChange = (event) => {
     var newUser = user;
     newUser[event.target.name] = event.target.value;
     setUser({ ...newUser });
   };
 
   useEffect(() => {
-    ValidatorForm.addValidationRule("isPasswordMatch", value =>
+    ValidatorForm.addValidationRule("isPasswordMatch", (value) =>
       user["password"] === value ? true : false
     );
   }, [user]);
 
   return (
     <ApolloConsumer>
-      {client => (
+      {(client) => (
         <Grid container direction="row" justify="center" alignItems="center">
           <div
             style={{
               position: "absolute",
-              top: "15%"
+              top: "15%",
             }}
           >
             {error && (
@@ -143,8 +140,8 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
               <ValidatorForm
                 instantValidate={false}
                 autoComplete="off"
-                onError={errors => console.log(errors)}
-                onSubmit={ev => {}}
+                onError={(errors) => console.log(errors)}
+                onSubmit={(ev) => {}}
               >
                 <TextValidator
                   className={classes.textField}
@@ -158,7 +155,7 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
                   validators={["required", "minStringLength:10"]}
                   errorMessages={[
                     "This field is required",
-                    "Field must be longer than 10 characters long"
+                    "Field must be longer than 10 characters long",
                   ]}
                 />
                 <TextValidator
@@ -173,14 +170,14 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
                   validators={["required", "isPasswordMatch"]}
                   errorMessages={[
                     "This field is required",
-                    "Mismatched passwords"
+                    "Mismatched passwords",
                   ]}
                 />
                 <ComponentWrapper style={{ textAlign: "center" }}>
                   <Button
                     className={classes.button}
                     variant="contained"
-                    onClick={ev => updatePassword(ev, client, dispatch)}
+                    onClick={(ev) => updatePassword(ev, client, dispatch)}
                   >
                     Update
                   </Button>

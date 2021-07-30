@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 import { ApolloConsumer } from "react-apollo";
 import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
@@ -6,18 +6,16 @@ import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
-import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import SnackbarContentWrapper from "../../Misc/SnackBarPopup.js";
 
-import styled from "styled-components";
 import { withStyles } from "@material-ui/styles";
 import gql from "graphql-tag";
 
-const styles = theme => ({
+const styles = (theme) => ({
   button: {
     backgroundColor: theme.palette.primary.main,
-    textAlign: "center"
+    textAlign: "center",
   },
   paperTitle: {
     paddingBottom: theme.spacing.unit * 5,
@@ -28,7 +26,7 @@ const styles = theme => ({
     width: "25vw",
     color: "white",
     textAlign: "center",
-    background: theme.palette.primary.main
+    background: theme.palette.primary.main,
   },
   paperForm: {
     overflowX: "auto",
@@ -38,14 +36,14 @@ const styles = theme => ({
     width: "25vw",
     marginBottom: theme.spacing.unit,
     marginTop: "-70px",
-    display: "inline-block"
+    display: "inline-block",
   },
   textField: {
     marginLeft: 10,
     marginRight: theme.spacing(1),
     width: 300,
-    margin: 10
-  }
+    margin: 10,
+  },
 });
 export const NEWUSER = gql`
   query createNewUser($user: NewUser!) {
@@ -62,9 +60,9 @@ const queryCreateNewUser = async (user, client) => {
         name: user.name,
         username: user.username,
         email: user.email,
-        password: user.password
-      }
-    }
+        password: user.password,
+      },
+    },
   });
   return data.createNewUser.created;
 };
@@ -75,16 +73,16 @@ const NewAccount = ({ email, dispatch, classes }) => {
     username: "",
     email: email,
     password: "",
-    passwordVerify: ""
+    passwordVerify: "",
   });
-  const handleChange = event => {
+  const handleChange = (event) => {
     var newUser = user;
     newUser[event.target.name] = event.target.value;
     setUser({ ...newUser });
   };
 
   useEffect(() => {
-    ValidatorForm.addValidationRule("isPasswordMatch", value =>
+    ValidatorForm.addValidationRule("isPasswordMatch", (value) =>
       user["password"] === value ? true : false
     );
   }, [user]);
@@ -95,7 +93,7 @@ const NewAccount = ({ email, dispatch, classes }) => {
       var acknowledgement = await queryCreateNewUser(user, client);
       if (acknowledgement) {
         dispatch({
-          type: "LOGOUT"
+          type: "LOGOUT",
         });
       } else {
         setError(10);
@@ -107,12 +105,12 @@ const NewAccount = ({ email, dispatch, classes }) => {
 
   return (
     <ApolloConsumer>
-      {client => (
+      {(client) => (
         <Grid container direction="row" justify="center" alignItems="center">
           <div
             style={{
               position: "absolute",
-              top: "15%"
+              top: "15%",
             }}
           >
             {error && (
@@ -131,8 +129,8 @@ const NewAccount = ({ email, dispatch, classes }) => {
               <ValidatorForm
                 instantValidate={false}
                 autoComplete="off"
-                onError={errors => console.log(errors)}
-                onSubmit={ev => {
+                onError={(errors) => console.log(errors)}
+                onSubmit={(ev) => {
                   //createNewUser(ev, client, dispatch)
                 }}
               >
@@ -160,7 +158,7 @@ const NewAccount = ({ email, dispatch, classes }) => {
                   validators={["required", "minStringLength:3"]}
                   errorMessages={[
                     "This field is required",
-                    "Field must be longer than 3 characters long"
+                    "Field must be longer than 3 characters long",
                   ]}
                 />
                 <TextValidator
@@ -186,7 +184,7 @@ const NewAccount = ({ email, dispatch, classes }) => {
                   validators={["required", "minStringLength:10"]}
                   errorMessages={[
                     "This field is required",
-                    "Field must be longer than 10 characters long"
+                    "Field must be longer than 10 characters long",
                   ]}
                 />
                 <TextValidator
@@ -201,7 +199,7 @@ const NewAccount = ({ email, dispatch, classes }) => {
                   validators={["required", "isPasswordMatch"]}
                   errorMessages={[
                     "This field is required",
-                    "Mismatched passwords"
+                    "Mismatched passwords",
                   ]}
                 />
                 <div style={{ textAlign: "center" }}>
@@ -209,7 +207,7 @@ const NewAccount = ({ email, dispatch, classes }) => {
                     type="submit"
                     className={classes.button}
                     variant="contianed"
-                    onClick={ev => createNewUser(ev, client, dispatch, user)}
+                    onClick={(ev) => createNewUser(ev, client, dispatch, user)}
                   >
                     Create
                   </Button>
@@ -222,8 +220,5 @@ const NewAccount = ({ email, dispatch, classes }) => {
     </ApolloConsumer>
   );
 };
-const ComponentWrapper = styled.div`
-  margin: 10px;
-`;
 
 export default withStyles(styles)(NewAccount);

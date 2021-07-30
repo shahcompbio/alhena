@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as d3 from "d3";
 import { DataGrid } from "@material-ui/data-grid";
 import TextField from "@material-ui/core/TextField";
@@ -6,9 +6,7 @@ import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import { matchSorter } from "match-sorter";
 
-import Autocomplete, {
-  createFilterOptions
-} from "@material-ui/lab/Autocomplete";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 
 import { withStyles } from "@material-ui/styles";
 import { useDashboardState } from "../ProjectState/dashboardState";
@@ -22,30 +20,30 @@ const styles = {
     resize: "horizontal",
     overflowX: "overlay",
     overflowY: "scroll",
-    borderRight: "1px solid"
+    borderRight: "1px solid",
   },
   title: {
     float: "left",
     color: "white",
     margin: 0,
     padding: 0,
-    marginLeft: 50
+    marginLeft: 50,
   },
   input: { color: "#23bbbb !important" },
   wrapper: { height: 750, width: 1200 },
   header: { backgroundColor: "#afafafd9" },
   search: {
     marginRight: "100vw-1200px/2",
-    marginBottom: 10
+    marginBottom: 10,
     //float: "right",
     //  marginLeft: 900,
     //  marginBottom: 10,
     //  right: 0
-  }
+  },
 };
 
 const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
-  const [{}, dispatch] = useDashboardState();
+  const [_, dispatch] = useDashboardState(); // eslint-disable-line no-unused-vars
   const [searchValue, setValue] = useState(null);
   const [tableRows, setTableRows] = useState([]);
   useEffect(() => {
@@ -56,7 +54,7 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
 
   const filterOptions = (options, { inputValue }) => {
     return matchSorter(options, inputValue, {
-      keys: ["project", "sample_id", "library_id", "jira_id"]
+      keys: ["project", "sample_id", "library_id", "jira_id"],
     });
   };
   return (
@@ -77,7 +75,7 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
           onChange={(event, newValue) => {
             if (typeof newValue === "string") {
               setValue({
-                title: newValue
+                title: newValue,
               });
             } else {
               setValue(newValue);
@@ -95,22 +93,22 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
           handleHomeEndKeys
           id="search"
           options={rows}
-          getOptionLabel={option => {
+          getOptionLabel={(option) => {
             return null;
           }}
           PopperComponent={() => null}
-          renderOption={option => {
+          renderOption={(option) => {
             return;
           }}
           style={{ width: 300 }}
           freeSolo
-          renderInput={params => (
+          renderInput={(params) => (
             <TextField
               {...params}
               label="Search"
               variant="outlined"
               InputProps={{
-                className: classes.input
+                className: classes.input,
               }}
             />
           )}
@@ -118,8 +116,8 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
       </Grid>
       <div className={classes.wrapper}>
         <DataGrid
-          rows={tableRows.map(row => ({ ...row, id: row["jira_id"] }))}
-          columns={columns.map(field => ({
+          rows={tableRows.map((row) => ({ ...row, id: row["jira_id"] }))}
+          columns={columns.map((field) => ({
             field: field["type"],
             headerName: field["label"],
             width:
@@ -129,7 +127,7 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
                 ? 200
                 : 150,
             flex: field["type"] === "sample" ? 1 : 0.2,
-            renderCell: params => {
+            renderCell: (params) => {
               return field["type"] === "sample_id" ? (
                 <a
                   id={
@@ -155,7 +153,7 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
                   onClick={() => {
                     dispatch({
                       type: "ANALYSIS_SELECT",
-                      value: { selectedAnalysis: params["row"]["jira_id"] }
+                      value: { selectedAnalysis: params["row"]["jira_id"] },
                     });
                     handleForwardStep();
                   }}
@@ -166,7 +164,7 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
                 <p style={{ cursor: "text" }}>{params["row"][field["type"]]}</p>
               );
             },
-            headerClassName: classes.header
+            headerClassName: classes.header,
           }))}
           rowHeight={40}
           className={classes.root}

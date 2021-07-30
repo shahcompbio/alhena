@@ -32,20 +32,16 @@ const ProfileWrapper = ({
   analysis,
   cellId,
   maxState,
-  segs
+  segs,
 }) => {
   const genomeYScale = getGenomeYScale(maxState);
   const axisDomain = Array.from(Array(maxState + 1).keys());
   const xOffset = categoryLength === 1 ? 12 : categoryLength === 2 ? 5 : 0;
   const [isLoading, setIsLoading] = useState(false);
 
-  function setLoadingCircle(value) {
-    setIsLoading(value);
-  }
-
   function useHookWithRefCallback() {
     const ref = useRef(null);
-    const setRef = useCallback(node => {
+    const setRef = useCallback((node) => {
       if (node) {
         const container = d3.select(node).select("#profileSvg");
 
@@ -58,8 +54,8 @@ const ProfileWrapper = ({
           .append("line")
           .attr("x1", 0)
           .attr("x2", heatmapConfig.profile.axisWidth)
-          .attr("y1", d => genomeYScale(d))
-          .attr("y2", d => genomeYScale(d));
+          .attr("y1", (d) => genomeYScale(d))
+          .attr("y2", (d) => genomeYScale(d));
 
         container
           .append("g")
@@ -68,10 +64,10 @@ const ProfileWrapper = ({
           .data(chromosomes)
           .enter()
           .append("rect")
-          .attr("class", d => "gw-background-box chrom-" + d.id)
-          .attr("x", d => chromMap[d.id].x)
+          .attr("class", (d) => "gw-background-box chrom-" + d.id)
+          .attr("x", (d) => chromMap[d.id].x)
           .attr("y", 0)
-          .attr("width", d => chromMap[d.id].width)
+          .attr("width", (d) => chromMap[d.id].width)
           .attr("height", heatmapConfig.profile.height)
           .attr(
             "fill",
@@ -87,8 +83,8 @@ const ProfileWrapper = ({
           .append("line")
           .attr("x1", 0)
           .attr("x2", heatmapConfig.width - heatmapConfig.profile.axisWidth)
-          .attr("y1", d => genomeYScale(d))
-          .attr("y2", d => genomeYScale(d));
+          .attr("y1", (d) => genomeYScale(d))
+          .attr("y2", (d) => genomeYScale(d));
       }
       ref.current = node;
     }, []);
@@ -104,7 +100,7 @@ const ProfileWrapper = ({
         query={BINS_QUERY}
         variables={{
           analysis: analysis,
-          id: cellId
+          id: cellId,
         }}
       >
         {({ loading, error, data }) => {
@@ -158,12 +154,14 @@ const ProfileWrapper = ({
         <canvas
           id="profileCanvas"
           style={{
-            marginLeft: heatmapConfig.profile.axisWidth
+            marginLeft: heatmapConfig.profile.axisWidth,
           }}
           width={heatmapConfig.width}
           height={heatmapConfig.profile.height}
         >
-          <ProfileWithData resetLoadingCircle={value => setIsLoading(value)} />
+          <ProfileWithData
+            resetLoadingCircle={(value) => setIsLoading(value)}
+          />
         </canvas>
         {cellId && isLoading && (
           <CircularProgress
@@ -171,7 +169,7 @@ const ProfileWrapper = ({
             style={{
               position: "relative",
               marginLeft: heatmapConfig.width * 0.45,
-              marginTop: heatmapConfig.profile.height * 0.45
+              marginTop: heatmapConfig.profile.height * 0.45,
             }}
           />
         )}

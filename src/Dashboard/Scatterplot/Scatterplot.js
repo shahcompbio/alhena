@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import * as d3 from "d3";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -23,21 +23,21 @@ const margin = {
   top: 37,
   bottom: 90,
   right: 10,
-  histogram: 20
+  histogram: 20,
 };
 const scatterplotDim = {
   x1: margin.left,
   y1: margin.top + histogramMaxHeight,
   x2: scatterplotDimension - margin.right,
-  y2: scatterplotDimension - margin.bottom
+  y2: scatterplotDimension - margin.bottom,
 };
 const selfType = "SCATTERPLOT";
-const styles = theme => ({
+const styles = (theme) => ({
   legend: {
     marginTop: 40,
     marginRight: 30,
-    marginLeft: 15
-  }
+    marginLeft: 15,
+  },
 });
 
 const SCATTERPLOT_QUERY = gql`
@@ -88,8 +88,8 @@ const Scatterplot = ({ analysis, classes }) => {
       selectedCells,
       scatterplotAxis,
       axisChange,
-      subsetSelection
-    }
+      subsetSelection,
+    },
   ] = useStatisticsState();
 
   const xAxis = scatterplotAxis.x.type;
@@ -109,7 +109,7 @@ const Scatterplot = ({ analysis, classes }) => {
         quality,
         selectedCells: selection,
         xAxis,
-        yAxis
+        yAxis,
       }}
     >
       {({ loading, error, data }) => {
@@ -152,7 +152,7 @@ const Scatterplot = ({ analysis, classes }) => {
 const Plot = ({ data, stats, histogram, selectionAllowed }) => {
   const [
     { scatterplotAxis, selectedCells, axisChange, subsetSelection },
-    dispatch
+    dispatch,
   ] = useStatisticsState();
   const [context, saveContext] = useState();
   var polyList = [];
@@ -273,8 +273,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     .attr("id", "scatterTip");
 
   function useHookWithRefCallback() {
-    const ref = useRef(null);
-    const setRef = useCallback(node => {
+    const setRef = useCallback((node) => {
       if (node) {
         const scatter = d3.select("#scatterplot");
         const canvas = scatter
@@ -354,10 +353,6 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     return c;
   }
 
-  function setMousePosition(e, boundingRect) {
-    mousePos.x = e.clientX - boundingRect.left;
-    mousePos.y = e.clientY - boundingRect.top;
-  }
   function setD3MousePosition(event, boundingRect) {
     mousePos.x = event.pageX - boundingRect.left;
     mousePos.y = event.pageY - boundingRect.top;
@@ -393,8 +388,8 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     var docCanvas = document.getElementById("scatterCanvas");
     docCanvas.style.pointerEvents = "all";
   };
-  const appendEventListenersToCanvas = context => {
-    var docCanvas = document.getElementById("scatterCanvas");
+  const appendEventListenersToCanvas = (context) => {
+    // var docCanvas = document.getElementById("scatterCanvas");
     const scatterSelection = d3.select("#scatterSelection");
 
     d3.select("#scatterCanvas")
@@ -456,13 +451,13 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
               type: "BRUSH",
               value: selectedNodes,
               dispatchedFrom: selfType,
-              subsetSelection: selectedNodes
+              subsetSelection: selectedNodes,
             });
           } else {
             dispatch({
               type: "BRUSH",
               value: selectedNodes,
-              dispatchedFrom: selfType
+              dispatchedFrom: selfType,
             });
           }
         }
@@ -522,7 +517,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     context.lineWidth = 1;
     context.strokeStyle = "black";
 
-    data.map(point => {
+    data.forEach((point) => {
       context.beginPath();
       context.arc(x(point.x), y(point.y), radius, 0, Math.PI * 2, true);
       if (!highlightedCells) {
@@ -540,7 +535,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     });
   };
 
-  const createHighlightedObjectFromArray = highlightedCells =>
+  const createHighlightedObjectFromArray = (highlightedCells) =>
     highlightedCells.reduce((final, heatmapOrder) => {
       final[heatmapOrder] = true;
       return final;
@@ -572,17 +567,18 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       .domain([0, yBucketCountMax])
       .range([
         scatterplotDim.y2,
-        scatterplotDim.y2 + histogramMaxHeight + barPadding.margin
+        scatterplotDim.y2 + histogramMaxHeight + barPadding.margin,
       ])
       .nice();
     var extraYLength = 0;
-    var extraXLength = 0;
+    var extraXLength = 0; // eslint-disable-line no-unused-vars
 
     //  const extraYLength = data.yBuckets.filter(row => row["key"] >= 0.99).length;
 
     if (axis.y.type === "quality") {
-      const yShift = data.yBuckets.filter(row => row["key"] >= 0.99).length;
-      const has1Quality = data.yBuckets.filter(row => row["key"] === 1).length;
+      const yShift = data.yBuckets.filter((row) => row["key"] >= 0.99).length;
+      const has1Quality = data.yBuckets.filter((row) => row["key"] === 1)
+        .length;
 
       extraYLength = has1Quality
         ? yBarHeight + radius
@@ -591,8 +587,9 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
         : 0;
     }
     if (axis.x.type === "quality") {
-      const xShift = data.xBuckets.filter(row => row["key"] >= 0.99).length;
-      const has1Quality = data.xBuckets.filter(row => row["key"] === 1).length;
+      const xShift = data.xBuckets.filter((row) => row["key"] >= 0.99).length;
+      const has1Quality = data.xBuckets.filter((row) => row["key"] === 1)
+        .length;
 
       extraXLength = has1Quality
         ? xBarWidth + radius
@@ -604,7 +601,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
     const xBucketZero = xBucketHeightScale(0);
     const yBucketZero = yBucketWidthScale(0);
 
-    data.yBuckets.forEach(bucket => {
+    data.yBuckets.forEach((bucket) => {
       const width = yBucketWidthScale(bucket.count);
       context.beginPath();
       context.fillStyle = "#e8ecf1";
@@ -649,7 +646,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
       style={{
         width: scatterplotDimension,
         height: scatterplotDimension,
-        position: "relative"
+        position: "relative",
       }}
       ref={ref}
     >
@@ -659,7 +656,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
           width: scatterplotDimension,
           height: scatterplotDimension,
           position: "absolute",
-          pointerEvents: "all"
+          pointerEvents: "all",
         }}
       >
         <canvas id="scatterCanvas" />
@@ -669,7 +666,7 @@ const Plot = ({ data, stats, histogram, selectionAllowed }) => {
         style={{
           width: scatterplotDimension,
           height: scatterplotDimension,
-          position: "unset"
+          position: "unset",
         }}
       />
     </div>

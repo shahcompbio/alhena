@@ -5,24 +5,20 @@ import { Dialog, Grid } from "@material-ui/core";
 
 import Button from "@material-ui/core/Button";
 import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
 import FilledInput from "@material-ui/core/FilledInput";
 
-import { withStyles, makeStyles } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
+import { withStyles } from "@material-ui/core/styles";
 
-import { useAppState } from "../util/app-state";
-import { useQuery } from "@apollo/client";
 import gql from "graphql-tag";
 
 import { useStatisticsState } from "../Dashboard/DashboardState/statsState";
 
-const styles = theme => ({
+const styles = (theme) => ({
   dialogContent: {
     width: "85%",
     height: 70,
     textAlign: "center",
-    paddingTop: "10px !important"
+    paddingTop: "10px !important",
   },
   dialogGrid: { width: "80%" },
   shareButton: {
@@ -30,18 +26,18 @@ const styles = theme => ({
     right: 100,
     position: "absolute",
     backgroundColor: "#e5f3f3",
-    color: "#2b5d65"
+    color: "#2b5d65",
   },
   closeButton: {
     marginTop: 7,
     right: 20,
     position: "absolute",
     color: "#350800",
-    backgroundColor: "#efcfc5"
+    backgroundColor: "#efcfc5",
   },
   urlInput: {
-    paddingTop: 20
-  }
+    paddingTop: 20,
+  },
 });
 
 const SET_CACHE_SETTING = gql`
@@ -56,9 +52,9 @@ const SharePopup = ({
   openSharePopup,
   client,
   classes,
-  analysis
+  analysis,
 }) => {
-  const [state, dispatch] = useStatisticsState();
+  const [state] = useStatisticsState();
   const [url, setUrl] = useState(
     window.location.origin + "/alhena/dashboards/" + analysis
   );
@@ -66,7 +62,7 @@ const SharePopup = ({
     (async () => {
       if (
         Object.keys(state.axisChange)
-          .map(key => state.axisChange[key])
+          .map((key) => state.axisChange[key])
           .indexOf(true) !== -1
       ) {
         const paramsString = JSON.stringify(state);
@@ -74,8 +70,8 @@ const SharePopup = ({
           query: SET_CACHE_SETTING,
           variables: {
             type: "copyUrl",
-            value: paramsString
-          }
+            value: paramsString,
+          },
         });
         if (response) {
           setUrl(url + "/" + response.data.setCacheCopyUrl.link);

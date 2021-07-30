@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
-import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import RadioButtonCheckedIcon from "@material-ui/icons/RadioButtonChecked";
 import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
-import Drawer from "@material-ui/core/Drawer";
 import Tooltip from "@material-ui/core/Tooltip";
 
 const drawerWidth = 90;
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: "100px",
     marginTop: "40vh",
@@ -15,41 +13,41 @@ const useStyles = makeStyles(theme => ({
     position: "fixed",
     right: 0,
     float: "right",
-    margin: theme.spacing(5)
+    margin: theme.spacing(5),
   },
   activeWhite: {
     cursor: "pointer",
-    color: "white !important"
+    color: "white !important",
   },
   activeBlack: {
-    color: "#1b1919a3 !important"
+    color: "#1b1919a3 !important",
   },
   activeBold: {
     cursor: "pointer",
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
   disabled: {
     color: "#1b1919a3",
-    pointer: "none !important"
+    pointer: "none !important",
   },
   drawerClose: {
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
+      duration: theme.transitions.duration.leavingScreen,
     }),
     overflowX: "hidden",
     width: 0,
     borderLeft: 0,
-    background: "none"
+    background: "none",
   },
   drawerOpen: {
     width: drawerWidth,
     transition: theme.transitions.create("width", {
       easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen
+      duration: theme.transitions.duration.enteringScreen,
     }),
     borderLeft: 0,
-    background: "none"
+    background: "none",
   },
   drawerContent: {
     zIndex: -10,
@@ -59,25 +57,25 @@ const useStyles = makeStyles(theme => ({
     position: "absolute",
     right: 0,
     float: "right",
-    marginLeft: theme.spacing(2)
+    marginLeft: theme.spacing(2),
   },
   drawerLabelTwoLines: {
     cursor: "pointer",
-    marginBottom: theme.spacing(20)
+    marginBottom: theme.spacing(20),
   },
   drawerLabelOneLine: {
     cursor: "pointer",
-    marginBottom: theme.spacing(20)
+    marginBottom: theme.spacing(20),
   },
   line: {
-    minHeight: 80
+    minHeight: 80,
   },
   button: {
-    marginBottom: theme.spacing(20)
+    marginBottom: theme.spacing(20),
   },
   vertical: {
-    right: 0
-  }
+    right: 0,
+  },
 }));
 
 function getSteps() {
@@ -88,6 +86,7 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
   const classes = useStyles();
   const steps = getSteps();
   const [detailsDrawer, setDetailsDrawer] = useState(
+    // eslint-disable-line no-unused-vars
     activeStep === 1 ? true : false
   );
   const [stepperColour, setStepperColour] = useState(classes.activeWhite);
@@ -98,7 +97,7 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
       : setStepperColour(classes.activeWhite);
   }, [activeStep]);
 
-  const handleStep = step => {
+  const handleStep = (step) => {
     if (activeStep === 1) {
       setDetailsDrawer(true);
     }
@@ -151,7 +150,7 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
                 marginTop: -75,
                 marginLeft: 5,
                 color: "white",
-                fontWeight: "bold"
+                fontWeight: "bold",
               }}
             >
               ﹀
@@ -159,7 +158,7 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
           ) : (
             <div
               style={{
-                marginTop: -75
+                marginTop: -75,
               }}
             />
           )}

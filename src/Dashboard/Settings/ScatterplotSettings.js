@@ -17,16 +17,16 @@ const ScatterplotSettings = ({
   analysis,
   classes,
   setAxisOption,
-  isDisabled
+  isDisabled,
 }) => {
-  const [{ quality, scatterplotAxis }, dispatch] = useStatisticsState();
+  const [{ quality, scatterplotAxis }] = useStatisticsState();
   const [xAxisLabel, setXAxisLabel] = useState(scatterplotAxis.x.type);
   const [yAxisLabel, setYAxisLabel] = useState(scatterplotAxis.y.type);
   const { loading, data } = useQuery(SCATTERPLOT_OPTIONS, {
     variables: {
       analysis: analysis,
-      quality: quality
-    }
+      quality: quality,
+    },
   });
   useEffect(() => {
     if (scatterplotAxis) {
@@ -42,11 +42,11 @@ const ScatterplotSettings = ({
   if (!loading && data) {
     const axisOptions = data.scatterplotAxisOptions;
 
-    const handleAxisChange = name => event => {
+    const handleAxisChange = (name) => (event) => {
       var axisObjext = scatterplotAxis;
       axisObjext[name] = {
         type: event.target.value,
-        label: event.target.selectedOptions[0].label
+        label: event.target.selectedOptions[0].label,
       };
       if (name === "x") {
         setXAxisLabel(event.target.value);

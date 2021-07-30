@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useDashboardState } from "../../Search/ProjectView/ProjectState/dashboardState";
 
-import gql from "graphql-tag";
-import { useQuery } from "react-apollo-hooks";
 import _ from "lodash";
 
 import {
@@ -11,32 +8,16 @@ import {
   FormControlLabel,
   Grid,
   Input,
-  InputLabel,
   ListItemText,
   MenuItem,
   Select,
   Slider,
   Switch,
-  Typography
+  Typography,
 } from "@material-ui/core";
 
 import { useStatisticsState } from "../DashboardState/statsState";
 import { heatmapConfig } from "../Heatmap/config";
-const orderFromParamsQuary = gql`
-  query heatmapOrderFromParameter(
-    $analysis: String!
-    $quality: String!
-    $params: [InputParams]
-  ) {
-    heatmapOrderFromParameter(
-      analysis: $analysis
-      quality: $quality
-      params: $params
-    ) {
-      order
-    }
-  }
-`;
 
 const DataFilters = ({
   classes,
@@ -46,11 +27,10 @@ const DataFilters = ({
   experimentalConditions,
   numericalDataFilters,
   isDisabled,
-  key
+  key,
 }) => {
   const [
     { quality, isContaminated, axisChange, expCondition },
-    dispatch
   ] = useStatisticsState();
   const [qualityMenuValue, setQualityMenuValue] = useState(quality);
   const [contaminatedMenuValue, setContaminatedMenuValue] = useState(
@@ -59,7 +39,7 @@ const DataFilters = ({
 
   const [experimentalMenuValue, setExperimentalMenuValue] = useState([]);
 
-  const [paramObj, setParamObj] = useState({});
+  const [paramObj, setParamObj] = useState({}); // eslint-disable-line no-unused-vars
   useEffect(() => {
     if (axisChange["datafilter"] === false && experimentalMenuValue !== null) {
       setExperimentalMenuValue(null);
@@ -113,12 +93,12 @@ const DataFilters = ({
           onChangeCommitted={() =>
             update(
               {
-                quality: qualityMenuValue.toString()
+                quality: qualityMenuValue.toString(),
               },
               "QUALITY_UPDATE"
             )
           }
-          getAriaValueText={value => value}
+          getAriaValueText={(value) => value}
           aria-labelledby="discrete-slider"
           step={0.05}
           marks={heatmapConfig.qualitySliderMarks}
@@ -140,7 +120,6 @@ const DataFilters = ({
         <FormControl
           disabled={isDisabled}
           variant="outlined"
-          key="contaminatedFormControll"
           className={classes.formControl}
           key={key + "filterFormControl"}
         >
@@ -156,7 +135,7 @@ const DataFilters = ({
                   };*/
                   update(
                     {
-                      isContaminated: contaminatedMenuValue
+                      isContaminated: contaminatedMenuValue,
                     },
                     "CONTIMATED_UPDATE"
                   );
@@ -192,17 +171,17 @@ const DataFilters = ({
             displayEmpty
             input={<Input />}
             multiple
-            renderValue={selected =>
+            renderValue={(selected) =>
               selected.length > 1 ? selected.join(",") : selected
             }
-            onChange={event => {
+            onChange={(event) => {
               const value = event.target.value;
               if (value.indexOf("") !== -1) {
                 setExperimentalMenuValue([]);
                 setParamObj["experimental_condition"] = [];
                 update(
                   {
-                    expCondition: null
+                    expCondition: null,
                   },
                   "EXP_CONDITION_UPDATE"
                 );
@@ -214,7 +193,7 @@ const DataFilters = ({
 
                 setParamObj["experimental_condition"] = {
                   param: "experimental_condition",
-                  value: [...expValue]
+                  value: [...expValue],
                 };
 
                 update(
@@ -222,7 +201,7 @@ const DataFilters = ({
                     expCondition:
                       expValue.length > 1
                         ? expValue.join(",")
-                        : value.toString()
+                        : value.toString(),
                   },
                   "EXP_CONDITION_UPDATE"
                 );
@@ -262,13 +241,13 @@ const DataFilters = ({
           isDisabled={isDisabled}
         />
       )}
-    </Grid>
+    </Grid>,
   ];
 };
 const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
   const [
-    { axisChange, absoluteMinMaxDataFilters, selectedCells },
-    dispatch
+    { axisChange, absoluteMinMaxDataFilters },
+    dispatch,
   ] = useStatisticsState();
 
   const [defaultValues, setDefualtValues] = useState({});
@@ -319,11 +298,11 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
     }
   }, [axisChange]);
 
-  const checkValidCommit = name =>
+  const checkValidCommit = (name) =>
     prevDefaultValues[name][0] !== defaultValues[name][0] ||
     prevDefaultValues[name][1] !== defaultValues[name][1];
 
-  const numFormatter = num => {
+  const numFormatter = (num) => {
     const absNum = Math.abs(num);
     if (absNum > 999 && absNum < 1000000) {
       return (num / 1000).toFixed(0) + "K";
@@ -341,7 +320,7 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
   };
 
   return filters.length > 0 && Object.keys(defaultValues).length > 0
-    ? filters.map(filter => {
+    ? filters.map((filter) => {
         const formattedMin = numFormatter(defaultValues[filter["name"]][0]);
         const formattedMax = numFormatter(defaultValues[filter["name"]][1]);
 
@@ -363,14 +342,14 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
               marks={[
                 {
                   value: defaultValues[filter["name"]][0],
-                  label: formattedMin
+                  label: formattedMin,
                 },
                 {
                   value: defaultValues[filter["name"]][1],
-                  label: formattedMax
-                }
+                  label: formattedMax,
+                },
               ]}
-              onChangeCommitted={event => {
+              onChangeCommitted={(event) => {
                 if (checkValidCommit(filter["name"])) {
                   dispatch({
                     type: "NUMERICAL_DATA_FILTER_UPDATE",
@@ -380,16 +359,16 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
                         {
                           param: filter["name"],
                           value: defaultValues[filter["name"]][1].toString(),
-                          operator: "lte"
+                          operator: "lte",
                         },
                         {
                           param: filter["name"],
                           value: defaultValues[filter["name"]][0].toString(),
-                          operator: "gte"
-                        }
+                          operator: "gte",
+                        },
                       ],
-                      absoluteMinMax: [...prevDefaultValues[filter["name"]]]
-                    }
+                      absoluteMinMax: [...prevDefaultValues[filter["name"]]],
+                    },
                   });
                   setPrevDefaultValues({ ...defaultValues });
                 }
@@ -409,12 +388,10 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
               }
               min={filter["min"]}
               max={filter["max"]}
-              valueLabelDisplay="auto"
               aria-labelledby="range-slider"
-              getAriaValueText={value => value}
               valueLabelDisplay="auto"
               label={filter["name"]}
-              getAriaValueText={value => numFormatter(value)}
+              getAriaValueText={(value) => numFormatter(value)}
             />
           </Grid>
         );

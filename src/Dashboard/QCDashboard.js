@@ -72,51 +72,51 @@ const HEATMAP_ORDER = gql`
     }
   }
 `;
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     flexGrow: 1,
-    height: "100%"
+    height: "100%",
   },
   content: {
     height: "100%",
-    overflowX: "scroll"
+    overflowX: "scroll",
   },
   heatmapContent: {
     padding: 15,
     height: 975,
-    width: 1050
+    width: 1050,
   },
   violinContent: {
     padding: 15,
     height: 375,
-    width: 800
+    width: 800,
   },
   gcBias: {
     width: 850,
-    height: 625
+    height: 625,
   },
   scatterplot: {
     width: 650,
-    height: 525
+    height: 525,
   },
   chip: {
-    width: 900
+    width: 900,
   },
   noCells: {
-    margin: "auto"
+    margin: "auto",
   },
   noCellPaper: {
     textAlign: "center",
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   paperContainer: {
-    margin: 15
+    margin: 15,
   },
   settings: {
-    width: 400
-  }
+    width: 400,
+  },
 });
 const getQueryParams = (isContaminated, expCondition, numericalDataFilters) => {
   var params = isContaminated
@@ -136,14 +136,13 @@ const QCDashboard = ({ analysis, classes, client }) => {
     {
       selectedCells,
       quality,
-      popupFacadeIsOpen,
       isContaminated,
       numericalDataFilters,
       expCondition,
       axisChange,
-      subsetSelection
+      subsetSelection,
     },
-    dispatch
+    dispatch,
   ] = useStatisticsState();
   let history = useHistory();
   const [openExportPopup, setOpenExportPopup] = useState(false);
@@ -161,8 +160,8 @@ const QCDashboard = ({ analysis, classes, client }) => {
     variables: {
       analysis: analysis,
       quality: quality,
-      params: [...params]
-    }
+      params: [...params],
+    },
   });
 
   if (!loading && data) {
@@ -170,21 +169,21 @@ const QCDashboard = ({ analysis, classes, client }) => {
       var heatmapOrder;
       if (axisChange["datafilter"]) {
         const selection = data.numericalDataFilters.heatmapOrderFromDataFilters.map(
-          order => order.order
+          (order) => order.order
         );
         heatmapOrder = subsetSelection.length > 0 ? subsetSelection : selection;
         if (selection.length !== selectedCells.length) {
           dispatch({
             type: "BRUSH",
             value: selection,
-            dispatchedFrom: "dataFilter"
+            dispatchedFrom: "dataFilter",
           });
         }
       } else {
         heatmapOrder =
           selectedCells.length > 0
             ? selectedCells
-            : data.heatmapOrder.map(order => order.order);
+            : data.heatmapOrder.map((order) => order.order);
       }
 
       return (
@@ -240,7 +239,7 @@ const QCDashboard = ({ analysis, classes, client }) => {
                   className={[
                     classes.scatterplot,
                     classes.paperContainer,
-                    classes.noCellPaper
+                    classes.noCellPaper,
                   ].join(" ")}
                 >
                   <Typography variant="h4" className={classes.noCells}>
@@ -254,7 +253,7 @@ const QCDashboard = ({ analysis, classes, client }) => {
                   key={"heatmapPaper"}
                   className={[
                     classes.heatmapContent,
-                    classes.paperContainer
+                    classes.paperContainer,
                   ].join(" ")}
                 >
                   <Heatmap

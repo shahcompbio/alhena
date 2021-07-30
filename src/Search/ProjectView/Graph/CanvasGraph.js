@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  useLayoutEffect
-} from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import * as d3 from "d3";
 
 import { createRoot, hierarchyColouring } from "./appendUtils.js";
@@ -12,22 +6,20 @@ import {
   getSelectionPath,
   originalRadiusCanvas,
   setSmallerPanelFont,
-  setLargerPanelFont
+  setLargerPanelFont,
 } from "./utils";
 import { config } from "../config.js";
 
 import { useDashboardState } from "../ProjectState/dashboardState";
 
-import { useAppState } from "../../../util/app-state";
-
 import { initContext } from "../../../Dashboard/utils.js";
 
 const spacingOffset = 200;
-const getScreenType = width => ({
+const getScreenType = (width) => ({
   isBigScreen: width > 1700,
   isMedScreen: width >= 1330 && width <= 1700,
   isSmallScreen: width < 1330,
-  is1DPR: window.devicePixelRatio === 1
+  is1DPR: window.devicePixelRatio === 1,
 });
 
 const CanvasGraph = ({
@@ -35,16 +27,13 @@ const CanvasGraph = ({
   data,
   filters,
   handleFilterChange,
-  handleForwardStep
+  handleForwardStep,
 }) => {
-  const [
-    { filterMouseover, dimensions, selectedAnalysis },
-    dispatch
-  ] = useDashboardState();
+  const [{ filterMouseover, dimensions }, dispatch] = useDashboardState();
   const [context, saveContext] = useState();
   const [nodes, setNodes] = useState();
   const [links, setLinks] = useState();
-  const [currScale, setCurrScale] = useState(1);
+  const [currScale, setCurrScale] = useState(1); // eslint-disable-line no-unused-vars
 
   const [allCircleCords, setAllCircleCords] = useState([]);
   const screenType = getScreenType(dimensions.width);
@@ -72,19 +61,19 @@ const CanvasGraph = ({
   const voronoid = screenType.is1DPR
     ? d3
         .voronoi()
-        .x(d => d.x)
-        .y(d => d.y)
+        .x((d) => d.x)
+        .y((d) => d.y)
         .extent([
           [-dimensions.width, -dimensions.height],
-          [dimensions.width, dimensions.height]
+          [dimensions.width, dimensions.height],
         ])
     : d3
         .voronoi()
-        .x(d => d.x * 0.5 + dimensions.width / 6)
-        .y(d => d.y * 0.5 + dimensions.height / 4)
+        .x((d) => d.x * 0.5 + dimensions.width / 6)
+        .y((d) => d.y * 0.5 + dimensions.height / 4)
         .extent([
           [-dimensions.width, -dimensions.height],
-          [dimensions.width, dimensions.height]
+          [dimensions.width, dimensions.height],
         ]);
   useEffect(() => {
     if (dimensions.width !== 0 && dimensions.height !== 0 && !context) {
@@ -185,7 +174,7 @@ const CanvasGraph = ({
     context.strokeStyle = "white";
     context.lineWidth = 10;
     context.rotate(1.5708);
-    links.forEach(link => {
+    links.forEach((link) => {
       context.beginPath();
       if (selectionText.length === 0) {
         context.strokeStyle = "white";
@@ -198,8 +187,8 @@ const CanvasGraph = ({
 
       d3
         .linkRadial()
-        .angle(d => d.x)
-        .radius(d => {
+        .angle((d) => d.x)
+        .radius((d) => {
           const compactVersion = d.height === 0 ? 250 : 0;
           if (selectionText.indexOf(d.data.target) !== -1) {
             return d.y + 200 - filterOffset - compactVersion;
@@ -221,7 +210,7 @@ const CanvasGraph = ({
     currNode
   ) => {
     var allCords = [];
-    allNodes.forEach(node => {
+    allNodes.forEach((node) => {
       context.rotate(node.x);
       var radius = originalRadiusCanvas(node);
       context.beginPath();
@@ -281,7 +270,7 @@ const CanvasGraph = ({
         d3.select("#canvasGraphSelection g").remove();
       }
       const rootNode = allCircleCords.filter(
-        node => node.element.depth === 0
+        (node) => node.element.depth === 0
       )[0];
 
       d3.select("#canvasGraphSelection")
@@ -315,7 +304,7 @@ const CanvasGraph = ({
 
       voronoi
         .selectAll("path")
-        .data(voronoid(allCircleCords).polygons(), d => {
+        .data(voronoid(allCircleCords).polygons(), (d) => {
           if (!d) {
             console.log(d);
           }
@@ -327,8 +316,8 @@ const CanvasGraph = ({
         //.style("stroke-width", 3)
         .style("fill", "none")
         .style("pointer-events", "all")
-        .attr("d", d => (d ? "M" + d.join("L") + "Z" : null))
-        .attr("class", d => {
+        .attr("d", (d) => (d ? "M" + d.join("L") + "Z" : null))
+        .attr("class", (d) => {
           return d ? "voronoi-" + d.data.element.data.target : "";
         })
         .on("mouseover", (data, index, element) => {
@@ -346,7 +335,7 @@ const CanvasGraph = ({
                 ? []
                 : previousSelectionClasses
                     .split(",")
-                    .filter(nodeName => nodeName !== "");
+                    .filter((nodeName) => nodeName !== "");
 
             if (nodeSelectionText !== prevSelectedList) {
               selectionLayer.classed(previousSelectionClasses, true);
@@ -382,7 +371,7 @@ const CanvasGraph = ({
           if (data.data.element.height === 0) {
             dispatch({
               type: "ANALYSIS_SELECT",
-              value: { selectedAnalysis: data.data.element.data.target }
+              value: { selectedAnalysis: data.data.element.data.target },
             });
             handleForwardStep();
           } else {
@@ -391,7 +380,7 @@ const CanvasGraph = ({
               handleFilterChange(
                 {
                   value: currNode.data.target,
-                  label: config.depthTohierarchy[currNode.depth]
+                  label: config.depthTohierarchy[currNode.depth],
                 },
                 "update"
               );
@@ -407,7 +396,7 @@ const CanvasGraph = ({
     }
   }, [allCircleCords]);
 
-  const clearAll = context => {
+  const clearAll = (context) => {
     context.save();
     context.setTransform(1, 0, 0, 1, 0, 0);
     context.clearRect(0, 0, dimensions.width * 2, dimensions.height * 2);
@@ -453,10 +442,9 @@ const CanvasGraph = ({
       context.lineWidth = 5;
 
       const yIncrementVar = 40;
-      const xIncrementVar = 130;
 
       const rootNode = allCircleCords.filter(
-        node => node.element.depth === 0
+        (node) => node.element.depth === 0
       )[0];
 
       const rootRadius = originalRadiusCanvas(rootNode["element"]);
@@ -511,15 +499,14 @@ const CanvasGraph = ({
       y: Math.round(
         element.x * transform.b + element.y * transform.d + transform.f / 2
       ),
-      element: element
+      element: element,
     };
   }
 
   const [ref] = useHookWithRefCallback();
 
   function useHookWithRefCallback() {
-    const ref = useRef(null);
-    const setRef = useCallback(node => {
+    const setRef = useCallback((node) => {
       if (node && context === undefined) {
         /*  const graph = d3.select("#canvasGraph");
         const canvas = graph
@@ -549,7 +536,7 @@ const CanvasGraph = ({
       style={{
         width: dimensions.width + "px",
         height: dimensions.height + "px",
-        position: "relative"
+        position: "relative",
       }}
       ref={ref}
     >
@@ -559,7 +546,7 @@ const CanvasGraph = ({
           width: dimensions.width + "px",
           height: dimensions.height + "px",
           position: "absolute",
-          pointerEvents: "all"
+          pointerEvents: "all",
         }}
       >
         <canvas />
@@ -575,7 +562,7 @@ const CanvasGraph = ({
         style={{
           width: dimensions.width + "px",
           height: dimensions.height + "px",
-          position: "relative"
+          position: "relative",
         }}
       />
     </div>

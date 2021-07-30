@@ -7,9 +7,9 @@ const ViolinSettings = ({
   classes,
   axisOptions,
   setAxisOption,
-  isDisabled
+  isDisabled,
 }) => {
-  const [{ quality, violinAxis }, dispatch] = useStatisticsState();
+  const [{ violinAxis }] = useStatisticsState();
   const [xAxisLabel, setXAxisLabel] = useState(violinAxis.x.type);
   const [yAxisLabel, setYAxisLabel] = useState(violinAxis.y.type);
 
@@ -24,11 +24,11 @@ const ViolinSettings = ({
     }
   }, [violinAxis]);
 
-  const handleAxisChange = name => event => {
+  const handleAxisChange = (name) => (event) => {
     var axisObjext = violinAxis;
     axisObjext[name] = {
       type: event.target.value,
-      label: event.target.selectedOptions[0].label
+      label: event.target.selectedOptions[0].label,
     };
 
     if (name === "x") {

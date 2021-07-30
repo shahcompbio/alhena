@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useWindowSize,
-  useLayoutEffect
-} from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import Menu from "../Misc/Menu.js";
 import ProjectViewContent from "./ProjectView/ProjectViewContent.js";
 import Stepper from "./Stepper.js";
@@ -22,14 +17,14 @@ import { withStyles } from "@material-ui/styles";
 const styles = ({ theme }) => ({
   root: { flexGrow: 1, height: "100vh" },
   hide: {
-    display: "none"
+    display: "none",
   },
-  sliderContent: { position: "absolute", width: "95%", height: "100%" }
+  sliderContent: { position: "absolute", width: "95%", height: "100%" },
 });
 const defaultStepperText = [
   "Dashboard Selection",
   "Analysis Selection",
-  "View Dashbaord"
+  "View Dashbaord",
 ];
 const dashboardPathname = "/dashboards";
 const slideTimeOut = 1500;
@@ -37,7 +32,7 @@ const Content = ({ classes, client }) => {
   let history = useHistory();
   const [
     { selectedDashboard, selectedAnalysis },
-    dispatch
+    dispatch,
   ] = useDashboardState();
   const [width, height] = useWindowSize();
 
@@ -46,7 +41,7 @@ const Content = ({ classes, client }) => {
       dispatch({
         type: "SIZE_CHANGE",
         width: width,
-        height: height
+        height: height,
       });
     }
   }, [height, width]);
@@ -82,19 +77,19 @@ const Content = ({ classes, client }) => {
   const [stepTextValues, setStepTextValues] = useState(defaultStepperText);
   const [isBackwards, setIsBackwards] = useState(false);
 
-  const handleBackStep = index => {
+  const handleBackStep = (index) => {
     setIsBackwards(true);
     setActiveStep(index);
     if (index === 0) {
       dispatch({
         type: "DASHBOARD_SELECT",
-        value: { selectedDashboard: null }
+        value: { selectedDashboard: null },
       });
     }
     if (index === 1) {
       dispatch({
         type: "ANALYSIS_SELECT",
-        value: { selectedAnalysis: null }
+        value: { selectedAnalysis: null },
       });
     }
 
@@ -117,12 +112,12 @@ const Content = ({ classes, client }) => {
     setStepTextValues([...newStepperTextValues]);
   }, [selectedDashboard, selectedAnalysis]);
 
-  const handleForwardStep = index => {
+  const handleForwardStep = (index) => {
     setIsBackwards(false);
     setActiveStep(index);
   };
 
-  const getDirection = index =>
+  const getDirection = (index) =>
     activeStep === index
       ? isBackwards
         ? "down"

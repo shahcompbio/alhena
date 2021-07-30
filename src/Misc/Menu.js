@@ -5,7 +5,6 @@ import { withRouter } from "react-router-dom";
 
 import { useAppState } from "../util/app-state";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
-import Fab from "@material-ui/core/Fab";
 import HelpIcon from "@material-ui/icons/Help";
 import SearchIcon from "@material-ui/icons/Search";
 import ExitToApp from "@material-ui/icons/ExitToApp";
@@ -15,16 +14,16 @@ import InfoIcon from "@material-ui/icons/Info";
 import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
 
-const styles = theme => ({
+const styles = (theme) => ({
   fab: {
     backgroundColor: "#c7e4e8",
     //backgroundColor: theme.palette.primary.main,
     boxShadow: "none !important",
     borderRadius: "10%",
     "&:hover": {
-      backgroundColor: "#c7e4e8"
+      backgroundColor: "#c7e4e8",
       //  backgroundColor: theme.palette.primary.main
-    }
+    },
   },
   menu: {
     color: "black",
@@ -38,12 +37,12 @@ const styles = theme => ({
         "0px 0px 0px 0px rgba(0,0,0,0), 0px 0px 0px 0px rgba(0,0,0,0), 0px 0px 0px 0px rgba(0,0,0,0) !important",
 
       color: theme.palette.background.default,
-      backgroundColor: "#c7e4e8"
+      backgroundColor: "#c7e4e8",
       //backgroundColor: theme.palette.primary.main
-    }
+    },
   },
   root: {
-    flexGrow: 1
+    flexGrow: 1,
   },
   wrapper: {
     zIndex: 100,
@@ -51,7 +50,7 @@ const styles = theme => ({
     position: "fixed",
     bottom: 15,
     left: 15,
-    width: 380
+    width: 380,
   },
   speedDial: {
     color: theme.palette.primary.dark,
@@ -60,34 +59,34 @@ const styles = theme => ({
     float: "left",
     "&.MuiSpeedDial-directionUp, &.MuiSpeedDial-directionLeft": {
       bottom: theme.spacing(2),
-      right: theme.spacing(2)
+      right: theme.spacing(2),
     },
     "&.MuiSpeedDial-directionDown, &.MuiSpeedDial-directionRight": {
       top: theme.spacing(2),
-      left: theme.spacing(2)
-    }
-  }
+      left: theme.spacing(2),
+    },
+  },
 });
 const unauthenticatedActions = [
   {
     icon: <AccountCircleIcon />,
-    name: "Login"
+    name: "Login",
   },
   {
     icon: <InfoIcon />,
-    name: "About"
-  }
+    name: "About",
+  },
 ];
 const defaultActions = [
   {
     icon: <SearchIcon />,
-    name: "Search"
+    name: "Search",
   },
   {
     icon: <HelpIcon />,
-    name: "Help"
+    name: "Help",
   },
-  { icon: <ExitToApp />, name: "Logout" }
+  { icon: <ExitToApp />, name: "Logout" },
 ];
 const adminActions = [{ icon: <SupervisorAccountIcon />, name: "Admin" }];
 
@@ -120,7 +119,7 @@ const Menu = ({ history, classes }) => {
         return history.goBack();
       case "Logout": {
         dispatch({
-          type: "LOGOUT"
+          type: "LOGOUT",
         });
         return;
       }
@@ -149,7 +148,7 @@ const Menu = ({ history, classes }) => {
           open={open}
           direction={direction}
         >
-          {actions.map(action => (
+          {actions.map((action) => (
             <SpeedDialAction
               key={action.name}
               icon={action.icon}

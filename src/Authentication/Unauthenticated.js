@@ -1,6 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import * as d3 from "d3";
-import logo from "../config/LoginTitle.png";
+import React, { useState, useRef, useCallback } from "react";
 import { useAppState } from "../util/app-state";
 import { useHistory } from "react-router-dom";
 import gql from "graphql-tag";
@@ -12,7 +10,7 @@ import {
   Grid,
   InputAdornment,
   IconButton,
-  TextField
+  TextField,
 } from "@material-ui/core";
 import { Visibility, VisibilityOff } from "@material-ui/icons";
 
@@ -22,33 +20,33 @@ import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
 
 import { withStyles } from "@material-ui/styles";
 import styled from "styled-components";
-const styles = theme => ({
+const styles = (theme) => ({
   circleImg: {
     height: 500,
     width: 500,
     top: "20%",
     margin: 10,
-    position: "absolute"
+    position: "absolute",
   },
 
   floatingLabelFocusStyle: {
     color: "black",
-    fontWeight: "500"
+    fontWeight: "500",
   },
   input: {
     color: "black",
-    borderBottom: "1px solid #769bb5"
+    borderBottom: "1px solid #769bb5",
   },
   inputWrapper: {
     position: "absolute",
     top: "50vh",
-    marginLeft: 10
+    marginLeft: 10,
   },
   logo: {
     position: "absolute",
     top: "20vh",
     margin: 10,
-    marginLeft: 30
+    marginLeft: 30,
   },
   forgotPasswordButton: { marginLeft: 20, marginTop: 40 },
   submitButton: {
@@ -57,14 +55,14 @@ const styles = theme => ({
     backgroundColor: theme.palette.primary.dark,
     color: theme.palette.background.default,
     "&:hover": {
-      backgroundColor: theme.palette.primary.main
-    }
+      backgroundColor: theme.palette.primary.main,
+    },
   },
   textField: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
-    width: 300
-  }
+    width: 300,
+  },
 });
 export const LOGIN = gql`
   query Login($user: User!) {
@@ -80,8 +78,8 @@ const login = async (uid, password, client, dispatch) => {
   const { data, loading } = await client.query({
     query: LOGIN,
     variables: {
-      user: { uid: uid, password: password }
-    }
+      user: { uid: uid, password: password },
+    },
   });
 
   if (loading) {
@@ -89,7 +87,7 @@ const login = async (uid, password, client, dispatch) => {
       type: "LOADING",
       response: data.login.response,
       authKeyID: data.login.authKeyID,
-      uid: uid
+      uid: uid,
     });
   }
   if (data) {
@@ -98,13 +96,13 @@ const login = async (uid, password, client, dispatch) => {
       response: data.login.response,
       authKeyID: data.login.authKeyID,
       uid: uid,
-      isSuperUser: data.login.isAdmin
+      isSuperUser: data.login.isAdmin,
     });
   }
 };
 const UnauthenticatedApp = ({ client, classes }) => {
   let history = useHistory();
-  const [_, dispatch] = useAppState();
+  const [_, dispatch] = useAppState(); // eslint-disable-line no-unused-vars
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const usernameRef = useRef();
@@ -123,7 +121,7 @@ const UnauthenticatedApp = ({ client, classes }) => {
         dispatch
       );
     } catch (error) {
-      error.graphQLErrors.map(message => {
+      error.graphQLErrors.forEach((message) => {
         if (message.extensions.exception.meta.body.status) {
           setError(message.extensions.exception.meta.body.status);
         }
@@ -133,8 +131,7 @@ const UnauthenticatedApp = ({ client, classes }) => {
   };
   const [ref] = useHookWithRefCallback();
   function useHookWithRefCallback() {
-    const ref = useRef(null);
-    const setRef = useCallback(node => {
+    const setRef = useCallback((node) => {
       if (node) {
         /*    const title = d3.select("#title");
         title
@@ -168,14 +165,14 @@ const UnauthenticatedApp = ({ client, classes }) => {
         style={{
           //  backgroundImage: `url(${logo})`,
           backgroundPosition: "50% 50%",
-          backgroundPosition: "center",
+          // backgroundPosition: "center",
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
           imageRendering: "-webkit-optimize-contrast",
           height: 425,
           width: 500,
           marginTop: -55,
-          marginLeft: 85
+          marginLeft: 85,
         }}
         className={classes.logo}
         height={"191px"}
@@ -184,9 +181,10 @@ const UnauthenticatedApp = ({ client, classes }) => {
         <img
           id="title"
           src={title}
+          alt={"Alhena logo"}
           style={{
             width: 400,
-            height: 325
+            height: 325,
           }}
         />
       </div>
@@ -196,7 +194,7 @@ const UnauthenticatedApp = ({ client, classes }) => {
           <LoadingCircle />
         ) : (
           <form
-            onSubmit={ev => handleLogin(ev, client, dispatch)}
+            onSubmit={(ev) => handleLogin(ev, client, dispatch)}
             id="loginForm"
           >
             <ComponentWrapper>
@@ -208,7 +206,7 @@ const UnauthenticatedApp = ({ client, classes }) => {
                 required
                 fullWidth
                 InputLabelProps={{
-                  className: classes.floatingLabelFocusStyle
+                  className: classes.floatingLabelFocusStyle,
                 }}
                 InputProps={{ className: classes.input }}
                 value={usernameRef.value}
@@ -226,7 +224,7 @@ const UnauthenticatedApp = ({ client, classes }) => {
                 required
                 fullWidth
                 InputLabelProps={{
-                  className: classes.floatingLabelFocusStyle
+                  className: classes.floatingLabelFocusStyle,
                 }}
                 InputProps={{
                   className: classes.input,
@@ -241,7 +239,7 @@ const UnauthenticatedApp = ({ client, classes }) => {
                         {showPassword ? <Visibility /> : <VisibilityOff />}
                       </IconButton>
                     </InputAdornment>
-                  )
+                  ),
                 }}
                 value={passwordRef.value}
                 label={"Password"}

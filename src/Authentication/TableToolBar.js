@@ -7,35 +7,34 @@ import Typography from "@material-ui/core/Typography";
 import CheckIcon from "@material-ui/icons/Check";
 import ClearIcon from "@material-ui/icons/Clear";
 import EditIcon from "@material-ui/icons/Edit";
-import VpnKeyIcon from "@material-ui/icons/VpnKey";
 
 import clsx from "clsx";
 import { lighten, makeStyles } from "@material-ui/core/styles";
 
-const useToolbarStyles = makeStyles(theme => ({
+const useToolbarStyles = makeStyles((theme) => ({
   root: {
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(1),
-    borderRadius: "10px 10px 0px 0px"
+    borderRadius: "10px 10px 0px 0px",
   },
   highlight: {
-    backgroundColor: "#eac9cc"
+    backgroundColor: "#eac9cc",
   },
   deleteHighlight: {
     color: "black",
     fontWeight: "bold",
-    backgroundColor: "#f1a9a0"
+    backgroundColor: "#f1a9a0",
   },
   editHighlight: {
-    backgroundColor: "#c9e2ea"
+    backgroundColor: "#c9e2ea",
   },
   completeHighlight: {
     color: "#03a678",
-    backgroundColor: lighten("#03a678", 0.7)
+    backgroundColor: lighten("#03a678", 0.7),
   },
   title: {
-    flex: "1 1 100%"
-  }
+    flex: "1 1 100%",
+  },
 }));
 
 const TableToolbar = ({
@@ -45,7 +44,7 @@ const TableToolbar = ({
   actionComplete,
   isLoading,
   edit,
-  setIsEditing
+  setIsEditing,
 }) => {
   const classes = useToolbarStyles();
   const [selectedAction, setSelectedAction] = useState(null);
@@ -56,7 +55,7 @@ const TableToolbar = ({
         [classes.highlight]: selectedAction === null,
         [classes.completeHighlight]: actionComplete,
         [classes.deleteHighlight]: selectedAction === "Delete",
-        [classes.editHighlight]: selectedAction === "Edit"
+        [classes.editHighlight]: selectedAction === "Edit",
       })}
       key={name + "Toolbar"}
     >
@@ -65,7 +64,7 @@ const TableToolbar = ({
           <Tooltip title="Delete" key={name + "ToolbarDelete"}>
             <IconButton
               aria-label="delete"
-              onClick={ev => setSelectedAction("Delete")}
+              onClick={(ev) => setSelectedAction("Delete")}
             >
               <DeleteIcon />
             </IconButton>
@@ -73,7 +72,7 @@ const TableToolbar = ({
           <Tooltip title="Edit" key={name + "ToolbarEdit"}>
             <IconButton
               aria-label="edit"
-              onClick={ev => {
+              onClick={(ev) => {
                 setIsEditing();
                 setSelectedAction("Edit");
               }}
@@ -82,10 +81,10 @@ const TableToolbar = ({
             </IconButton>
           </Tooltip>,
           <Tooltip title="Cancel" style={{ float: "right" }}>
-            <IconButton aria-label="Cancel" onClick={ev => clear(true)}>
+            <IconButton aria-label="Cancel" onClick={(ev) => clear(true)}>
               <ClearIcon />
             </IconButton>
-          </Tooltip>
+          </Tooltip>,
         ]
       ) : isLoading ? (
         <Typography>Loading</Typography>
@@ -94,14 +93,14 @@ const TableToolbar = ({
       ) : (
         [
           <Tooltip title="Clear">
-            <IconButton aria-label="clear" onClick={ev => clear(true)}>
+            <IconButton aria-label="clear" onClick={(ev) => clear(true)}>
               <ClearIcon />
             </IconButton>
           </Tooltip>,
           <Tooltip title="Confirm">
             <IconButton
               aria-label="confirm"
-              onClick={ev =>
+              onClick={(ev) =>
                 selectedAction === "Edit" ? edit(name) : deleteName(name)
               }
             >
@@ -116,7 +115,7 @@ const TableToolbar = ({
             >
               Delete {name}?
             </Typography>
-          )
+          ),
         ]
       )}
     </Toolbar>

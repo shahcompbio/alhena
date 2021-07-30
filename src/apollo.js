@@ -10,22 +10,22 @@ const httpLink = process.env.REACT_APP_BASENAME
 
 const link = createHttpLink({
   uri: httpLink,
-  credentials: "same-origin"
+  credentials: "same-origin",
 });
 
 const retryLink = new RetryLink({
   attempts: (count, operation, error) => {
-    return !!error && operation.operationName != "specialCase";
+    return !!error && operation.operationName !== "specialCase";
   },
   delay: (count, operation, error) => {
     return count * 1000 * Math.random();
-  }
+  },
 });
 
 const client = new ApolloClient({
   link,
   retryLink,
   cache: new InMemoryCache(),
-  shouldBatch: true
+  shouldBatch: true,
 });
 export default client;

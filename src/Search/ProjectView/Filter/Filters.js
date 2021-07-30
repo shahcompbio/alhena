@@ -1,77 +1,77 @@
 import _ from "lodash";
-import React, { useState } from "react";
+import React from "react";
 
 import * as d3 from "d3";
 
 import { withStyles } from "@material-ui/styles";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 
-import { Chip, FormControl, Grid, TextField, Select } from "@material-ui/core";
+import { Chip, FormControl, Grid, TextField } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import { hierarchyColouring } from "../Graph/appendUtils.js";
 import { useDashboardState } from "../ProjectState/dashboardState";
 
 import { config } from "../config.js";
 
-const styles = theme => ({
+const styles = (theme) => ({
   root: {
     flexGrow: 1,
     padding: "45px",
-    paddingRight: "0px"
+    paddingRight: "0px",
   },
   label: {
     color: "white",
     minWidth: 200,
     fontWeight: "normal",
-    paddingBottom: "10px"
+    paddingBottom: "10px",
   },
   item: {
     paddingLeft: "25px !important",
-    width: "100%"
+    width: "100%",
   },
   filterDots: {
-    position: "absolute"
+    position: "absolute",
   },
   input: { background: "white", borderRadius: 5, opacity: "80%" },
   formControl: { minWidth: 300 },
   dropdownStyle: {
     maxHeight: 100,
     overflowY: "scroll",
-    backgroundColor: "lightgrey"
+    backgroundColor: "lightgrey",
   },
   whiteBorder: {
     "& .MuiAutocomplete-popper": {
-      marginTop: -15
+      marginTop: -15,
     },
     "& .MuiInputBase-root": {
-      color: "white"
+      color: "white",
     },
     "& .MuiIconButton-label": {
-      color: "white"
+      color: "white",
     },
     "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-      borderColor: "white"
+      borderColor: "white",
     },
     "&:hover .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": {
-      borderColor: "white"
+      borderColor: "white",
     },
     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-      borderColor: "white"
+      borderColor: "white",
     },
-    color: "white"
+    color: "white",
   },
-  whiteText: { color: "white" }
+  whiteText: { color: "white" },
 });
 var collator = new Intl.Collator(undefined, {
   numeric: true,
-  sensitivity: "base"
+  sensitivity: "base",
 });
 const Filters = ({
   filters,
   handleFilterChange,
   classes,
   selectedOptions,
-  handleForwardStep
+  handleForwardStep,
 }) => {
   const [{ selectedDashboard }, dispatch] = useDashboardState();
 
@@ -85,13 +85,10 @@ const Filters = ({
   const isFilterSmallerThanLargestChoosen = (type, largestFilterIndex) =>
     config.filterHeirarchy.indexOf(type) < largestFilterIndex;
 
-  const getLargestFilterIndex = selectedOptions =>
-    Object.keys(selectedOptions).map(optionName =>
+  const getLargestFilterIndex = (selectedOptions) =>
+    Object.keys(selectedOptions).map((optionName) =>
       config.filterHeirarchy.indexOf(optionName)
     );
-
-  const isUserSelectedOption = (selectedOptions, filterType) =>
-    selectedOptions[filterType];
 
   const isDisabledOption = (selectedOptions, filterType) => {
     var largestFilterIndex = getLargestFilterIndex(selectedOptions);
@@ -99,9 +96,9 @@ const Filters = ({
   };
 
   if (filters) {
-    const filterTypes = filters.map(filter => filter.type);
+    const filterTypes = filters.map((filter) => filter.type);
 
-    var panels = _.times(filterTypes.length, i => {
+    var panels = _.times(filterTypes.length, (i) => {
       return filterTypes[i] !== "project"
         ? {
             key: `panel-${i}`,
@@ -116,7 +113,7 @@ const Filters = ({
                 onMouseLeave={() => {
                   dispatch({
                     type: "FILTER_MOUSEOVER",
-                    value: { value: null, type: null }
+                    value: { value: null, type: null },
                   });
                 }}
                 renderTags={(value, getTagProps) => {
@@ -135,7 +132,7 @@ const Filters = ({
                   if (filterTypes[i] === "jira_id") {
                     dispatch({
                       type: "ANALYSIS_SELECT",
-                      value: { selectedAnalysis: value.value }
+                      value: { selectedAnalysis: value.value },
                     });
 
                     handleForwardStep();
@@ -151,7 +148,7 @@ const Filters = ({
                     }
                     InputLabelProps={{
                       shrink: true,
-                      className: classes.whiteText
+                      className: classes.whiteText,
                     }}
                     className={classes.label}
                     variant="outlined"
@@ -164,25 +161,25 @@ const Filters = ({
                     final = [...final, { label: value, value: value }];
                     return final;
                   }, [])}
-                renderOption={value => (
+                renderOption={(value) => (
                   <span
                     style={{ width: "100%" }}
-                    onMouseOver={event => {
+                    onMouseOver={(event) => {
                       dispatch({
                         type: "FILTER_MOUSEOVER",
                         value: {
                           type: filterTypes[i],
-                          value: event.currentTarget.innerText
-                        }
+                          value: event.currentTarget.innerText,
+                        },
                       });
                     }}
                   >
                     {value["label"]}
                   </span>
                 )}
-                getOptionLabel={value => value["label"]}
+                getOptionLabel={(value) => value["label"]}
               />
-            )
+            ),
           }
         : "";
     });
@@ -217,7 +214,7 @@ const Filters = ({
 
       {panels.length > 0
         ? panels
-            .filter(panel => panel !== "")
+            .filter((panel) => panel !== "")
             .map((panel, index) => (
               <Grid
                 item
@@ -253,13 +250,13 @@ const FilterDots = () => {
     svg
       .append("g")
       .append("circle")
-      .attr("fill", d =>
+      .attr("fill", (d) =>
         index % 2 !== 0 ? hierarchyColouring[3 - (index - 1) / 2] : "none"
       )
-      .attr("r", d => (index % 2 === 0 ? 7 : 5))
+      .attr("r", (d) => (index % 2 === 0 ? 7 : 5))
       .attr("cx", 10)
       .attr("cy", position)
-      .attr("class", d =>
+      .attr("class", (d) =>
         index % 2 === 0 ? "filterDotsOutterCircles" : "filterDotsCircles"
       )
   );

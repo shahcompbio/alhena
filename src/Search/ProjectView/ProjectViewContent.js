@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import Search from "./Filter/Search.js";
 
 import { useAppState } from "../../util/app-state";
@@ -14,30 +14,29 @@ import Grid from "@material-ui/core/Grid";
 
 import { Query } from "react-apollo";
 
-import { useQuery } from "@apollo/client";
 import gql from "graphql-tag";
 import { useDashboardState } from "./ProjectState/dashboardState";
 
 const styles = {
   root: { flexGrow: 1 },
   hide: {
-    display: "none"
+    display: "none",
   },
   title: {
     color: "white",
     filter: "url(#textGlow)",
     paddingTop: 50,
-    paddingLeft: 50
+    paddingLeft: 50,
   },
   activeWhite: {
     cursor: "pointer",
-    color: "white !important"
+    color: "white !important",
   },
   disabled: { cursor: "pointer" },
   stepper: { margin: "auto", position: "absolute", bottom: 50, left: "50vw" },
   tableWrapper: {
-    marginTop: "5vh"
-  }
+    marginTop: "5vh",
+  },
 };
 const getAllAnalyses = gql`
   query Sunburst($filter: [Term]!, $user: ApiUser!, $dashboardName: String!) {
@@ -104,17 +103,16 @@ const SET_CACHE_SETTING = gql`
 `;
 const slideTimeOut = 1500;
 const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
-  const [{ selectedDashboard, copyLink }] = useDashboardState();
+  const [{ selectedDashboard }] = useDashboardState();
 
   const [{ authKeyID, uid }, dispatch] = useAppState();
   const [selectedOptions, setSelectedOptions] = useState({});
   const [activeStep, setActiveStep] = useState(null);
   const [filters, setFilters] = useState([]);
 
-  const [graphDim, setDim] = useState(0);
   const dimRef = useRef(0);
 
-  const getDirection = index => (index === 0 ? "right" : "left");
+  const getDirection = (index) => (index === 0 ? "right" : "left");
 
   const handleFilterChange = (filter, type) => {
     var options = selectedOptions;
@@ -122,7 +120,7 @@ const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
     if (filter && type.localeCompare("clear") !== 0) {
       options[filter.label] = {
         value: filter.label,
-        label: filter.value
+        label: filter.value,
       };
       setSelectedOptions(options);
       setFilters([...filters, filter]);
@@ -141,7 +139,7 @@ const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
       variables={{
         filter: [...filters],
         dashboardName: selectedDashboard,
-        user: { authKeyID: authKeyID, uid: uid }
+        user: { authKeyID: authKeyID, uid: uid },
       }}
     >
       {({ loading, error, data }) => {
@@ -223,7 +221,7 @@ const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
         } else {
           if (data["analyses"] && data["analyses"]["error"]) {
             dispatch({
-              type: "LOGOUT"
+              type: "LOGOUT",
             });
             return null;
           } else {
@@ -291,7 +289,7 @@ const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
                     </Grid>
                     <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
                       <CanvasGraph
-                        graphDim={graphDim}
+                        graphDim={0}
                         isLoading={false}
                         key={"packing-circles"}
                         filters={filters}
@@ -322,8 +320,8 @@ const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
                             variables: {
                               type: "isSpiderSelectionDefault",
                               value: newActiveStep,
-                              auth: { authKeyID: authKeyID, uid: uid }
-                            }
+                              auth: { authKeyID: authKeyID, uid: uid },
+                            },
                           });
                           setActiveStep(newActiveStep);
                         }}

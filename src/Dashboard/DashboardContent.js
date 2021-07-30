@@ -3,7 +3,6 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 
 import QCDashboard from "./QCDashboard.js";
-import LoadingCircle from "./CommonModules/LoadingCircle.js";
 
 import { Grid, Paper } from "@material-ui/core";
 
@@ -12,17 +11,17 @@ import { StatsProvider } from "./DashboardState/statsState";
 
 import { useDashboardState } from "../Search/ProjectView/ProjectState/dashboardState";
 
-const styles = theme => ({
+const styles = (theme) => ({
   heatmapContent: {
     padding: 15,
     height: 1000,
-    width: 1000
+    width: 1000,
   },
   paperContainer: {
-    margin: 15
+    margin: 15,
   },
   plots: {
-    marginLeft: 400
+    marginLeft: 400,
   },
   settings: {
     padding: 10,
@@ -30,8 +29,8 @@ const styles = theme => ({
     background: "none",
     height: "100%",
     position: "fixed",
-    backgroundColor: "#FFFFFF"
-  }
+    backgroundColor: "#FFFFFF",
+  },
 });
 
 const DashboardContent = ({ classes, history, client }) => {
@@ -56,7 +55,7 @@ const DashboardContent = ({ classes, history, client }) => {
             <Paper
               className={[classes.heatmapContent, classes.paperContainer]}
             />
-          </Grid>
+          </Grid>,
         ]
       )}
     </StatsProvider>

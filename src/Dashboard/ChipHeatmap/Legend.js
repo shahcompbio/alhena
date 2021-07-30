@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import * as d3 from "d3";
 const legendHeight = 300;
 const legendWidth = 15;
@@ -50,9 +50,7 @@ const Legend = ({ max, maxColour, legendTitle }) => {
   }, [max]);
 
   function useHookWithRefCallback() {
-    const ref = useRef(null);
-
-    const setRef = useCallback(node => {
+    const setRef = useCallback((node) => {
       if (node) {
         const legendSvg = d3.select("#chipLegendSvg");
 
@@ -111,7 +109,7 @@ const Legend = ({ max, maxColour, legendTitle }) => {
   }
   const appendTitle = (multiLineTitle, legendSvg) => {
     legendSvg.selectAll("text").text("");
-    multiLineTitle.map((text, index) => {
+    multiLineTitle.forEach((text, index) => {
       legendSvg
         .append("text")
         .attr("class", "title")

@@ -1,10 +1,9 @@
-import React from "react";
 import * as d3 from "d3";
 import { heatmapConfig } from "./config.js";
 
 const ChromAxis = ({ chromosomes, chromMap, categoryWidth }) => {
   function handleCanvas(context, chromosomes, chromMap, categoryWidth) {
-    chromosomes.map((chromosome, index) => {
+    chromosomes.forEach((chromosome, index) => {
       const data = chromMap[chromosome.id];
       context.fillStyle = heatmapConfig.chromosome["color"][index % 2];
       context.fillRect(
@@ -51,7 +50,7 @@ const ChromAxis = ({ chromosomes, chromMap, categoryWidth }) => {
   // start observing
   observer.observe(document, {
     childList: true,
-    subtree: true
+    subtree: true,
   });
   return null;
 };

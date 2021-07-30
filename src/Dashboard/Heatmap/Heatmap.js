@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import * as d3 from "d3";
 import { withStyles } from "@material-ui/core/styles";
 
@@ -13,7 +13,7 @@ import {
   getBPRatio,
   getSegWidth,
   getSegX,
-  colorScale
+  colorScale,
 } from "./utils.js";
 
 import CategoriesLegend from "./CategoriesLegend.js";
@@ -37,17 +37,17 @@ const margin = {
   top: 37,
   bottom: 90,
   right: 10,
-  histogram: 20
+  histogram: 20,
 };
-const styles = theme => ({
+const styles = (theme) => ({
   content: {
     flexGrow: 1,
     backgroundColor: "#FFFFFFF",
-    padding: theme.spacing(3)
+    padding: theme.spacing(3),
   },
   container: {
-    minHeight: "100vh"
-  }
+    minHeight: "100vh",
+  },
 });
 const CHROMOSOME_SEGS_QUERY = gql`
   query chromosomes_segs(
@@ -89,7 +89,7 @@ const CHROMOSOME_SEGS_QUERY = gql`
     }
   }
 `;
-const getIndicesFromAllHeatmapOrder = allHeatmapOrder =>
+const getIndicesFromAllHeatmapOrder = (allHeatmapOrder) =>
   allHeatmapOrder.filter(
     (order, index) => index < heatmapConfig.height / heatmapConfig.rowHeight - 2
   );
@@ -99,7 +99,6 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
   const [heatmapOrder, setHeatmapOrder] = useState([]);
 
   const [hoverCell, setHoverCell] = useState({ cell: {} });
-  const [selectedCell, setSelectedCell] = useState({ cell: {} });
 
   const [indices, setIndices] = useState([]);
   useEffect(() => {
@@ -125,7 +124,7 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
         analysis,
         indices,
         quality,
-        heatmapWidth
+        heatmapWidth,
       }}
     >
       {({ loading, error, data }) => {
@@ -195,17 +194,17 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
                     if (cell !== undefined) {
                       setHoverCell({
                         y: yScale(heatmapRow),
-                        cell: segs[heatmapRow]
+                        cell: segs[heatmapRow],
                       });
                     }
                   }}
-                  selectedCell={selectedCell}
+                  selectedCell={{ cell: {} }}
                   setHoverCellCoordinate={(y, heatmapRow) => {
                     const cell = segs[heatmapRow];
                     if (cell !== undefined) {
                       setHoverCell({
                         y: yScale(heatmapRow),
-                        cell: segs[heatmapRow]
+                        cell: segs[heatmapRow],
                       });
                     }
                   }}
@@ -219,11 +218,11 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
               </Grid>
               <Grid item>
                 <Minimap
-                  triggerHeatmapRequery={index => setIndices([...index])}
+                  triggerHeatmapRequery={(index) => setIndices([...index])}
                   heatmapOrder={heatmapOrder}
                   rangeExtent={[
                     heatmapOrderToHeatmapIndex(indices[0]),
-                    heatmapOrderToHeatmapIndex(indices[indices.length - 1])
+                    heatmapOrderToHeatmapIndex(indices[indices.length - 1]),
                   ]}
                   analysis={analysis}
                   chromosomes={chromosomes}
@@ -276,7 +275,7 @@ const Plot = ({
   setSelectedCell,
   segs,
   categoryWidth,
-  indicator
+  indicator,
 }) => {
   const [context, saveContext] = useState();
 
@@ -305,7 +304,7 @@ const Plot = ({
     }
     if (rowHoverCordinates !== null) {
       const roundY = Math.max(rowHoverCordinates[1], 0);
-      var heatmapRow = yScale.domain()[d3.bisect(invertYScale, roundY) - 1];
+      heatmapRow = yScale.domain()[d3.bisect(invertYScale, roundY) - 1];
       if (heatmapRow < segs.length) {
         setHoverCellCoordinate(rowHoverCordinates[1], heatmapRow);
         drawHeatmap(segs, context, yScale(heatmapRow));
@@ -322,8 +321,7 @@ const Plot = ({
   }, [segs]);
 
   function useHookWithRefCallback() {
-    const ref = useRef(null);
-    const setRef = useCallback(node => {
+    const setRef = useCallback((node) => {
       if (node) {
         const heatmap = d3.select("#heatmap");
         const canvas = heatmap
@@ -363,7 +361,7 @@ const Plot = ({
       const y = yScale(index);
 
       const bpRatio = getBPRatio(chromosomes);
-      segRow.segs.forEach(seg => {
+      segRow.segs.forEach((seg) => {
         const x = getSegX(seg, chromMap, bpRatio, false, 0);
 
         context.beginPath();
@@ -398,7 +396,7 @@ const Plot = ({
       style={{
         width: width - categoryWidth,
         height: height - heatmapConfig.chromosome["height"],
-        position: "relative"
+        position: "relative",
       }}
       ref={ref}
     >
@@ -408,7 +406,7 @@ const Plot = ({
           width: width - categoryWidth,
           height: height - heatmapConfig.chromosome["height"],
           position: "absolute",
-          pointerEvents: "all"
+          pointerEvents: "all",
         }}
       >
         <canvas id="heatmapCanvas" />
@@ -418,7 +416,7 @@ const Plot = ({
         style={{
           width: width - categoryWidth,
           height: height - heatmapConfig.chromosome["height"],
-          position: "relative"
+          position: "relative",
         }}
       />
     </div>

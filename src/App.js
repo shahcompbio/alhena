@@ -1,14 +1,9 @@
-import React, {
-  useWindowSize,
-  useEffect,
-  useState,
-  useLayoutEffect
-} from "react";
+import React from "react";
 import {
   useAppState,
   PrivateRoute,
   AdminRoute,
-  UnauthenticatedRoute
+  UnauthenticatedRoute,
 } from "./util/app-state";
 import { ApolloConsumer } from "react-apollo";
 import { Route, Switch } from "react-router-dom";
@@ -19,8 +14,6 @@ import { useHistory } from "react-router-dom";
 import AdminPanel from "./Authentication/AdminPanel.js";
 
 import DashboardWrapper from "./Search/DashboardWrapper";
-import DashboardContent from "./Dashboard/DashboardContent.js";
-import ProjectViewContent from "./Search/ProjectView/ProjectViewContent";
 
 import ExportPopup from "./Misc/ExportPopup.js";
 import Unauthenticated from "./Authentication/Unauthenticated.js";
@@ -34,7 +27,7 @@ import { MuiThemeProvider } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 
 const App = () => {
-  const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
+  const [{ authKeyID }, dispatch] = useAppState();
   let history = useHistory();
   return (
     <MuiThemeProvider theme={theme}>
@@ -47,7 +40,7 @@ const App = () => {
             history.replace("/login");
             return (
               <ApolloConsumer>
-                {client => <Unauthenticated client={client} />}
+                {(client) => <Unauthenticated client={client} />}
               </ApolloConsumer>
             );
           }}
@@ -63,7 +56,7 @@ const App = () => {
               history.replace("/login");
               return (
                 <ApolloConsumer>
-                  {client => <Unauthenticated client={client} />}
+                  {(client) => <Unauthenticated client={client} />}
                 </ApolloConsumer>
               );
             }}
@@ -74,7 +67,7 @@ const App = () => {
           exact={true}
           component={() => (
             <ApolloConsumer>
-              {client => <Unauthenticated client={client} />}
+              {(client) => <Unauthenticated client={client} />}
             </ApolloConsumer>
           )}
         />

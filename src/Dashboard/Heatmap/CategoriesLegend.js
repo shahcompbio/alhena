@@ -6,7 +6,7 @@ import * as d3 from "d3";
 import { heatmapConfig } from "./config.js";
 import { cleanUpPreviousContent, getColourScale } from "./utils.js";
 
-const getXOffset = categoryLength =>
+const getXOffset = (categoryLength) =>
   categoryLength === 1 ? 4 : categoryLength === 2 ? 2 : 4;
 
 const CategoriesLegend = ({ choosenStats }) => {
@@ -86,8 +86,6 @@ const CategoriesLegend = ({ choosenStats }) => {
           .attr("height", squareSize)
           .attr("fill", colouredCategories[4])
           .on("mousemove", function(d) {
-            var coordinates = d3.mouse(this);
-
             const dim = d3
               .select("#title-" + categoryName)
               .node()

@@ -6,7 +6,7 @@ import * as d3 from "d3";
 import { heatmapConfig } from "./config.js";
 import { cleanUpPreviousContent, getColourScale } from "./utils.js";
 
-const getCategoryWidth = categoriesLength =>
+const getCategoryWidth = (categoriesLength) =>
   categoriesLength * heatmapConfig.categories.squareSize;
 
 const Categories = ({ cellStats, yScale, categories }) => {
@@ -48,10 +48,8 @@ const Categories = ({ cellStats, yScale, categories }) => {
             return colourScale(d[categoryName]);
           })
           .on("mousemove", function(d) {
-            var coordinates = d3.mouse(this);
             d3.select(this).attr("class", "hoveredCategorySquare");
 
-            const colour = colourScale(d[categoryName]);
             const name = d[categoryName];
             d3.select("#categoryChipTip")
               .style("visibility", "visible")

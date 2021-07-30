@@ -1,5 +1,3 @@
-import React, { useEffect } from "react";
-
 import * as d3 from "d3";
 
 import { heatmapConfig } from "./config.js";
@@ -15,7 +13,7 @@ const ProfileAxis = ({ genomeYScale }) => {
     context.moveTo(xPos + 10, genomeYScale(genomeYScale.domain()[0]) + 10);
     context.lineTo(xPos + 10, genomeYScale(genomeYScale.domain()[1]) + 5);
     context.stroke();
-    genomeYScale.ticks(genomeYScale.domain()[1]).forEach(tick => {
+    genomeYScale.ticks(genomeYScale.domain()[1]).forEach((tick) => {
       context.fillText(tick, xPos - 12, genomeYScale(tick) + 10);
 
       context.moveTo(xPos, genomeYScale(tick) + 8);
@@ -45,7 +43,7 @@ const ProfileAxis = ({ genomeYScale }) => {
   // start observing
   observer.observe(document, {
     childList: true,
-    subtree: true
+    subtree: true,
   });
   return null;
 };

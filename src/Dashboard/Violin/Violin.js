@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import * as d3 from "d3";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -20,7 +20,7 @@ const margin = {
   left: 60,
   top: 15,
   bottom: 30,
-  right: 10
+  right: 10,
 };
 
 const dimensions = {
@@ -30,12 +30,12 @@ const dimensions = {
   y2: 300 + margin.top,
   height: 375,
   width: 700,
-  padding: 4
+  padding: 4,
 };
 const selfType = "VIOLIN";
 
-const styles = theme => ({
-  root: {}
+const styles = (theme) => ({
+  root: {},
 });
 const color = {
   defaultStroke: "black",
@@ -45,7 +45,7 @@ const color = {
   grey: "#c7ccd1",
   black: "#000000",
   green: "#2f7d29",
-  red: "#96281b"
+  red: "#96281b",
 };
 
 const VIOLIN_QUERY = gql`
@@ -104,8 +104,8 @@ const Violin = ({ analysis, classes }) => {
       selectedCells,
       violinAxis,
       subsetSelection,
-      axisChange
-    }
+      axisChange,
+    },
   ] = useStatisticsState();
 
   const xAxis = violinAxis.x.type;
@@ -125,7 +125,7 @@ const Violin = ({ analysis, classes }) => {
         quality,
         selectedCells: selection,
         xAxis,
-        yAxis
+        yAxis,
       }}
     >
       {({ loading, error, data }) => {
@@ -171,7 +171,7 @@ const tooltip = d3Tip()
 const Plot = ({ data, stats, cells, selectionAllowed }) => {
   const [
     { selectedCells, violinAxis, axisChange },
-    dispatch
+    dispatch,
   ] = useStatisticsState();
 
   const xAxis = violinAxis.x.label;
@@ -186,7 +186,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
   var x = d3
     .scaleBand()
     .range([dimensions.x1, dimensions.width])
-    .domain([...data.map(option => option["name"])])
+    .domain([...data.map((option) => option["name"])])
     .padding(0.05);
 
   const isCountInsignificant = data.reduce((final, cur) => {
@@ -208,7 +208,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
             parseFloat(data[0]["histogram"][9]["key"]) > stats.max
               ? parseFloat(data[0]["histogram"][9]["key"])
               : stats.max,
-            parseFloat(data[0]["histogram"][0]["key"])
+            parseFloat(data[0]["histogram"][0]["key"]),
           ])
           .range([dimensions.y1, dimensions.y2])
           .nice()
@@ -220,7 +220,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
 
   const maxNum = Math.max.apply(
     Math,
-    _.flatten(data.map(d => d["histogram"])).map(d => d["count"])
+    _.flatten(data.map((d) => d["histogram"])).map((d) => d["count"])
   );
 
   useEffect(() => {
@@ -228,7 +228,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
       const percentileObj = getPercentileObject(data);
       d3.select("#violin").attr("category", null);
       context.clearRect(0, 0, dimensions.width, dimensions.height);
-      Object.keys(violinPaths).forEach(name => {
+      Object.keys(violinPaths).forEach((name) => {
         //grapql cache error
         if (percentileObj[name]) {
           drawViolinArea(context, name, violinPaths[name]);
@@ -256,8 +256,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
   }, [data]);
 
   function useHookWithRefCallback() {
-    const ref = useRef(null);
-    const setRef = useCallback(node => {
+    const setRef = useCallback((node) => {
       if (node) {
         const violin = d3.select("#violin");
 
@@ -304,8 +303,8 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
   const drawAxis = (context, x, y, xNum, data) => {
     const decimalFormat = d3.format(".3f");
     const intFormat = d3.format("0.5~s");
-    const isDecimal = d => parseFloat(d) < 1 && parseFloat(d) > 0;
-    data.forEach(d => {
+    const isDecimal = (d) => parseFloat(d) < 1 && parseFloat(d) > 0;
+    data.forEach((d) => {
       context.fillStyle = color["black"];
       context.fillText(
         d["name"],
@@ -379,11 +378,11 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
           context.clearRect(0, 0, dimensions.width, dimensions.height);
           drawAxis(context, x, y, xNum, data);
           drawAxisLabels(context, x, y);
-          Object.keys(percentileObj).forEach(name => {
+          Object.keys(percentileObj).forEach((name) => {
             if (name === d["name"]) {
               showTooltip(percentileObj[name], name);
               drawViolinArea(context, name, violinPathObjects[name], {
-                isHover: true
+                isHover: true,
               });
             } else {
               drawViolinArea(context, name, violinPathObjects[name]);
@@ -398,11 +397,11 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
         context.clearRect(0, 0, dimensions.width, dimensions.height);
         drawAxis(context, x, y, xNum, data);
         drawAxisLabels(context, x, y);
-        Object.keys(percentileObj).forEach(name => {
+        Object.keys(percentileObj).forEach((name) => {
           !selectedCategory || selectedCategory === name
             ? drawViolinArea(context, name, violinPathObjects[name])
             : drawViolinArea(context, name, violinPathObjects[name], {
-                isGrey: true
+                isGrey: true,
               });
           !selectedCategory || selectedCategory === name
             ? drawQLines(context, percentileObj[name], name)
@@ -415,36 +414,36 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
 
           drawAxis(context, x, y, xNum, data);
           drawAxisLabels(context, x, y);
-          Object.keys(percentileObj).map(name => {
+          Object.keys(percentileObj).forEach((name) => {
             if (d["name"] === name) {
               d3.select("#violin").attr("category", name);
               drawViolinArea(context, name, violinPathObjects[name]);
               drawQLines(context, percentileObj[name], name);
             } else {
               drawViolinArea(context, name, violinPathObjects[name], {
-                isGrey: true
+                isGrey: true,
               });
               drawQLines(context, percentileObj[name], name, {
-                isGrey: true
+                isGrey: true,
               });
             }
           });
           const selection = cells
-            .filter(cell => cell.category === d["name"])
-            .map(cell => cell["order"]);
+            .filter((cell) => cell.category === d["name"])
+            .map((cell) => cell["order"]);
 
           if (axisChange["datafilter"]) {
             dispatch({
               type: "BRUSH",
               value: [...selection],
               dispatchedFrom: selfType,
-              subsetSelection: [...selection]
+              subsetSelection: [...selection],
             });
           } else {
             dispatch({
               type: "BRUSH",
               value: [...selection],
-              dispatchedFrom: selfType
+              dispatchedFrom: selfType,
             });
           }
         }
@@ -494,7 +493,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
         );
       });
   };
-  const getPercentileObject = data =>
+  const getPercentileObject = (data) =>
     data.reduce((final, curr) => {
       final[curr["name"]] = curr["percentiles"].reduce((f, c, index) => {
         f[c["percentile"]] = c["value"];
@@ -503,15 +502,15 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
       return final;
     }, {});
 
-  const setDefaultStyles = context => {
+  const setDefaultStyles = (context) => {
     context.strokeStyle = color["defaultStroke"];
     context.fillStyle = color["defaultFill"];
   };
-  const setHoverStyles = context => {
+  const setHoverStyles = (context) => {
     context.strokeStyle = color["hoverStroke"];
     context.fillStyle = color["hoverFill"];
   };
-  const setGreyedOutStyles = context => {
+  const setGreyedOutStyles = (context) => {
     context.strokeStyle = color["grey"];
     context.fillStyle = color["grey"];
   };
@@ -562,7 +561,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
         pointerEvents: "all",
         width: dimensions["width"],
         height: dimensions["height"],
-        position: "relative"
+        position: "relative",
       }}
       ref={ref}
     >
@@ -572,7 +571,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
           width: dimensions["width"],
           height: dimensions["height"],
           position: "absolute",
-          pointerEvents: "all"
+          pointerEvents: "all",
         }}
       >
         <canvas />
@@ -583,7 +582,7 @@ const Plot = ({ data, stats, cells, selectionAllowed }) => {
           pointerEvents: "all",
           width: dimensions["width"],
           height: dimensions["height"],
-          position: "relative"
+          position: "relative",
         }}
       />
     </div>

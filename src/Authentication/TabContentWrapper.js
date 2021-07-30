@@ -12,7 +12,6 @@ import TableToolbar from "./TableToolBar.js";
 import Grid from "@material-ui/core/Grid";
 
 import { ApolloConsumer } from "react-apollo";
-import { updateDashboard, deleteUserByUsername } from "../util/utils.js";
 
 import { getAllDashboards, getUsers } from "../Queries/queries.js";
 import { withStyles, useTheme } from "@material-ui/styles";
@@ -65,11 +64,11 @@ const styles = (theme, tabIndex) => ({
     borderRadius: 20,
     zIndex: 20,
     marginTop: 25,
-    marginBottom: 80
+    marginBottom: 80,
   },
   grid: {
-    marginTop: "-60px"
-  }
+    marginTop: "-60px",
+  },
 });
 
 const TabContentWrapper = ({ tabIndex, classes }) => {
@@ -103,7 +102,7 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
     setSelected(null);
   };
 
-  const handleRowClick = name => {
+  const handleRowClick = (name) => {
     if (selected === null) {
       setSelected(name);
     } else if (selected === name) {
@@ -126,8 +125,8 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
         name: full_name,
         username: username,
         newRoles: [...roles],
-        isAdmin: isAdmin
-      }
+        isAdmin: isAdmin,
+      },
     });
     return data.updateUser.created;
   };
@@ -135,8 +134,8 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
     const { data } = await client.query({
       query: DELETEUSERBYUSERNAME,
       variables: {
-        username: username
-      }
+        username: username,
+      },
     });
     return data.deleteUser.isDeleted;
   };
@@ -144,8 +143,8 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
     const { data } = await client.query({
       query: DELETEDASHBOARD,
       variables: {
-        name: name
-      }
+        name: name,
+      },
     });
 
     if (data.deleteDashboardByName.allDeleted) {
@@ -169,9 +168,9 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
           indices: selectedIndices,
           columns: selectedColumns,
           users: selectedUsers,
-          deletedUsers: deletedUsers
-        }
-      }
+          deletedUsers: deletedUsers,
+        },
+      },
     });
     clearAll();
     if (updated.data.updateDashboardByName.updated) {
@@ -223,7 +222,7 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
         if (confirmed === false) {
           //has updated
           setData(
-            modifiedUsers.map(user => {
+            modifiedUsers.map((user) => {
               if (user.username === selected) {
                 user.roles = roles;
                 user.isAdmin = isAdmin;
@@ -238,7 +237,7 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
       }
     } catch (error) {}
   };
-  const sortAlpha = list =>
+  const sortAlpha = (list) =>
     list.sort((a, b) => {
       var textA = a.name ? a.name.toUpperCase() : a.username.toUpperCase();
       var textB = b.name ? b.name.toUpperCase() : b.username.toUpperCase();
@@ -255,7 +254,7 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
 
       if (confirmed) {
         //has updated
-        setData(users.filter(user => user.username !== selected));
+        setData(users.filter((user) => user.username !== selected));
         actionCompleteReset();
         window.location.reload();
       } else {
@@ -267,13 +266,13 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
     1: {
       query: getAllDashboards,
       dataReturnName: "getAllDashboards",
-      tableKey: "dashboardsContentKey"
+      tableKey: "dashboardsContentKey",
     },
     0: {
       query: getUsers,
       dataReturnName: "getUsers",
-      tableKey: "usersContentKey"
-    }
+      tableKey: "usersContentKey",
+    },
   };
 
   const tableConfig = config[tabIndex];
@@ -282,7 +281,7 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
     <Query
       query={tableConfig.query}
       variables={{
-        user: { authKeyID: authKeyID, uid: uid }
+        user: { authKeyID: authKeyID, uid: uid },
       }}
     >
       {({ loading, error, data }) => {
@@ -294,7 +293,7 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
                 background:
                   tabIndex === 1
                     ? theme.palette.primary.main
-                    : theme.palette.primary.dark
+                    : theme.palette.primary.dark,
               }}
             >
               <div />
@@ -302,7 +301,7 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
           );
         if (error) {
           dispatch({
-            type: "LOGOUT"
+            type: "LOGOUT",
           });
           return null;
         }
@@ -324,7 +323,7 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
               key={"adminGrid"}
             >
               <ApolloConsumer>
-                {client => (
+                {(client) => (
                   <Paper
                     className={classes.root}
                     key={"adminTablePaper" + tabIndex}
@@ -332,7 +331,7 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
                       background:
                         tabIndex === 1
                           ? theme.palette.primary.main
-                          : theme.palette.primary.dark
+                          : theme.palette.primary.dark,
                     }}
                   >
                     {(selected || actionComplete) && (
@@ -341,8 +340,8 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
                         deleteName={() =>
                           deleteByName(client, modifiedData, tabIndex)
                         }
-                        edit={name => confirmEditUser(client, modifiedData)}
-                        clear={isCleared => clearAll()}
+                        edit={(name) => confirmEditUser(client, modifiedData)}
+                        clear={(isCleared) => clearAll()}
                         setIsEditing={() => setIsEditing(true)}
                         isLoading={isLoading}
                         actionComplete={actionComplete}
@@ -356,18 +355,18 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
                       allRoles={
                         tabIndex === 0
                           ? data.getAllDashboards.map(
-                              dashboard => dashboard.name
+                              (dashboard) => dashboard.name
                             )
                           : []
                       }
-                      setSelectedUserRoles={userRoles =>
+                      setSelectedUserRoles={(userRoles) =>
                         setSelectedUserRoles(userRoles)
                       }
-                      setSelectedUserAdmin={isAdmin =>
+                      setSelectedUserAdmin={(isAdmin) =>
                         setSelectedUserAdmin(isAdmin)
                       }
                       selected={selected}
-                      handleRowClick={name => handleRowClick(name)}
+                      handleRowClick={(name) => handleRowClick(name)}
                     />
                     {isEditing && tabIndex === 1 && (
                       <EditDashboardPopupWrapper

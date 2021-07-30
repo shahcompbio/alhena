@@ -1,7 +1,6 @@
 import * as d3 from "d3";
 
 import { config } from "../config.js";
-const displayConfig = config.DisplayConfig;
 export const setLargerPanelFont = (context, screenType) => {
   context.font = screenType.isBigScreen
     ? "30px Lucida Console, Monaco, monospace"
@@ -52,11 +51,11 @@ export const voronoiXScale = (x1, x2) =>
 
 export const voronoid = d3
   .voronoi()
-  .x(d => d.x)
-  .y(d => d.y)
+  .x((d) => d.x)
+  .y((d) => d.y)
   .extent([
     [-4000, -4000],
-    [4000, 4000]
+    [4000, 4000],
   ]);
 
 export const removeLegendLabels = () => {
@@ -81,7 +80,7 @@ export const colourNodeSelections = (nodeSelection, heightOfDetail) =>
       return heightOfDetail === d.height ? 70 : 20;
     });
 
-export const removeAllContent = mainSvg => {
+export const removeAllContent = (mainSvg) => {
   mainSvg
     .selectAll(
       ".allCircleNodes, .lines, .directLabel, .node-label, path, .legendDescription"
@@ -90,9 +89,9 @@ export const removeAllContent = mainSvg => {
 
   d3.select(".sampleAfterFilterLabel").text("");
 };
-export const ungreySelection = selectionText =>
+export const ungreySelection = (selectionText) =>
   d3.selectAll(selectionText).classed("greyedNodes", false);
-export const greySelection = selectionText =>
+export const greySelection = (selectionText) =>
   d3.selectAll(selectionText).classed("greyedNodes", true);
 
 export function getSelectionPath(data, type) {
@@ -125,7 +124,7 @@ function traverseTree(tree, type) {
     );
   }
 }
-export const linkSelect = selectionText => {
+export const linkSelect = (selectionText) => {
   var selection = d3.selectAll(selectionText);
 
   selection.classed("link-hover", true).classed("greyedNodes", false);
@@ -139,8 +138,8 @@ export const linkSelect = selectionText => {
       "d",
       d3
         .linkRadial()
-        .angle(d => d.x + config.filtersOffSet)
-        .radius(d => {
+        .angle((d) => d.x + config.filtersOffSet)
+        .radius((d) => {
           return d.y + config.filtersOffSet + 125;
         })
     );
@@ -149,19 +148,19 @@ export const linkSelect = selectionText => {
 export const ungreyOutJiraLabels = () =>
   d3.selectAll(".jiraTicketlabels").classed("greyedNodes", false);
 
-export const greyOutJiraLabels = notSelection =>
+export const greyOutJiraLabels = (notSelection) =>
   d3
     .selectAll(".jiraTicketlabels:not(.jiraTicketFor-" + notSelection + ")")
     .classed("greyedNodes", true);
 
-export const linkDeselect = selectionText =>
+export const linkDeselect = (selectionText) =>
   d3.selectAll(selectionText).classed("link-hover", false);
 
 export const nodeSelect = (selection, heightOfDetail) => {
   selection.classed("hover", true);
   selection.classed("greyedNodes", false);
 
-  selection.transition().attr("transform", d => {
+  selection.transition().attr("transform", (d) => {
     if (d.depth === 2) {
       return `
       translate(65,0)
@@ -179,7 +178,7 @@ export const nodeSelect = (selection, heightOfDetail) => {
   });
 };
 
-export const nodeDeselect = selectionText =>
+export const nodeDeselect = (selectionText) =>
   d3
     .selectAll(selectionText)
     .classed("hover", true)
@@ -196,7 +195,7 @@ export const initSvg = (root, width, height) =>
     .attr("height", "100vh")
     .attr("transform", "scale(1.25,1.25)");
 
-export const raiseLabels = prevState => {
+export const raiseLabels = (prevState) => {
   prevState.labelGroup.raise();
   d3.select(".jiraLabelTitle").raise();
   d3.select(".titleUnderline").raise();
@@ -216,7 +215,7 @@ export const removeAllPreviousContent = () => {
   d3.selectAll(".jiraLabel").remove();
 };
 
-export const greyOutAllNodes = target => {
+export const greyOutAllNodes = (target) => {
   d3.selectAll(".allCircleNodes circle:not(.parent-project)").classed(
     "greyedNodes",
     true

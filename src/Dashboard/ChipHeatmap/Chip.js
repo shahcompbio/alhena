@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import * as d3 from "d3";
 
-import XYFrame from "semiotic/lib/XYFrame";
 import Legend from "./Legend.js";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -15,7 +14,6 @@ import Grid from "@material-ui/core/Grid";
 
 import { initContext, getSelection, isSelectionAllowed } from "../utils.js";
 import { useStatisticsState } from "../DashboardState/statsState";
-import { scaleLinear } from "d3-scale";
 import d3Tip from "d3-tip";
 
 const chipHeatmapDimension = 775;
@@ -24,15 +22,15 @@ const margin = {
   left: 55,
   top: 37,
   bottom: 90,
-  right: 10
+  right: 10,
 };
 
-const styles = theme => ({
+const styles = (theme) => ({
   legend: {
     marginTop: 40,
     marginRight: 30,
-    marginLeft: 15
-  }
+    marginLeft: 15,
+  },
 });
 const selfType = "CHIP";
 const CHIP_HEATMAP_QUERY = gql`
@@ -70,8 +68,8 @@ const Chip = ({ analysis, classes }) => {
       selectedCellsDispatchFrom,
       chipHeatmapAxis,
       subsetSelection,
-      axisChange
-    }
+      axisChange,
+    },
   ] = useStatisticsState();
 
   const selection = getSelection(
@@ -88,7 +86,7 @@ const Chip = ({ analysis, classes }) => {
         analysis,
         quality,
         selectedCells: selection,
-        metric: chipHeatmapAxis.type
+        metric: chipHeatmapAxis.type,
       }}
     >
       {({ loading, error, data }) => {
@@ -137,14 +135,14 @@ const Chip = ({ analysis, classes }) => {
 const getHeatmapOrderFromExtent = (extent, data) =>
   data
     .filter(
-      entry =>
+      (entry) =>
         entry.columnIndex >= extent[0][0] &&
         entry.columnIndex < extent[1][0] &&
         entry.rowIndex >= extent[0][1] &&
         entry.rowIndex < extent[1][1]
     )
-    .map(entry => entry.heatmapOrder)
-    .filter(entry => entry !== null && entry.heatmapOrder !== null)
+    .map((entry) => entry.heatmapOrder)
+    .filter((entry) => entry !== null && entry.heatmapOrder !== null)
     .sort((a, b) => a - b);
 
 const ChipHeatmap = ({ data, selectionAllowed }) => {
@@ -177,7 +175,7 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
     x2: chipHeatmapDimension - margin.right,
     y2: chipHeatmapDimension - margin.bottom,
     width: chipHeatmapDimension - margin.left - margin.right,
-    height: chipHeatmapDimension - margin.top - margin.bottom
+    height: chipHeatmapDimension - margin.top - margin.bottom,
   };
 
   useEffect(() => {
@@ -230,13 +228,13 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
           type: "BRUSH",
           value: extentHighlight,
           dispatchedFrom: selfType,
-          subsetSelection: extentHighlight
+          subsetSelection: extentHighlight,
         });
       } else {
         dispatch({
           type: "BRUSH",
           value: extentHighlight,
-          dispatchedFrom: selfType
+          dispatchedFrom: selfType,
         });
       }
     }
@@ -258,7 +256,7 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
 
   function useHookWithRefCallback() {
     const ref = useRef(null);
-    const setRef = useCallback(node => {
+    const setRef = useCallback((node) => {
       if (node) {
         const chip = d3.select("#chip");
         const canvas = chip
@@ -298,7 +296,7 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
             var coordinates = d3.mouse(this);
             const highlightedCell = getSingleWellFromCordinates(
               coordinates
-            ).map(entry => entry.heatmapOrder);
+            ).map((entry) => entry.heatmapOrder);
 
             if (highlightedCell.length > 0) {
               d3.select("#chipSelection").classed(highlightedCell, true);
@@ -318,12 +316,12 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
                 ? []
                 : wellSelection
                     .split(",")
-                    .filter(heatmapOrder => heatmapOrder !== "")
-                    .map(heatmapOrder => parseInt(heatmapOrder));
+                    .filter((heatmapOrder) => heatmapOrder !== "")
+                    .map((heatmapOrder) => parseInt(heatmapOrder));
             //if somethinig is highlighted
             if (highlightedCell.length > 0) {
               const heatmapOrder = highlightedCell.map(
-                entry => entry.heatmapOrder
+                (entry) => entry.heatmapOrder
               );
               //if the highlighted square is in a selection
               if (alreadySelectedWells.indexOf(heatmapOrder) === -1) {
@@ -367,7 +365,7 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
           .brush()
           .extent([
             [heatmapDim.x1, heatmapDim.y1],
-            [heatmapDim.x2, heatmapDim.y2]
+            [heatmapDim.x2, heatmapDim.y2],
           ])
           .on("end", brushended)
           .on("brush", brushDuring);
@@ -386,10 +384,10 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
         function getSingleWellFromCordinates(coordinates) {
           var extent = [
             Math.floor(x.invert(coordinates[0])),
-            Math.floor(y.invert(coordinates[1]))
+            Math.floor(y.invert(coordinates[1])),
           ];
           return data.squares.filter(
-            entry =>
+            (entry) =>
               entry.columnIndex === extent[0] && entry.rowIndex === extent[1]
           );
         }
@@ -402,9 +400,9 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
             .style("opacity", 0)
             .classed("hidden", true);
 
-          var snapExtent = d3.event.selection.map(boundry => [
+          var snapExtent = d3.event.selection.map((boundry) => [
             Math.round(x.invert(boundry[0])),
-            Math.round(y.invert(boundry[1]))
+            Math.round(y.invert(boundry[1])),
           ]);
 
           const highlightedCells = getHeatmapOrderFromExtent(
@@ -418,14 +416,14 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
           const selection = d3.event.selection;
           if (!d3.event.sourceEvent || !selection) return;
 
-          var snapExtent = d3.event.selection.map(boundry => [
+          var snapExtent = d3.event.selection.map((boundry) => [
             Math.round(x.invert(boundry[0])),
-            Math.round(y.invert(boundry[1]))
+            Math.round(y.invert(boundry[1])),
           ]);
 
-          const brushExtent = snapExtent.map(boundry => [
+          const brushExtent = snapExtent.map((boundry) => [
             x(boundry[0]),
-            y(boundry[1])
+            y(boundry[1]),
           ]);
 
           const highlightedCells = getHeatmapOrderFromExtent(
@@ -447,10 +445,7 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
     return [setRef];
   }
 
-  const drawBackgroundLines = context => {
-    const yTicks = y.ticks(72);
-    const xTicks = x.ticks(72);
-
+  const drawBackgroundLines = (context) => {
     x.ticks(72).forEach(function(d) {
       context.moveTo(x(d), heatmapDim.y1);
       context.lineTo(x(d), heatmapDim.y2);
@@ -460,7 +455,7 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
     context.strokeStyle = "#d2d7d3";
     context.stroke();
   };
-  const drawBackground = context => {
+  const drawBackground = (context) => {
     context.beginPath();
     context.fillStyle = "#e6e6e6";
     context.fillRect(
@@ -473,7 +468,7 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
   };
   const drawWells = (data, context, extent) => {
     context.beginPath();
-    data.map(square => {
+    data.forEach((square) => {
       if (_.includes(extent, square.heatmapOrder)) {
         // |
         context.moveTo(x(square.columnIndex) + 0, y(square.rowIndex) + 0);
@@ -518,7 +513,7 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
       width={chipHeatmapDimension}
       height={chipHeatmapDimension}
       style={{
-        position: "relative"
+        position: "relative",
       }}
       key="chipRef"
       ref={ref}
@@ -530,7 +525,7 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
         height={chipHeatmapDimension}
         style={{
           position: "absolute",
-          pointerEvents: "all"
+          pointerEvents: "all",
         }}
       >
         <canvas width={chipHeatmapDimension} height={chipHeatmapDimension} />
@@ -540,10 +535,10 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
         style={{
           width: chipHeatmapDimension,
           height: chipHeatmapDimension,
-          position: "relative"
+          position: "relative",
         }}
       />
-    </div>
+    </div>,
   ];
 };
 export default withStyles(styles)(Chip);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import clsx from "clsx";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import ErrorIcon from "@material-ui/icons/Error";
@@ -14,40 +14,40 @@ const variantIcon = {
   success: CheckCircleIcon,
   warning: WarningIcon,
   error: ErrorIcon,
-  info: InfoIcon
+  info: InfoIcon,
 };
 
-const useSnackBarStyles = makeStyles(theme => ({
+const useSnackBarStyles = makeStyles((theme) => ({
   success: {
-    backgroundColor: green[600]
+    backgroundColor: green[600],
   },
   error: {
-    backgroundColor: theme.palette.error.dark
+    backgroundColor: theme.palette.error.dark,
   },
   info: {
-    backgroundColor: theme.palette.primary.main
+    backgroundColor: theme.palette.primary.main,
   },
   warning: {
-    backgroundColor: amber[700]
+    backgroundColor: amber[700],
   },
   icon: {
-    fontSize: 20
+    fontSize: 20,
   },
   iconVariant: {
     opacity: 0.9,
-    marginRight: theme.spacing(1)
+    marginRight: theme.spacing(1),
   },
   message: {
     display: "flex",
-    alignItems: "center"
-  }
+    alignItems: "center",
+  },
 }));
 
 const SnackbarContentWrapper = ({
   className,
   errorNumber,
   setError,
-  variant
+  variant,
 }) => {
   const [isOpen, setOpen] = useState(true);
   const classes = useSnackBarStyles();
@@ -63,7 +63,7 @@ const SnackbarContentWrapper = ({
       }}
       anchorOrigin={{
         vertical: "bottom",
-        horizontal: "left"
+        horizontal: "left",
       }}
     >
       <SnackbarContent

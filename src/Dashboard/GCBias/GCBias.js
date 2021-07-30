@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import * as d3 from "d3";
 
 import { Query } from "react-apollo";
@@ -51,8 +51,8 @@ const GCBias = ({ analysis }) => {
       selectedCells,
       selectedCellsDispatchFrom,
       subsetSelection,
-      axisChange
-    }
+      axisChange,
+    },
   ] = useStatisticsState();
   const selection = getSelection(
     axisChange,
@@ -69,7 +69,7 @@ const GCBias = ({ analysis }) => {
         analysis,
         quality,
         selectedCells: selection,
-        gcBiasIsGrouped
+        gcBiasIsGrouped,
       }}
     >
       {({ loading, error, data }) => {
@@ -115,12 +115,12 @@ const gcBiasDim = {
   x2: margin.left + plotWidth,
   y2: margin.top + plotHeight,
   width: margin.left + plotWidth + margin.right,
-  height: margin.top + plotHeight + margin.bottom
+  height: margin.top + plotHeight + margin.bottom,
 };
 const Plot = ({ data, selectionAllowed }) => {
   const [
     { gcBiasAxis, selectedCells, axisChange },
-    dispatch
+    dispatch,
   ] = useStatisticsState();
 
   const [context, saveContext] = useState();
@@ -128,7 +128,7 @@ const Plot = ({ data, selectionAllowed }) => {
   const [ref] = useHookWithRefCallback();
 
   const highestMax = Math.max(
-    ...data.map(category => category["stats"]["yMax"])
+    ...data.map((category) => category["stats"]["yMax"])
   );
 
   var medianLine = d3
@@ -187,7 +187,7 @@ const Plot = ({ data, selectionAllowed }) => {
 
   var colors = d3
     .scaleOrdinal()
-    .domain([...data.map(category => category["experimentalCondition"])])
+    .domain([...data.map((category) => category["experimentalCondition"])])
     .range([
       "#4ecdc4",
       "#f64747",
@@ -197,7 +197,7 @@ const Plot = ({ data, selectionAllowed }) => {
       "#019875",
       "#013243",
       "#e87e04",
-      "#f2784b"
+      "#f2784b",
     ]);
 
   useEffect(() => {
@@ -239,8 +239,7 @@ const Plot = ({ data, selectionAllowed }) => {
   }, [data]);
 
   function useHookWithRefCallback() {
-    const ref = useRef(null);
-    const setRef = useCallback(node => {
+    const setRef = useCallback((node) => {
       if (node) {
         const gcBias = d3.select("#gcBias");
 
@@ -266,7 +265,7 @@ const Plot = ({ data, selectionAllowed }) => {
 
     return [setRef];
   }
-  const canvasClipping = context => {
+  const canvasClipping = (context) => {
     context.clearRect(0, 0, gcBiasDim.width, gcBiasDim.y1);
     context.clearRect(0, gcBiasDim.y2, gcBiasDim.width, margin.bottom);
     context.save();
@@ -288,7 +287,7 @@ const Plot = ({ data, selectionAllowed }) => {
       gcBiasDim.y1 + titleHeight
     );
     titleHeight = titleHeight * 2;
-    data.map((category, index) => {
+    data.forEach((category, index) => {
       context.globalAlpha = 0.5;
       context.strokeStyle = colors(category["experimentalCondition"]);
       context.fillStyle = colors(category["experimentalCondition"]);
@@ -322,7 +321,7 @@ const Plot = ({ data, selectionAllowed }) => {
               plotWidth,
               plotHeight
             );
-            canvasPaths.map(path => {
+            canvasPaths.forEach((path) => {
               fillPaths(
                 context,
                 path,
@@ -336,7 +335,7 @@ const Plot = ({ data, selectionAllowed }) => {
             drawLegend(context, data, svg, canvasPaths);
 
             const selection = data.filter(
-              option =>
+              (option) =>
                 option["experimentalCondition"] ===
                 category["experimentalCondition"]
             )[0]["cellOrder"];
@@ -346,13 +345,13 @@ const Plot = ({ data, selectionAllowed }) => {
                 type: "BRUSH",
                 value: [...selection],
                 subsetSelection: [...selection],
-                dispatchedFrom: selfType
+                dispatchedFrom: selfType,
               });
             } else {
               dispatch({
                 type: "BRUSH",
                 value: [...selection],
-                dispatchedFrom: selfType
+                dispatchedFrom: selfType,
               });
             }
           }
@@ -383,13 +382,13 @@ const Plot = ({ data, selectionAllowed }) => {
   };
   const drawPaths = (context, paths) => {
     context.beginPath();
-    paths.map(path => {
+    paths.forEach((path) => {
       fillPaths(context, path);
     });
     context.clearRect(0, 0, gcBiasDim.width, gcBiasDim.y1);
     context.save();
   };
-  const getSvgPaths = svg => {
+  const getSvgPaths = (svg) => {
     var pathsList = [];
     svg.selectAll("g").each(function(d) {
       const that = d3.select(this);
@@ -399,13 +398,13 @@ const Plot = ({ data, selectionAllowed }) => {
 
         pathsList = [
           ...pathsList,
-          { path: new Path2D(dAttr), category: that.attr("category") }
+          { path: new Path2D(dAttr), category: that.attr("category") },
         ];
       });
     });
     return pathsList;
   };
-  const setSvgPaths = svg => {
+  const setSvgPaths = (svg) => {
     svg = svg
       .selectAll("g")
       .data(data)
@@ -511,7 +510,7 @@ const Plot = ({ data, selectionAllowed }) => {
         width: gcBiasDim.width,
         height: gcBiasDim.height,
         position: "relative",
-        pointerEvents: "all"
+        pointerEvents: "all",
       }}
       ref={ref}
     >
@@ -521,7 +520,7 @@ const Plot = ({ data, selectionAllowed }) => {
           width: gcBiasDim.width,
           height: gcBiasDim.height,
           pointerEvents: "none",
-          position: "absolute"
+          position: "absolute",
         }}
       >
         <canvas id="gcBiasCanvas" />
@@ -532,7 +531,7 @@ const Plot = ({ data, selectionAllowed }) => {
           pointerEvents: "all",
           width: gcBiasDim.width,
           height: gcBiasDim.height,
-          position: "unset"
+          position: "unset",
         }}
       />
     </div>

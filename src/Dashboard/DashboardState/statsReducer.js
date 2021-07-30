@@ -8,44 +8,42 @@ const initialState = {
     scatterplot: false,
     chip: false,
     violin: false,
-    gcBias: false
+    gcBias: false,
   },
   absoluteMinMaxDataFilters: {},
   numericalDataFilters: [],
   experimentalCondition: {
     label: "Experimental Condition",
-    type: "experimental_condition"
+    type: "experimental_condition",
   },
   selectedCells: [],
   subsetSelection: [],
   chipHeatmapAxis: {
     label: "Total Mapped Reads",
-    type: "total_mapped_reads"
+    type: "total_mapped_reads",
   },
 
   scatterplotAxis: {
     x: { label: "Quality", type: "quality" },
     y: { label: "Total Reads", type: "total_reads" },
     popupFacadeIsOpen: false,
-    selectedCellsDispatchFrom: null
+    selectedCellsDispatchFrom: null,
   },
 
   violinAxis: {
     y: { label: "Quality", type: "quality" },
-    x: { label: "Experimental Condition", type: "experimental_condition" }
+    x: { label: "Experimental Condition", type: "experimental_condition" },
   },
 
   gcBiasAxis: {
     x: { label: "GC Percent" },
-    y: { label: "Average" }
+    y: { label: "Average" },
   },
-
-  gcBiasIsGrouped: false,
 
   isScatterAxisChanged: false,
   isChipAxisChanged: false,
   gcBiasIsGrouped: false,
-  isViolinAxisChanged: false
+  isViolinAxisChanged: false,
 };
 
 const statsStateReducer = (state, action) => {
@@ -59,7 +57,7 @@ const statsStateReducer = (state, action) => {
             : action.value,
         selectedCellsDispatchFrom:
           action.dispatchedFrom === "clear" ? null : action.dispatchedFrom,
-        subsetSelection: action.subsetSelection ? action.subsetSelection : []
+        subsetSelection: action.subsetSelection ? action.subsetSelection : [],
       };
     }
     case "DATA_FILTER_OFF": {
@@ -72,14 +70,14 @@ const statsStateReducer = (state, action) => {
         absoluteMinMaxDataFilters: {},
         selectedCells: [],
         selectedCellsDispatchFrom: null,
-        subsetSelection: []
+        subsetSelection: [],
       };
     }
     case "CONTIMATED_UPDATE": {
       return {
         ...state,
         axisChange: { ...state.axisChange, datafilter: true },
-        isContaminated: true
+        isContaminated: true,
       };
     }
     case "EXP_CONDITION_UPDATE": {
@@ -91,10 +89,10 @@ const statsStateReducer = (state, action) => {
         ...state,
         axisChange: {
           ...state.axisChange,
-          datafilter: isBackToDefault ? false : true
+          datafilter: isBackToDefault ? false : true,
         },
         selectedCells: isBackToDefault ? [] : state.selectedCells,
-        expCondition: action.value.expCondition
+        expCondition: action.value.expCondition,
       };
     }
     case "QUALITY_UPDATE": {
@@ -103,7 +101,7 @@ const statsStateReducer = (state, action) => {
         quality: action.value.quality,
         selectedCells: [],
         axisChange: { ...state.axisChange, datafilter: true },
-        categoryState: action.value.choosenCategories
+        categoryState: action.value.choosenCategories,
       };
     }
     case "NUMERICAL_DATA_FILTER_UPDATE": {
@@ -117,11 +115,11 @@ const statsStateReducer = (state, action) => {
       if (existingFilters[action.value["name"]]) {
         //update existing
         var newDataFilters = state.numericalDataFilters.filter(
-          filter => filter["name"] !== action.value["name"]
+          (filter) => filter["name"] !== action.value["name"]
         );
         return {
           ...state,
-          numericalDataFilters: [...newDataFilters, ...action.value.params]
+          numericalDataFilters: [...newDataFilters, ...action.value.params],
         };
       } else {
         return {
@@ -129,12 +127,12 @@ const statsStateReducer = (state, action) => {
           axisChange: { ...state.axisChange, datafilter: true },
           numericalDataFilters: [
             ...state.numericalDataFilters,
-            ...action.value.params
+            ...action.value.params,
           ],
           absoluteMinMaxDataFilters: {
             ...state.absoluteMinMax,
-            [action.value["name"]]: [...action.value["absoluteMinMax"]]
-          }
+            [action.value["name"]]: [...action.value["absoluteMinMax"]],
+          },
         };
       }
     }
@@ -142,7 +140,7 @@ const statsStateReducer = (state, action) => {
       return {
         ...state,
         selectedCells: [],
-        categoryState: action.value
+        categoryState: action.value,
       };
     }
     case "CHIPHEATMAP_AXIS_UPDATE": {
@@ -150,7 +148,7 @@ const statsStateReducer = (state, action) => {
         ...state,
         selectedCells: [],
         axisChange: { ...state.axisChange, chip: true },
-        chipHeatmapAxis: action.value
+        chipHeatmapAxis: action.value,
       };
     }
     case "CHIPHEATMAP_AXIS_RESET": {
@@ -162,8 +160,8 @@ const statsStateReducer = (state, action) => {
         subsetSelection: [],
         chipHeatmapAxis: {
           label: "Total Mapped Reads",
-          type: "total_mapped_reads"
-        }
+          type: "total_mapped_reads",
+        },
       };
     }
     case "VIOLIN_AXIS_RESET": {
@@ -175,8 +173,11 @@ const statsStateReducer = (state, action) => {
         subsetSelection: [],
         violinAxis: {
           y: { label: "Quality", type: "quality" },
-          x: { label: "Experimental Condition", type: "experimental_condition" }
-        }
+          x: {
+            label: "Experimental Condition",
+            type: "experimental_condition",
+          },
+        },
       };
     }
     case "VIOLIN_AXIS_UPDATE": {
@@ -184,7 +185,7 @@ const statsStateReducer = (state, action) => {
         ...state,
         selectedCells: [],
         axisChange: { ...state.axisChange, violin: true },
-        violinAxis: action.value
+        violinAxis: action.value,
       };
     }
     case "SCATTERPLOT_AXIS_UPDATE": {
@@ -192,7 +193,7 @@ const statsStateReducer = (state, action) => {
         ...state,
         selectedCells: [],
         axisChange: { ...state.axisChange, scatterplot: true },
-        scatterplotAxis: action.value
+        scatterplotAxis: action.value,
       };
     }
     case "SCATTERPLOT_AXIS_RESET": {
@@ -206,27 +207,27 @@ const statsStateReducer = (state, action) => {
           x: { label: "Quality", type: "quality" },
           y: { label: "Total Reads", type: "total_reads" },
           popupFacadeIsOpen: false,
-          selectedCellsDispatchFrom: null
-        }
+          selectedCellsDispatchFrom: null,
+        },
       };
     }
     case "GCBIAS_IS_GROUPED": {
       return {
         ...state,
-        gcBiasIsGrouped: action.value
+        gcBiasIsGrouped: action.value,
       };
     }
     case "FACADE_EXISTS_WARNING": {
       return {
         ...state,
-        popupFacadeIsOpen: action.value
+        popupFacadeIsOpen: action.value,
       };
     }
     case "SIZE_CHANGE": {
       return {
         ...state,
         width: action.width,
-        height: action.height
+        height: action.height,
       };
     }
     default:

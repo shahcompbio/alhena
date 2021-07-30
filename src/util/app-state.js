@@ -18,7 +18,7 @@ export function useAppState() {
   return useContext(StateContext);
 }
 export function UnauthenticatedRoute({ children, ...rest }) {
-  const [{ authKeyID }, dispatch] = useAppState();
+  const [{ authKeyID }] = useAppState();
 
   return (
     <Route
@@ -27,7 +27,7 @@ export function UnauthenticatedRoute({ children, ...rest }) {
         if (!authKeyID) {
           return (
             <ApolloConsumer>
-              {client =>
+              {(client) =>
                 React.cloneElement(children, { uri: match, client: client })
               }
             </ApolloConsumer>
@@ -38,7 +38,7 @@ export function UnauthenticatedRoute({ children, ...rest }) {
   );
 }
 export function PrivateRoute({ children, ...rest }) {
-  const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
+  const [{ authKeyID }, dispatch] = useAppState();
 
   return (
     <Route
@@ -47,14 +47,14 @@ export function PrivateRoute({ children, ...rest }) {
         if (authKeyID) {
           return (
             <ApolloConsumer>
-              {client =>
+              {(client) =>
                 React.cloneElement(children, { uri: match, client: client })
               }
             </ApolloConsumer>
           );
         } else {
           dispatch({
-            type: "LOGOUT"
+            type: "LOGOUT",
           });
         }
       }}
@@ -62,7 +62,7 @@ export function PrivateRoute({ children, ...rest }) {
   );
 }
 export function AdminRoute({ children, ...rest }) {
-  const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
+  const [{ authKeyID, isSuperUser }] = useAppState();
   return (
     <Route
       {...rest}
@@ -72,7 +72,7 @@ export function AdminRoute({ children, ...rest }) {
         ) : (
           <Redirect
             to={{
-              pathname: "/dashboards"
+              pathname: "/dashboards",
             }}
           />
         )

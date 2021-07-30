@@ -5,16 +5,12 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
-import Input from "@material-ui/core/Input";
 import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
 import StepLabel from "@material-ui/core/StepLabel";
-import Typography from "@material-ui/core/Typography";
-import Slide from "@material-ui/core/Slide";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import MuiAlert from "@material-ui/lab/Alert";
@@ -22,10 +18,8 @@ import MuiAlert from "@material-ui/lab/Alert";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import ListItemText from "@material-ui/core/ListItemText";
 import Checkbox from "@material-ui/core/Checkbox";
-import CommentIcon from "@material-ui/icons/Comment";
 
 import LoadingCircle from "../ProgressCircle.js";
 import IconButton from "@material-ui/core/IconButton";
@@ -33,41 +27,41 @@ import CheckIcon from "@material-ui/icons/Check";
 
 import TransferList from "../TransferList.js";
 
-const useStylesStepper = makeStyles(theme => ({
+const useStylesStepper = makeStyles((theme) => ({
   root: {
     width: "100%",
-    minHeight: 300
+    minHeight: 300,
   },
   buttonGrid: { marginTop: 25, marginRight: 25 },
   backButton: {
     marginTop: theme.spacing(1),
-    marginLeft: theme.spacing(1)
+    marginLeft: theme.spacing(1),
   },
   instructions: {
     marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1)
+    marginBottom: theme.spacing(1),
   },
   dialogButtons: {
-    float: "right"
+    float: "right",
   },
-  cancelButton: { marginLeft: "25px" }
+  cancelButton: { marginLeft: "25px" },
 }));
-const useListStyles = makeStyles(theme => ({
+const useListStyles = makeStyles((theme) => ({
   root: {
     width: "100%",
     margin: 0,
     height: 250,
     overflowY: "scroll",
-    backgroundColor: theme.palette.background.paper
+    backgroundColor: theme.palette.background.paper,
   },
-  columnPaper: { width: "50%", margin: "auto" }
+  columnPaper: { width: "50%", margin: "auto" },
 }));
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   button: { color: "black", backgroundColor: theme.palette.secondary.main },
   dialogContent: {
     padding: "0px 10px",
     paddingTop: "0 !important",
-    paddingLeft: 50
+    paddingLeft: 50,
   },
   dialogTitle: { paddingBottom: 0, marginLeft: "50px", fontSize: 15 },
   dialogWrapper: {
@@ -75,7 +69,7 @@ const useStyles = makeStyles(theme => ({
     width: 250,
     margin: "auto",
     left: "25%",
-    position: "absolute"
+    position: "absolute",
   },
   icon: { fontSize: "6em", position: "absolute" },
   iconButton: { top: "65%", left: "45%" },
@@ -83,18 +77,18 @@ const useStyles = makeStyles(theme => ({
     width: 350,
     left: 10,
     marginBottom: 10,
-    "&$.MuiOutlinedInput-input": { padding: "15px 12px" }
+    "&$.MuiOutlinedInput-input": { padding: "15px 12px" },
   },
   searchInput: {
-    padding: "15px 12px"
+    padding: "15px 12px",
   },
   stepper: { padding: "0 !important" },
   textValidator: {
     paddingBottom: 0,
     width: "80%",
     marginLeft: 60,
-    marginTop: -20
-  }
+    marginTop: -20,
+  },
 }));
 function getSteps() {
   return ["Dashboard Name", "Add Indices", "Show/Hide Metadata", "Add Users"];
@@ -104,7 +98,6 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-const slideTimeOut = 800;
 const PopUpContent = ({
   isOpen,
   handleClose,
@@ -116,7 +109,7 @@ const PopUpContent = ({
   allDashboardColumns,
   selectedDashboardColumns,
   selectedDashboardUsers,
-  allDashboardsUsers
+  allDashboardsUsers,
 }) => {
   const classes = useStylesStepper();
 
@@ -125,15 +118,15 @@ const PopUpContent = ({
   );
   const [selectedColumns, setSelectedColumns] = useState(
     selectedDashboardColumns.length > 0
-      ? selectedDashboardColumns.map(col => col.type)
+      ? selectedDashboardColumns.map((col) => col.type)
       : ["jira_id"]
   );
   const [selectedUsers, setSelectedUsers] = useState(
     selectedDashboardUsers.length > 0
-      ? selectedDashboardUsers.map(user => user.username)
+      ? selectedDashboardUsers.map((user) => user.username)
       : allDashboardsUsers
-          .filter(user => user.isAdmin)
-          .map(user => user.username)
+          .filter((user) => user.isAdmin)
+          .map((user) => user.username)
   );
 
   const [name, setName] = useState(dashboardName);
@@ -146,15 +139,11 @@ const PopUpContent = ({
   const steps = getSteps();
 
   const handleBack = () => {
-    setActiveStep(prevActiveStep => prevActiveStep - 1);
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
     setIsDisabled(false);
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
-  };
-
-  const handleNameChange = event => {
+  const handleNameChange = (event) => {
     setName(event.target.value);
   };
 
@@ -174,7 +163,6 @@ const PopUpContent = ({
     }
   }, [name, selectedIndices, activeStep, selectedColumns, selectedUsers]);
 
-  const getDirection = index => (index === 0 ? "right" : "left");
   return (
     <Dialog
       open={isOpen}
@@ -187,7 +175,7 @@ const PopUpContent = ({
         <DialogContent
           style={{
             paddingTop: isSent && isLoading ? 0 : 20,
-            margin: "auto"
+            margin: "auto",
           }}
         >
           <LoadingContent classes={classes} isSent={isSent} />
@@ -213,7 +201,7 @@ const PopUpContent = ({
             alternativeLabel
             className={classes.stepper}
           >
-            {steps.map(label => (
+            {steps.map((label) => (
               <Step key={label}>
                 <StepLabel>{label}</StepLabel>
               </Step>
@@ -283,9 +271,10 @@ const PopUpContent = ({
                             ? []
                             : selectedDashboardUsers
                                 .filter(
-                                  user => !selectedUsers.includes(user.username)
+                                  (user) =>
+                                    !selectedUsers.includes(user.username)
                                 )
-                                .map(user => user.username);
+                                .map((user) => user.username);
 
                         await dashboardAction(
                           name,
@@ -301,7 +290,7 @@ const PopUpContent = ({
                           handleClose();
                         }, 2000);
                       } else {
-                        setActiveStep(prevActiveStep => prevActiveStep + 1);
+                        setActiveStep((prevActiveStep) => prevActiveStep + 1);
                         setIsDisabled(true);
                       }
                     }}
@@ -320,14 +309,14 @@ const PopUpContent = ({
 const DynamicColumnsContent = ({
   columns,
   setSelectedColumns,
-  selectedColumns
+  selectedColumns,
 }) => {
   const classes = useListStyles();
   const [checked, setChecked] = useState(
     selectedColumns.length > 0 ? selectedColumns : ["jira_id"]
   );
 
-  const handleToggle = value => () => {
+  const handleToggle = (value) => () => {
     const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
 
@@ -342,12 +331,11 @@ const DynamicColumnsContent = ({
   return (
     <Paper className={classes.columnPaper} key={"addColumnToDashboardPaper"}>
       <List className={classes.root} key={"addColumnToDashboardList"}>
-        {columns.map(value => {
+        {columns.map((value) => {
           const labelId = `checkbox-list-label-${value.type}`;
 
           return (
             <ListItem
-              key={value.type}
               role={undefined}
               dense
               button
@@ -407,7 +395,7 @@ const TransferListContent = ({
   setSelectedIndices,
   searchValue,
   allIndices,
-  alreadySelectedIndices
+  alreadySelectedIndices,
 }) => {
   const classes = useStyles();
   return (
@@ -421,13 +409,13 @@ const TransferListContent = ({
           value={searchValue}
           className={classes.textField}
           InputProps={{ classes: { input: classes.searchInput } }}
-          onChange={event => setSearchValue(event.target.value)}
+          onChange={(event) => setSearchValue(event.target.value)}
         />
         <TransferList
           key={"transferList"}
           allIndices={allIndices}
           searchValue={searchValue}
-          setSelectedIndices={indices => setSelectedIndices(indices)}
+          setSelectedIndices={(indices) => setSelectedIndices(indices)}
           alreadyChoosen={alreadySelectedIndices}
         />
       </DialogContent>
@@ -437,12 +425,12 @@ const TransferListContent = ({
 const UserDashboardContent = ({
   allUsers,
   setSelectedUsers,
-  selectedUsers
+  selectedUsers,
 }) => {
   const classes = useListStyles();
   const [checked, setChecked] = useState(selectedUsers);
 
-  const handleToggle = value => () => {
+  const handleToggle = (value) => () => {
     const currentIndex = checked.indexOf(value);
     const newChecked = [...checked];
 
@@ -462,12 +450,11 @@ const UserDashboardContent = ({
       <List className={classes.root} key={"addUserToDashboardList"}>
         {allUsers
           .sort((a, b) => a.full_name.localeCompare(b.full_name))
-          .map(value => {
+          .map((value) => {
             const labelId = `checkbox-list-label-${value.username}`;
 
             return (
               <ListItem
-                key={value}
                 role={undefined}
                 dense
                 button

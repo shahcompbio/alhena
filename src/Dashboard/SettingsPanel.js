@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   AccordionActions,
   Button,
-  Divider,
   Paper,
   Typography,
   Grid,
   Accordion,
   AccordionDetails,
-  AccordionSummary
+  AccordionSummary,
 } from "@material-ui/core";
 
 import { ApolloConsumer } from "react-apollo";
@@ -28,62 +27,61 @@ import { withStyles } from "@material-ui/core/styles";
 import { useDashboardState } from "../Search/ProjectView/ProjectState/dashboardState";
 
 import { useStatisticsState } from "./DashboardState/statsState";
-import { heatmapConfig } from "./Heatmap/config";
 
-const styles = theme => ({
+const styles = (theme) => ({
   fieldComponent: {
-    margin: theme.spacing(0, 3, 8, 3)
+    margin: theme.spacing(0, 3, 8, 3),
   },
   fieldTitle: {
-    paddingBottom: 30
+    paddingBottom: 30,
   },
   AccordionRoot: {
     boxShadow:
-      "0px 2px 1px -1px rgba(255, 255, 255, 0.85), 0px -1px 0px 0px rgb(255, 255, 255), 0px 1px 3px 0px rgba(204, 196, 196, 0)"
+      "0px 2px 1px -1px rgba(255, 255, 255, 0.85), 0px -1px 0px 0px rgb(255, 255, 255), 0px 1px 3px 0px rgba(204, 196, 196, 0)",
   },
   AccordionSummary: {
-    padding: "0 14px 0 14px"
+    padding: "0 14px 0 14px",
   },
   expanded: { margin: "0px !important" },
   panel: {
     padding: theme.spacing(3, 3, 3, 3),
     margin: theme.spacing(0, 0, 0, 0),
     width: "100%",
-    background: "white"
+    background: "white",
   },
   selectedCells: {
     backgroundColor: "#e6eaec",
     padding: theme.spacing(3, 3, 3, 3),
-    margin: theme.spacing(2, 0, 2, 0)
+    margin: theme.spacing(2, 0, 2, 0),
   },
   markLabel: {
-    color: "rgba(225, 225, 225, 0.54)"
+    color: "rgba(225, 225, 225, 0.54)",
   },
   metaDataPanel: {
     background: "none",
-    marginBottom: 10
+    marginBottom: 10,
   },
   buttonWrapper: {
-    textAlign: "center"
+    textAlign: "center",
   },
   button: {
-    margin: theme.spacing(3)
+    margin: theme.spacing(3),
   },
   exportButton: {
     width: 130,
     marginBottom: 10,
-    marginRight: 12
+    marginRight: 12,
   },
   shareButton: {
     width: 135,
-    marginBottom: 10
+    marginBottom: 10,
   },
-  fieldComponent: {
-    margin: theme.spacing(2, 0, 0, 0)
-  },
+  // fieldComponent: {
+  //   margin: theme.spacing(2, 0, 0, 0),
+  // },
   formControl: {
     width: "100%",
-    margin: theme.spacing(0, 0, 2, 0)
+    margin: theme.spacing(0, 0, 2, 0),
   },
   gridSlider: { width: "100%", marginBottom: 10 },
   settings: {
@@ -92,31 +90,26 @@ const styles = theme => ({
     background: "none",
     height: "100%",
     position: "fixed",
-    overflowY: "scroll"
+    overflowY: "scroll",
   },
   sliderPanel: {
-    padding: 20
+    padding: 20,
   },
   slider: {
-    marginTop: 10
+    marginTop: 10,
   },
   titlePadding: {
     paddingBottom: 15,
-    paddingTop: 15
+    paddingTop: 15,
   },
   whiteText: {
-    color: "white"
+    color: "white",
   },
   panelDetails: {
-    padding: "0px 24px 24px"
-  }
+    padding: "0px 24px 24px",
+  },
 });
-const defaultCleared = {
-  dataFilters: false,
-  scatterplot: false,
-  chip: false,
-  GCBias: false
-};
+
 const SettingsPanel = ({
   analysis,
   classes,
@@ -127,7 +120,7 @@ const SettingsPanel = ({
   numericalDataFilters,
   metaData,
   setOpenExportPopup,
-  setOpenSharePopup
+  setOpenSharePopup,
 }) => {
   const [{ selectedAnalysis, selectedDashboard }] = useDashboardState();
   const [
@@ -137,9 +130,9 @@ const SettingsPanel = ({
       experimentalCondition,
       axisChange,
       subsetSelection,
-      selectedCellsDispatchFrom
+      selectedCellsDispatchFrom,
     },
-    dispatch
+    dispatch,
   ] = useStatisticsState();
 
   const meta = metaData ? metaData : {};
@@ -149,17 +142,17 @@ const SettingsPanel = ({
     scatterplot: false,
     chip: false,
     GCBias: false,
-    violin: false
+    violin: false,
   });
 
-  const resetFilter = type => {
+  const resetFilter = (type) => {
     update("", type);
   };
 
   function update(value, type) {
     dispatch({
       type: type,
-      value: value
+      value: value,
     });
   }
   const isDisabled =
@@ -186,7 +179,7 @@ const SettingsPanel = ({
         project={selectedDashboard}
         analysis={selectedAnalysis}
       />
-      {((selectedCells.length !== 0 && axisChange["datafilter"] == false) ||
+      {((selectedCells.length !== 0 && axisChange["datafilter"] === false) ||
         subsetSelection.length !== 0) && (
         <SelectedCellsPanel
           classes={classes}
@@ -200,7 +193,7 @@ const SettingsPanel = ({
               type: "BRUSH",
               value: [],
               subsetSelection: [],
-              dispatchedFrom: "clear"
+              dispatchedFrom: "clear",
             })
           }
         />
@@ -243,14 +236,14 @@ const SettingsPanel = ({
         }}
       >
         <ApolloConsumer key={"dataFilterConsumer"}>
-          {client =>
+          {(client) =>
             categoryStats.length > 0 ? (
               <DataFilters
                 key={"dataFilterWrapper"}
                 client={client}
                 numericalDataFilters={numericalDataFilters}
                 experimentalConditions={categoryStats.filter(
-                  category =>
+                  (category) =>
                     category["category"] === experimentalCondition["type"]
                 )}
                 analysis={selectedAnalysis}
@@ -287,7 +280,7 @@ const SettingsPanel = ({
         <ScatterplotSettings
           classes={classes}
           analysis={analysis}
-          setAxisOption={value => update(value, "SCATTERPLOT_AXIS_UPDATE")}
+          setAxisOption={(value) => update(value, "SCATTERPLOT_AXIS_UPDATE")}
           isDisabled={isDisabled}
         />
       </AccordianWrapper>
@@ -307,7 +300,7 @@ const SettingsPanel = ({
           classes={classes}
           axisOptions={chipHeatmapOptions}
           currentlySelectedAxis={chipHeatmapAxis}
-          setAxisOption={value => update(value, "CHIPHEATMAP_AXIS_UPDATE")}
+          setAxisOption={(value) => update(value, "CHIPHEATMAP_AXIS_UPDATE")}
           isDisabled={isDisabled}
         />
       </AccordianWrapper>
@@ -326,7 +319,7 @@ const SettingsPanel = ({
         <ViolinSettings
           classes={classes}
           axisOptions={violinOptions}
-          setAxisOption={value => update(value, "VIOLIN_AXIS_UPDATE")}
+          setAxisOption={(value) => update(value, "VIOLIN_AXIS_UPDATE")}
           isDisabled={isDisabled}
         />
       </AccordianWrapper>
@@ -344,7 +337,7 @@ const SettingsPanel = ({
       >
         <GCBiasSettings
           classes={classes}
-          setAxisOption={value => update(value, "GCBIAS_IS_GROUPED")}
+          setAxisOption={(value) => update(value, "GCBIAS_IS_GROUPED")}
           isDisabled={isDisabled}
         />
       </AccordianWrapper>
@@ -359,7 +352,7 @@ const AccordianWrapper = ({
   resetFilter,
   isResetPossible,
   setIsOpenAccordian,
-  openAccordian
+  openAccordian,
 }) => (
   <Accordion
     className={classes.AccordionRoot}
@@ -367,7 +360,7 @@ const AccordianWrapper = ({
     onChange={() =>
       setIsOpenAccordian({
         ...openAccordian,
-        [name]: !openAccordian[name]
+        [name]: !openAccordian[name],
       })
     }
     key={name + "accordian"}
@@ -416,7 +409,7 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
         variant="h6"
         fontWeight="fontWeightRegular"
         style={{
-          color: "#a2a2a2"
+          color: "#a2a2a2",
         }}
       >
         <span
@@ -424,7 +417,7 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
             width: 225,
             display: "inline-block",
             fontWeight: "bold",
-            wordBreak: "break-all"
+            wordBreak: "break-all",
           }}
         >
           Analysis: {analysis}
@@ -475,7 +468,7 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
 const SelectedCellsPanel = ({
   classes,
   selectedCellsCount,
-  clearCellSelection
+  clearCellSelection,
 }) => (
   <Paper
     className={[classes.panel, classes.selectedCells]}
