@@ -148,6 +148,7 @@ const Minimap = ({
       ]);
     }
   }, [data, paintReady]);
+
   const heatmapWidth = heatmapConfig.minimap.width;
   return (
     <Query

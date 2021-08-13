@@ -18,17 +18,21 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(5)
   },
   activeWhite: {
+    fontSize: 40,
     cursor: "pointer",
     color: "white !important"
   },
   activeBlack: {
+    fontSize: 40,
     color: "#1b1919a3 !important"
   },
   activeBold: {
+    fontSize: 40,
     cursor: "pointer",
     fontWeight: "bold"
   },
   disabled: {
+    fontSize: 40,
     color: "#1b1919a3",
     pointer: "none !important"
   },
@@ -73,7 +77,7 @@ const useStyles = makeStyles(theme => ({
     minHeight: 80
   },
   button: {
-    marginBottom: theme.spacing(20)
+    marginBottom: 100
   },
   vertical: {
     right: 0
@@ -149,7 +153,6 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
               className={stepperColour}
               style={{
                 marginTop: -75,
-                marginLeft: 5,
                 color: "white",
                 fontWeight: "bold"
               }}
@@ -169,45 +172,3 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
   );
 };
 export default SearchStepper;
-
-/*      <Drawer
-        variant="permanent"
-        className={clsx(classes.drawer, {
-          [classes.drawerOpen]: detailsDrawer,
-          [classes.drawerClose]: !detailsDrawer
-        })}
-        classes={{
-          paper: clsx({
-            [classes.drawerOpen]: detailsDrawer,
-            [classes.drawerClose]: !detailsDrawer
-          })
-        }}
-        anchor={"right"}
-        open={detailsDrawer}
-        onMouseEnter={moreDetailOpen}
-        onMouseLeave={moreDetailExit}
-        onClose={() => setDetailsDrawer(false)}
-        ModalProps={{
-          keepMounted: true
-        }}
-      >
-        <div className={classes.drawerContent}>
-          {stepTextValues.map((value, index) => {
-            return (
-              <div
-                key={value}
-                className={clsx(
-                  value.length >= 10
-                    ? classes.drawerLabelTwoLines
-                    : classes.drawerLabelOneLine,
-                  index <= activeStep ? stepperColour : classes.disabled,
-                  index === activeStep ? classes.activeBold : ""
-                )}
-                onClick={() => handleStep(index)}
-              >
-                {value}
-              </div>
-            );
-          })}
-        </div>
-      </Drawer>*/
