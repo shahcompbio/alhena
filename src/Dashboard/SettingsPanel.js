@@ -11,6 +11,9 @@ import {
   AccordionSummary
 } from "@material-ui/core";
 
+import TextField from "@material-ui/core/TextField";
+import Autocomplete from "@material-ui/lab/Autocomplete";
+
 import { ApolloConsumer } from "react-apollo";
 import ChipHeatmapSettings from "./Settings/ChipHeatmapSettings.js";
 import ScatterplotSettings from "./Settings/ScatterplotSettings.js";
@@ -98,7 +101,13 @@ const styles = theme => ({
     padding: 20
   },
   slider: {
-    marginTop: 10
+    //marginTop: 10
+  },
+  search: {
+    marginTop: 0,
+    '&&[class*="MuiFormControl-marginNormal"]': {
+      marginTop: 0
+    }
   },
   titlePadding: {
     paddingBottom: 15,
@@ -127,7 +136,8 @@ const SettingsPanel = ({
   numericalDataFilters,
   metaData,
   setOpenExportPopup,
-  setOpenSharePopup
+  setOpenSharePopup,
+  cellIDs
 }) => {
   const [{ selectedAnalysis, selectedDashboard }] = useDashboardState();
   const [
@@ -230,6 +240,35 @@ const SettingsPanel = ({
           Share
         </Button>
       </Grid>
+      <Autocomplete
+        id="cellid-searchInput"
+        freeSolo
+        options={
+          cellIDs
+            ? cellIDs.sort((a, b) =>
+                a["cellID"].localeCompare(b["cellID"], "en", { numeric: true })
+              )
+            : []
+        }
+        onChange={(event, newValue) => {
+          dispatch({
+            type: "BRUSH",
+            value: newValue ? [newValue.order] : [],
+            dispatchedFrom: newValue ? "search" : "clear"
+          });
+        }}
+        getOptionLabel={option => option.cellID}
+        style={{ marginTop: -16 }}
+        className={classes.search}
+        renderInput={params => (
+          <TextField
+            {...params}
+            label="Search By Cell ID"
+            margin="normal"
+            variant="outlined"
+          />
+        )}
+      />
       <AccordianWrapper
         classes={classes}
         name="dataFilter"
@@ -424,6 +463,7 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
             width: 225,
             display: "inline-block",
             fontWeight: "bold",
+            fontSize: 20,
             wordBreak: "break-all"
           }}
         >
@@ -432,7 +472,7 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
       </Typography>
       {project && (
         <Typography
-          variant="h7"
+          variant="h6"
           fontWeight="fontWeightRegular"
           style={{ color: "#a2a2a2" }}
         >
@@ -441,7 +481,7 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
       )}
       {metaData && (
         <Typography
-          variant="h7"
+          variant="h6"
           fontWeight="fontWeightRegular"
           style={{ color: "#a2a2a2" }}
         >
@@ -450,7 +490,7 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
       )}
       {metaData && (
         <Typography
-          variant="h7"
+          variant="h6"
           fontWeight="fontWeightRegular"
           style={{ color: "#a2a2a2" }}
         >
@@ -461,7 +501,7 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
         <LoadingCircle />
       ) : (
         <Typography
-          variant="h7"
+          variant="h6"
           fontWeight="fontWeightRegular"
           style={{ color: "#a2a2a2" }}
         >

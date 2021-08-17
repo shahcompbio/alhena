@@ -15,6 +15,7 @@ import { Route, Switch } from "react-router-dom";
 
 import { withRouter } from "react-router";
 import { useHistory } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 import AdminPanel from "./Authentication/AdminPanel.js";
 
@@ -36,6 +37,34 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 const App = () => {
   const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
   let history = useHistory();
+
+  const [locationKeys, setLocationKeys] = useState([]);
+  const loc = useLocation();
+
+  useEffect(() => {
+    return history.listen(location => {
+      console.log(location);
+      if (history.action === "PUSH") {
+        setLocationKeys([location.key]);
+      }
+
+      if (history.action === "POP") {
+        if (locationKeys[1] === location.key) {
+          setLocationKeys(([_, ...keys]) => keys);
+
+          // Handle forward event
+        } else {
+          console.log("hello");
+          setLocationKeys(keys => [location.key, ...keys]);
+          console.log(loc.pathname);
+          console.log(history.location.pathname);
+          history.replace(history.location.pathname, "/dashboards");
+          // Handle back event
+        }
+      }
+    });
+  }, [locationKeys]);
+
   return (
     <MuiThemeProvider theme={theme}>
       <CssBaseline />

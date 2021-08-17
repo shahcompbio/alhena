@@ -138,7 +138,7 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
                     "-" +
                     params["row"]["sample_id"]
                   }
-                  style={{ color: "white" }}
+                  style={{ color: "white", fontSize: 18 }}
                   href={"javascript:;"}
                   onMouseEnter={function(event, row) {
                     d3.select("#" + event.target.id).style(
@@ -163,7 +163,9 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
                   {params["row"]["sample_id"]}
                 </a>
               ) : (
-                <p style={{ cursor: "text" }}>{params["row"][field["type"]]}</p>
+                <p style={{ cursor: "text", fontSize: 18 }}>
+                  {params["row"][field["type"]]}
+                </p>
               );
             },
             headerClassName: classes.header

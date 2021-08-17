@@ -273,12 +273,13 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
 
   const [defaultValues, setDefualtValues] = useState({});
   const [prevDefaultValues, setPrevDefaultValues] = useState({});
+  const originalDefaultValues = filters.reduce((final, curr) => {
+    final[curr["name"]] = [curr["min"], curr["max"]];
+    return final;
+  }, {});
+
   useEffect(() => {
     if (_.isEmpty(defaultValues)) {
-      const originalDefaultValues = filters.reduce((final, curr) => {
-        final[curr["name"]] = [curr["min"], curr["max"]];
-        return final;
-      }, {});
       setDefualtValues({ ...originalDefaultValues });
       setPrevDefaultValues({ ...originalDefaultValues });
     }
@@ -290,10 +291,6 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
       _.isEmpty(absoluteMinMaxDataFilters) &&
       axisChange["datafilter"] === false
     ) {
-      const originalDefaultValues = filters.reduce((final, curr) => {
-        final[curr["name"]] = [curr["min"], curr["max"]];
-        return final;
-      }, {});
       setDefualtValues({ ...originalDefaultValues });
       setPrevDefaultValues({ ...originalDefaultValues });
     }
@@ -342,6 +339,9 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
 
   return filters.length > 0 && Object.keys(defaultValues).length > 0
     ? filters.map(filter => {
+        const formattedLocalMax = numFormatter(filter["localMax"]);
+        const formattedLocalMin = numFormatter(filter["localMin"]);
+
         const formattedMin = numFormatter(defaultValues[filter["name"]][0]);
         const formattedMax = numFormatter(defaultValues[filter["name"]][1]);
 
@@ -354,8 +354,42 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
             >
               {filter["label"]}
             </Typography>
+            <Typography
+              id="breath-local-slider"
+              gutterBottom
+              style={{ fontSize: 12, marginBottom: 0 }}
+            >
+              Local Max/Min
+            </Typography>
+            <Slider
+              disabled
+              defaultValue={null}
+              defaultValue={[filter["localMin"], filter["localMax"]]}
+              aria-labelledby="breath-local-slider"
+              min={originalDefaultValues[filter["name"]][0]}
+              max={originalDefaultValues[filter["name"]][1]}
+              style={{ marginBottom: 0 }}
+              marks={[
+                {
+                  value: filter["localMin"],
+                  label: formattedLocalMin
+                },
+                {
+                  value: filter["localMax"],
+                  label: formattedLocalMax
+                }
+              ]}
+            />
+            <Typography
+              id="breath-overall-slider"
+              gutterBottom
+              style={{ fontSize: 12, marginBottom: 0, marginTop: 10 }}
+            >
+              Range Controls
+            </Typography>
             <Slider
               key={filter["name"] + "-slider"}
+              aria-labelledby="breath-overall-slider"
               value={defaultValues[filter["name"]]}
               className={classes.slider}
               color={"secondary"}

@@ -19,7 +19,11 @@ const CategoriesLegend = ({ choosenStats }) => {
   var tooltip = d3Tip()
     .attr("class", "d3-tip w")
     .attr("id", "categoryTip");
-
+  const nameMapping = {
+    state_mode: "State Mode",
+    cell_call: "Cell Call",
+    experimental_condition: "Experimental Condition"
+  };
   useEffect(() => {
     if (choosenStats) {
       const xOffset = getXOffset(choosenStats.length);
@@ -43,7 +47,7 @@ const CategoriesLegend = ({ choosenStats }) => {
           .attr("class", "cat-legend category-" + categoryName)
           .attr("text-anchor", "start")
           .on("mouseout", tooltip.hide)
-          .text(categoryName);
+          .text(nameMapping[categoryName]);
 
         var horizLineDim = index * squareSize + index * spacing;
 
