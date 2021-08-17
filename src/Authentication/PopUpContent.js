@@ -167,10 +167,7 @@ const PopUpContent = ({
   );
 };
 const LoadingContent = ({ classes, isSent }) => (
-  <div
-    className={classes.dialogWrapper}
-    style={{ width: "70%", height: "70%" }}
-  >
+  <div className={classes.dialogWrapper}>
     {isSent && (
       <IconButton className={classes.iconButton}>
         <CheckIcon className={classes.icon} />
