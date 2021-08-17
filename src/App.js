@@ -37,6 +37,29 @@ const App = () => {
   const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
   let history = useHistory();
 
+  const [locationKeys, setLocationKeys] = useState([]);
+  const loc = useLocation();
+
+  useEffect(() => {
+    return history.listen(location => {
+      if (history.action === "PUSH") {
+        setLocationKeys([location.key]);
+      }
+
+      if (history.action === "POP") {
+        if (locationKeys[1] === location.key) {
+          setLocationKeys(([_, ...keys]) => keys);
+
+          // Handle forward event
+        } else {
+          setLocationKeys(keys => [location.key, ...keys]);
+          history.replace(history.location.pathname, "/dashboards");
+          // Handle back event
+        }
+      }
+    });
+  }, [locationKeys]);
+
   return (
     <MuiThemeProvider theme={theme}>
       <CssBaseline />

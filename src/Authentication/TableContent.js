@@ -79,6 +79,7 @@ const styles = theme => ({
     backgroundColor: "#11151d40"
   },
   tableHeader: {
+    fontSize: 16,
     fontWeight: "bold"
   },
   tablePagination: {
