@@ -15,6 +15,7 @@ import { Route, Switch } from "react-router-dom";
 
 import { withRouter } from "react-router";
 import { useHistory } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 import AdminPanel from "./Authentication/AdminPanel.js";
 
@@ -80,7 +81,10 @@ const App = () => {
           <Route
             key="dashboardUnauth"
             path="/dashboards"
-            component={() => {
+            component={({ location, match }) => {
+              if (location.pathname !== match.path) {
+                localStorage.setItem("linkAttempt", location.pathname);
+              }
               history.replace("/login");
               return (
                 <ApolloConsumer>

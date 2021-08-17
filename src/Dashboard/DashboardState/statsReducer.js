@@ -49,6 +49,7 @@ const initialState = {
 };
 
 const statsStateReducer = (state, action) => {
+  console.log(action);
   switch (action.type) {
     case "BRUSH": {
       return {

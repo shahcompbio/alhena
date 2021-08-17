@@ -29,6 +29,7 @@ const HEATMAP_ORDER = gql`
   ) {
     heatmapOrder(analysis: $analysis, quality: $quality) {
       order
+      cellID
     }
     categoriesStats(analysis: $analysis) {
       category
@@ -210,6 +211,7 @@ const QCDashboard = ({ analysis, classes, client }) => {
                 numericalDataFilters={
                   data.numericalDataFilters.numericalDataFilters
                 }
+                cellIDs={data.heatmapOrder}
                 cellCount={data.heatmapOrder.length}
                 chipHeatmapOptions={data.chipHeatmapOptions}
                 violinOptions={data.violinAxisOptions}

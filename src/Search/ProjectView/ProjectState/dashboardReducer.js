@@ -4,6 +4,22 @@ const initialState = (
   selectedAnalysis,
   linkParams
 ) => {
+  if (selectedDashboard) {
+    var refresh =
+      window.location.protocol +
+      "//" +
+      window.location.host +
+      window.location.pathname +
+      "?=" +
+      selectedDashboard;
+    console.log(refresh);
+    if (selectedAnalysis) {
+      refresh = refresh + "?analysis=" + selectedAnalysis;
+    }
+
+    window.history.pushState({ path: refresh }, "", refresh);
+  }
+
   return {
     dashboards: dashboards,
     selectedDashboard: selectedDashboard,
@@ -23,12 +39,35 @@ const statsStateReducer = (state, action) => {
       };
     }
     case "DASHBOARD_SELECT": {
+      var refresh =
+        window.location.protocol +
+        "//" +
+        window.location.host +
+        window.location.pathname;
+
+      refresh = action.value.selectedDashboard
+        ? refresh + "?=" + action.value.selectedDashboard
+        : refresh;
+
+      window.history.pushState({ path: refresh }, "", refresh);
       return {
         ...state,
         selectedDashboard: action.value.selectedDashboard
       };
     }
     case "ANALYSIS_SELECT": {
+      const analysisRefresh =
+        window.location.protocol +
+        "//" +
+        window.location.host +
+        window.location.pathname +
+        "?=" +
+        state.selectedDashboard +
+        "?analysis=" +
+        action.value.selectedAnalysis;
+
+      window.history.pushState({ path: analysisRefresh }, "", analysisRefresh);
+
       return {
         ...state,
         selectedAnalysis: action.value.selectedAnalysis

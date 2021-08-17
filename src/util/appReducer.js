@@ -17,7 +17,12 @@ const appStateReducer = (state, action) => {
       localStorage.setItem("isSuperUser", action.isSuperUser);
       localStorage.setItem("authKeyID", action.authKeyID);
       localStorage.setItem("uid", action.uid);
-      action.isSuperUser ? history.push("/admin") : history.push("/dashboards");
+      const lastLink = localStorage.getItem("linkAttempt");
+      lastLink && lastLink !== "/dashboards"
+        ? history.push(lastLink)
+        : action.isSuperUser
+        ? history.push("/admin")
+        : history.push("/dashboards");
       return {
         ...state,
         authAttempted: true,
@@ -33,6 +38,8 @@ const appStateReducer = (state, action) => {
       localStorage.removeItem("isSuperUser");
       localStorage.removeItem("authKeyID");
       localStorage.removeItem("uid");
+      localStorage.removeItem("linkAttempt");
+
       history.push("/login");
 
       return { ...state, authAttempted: false, authKeyID: null, uid: null };

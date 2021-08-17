@@ -42,7 +42,7 @@ const OverviewContent = ({ classes, handleForwardStep }) => {
       >
         <Grid item style={{ textAlign: "center" }}>
           <Typography
-            variant="h5"
+            variant="h4"
             color="secondary"
             style={{ marginBottom: 50 }}
           >
@@ -59,6 +59,7 @@ const OverviewContent = ({ classes, handleForwardStep }) => {
                 <Button
                   key={"button" + project}
                   value={project}
+                  style={{ fontWeight: "bold", fontSize: 16 }}
                   onClick={() => selectProject(project)}
                 >
                   {project}

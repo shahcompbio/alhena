@@ -132,7 +132,7 @@ const AdminPanel = ({ classes }) => {
             key={"adminpanel-container" + keyType}
           >
             <Grid item xs={6} key={"admin-title" + keyType}>
-              <Typography variant="h5">Admin Settings</Typography>
+              <Typography variant="h4">Admin Settings</Typography>
             </Grid>
             <Grid item xs={6} key={"icon-container"}>
               <Grid
