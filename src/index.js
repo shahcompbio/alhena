@@ -6,11 +6,11 @@ import "react-app-polyfill/stable";
 import * as serviceWorker from "./serviceWorker";
 
 import { BrowserRouter } from "react-router-dom";
-import { ApolloProvider } from "react-apollo";
 import { AppStateProvider } from "./util/app-state";
 
 import appStateReducer, { initialState } from "./util/appReducer";
-import { ApolloProvider as ApolloHooksProvider } from "react-apollo-hooks";
+import { ApolloProvider } from "react-apollo";
+import { ApolloProvider as ApolloHooksProvider } from "@apollo/client";
 
 import client from "./apollo.js";
 require("dotenv").config();

@@ -1,9 +1,4 @@
-import React, {
-  useWindowSize,
-  useEffect,
-  useState,
-  useLayoutEffect
-} from "react";
+import React, { useEffect, useState } from "react";
 import {
   useAppState,
   PrivateRoute,
@@ -15,13 +10,10 @@ import { Route, Switch } from "react-router-dom";
 
 import { withRouter } from "react-router";
 import { useHistory } from "react-router-dom";
-import { useLocation } from "react-router-dom";
 
 import AdminPanel from "./Authentication/AdminPanel.js";
 
 import DashboardWrapper from "./Search/DashboardWrapper";
-import DashboardContent from "./Dashboard/DashboardContent.js";
-import ProjectViewContent from "./Search/ProjectView/ProjectViewContent";
 
 import ExportPopup from "./Misc/ExportPopup.js";
 import Unauthenticated from "./Authentication/Unauthenticated.js";
@@ -35,11 +27,10 @@ import { MuiThemeProvider } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 
 const App = () => {
-  const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
+  const [{ authKeyID }, dispatch] = useAppState();
   let history = useHistory();
 
   const [locationKeys, setLocationKeys] = useState([]);
-  const loc = useLocation();
 
   useEffect(() => {
     return history.listen(location => {

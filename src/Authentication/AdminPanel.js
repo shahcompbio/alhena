@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import gql from "graphql-tag";
+import React, { useState, useEffect } from "react";
+import { gql, useLazyQuery } from "@apollo/client";
 
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
@@ -12,10 +12,7 @@ import SeperatedTabs from "./SeperatedTabs.js";
 
 import NewUserPopup from "./NewUser/NewUserPopup.js";
 import AddDashboardPopupWrapper from "./AddDashboardPopupWrapper.js";
-
 import Menu from "../Misc/Menu.js";
-
-import { ApolloConsumer } from "react-apollo";
 import TabContentWrapper from "./TabContentWrapper.js";
 
 import { withStyles, useTheme } from "@material-ui/styles";
@@ -61,34 +58,15 @@ const CREATENEWDASHBOARD = gql`
     }
   }
 `;
-const createNewDashboard = async (
-  client,
-  name,
-  selectedIndices,
-  selectedColumns,
-  selectedUsers,
-  deletedUsers
-) => {
-  const { data } = await client.query({
-    query: CREATENEWDASHBOARD,
-    variables: {
-      dashboard: {
-        name: name,
-        indices: selectedIndices,
-        columns: selectedColumns,
-        users: selectedUsers,
-        deletedUsers: []
-      }
-    }
-  });
-  return data.createNewDashboard.created;
-};
 
 const AdminPanel = ({ classes }) => {
   const theme = useTheme();
 
   const [openPopup, setOpenPopup] = useState(false);
   const [tabIndex, setTabIndex] = useState(1);
+  const [createNewDashboard, { data, loading, error }] = useLazyQuery(
+    CREATENEWDASHBOARD
+  );
 
   const handleClickAdd = () => {
     setOpenPopup(true);
@@ -97,24 +75,32 @@ const AdminPanel = ({ classes }) => {
   const handleCloseAdd = () => {
     setOpenPopup(false);
   };
-  const addDashboard = async (
-    client,
+  useEffect(() => {
+    if (data) {
+      if (data.createNewDashboard.created) {
+        window.location.reload();
+      }
+    }
+  }, [data, loading, error]);
+
+  const addDashboard = (
+    createNewDashboard,
     name,
     selectedIndices,
     selectedColumns,
     selectedUsers
   ) => {
-    const created = await createNewDashboard(
-      client,
-      name,
-      selectedIndices,
-      selectedColumns,
-      selectedUsers,
-      []
-    );
-    if (created) {
-      window.location.reload();
-    }
+    createNewDashboard({
+      variables: {
+        dashboard: {
+          name: name,
+          indices: selectedIndices,
+          columns: selectedColumns,
+          users: selectedUsers,
+          deletedUsers: []
+        }
+      }
+    });
   };
   const keyType = tabIndex === 0 ? "-users" : "-dashboards";
   return (
@@ -142,48 +128,43 @@ const AdminPanel = ({ classes }) => {
                 alignItems="center"
                 className={classes.actions}
               >
-                <ApolloConsumer key={"add-consumer" + keyType}>
-                  {client => [
-                    <IconButton
-                      key={"add-button" + keyType}
-                      variant="outlined"
-                      color="secondary"
-                      className={classes.icons}
-                      onClick={handleClickAdd}
-                    >
-                      <AddBoxIcon className={classes.iconSvg} />
-                    </IconButton>,
-                    openPopup && tabIndex === 0 && (
-                      <NewUserPopup
-                        key={"newUserPopup"}
-                        isOpen={openPopup}
-                        handleClose={handleCloseAdd}
-                        client={client}
-                      />
-                    ),
-                    openPopup && tabIndex === 1 && (
-                      <AddDashboardPopupWrapper
-                        key={"newDashboardPopup"}
-                        isOpen={openPopup}
-                        handleClose={handleCloseAdd}
-                        dashboardAction={(
-                          name,
-                          selectedIndices,
-                          selectedColumns,
-                          selectedUsers
-                        ) =>
-                          addDashboard(
-                            client,
-                            name,
-                            selectedIndices,
-                            selectedColumns,
-                            selectedUsers
-                          )
-                        }
-                      />
-                    )
-                  ]}
-                </ApolloConsumer>
+                <IconButton
+                  key={"add-button" + keyType}
+                  variant="outlined"
+                  color="secondary"
+                  className={classes.icons}
+                  onClick={handleClickAdd}
+                >
+                  <AddBoxIcon className={classes.iconSvg} />
+                </IconButton>
+                {openPopup && tabIndex === 0 && (
+                  <NewUserPopup
+                    key={"newUserPopup"}
+                    isOpen={openPopup}
+                    handleClose={handleCloseAdd}
+                  />
+                )}
+                {openPopup && tabIndex === 1 && (
+                  <AddDashboardPopupWrapper
+                    key={"newDashboardPopup"}
+                    isOpen={openPopup}
+                    handleClose={handleCloseAdd}
+                    dashboardAction={(
+                      name,
+                      selectedIndices,
+                      selectedColumns,
+                      selectedUsers
+                    ) =>
+                      addDashboard(
+                        createNewDashboard,
+                        name,
+                        selectedIndices,
+                        selectedColumns,
+                        selectedUsers
+                      )
+                    }
+                  />
+                )}
               </Grid>
             </Grid>
           </Grid>
