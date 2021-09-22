@@ -6,8 +6,7 @@ import Legend from "./Legend.js";
 
 import { withStyles } from "@material-ui/core/styles";
 
-import { Query } from "react-apollo";
-import gql from "graphql-tag";
+import { gql, useQuery } from "@apollo/client";
 
 import _ from "lodash";
 
@@ -74,6 +73,14 @@ const Chip = ({ analysis, classes }) => {
     }
   ] = useStatisticsState();
 
+  const { loading, error, data } = useQuery(CHIP_HEATMAP_QUERY, {
+    variables: {
+      analysis,
+      quality,
+      selectedCells: selection,
+      metric: chipHeatmapAxis.type
+    }
+  });
   const selection = getSelection(
     axisChange,
     subsetSelection,
@@ -81,56 +88,43 @@ const Chip = ({ analysis, classes }) => {
     selectedCellsDispatchFrom,
     selfType
   );
-  return (
-    <Query
-      query={CHIP_HEATMAP_QUERY}
-      variables={{
-        analysis,
-        quality,
-        selectedCells: selection,
-        metric: chipHeatmapAxis.type
-      }}
-    >
-      {({ loading, error, data }) => {
-        if (error) return null;
-        if (loading && Object.keys(data).length === 0) {
-          return null;
-        }
-        const { chipHeatmap } = data;
 
-        return (
-          <Grid
-            container
-            direction="row"
-            justify="flex-start"
-            alignItems="flex-start"
-            key="chipWrapper"
-          >
-            <Grid item key="chipGrid">
-              <ChipHeatmap
-                data={chipHeatmap}
-                key="chip"
-                selectionAllowed={isSelectionAllowed(
-                  selfType,
-                  selectedCellsDispatchFrom,
-                  subsetSelection,
-                  selectedCells,
-                  axisChange
-                )}
-              />
-            </Grid>
-            <Grid item className={classes.legend} key="legendWrapper">
-              <Legend
-                legendTitle={chipHeatmapAxis.label}
-                max={chipHeatmap.stats.max}
-                maxColour={maxColour}
-                key="chipLegend"
-              />
-            </Grid>
-          </Grid>
-        );
-      }}
-    </Query>
+  if (error) return null;
+  if (loading && Object.keys(data).length === 0) {
+    return null;
+  }
+  const { chipHeatmap } = data;
+
+  return (
+    <Grid
+      container
+      direction="row"
+      justify="flex-start"
+      alignItems="flex-start"
+      key="chipWrapper"
+    >
+      <Grid item key="chipGrid">
+        <ChipHeatmap
+          data={chipHeatmap}
+          key="chip"
+          selectionAllowed={isSelectionAllowed(
+            selfType,
+            selectedCellsDispatchFrom,
+            subsetSelection,
+            selectedCells,
+            axisChange
+          )}
+        />
+      </Grid>
+      <Grid item className={classes.legend} key="legendWrapper">
+        <Legend
+          legendTitle={chipHeatmapAxis.label}
+          max={chipHeatmap.stats.max}
+          maxColour={maxColour}
+          key="chipLegend"
+        />
+      </Grid>
+    </Grid>
   );
 };
 

@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useDashboardState } from "../../Search/ProjectView/ProjectState/dashboardState";
 
 import gql from "graphql-tag";
-import { useQuery } from "react-apollo-hooks";
 import _ from "lodash";
 
 import {

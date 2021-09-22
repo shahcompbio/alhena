@@ -12,7 +12,8 @@ import SnackbarContentWrapper from "../../Misc/SnackBarPopup.js";
 
 import styled from "styled-components";
 import { withStyles } from "@material-ui/styles";
-import gql from "graphql-tag";
+
+import { gql, useLazyQuery, useQuery } from "@apollo/client";
 
 const styles = theme => ({
   button: {
@@ -54,20 +55,7 @@ export const NEWUSER = gql`
     }
   }
 `;
-const queryCreateNewUser = async (user, client) => {
-  const { data } = await client.query({
-    query: NEWUSER,
-    variables: {
-      user: {
-        name: user.name,
-        username: user.username,
-        email: user.email,
-        password: user.password
-      }
-    }
-  });
-  return data.createNewUser.created;
-};
+
 const NewAccount = ({ email, dispatch, classes }) => {
   const [error, setError] = useState(null);
   const [user, setUser] = useState({
@@ -77,6 +65,25 @@ const NewAccount = ({ email, dispatch, classes }) => {
     password: "",
     passwordVerify: ""
   });
+
+  const [createNewUser, { data, loading, error: gqlError }] = useLazyQuery(
+    NEWUSER
+  );
+
+  useEffect(() => {
+    if (data && data.createNewUser.created) {
+      dispatch({
+        type: "LOGOUT"
+      });
+    } else {
+      setError(10);
+    }
+
+    if (error) {
+      setError(error);
+    }
+  }, [data, loading, error]);
+
   const handleChange = event => {
     var newUser = user;
     newUser[event.target.name] = event.target.value;
@@ -88,22 +95,6 @@ const NewAccount = ({ email, dispatch, classes }) => {
       user["password"] === value ? true : false
     );
   }, [user]);
-
-  const createNewUser = async (event, client, dispatch, user) => {
-    event.preventDefault();
-    try {
-      var acknowledgement = await queryCreateNewUser(user, client);
-      if (acknowledgement) {
-        dispatch({
-          type: "LOGOUT"
-        });
-      } else {
-        setError(10);
-      }
-    } catch (error) {
-      setError(error);
-    }
-  };
 
   return (
     <ApolloConsumer>
@@ -209,7 +200,18 @@ const NewAccount = ({ email, dispatch, classes }) => {
                     type="submit"
                     className={classes.button}
                     variant="contianed"
-                    onClick={ev => createNewUser(ev, client, dispatch, user)}
+                    onClick={ev =>
+                      createNewUser({
+                        variables: {
+                          user: {
+                            name: user.name,
+                            username: user.username,
+                            email: user.email,
+                            password: user.password
+                          }
+                        }
+                      })
+                    }
                   >
                     Create
                   </Button>

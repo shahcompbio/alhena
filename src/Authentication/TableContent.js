@@ -70,7 +70,8 @@ const styles = theme => ({
   tableCell: {
     whiteSpace: "normal",
     wordWrap: "break-word",
-    maxWidth: "100px"
+    maxWidth: "100px",
+    fontSize: 18
   },
   selectedTableCell: {
     whiteSpace: "normal",

@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import * as d3 from "d3";
 
-import { Query } from "react-apollo";
-import gql from "graphql-tag";
+import { gql, useQuery } from "@apollo/client";
 
 import Grid from "@material-ui/core/Grid";
 
@@ -61,49 +60,42 @@ const GCBias = ({ analysis }) => {
     selectedCellsDispatchFrom,
     selfType
   );
+  const { loading, error, data } = useQuery(GCBIAS_QUERY, {
+    variables: {
+      analysis,
+      quality,
+      selectedCells: selection,
+      gcBiasIsGrouped
+    }
+  });
+  if (error) return null;
+  if (loading && Object.keys(data).length === 0) {
+    return null;
+  }
+  const { gcBias } = data;
 
   return (
-    <Query
-      query={GCBIAS_QUERY}
-      variables={{
-        analysis,
-        quality,
-        selectedCells: selection,
-        gcBiasIsGrouped
-      }}
+    <Grid
+      container
+      direction="row"
+      justify="flex-start"
+      alignItems="flex-start"
+      key="gcBias"
     >
-      {({ loading, error, data }) => {
-        if (error) return null;
-        if (loading && Object.keys(data).length === 0) {
-          return null;
-        }
-        const { gcBias } = data;
-
-        return (
-          <Grid
-            container
-            direction="row"
-            justify="flex-start"
-            alignItems="flex-start"
-            key="gcBias"
-          >
-            <Grid item key="gcBiasWrapper">
-              <Plot
-                data={gcBias}
-                selectionAllowed={isSelectionAllowed(
-                  selfType,
-                  selectedCellsDispatchFrom,
-                  subsetSelection,
-                  selectedCells,
-                  axisChange
-                )}
-                key="plot"
-              />
-            </Grid>
-          </Grid>
-        );
-      }}
-    </Query>
+      <Grid item key="gcBiasWrapper">
+        <Plot
+          data={gcBias}
+          selectionAllowed={isSelectionAllowed(
+            selfType,
+            selectedCellsDispatchFrom,
+            subsetSelection,
+            selectedCells,
+            axisChange
+          )}
+          key="plot"
+        />
+      </Grid>
+    </Grid>
   );
 };
 const margin = { left: 50, bottom: 50, right: 80, top: 50 };

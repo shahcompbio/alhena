@@ -13,13 +13,24 @@ import clsx from "clsx";
 import { lighten, makeStyles } from "@material-ui/core/styles";
 
 const useToolbarStyles = makeStyles(theme => ({
+  arrow: {
+    "&:before": {
+      border: "1px solid #E6E8ED"
+    },
+    color: "black"
+  },
   root: {
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(1),
     borderRadius: "10px 10px 0px 0px"
   },
+  tooltipTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    margin: 4
+  },
   highlight: {
-    backgroundColor: "#eac9cc"
+    backgroundColor: "#deddd5"
   },
   deleteHighlight: {
     color: "black",
@@ -34,6 +45,8 @@ const useToolbarStyles = makeStyles(theme => ({
     backgroundColor: lighten("#03a678", 0.7)
   },
   title: {
+    fontWeight: "bold",
+    fontSize: 16,
     flex: "1 1 100%"
   }
 }));
@@ -62,7 +75,12 @@ const TableToolbar = ({
     >
       {selectedAction === null ? (
         [
-          <Tooltip title="Delete" key={name + "ToolbarDelete"}>
+          <Tooltip
+            arrow
+            className={classes.tooltipTitle}
+            title={<Typography variant="h5">Delete</Typography>}
+            key={name + "ToolbarDelete"}
+          >
             <IconButton
               aria-label="delete"
               onClick={ev => setSelectedAction("Delete")}
@@ -70,7 +88,12 @@ const TableToolbar = ({
               <DeleteIcon />
             </IconButton>
           </Tooltip>,
-          <Tooltip title="Edit" key={name + "ToolbarEdit"}>
+          <Tooltip
+            arrow
+            className={classes.tooltipTitle}
+            title={<Typography variant="h5">Edit</Typography>}
+            key={name + "ToolbarEdit"}
+          >
             <IconButton
               aria-label="edit"
               onClick={ev => {
@@ -81,24 +104,37 @@ const TableToolbar = ({
               <EditIcon />
             </IconButton>
           </Tooltip>,
-          <Tooltip title="Cancel" style={{ float: "right" }}>
+          <Tooltip
+            arrow
+            className={classes.tooltipTitle}
+            title={<Typography variant="h5">Cancel</Typography>}
+            style={{ float: "right" }}
+          >
             <IconButton aria-label="Cancel" onClick={ev => clear(true)}>
               <ClearIcon />
             </IconButton>
           </Tooltip>
         ]
       ) : isLoading ? (
-        <Typography>Loading</Typography>
+        <Typography variant="h5"> Loading</Typography>
       ) : actionComplete ? (
         <CheckIcon />
       ) : (
         [
-          <Tooltip title="Clear">
+          <Tooltip
+            arrow
+            className={classes.tooltipTitle}
+            title={<Typography variant="h5">Clear</Typography>}
+          >
             <IconButton aria-label="clear" onClick={ev => clear(true)}>
               <ClearIcon />
             </IconButton>
           </Tooltip>,
-          <Tooltip title="Confirm">
+          <Tooltip
+            arrow
+            className={classes.tooltipTitle}
+            title={<Typography variant="h5">Confirm</Typography>}
+          >
             <IconButton
               aria-label="confirm"
               onClick={ev =>

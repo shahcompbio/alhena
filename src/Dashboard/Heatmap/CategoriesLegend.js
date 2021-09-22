@@ -90,8 +90,6 @@ const CategoriesLegend = ({ choosenStats }) => {
           .attr("height", squareSize)
           .attr("fill", colouredCategories[4])
           .on("mousemove", function(d) {
-            var coordinates = d3.mouse(this);
-
             const dim = d3
               .select("#title-" + categoryName)
               .node()

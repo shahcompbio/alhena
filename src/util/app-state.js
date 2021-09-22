@@ -32,6 +32,10 @@ export function UnauthenticatedRoute({ children, ...rest }) {
               }
             </ApolloConsumer>
           );
+        } else {
+          dispatch({
+            type: "LOGOUT"
+          });
         }
       }}
     />

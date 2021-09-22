@@ -5,14 +5,10 @@ import { Dialog, Grid } from "@material-ui/core";
 
 import Button from "@material-ui/core/Button";
 import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
 import FilledInput from "@material-ui/core/FilledInput";
 
-import { withStyles, makeStyles } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
+import { withStyles } from "@material-ui/core/styles";
 
-import { useAppState } from "../util/app-state";
-import { useQuery } from "@apollo/client";
 import gql from "graphql-tag";
 
 import { useStatisticsState } from "../Dashboard/DashboardState/statsState";

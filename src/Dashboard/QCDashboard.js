@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
-import gql from "graphql-tag";
-import { useQuery } from "react-apollo-hooks";
+import { gql, useQuery } from "@apollo/client";
 
 import { withStyles } from "@material-ui/core/styles";
 import { useHistory } from "react-router-dom";

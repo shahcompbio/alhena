@@ -245,7 +245,7 @@ const SettingsPanel = ({
         freeSolo
         options={
           cellIDs
-            ? cellIDs.sort((a, b) =>
+            ? [...cellIDs].sort((a, b) =>
                 a["cellID"].localeCompare(b["cellID"], "en", { numeric: true })
               )
             : []

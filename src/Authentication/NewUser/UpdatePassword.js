@@ -12,7 +12,8 @@ import SnackbarContentWrapper from "../../Misc/SnackBarPopup.js";
 
 import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
 
-import gql from "graphql-tag";
+import { gql, useLazyQuery } from "@apollo/client";
+
 import styled from "styled-components";
 import { withStyles } from "@material-ui/styles";
 
@@ -54,46 +55,31 @@ const UPDATEPASSWORD = gql`
     }
   }
 `;
-export const queryNewPassword = async (client, username, password) => {
-  const { data } = await client.query({
-    query: UPDATEPASSWORD,
-    variables: {
-      username: username,
-      newPassword: password
-    }
-  });
-  return data.changePassword.confirmed;
-};
 
 const UpdatePassword = ({ username, dispatch, classes }) => {
   let history = useHistory();
   const [error, setError] = useState(null);
   const [user, setUser] = useState({ password: "", passwordVerify: "" });
 
-  const passwordRef = useRef();
-  const verifyPasswordRef = useRef();
+  const [password, setPassword] = useState(null);
+  const [verifyPassword, setVerifyPassword] = useState(null);
 
-  const updatePassword = async (event, client, dispatch) => {
-    event.preventDefault();
-    if (user.password === user.passwordVerify) {
-      try {
-        var acknowledgement = await queryNewPassword(
-          client,
-          username,
-          user.password
-        );
-        if (acknowledgement) {
-          history.push("/login");
-        } else {
-          setError(10);
-        }
-      } catch (error) {
-        setError(error);
+  const [updatePassword, { loading, error: updateError, data }] = useLazyQuery(
+    UPDATEPASSWORD
+  );
+
+  useEffect(() => {
+    if (data) {
+      if (data.changePassword.confirmed) {
+        history.push("/login");
+      } else {
+        setError(10);
       }
-    } else {
-      setError(11);
     }
-  };
+    if (updateError) {
+      setError(updateError);
+    }
+  }, [data, loading, updateError]);
 
   const handleChange = event => {
     var newUser = user;
@@ -180,7 +166,18 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
                   <Button
                     className={classes.button}
                     variant="contained"
-                    onClick={ev => updatePassword(ev, client, dispatch)}
+                    onClick={ev => {
+                      if (password === verifyPassword) {
+                        updatePassword({
+                          variables: {
+                            username: username,
+                            newPassword: password
+                          }
+                        });
+                      } else {
+                        setError(11);
+                      }
+                    }}
                   >
                     Update
                   </Button>

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 
-import gql from "graphql-tag";
 import { FormControl, InputLabel, Select } from "@material-ui/core";
 
 import { useStatisticsState } from "../DashboardState/statsState";
-import { useQuery } from "react-apollo-hooks";
+import { gql, useQuery } from "@apollo/client";
 const SCATTERPLOT_OPTIONS = gql`
   query scatterplotAxisOptions {
     scatterplotAxisOptions {

@@ -5,16 +5,12 @@ import { makeStyles } from "@material-ui/core/styles";
 
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
-import Input from "@material-ui/core/Input";
 import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
 import StepLabel from "@material-ui/core/StepLabel";
-import Typography from "@material-ui/core/Typography";
-import Slide from "@material-ui/core/Slide";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import MuiAlert from "@material-ui/lab/Alert";
@@ -22,10 +18,8 @@ import MuiAlert from "@material-ui/lab/Alert";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import ListItemText from "@material-ui/core/ListItemText";
 import Checkbox from "@material-ui/core/Checkbox";
-import CommentIcon from "@material-ui/icons/Comment";
 
 import LoadingCircle from "../ProgressCircle.js";
 import IconButton from "@material-ui/core/IconButton";
@@ -150,10 +144,6 @@ const PopUpContent = ({
     setIsDisabled(false);
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
-  };
-
   const handleNameChange = event => {
     setName(event.target.value);
   };
@@ -174,7 +164,6 @@ const PopUpContent = ({
     }
   }, [name, selectedIndices, activeStep, selectedColumns, selectedUsers]);
 
-  const getDirection = index => (index === 0 ? "right" : "left");
   return (
     <Dialog
       open={isOpen}
