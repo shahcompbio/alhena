@@ -117,9 +117,7 @@ const ForgotPasswordWrapper = ({ dispatch, classes }) => {
           <UpdatePassword username={username} dispatch={dispatch} />
         ) : (
           <div>
-            <Typography variant="h6" style={{ text }}>
-              Reset Password
-            </Typography>
+            <Typography variant="h6">Reset Password</Typography>
 
             <form id="resetPassword">
               {fields.map(field => (
