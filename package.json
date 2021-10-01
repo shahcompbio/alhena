@@ -34,6 +34,7 @@
     "d3-weighted-voronoi": "^1.0.1",
     "d3-zoom": "^1.7.3",
     "dotenv": "^8.2.0",
+    "formik": "^2.2.9",
     "fs": "^0.0.1-security",
     "graphql": "^14.1.1",
     "graphql-tag": "^2.10.1",
@@ -60,7 +61,8 @@
     "sha1": "^1.1.1",
     "styled-components": "^4.4.0",
     "textures": "^1.2.0",
-    "yarn": "^1.22.10"
+    "yarn": "^1.22.15",
+    "yup": "^0.32.9"
   },
   "scripts": {
     "start": "react-scripts start",

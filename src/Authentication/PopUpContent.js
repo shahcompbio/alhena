@@ -138,7 +138,7 @@ const PopUpContent = ({
             <Button
               onClick={handleClose}
               color="secondary"
-              variant="contained"
+              variant="outlined"
               className={classes.button}
             >
               Cancel

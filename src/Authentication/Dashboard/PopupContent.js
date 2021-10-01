@@ -35,16 +35,20 @@ const useStylesStepper = makeStyles(theme => ({
   buttonGrid: { marginTop: 25, marginRight: 25 },
   backButton: {
     marginTop: theme.spacing(1),
-    marginLeft: theme.spacing(1)
+    marginRight: theme.spacing(3)
   },
   instructions: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1)
   },
   dialogButtons: {
+    marginTop: 20,
     float: "right"
   },
-  cancelButton: { marginLeft: "25px" }
+  cancelButton: { marginLeft: "25px", marginTop: 20 },
+  nextButton: {
+    boxShadow: "none !important"
+  }
 }));
 const useListStyles = makeStyles(theme => ({
   root: {
@@ -58,9 +62,14 @@ const useListStyles = makeStyles(theme => ({
 }));
 const useStyles = makeStyles(theme => ({
   button: { color: "black", backgroundColor: theme.palette.secondary.main },
+  textDialogContent: {
+    padding: "0px 10px",
+    paddingTop: "40px !important",
+    paddingLeft: 50
+  },
   dialogContent: {
     padding: "0px 10px",
-    paddingTop: "0 !important",
+    paddingTop: "0px !important",
     paddingLeft: 50
   },
   dialogTitle: { paddingBottom: 0, marginLeft: "50px", fontSize: 15 },
@@ -189,14 +198,6 @@ const PopUpContent = ({
           spacing={0}
           className={classes.root}
         >
-          <DialogTitle
-            id="form-dialog-title"
-            disableTypography={true}
-            className={classes.dialogTitle}
-            key={"dialogTitle"}
-          >
-            {isEdit ? "Edit Dashboard" : "Create New Dashboard"}
-          </DialogTitle>
           <Stepper
             activeStep={activeStep}
             alternativeLabel
@@ -208,7 +209,7 @@ const PopUpContent = ({
               </Step>
             ))}
           </Stepper>
-          <Grid item style={{ paddingTop: "0 !important" }}>
+          <Grid item>
             {activeStep === 0 && (
               <NameContent
                 isEdit={isEdit}
@@ -243,7 +244,11 @@ const PopUpContent = ({
           </Grid>
           <Grid item className={classes.buttonGrid}>
             <div className={classes.footer}>
-              <Button onClick={handleClose} className={classes.cancelButton}>
+              <Button
+                onClick={handleClose}
+                className={classes.cancelButton}
+                variant="outlined"
+              >
                 Cancel
               </Button>
               <div className={classes.dialogButtons}>
@@ -258,6 +263,7 @@ const PopUpContent = ({
                   <Button
                     variant="contained"
                     color="primary"
+                    className={classes.nextButton}
                     disabled={isActionDisabled}
                     onClick={async () => {
                       if (activeStep === steps.length - 1) {
@@ -370,7 +376,7 @@ const NameContent = ({ isEdit, name, handleNameChange }) => {
   const classes = useStyles();
   return (
     <ValidatorForm key={"validForm"} onSubmit={() => {}}>
-      <DialogContent className={classes.dialogContent}>
+      <DialogContent className={classes.textDialogContent}>
         <TextValidator
           key={"dialogName"}
           autoFocus
@@ -496,11 +502,6 @@ const UserDashboardContent = ({
 };
 const LoadingContent = ({ classes, isSent }) => (
   <div className={classes.dialogWrapper}>
-    {isSent && (
-      <IconButton className={classes.iconButton}>
-        <CheckIcon className={classes.icon} />
-      </IconButton>
-    )}
     <LoadingCircle overRideStroke={6} />
   </div>
 );
