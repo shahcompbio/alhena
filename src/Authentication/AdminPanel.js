@@ -21,11 +21,13 @@ const styles = theme => ({
     float: "right"
   },
   appBar: {
-    backgroundColor: "#ffffff",
-    margin: "auto",
-    marginTop: "-80px",
     width: "90%",
-    zIndex: 10
+    margin: "auto",
+    zIndex: 10,
+    marginLeft: -55,
+    marginTop: -60,
+    backgroundColor: "#ffffff00",
+    position: "absolute"
   },
   icons: {
     padding: 0,
@@ -176,13 +178,9 @@ const AdminPanel = ({ classes }) => {
               tabs={[{ label: "Users" }, { label: "Dashboards" }]}
               tabStyle={{
                 bgColor:
-                  tabIndex === 0
-                    ? theme.palette.primary.main
-                    : theme.palette.primary.dark,
+                  tabIndex === 0 ? "rgb(196 221 239)" : "rgb(97 160 137)",
                 selectedBgColor:
-                  tabIndex === 0
-                    ? theme.palette.primary.dark
-                    : theme.palette.primary.main
+                  tabIndex === 0 ? "rgb(97 160 137)" : "rgb(196 221 239)"
               }}
               tabProps={{
                 disableRipple: true

@@ -84,7 +84,7 @@ const styles = (theme, tabIndex) => ({
     flexGrow: 1,
     borderRadius: 20,
     zIndex: 20,
-    marginTop: 25,
+    // /  marginTop: 25,
     marginBottom: 80
   },
   grid: {
@@ -314,9 +314,7 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
         className={classes.root}
         style={{
           background:
-            tabIndex === 1
-              ? theme.palette.primary.main
-              : theme.palette.primary.dark
+            tabIndex === 1 ? "rgb(196 221 239)" : theme.palette.primary.dark
         }}
       >
         <div />
@@ -347,12 +345,10 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
       >
         <Paper
           className={classes.root}
+          elevation={0}
           key={"adminTablePaper" + tabIndex}
           style={{
-            background:
-              tabIndex === 1
-                ? theme.palette.primary.main
-                : theme.palette.primary.dark
+            background: tabIndex === 1 ? "rgb(196 221 239)" : "rgb(97 160 137)"
           }}
         >
           {(selected || actionComplete) && (

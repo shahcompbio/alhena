@@ -13,6 +13,7 @@ import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import Input from "@material-ui/core/Input";
 import FormControl from "@material-ui/core/FormControl";
+import Switch from "@material-ui/core/Switch";
 
 import clsx from "clsx";
 
@@ -32,14 +33,15 @@ const styles = theme => ({
   table: {
     width: "90%",
     margin: "auto",
-    minWidth: 650,
-    marginTop: 25
+    minWidth: 650
+    //marginTop: 25
   },
   select: {
     "&:before": {
       borderColor: "#ffffff"
     }
   },
+  editingRow: { height: 60 },
   tableRowIndex0: {
     backgroundColor: theme.palette.primary.dark,
     color: "white",
@@ -74,14 +76,18 @@ const styles = theme => ({
     fontSize: 18
   },
   selectedTableCell: {
+    height: 60,
+    fontSize: 20,
     whiteSpace: "normal",
     wordWrap: "break-word",
     maxWidth: "100px",
     backgroundColor: "#11151d40"
   },
   tableHeader: {
-    fontSize: 16,
+    fontSize: 18,
+    padding: 15,
     fontWeight: "bold"
+    //backgroundColor: "#ffffff94"
   },
   tablePagination: {
     fontWeight: "bold"
@@ -201,30 +207,28 @@ const TableContent = ({
                                 row[tableConfig.rowType],
                                 heading
                               ) ? (
-                                <DropDownEdit
-                                  setUserField={options =>
-                                    heading === "isAdmin"
-                                      ? setSelectedUserAdmin(
-                                          options === "Yes" ? true : false
-                                        )
-                                      : setSelectedUserRoles([...options])
-                                  }
-                                  currentSelection={
-                                    Array.isArray(row[heading])
-                                      ? row[heading]
-                                      : adminMapping.hasOwnProperty(
-                                          row[heading]
-                                        )
-                                  }
-                                  isMultiple={Array.isArray(row[heading])}
-                                  allOptions={
-                                    heading === "isAdmin"
-                                      ? ["Yes", "No"]
-                                      : allRoles
-                                  }
-                                  classes={classes}
-                                  user={row["username"]}
-                                />
+                                heading === "isAdmin" ? (
+                                  <RadioEdit
+                                    classes={classes}
+                                    checked={adminMapping.hasOwnProperty(
+                                      row[heading]
+                                    )}
+                                    onChange={event =>
+                                      setSelectedUserAdmin(event.target.checked)
+                                    }
+                                  />
+                                ) : (
+                                  <DropDownEdit
+                                    setUserField={options =>
+                                      setSelectedUserRoles([...options])
+                                    }
+                                    currentSelection={row[heading]}
+                                    isMultiple={Array.isArray(row[heading])}
+                                    allOptions={allRoles}
+                                    classes={classes}
+                                    user={row["username"]}
+                                  />
+                                )
                               ) : (
                                 editTextRows(row, heading, allRoles.length)
                               )}
@@ -269,6 +273,14 @@ const TableHeadings = ({ classes, tableHeadings, colorClass }) =>
       </TableCell>
     );
   });
+const RadioEdit = ({ classes, checked, onChange }) => (
+  <Switch
+    checked={checked}
+    onChange={event => onChange(event)}
+    name="checkedA"
+    inputProps={{ "aria-label": "secondary checkbox" }}
+  />
+);
 
 const DropDownEdit = ({
   currentSelection,

@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
+import { Formik, Form, useFormik, useFormikContext } from "formik";
+import * as yup from "yup";
 
 import { ApolloConsumer } from "react-apollo";
-import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
 
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
@@ -41,13 +42,21 @@ const styles = theme => ({
     marginTop: "-70px",
     display: "inline-block"
   },
+  helperText: { color: "red" },
   textField: {
     marginLeft: 10,
-    marginRight: theme.spacing(1),
-    width: 300,
-    margin: 10
+    width: "100%",
+    margin: 10,
+    paddingRight: 15
   }
 });
+const UNIQUE_USER = gql`
+  query doesUserExist($email: String!, $username: String!) {
+    doesUserExist(email: $email, username: $username) {
+      userAlreadyExists
+    }
+  }
+`;
 export const NEWUSER = gql`
   query createNewUser($user: NewUser!) {
     createNewUser(user: $user) {
@@ -58,17 +67,18 @@ export const NEWUSER = gql`
 
 const NewAccount = ({ email, dispatch, classes }) => {
   const [error, setError] = useState(null);
-  const [user, setUser] = useState({
-    name: "",
-    username: "",
-    email: email,
-    password: "",
-    passwordVerify: ""
-  });
 
   const [createNewUser, { data, loading, error: gqlError }] = useLazyQuery(
     NEWUSER
   );
+  const [
+    isUserUnique,
+    {
+      data: isUserUniqueData,
+      loading: isUserUniqueLoading,
+      error: isUserUniqueError
+    }
+  ] = useLazyQuery(UNIQUE_USER);
 
   useEffect(() => {
     if (data && data.createNewUser.created) {
@@ -83,149 +93,200 @@ const NewAccount = ({ email, dispatch, classes }) => {
       setError(error);
     }
   }, [data, loading, error]);
-
-  const handleChange = event => {
-    var newUser = user;
-    newUser[event.target.name] = event.target.value;
-    setUser({ ...newUser });
-  };
-
-  useEffect(() => {
-    ValidatorForm.addValidationRule("isPasswordMatch", value =>
-      user["password"] === value ? true : false
-    );
-  }, [user]);
-
+  const uniqueUserError =
+    isUserUniqueData && isUserUniqueData.doesUserExist.userAlreadyExists;
+  /*        {error && (
+          <SnackbarContentWrapper
+            variant="error"
+            errorNumber={error}
+            setError={setError}
+          />
+        )}*/
   return (
-    <ApolloConsumer>
-      {client => (
-        <Grid container direction="row" justify="center" alignItems="center">
-          <div
-            style={{
-              position: "absolute",
-              top: "15%"
+    <Grid container direction="row" justify="center" alignItems="center">
+      <div
+        style={{
+          position: "absolute",
+          top: "15%"
+        }}
+      >
+        <Paper rounded className={classes.paperTitle}>
+          <Typography variant="h4" color="white">
+            Create Account
+          </Typography>
+        </Paper>
+        <Paper rounded className={classes.paperForm}>
+          <Formik
+            validationSchema={yup.object({
+              name: yup
+                .string()
+                .min(2, "Must be at least 2 characters")
+                .required("Name is required")
+                .matches(
+                  /^[a-zA-Z0-9]+$/,
+                  "Cannot contain special characters or spaces"
+                ),
+              username: yup
+                .string()
+                .min(2, "Must be at least 2 characters")
+                .required("Name is required")
+                .matches(
+                  /^[a-zA-Z0-9]+$/,
+                  "Cannot contain special characters or spaces"
+                )
+                .test(
+                  "checkUserUnique",
+                  "This email/username already exists.",
+                  (name, value) => {
+                    isUserUnique({
+                      variables: {
+                        username: value.parent.username,
+                        email: email
+                      }
+                    });
+                    return true;
+                  }
+                ),
+              password: yup
+                .string("Enter your password")
+                .min(8, "Password should be of minimum 8 characters length")
+                .required("Password is required"),
+              passwordVerify: yup
+                .string()
+                .oneOf([yup.ref("password"), null], "Passwords must match")
+            })}
+            initialValues={{
+              name: "",
+              username: "",
+              email: "",
+              password: "",
+              passwordVerify: ""
             }}
+            onSubmit={values =>
+              createNewUser({
+                variables: {
+                  user: {
+                    name: values.name,
+                    username: values.username,
+                    email: email,
+                    password: values.password
+                  }
+                }
+              })
+            }
+            style={{ maxWidth: 450 }}
+            className={classes.root}
+            autoComplete="off"
+            instantValidate={false}
+            autoComplete="off"
           >
-            {error && (
-              <SnackbarContentWrapper
-                variant="error"
-                errorNumber={error}
-                setError={setError}
-              />
-            )}
-            <Paper rounded className={classes.paperTitle}>
-              <Typography variant="h4" color="white">
-                Create Account
-              </Typography>
-            </Paper>
-            <Paper rounded className={classes.paperForm}>
-              <ValidatorForm
-                instantValidate={false}
-                autoComplete="off"
-                onError={errors => console.log(errors)}
-                onSubmit={ev => {
-                  //createNewUser(ev, client, dispatch)
-                }}
-              >
-                <TextValidator
-                  className={classes.textField}
-                  key={"newUserName"}
-                  onChange={handleChange}
-                  value={user["name"]}
-                  name={"name"}
-                  fullWidth
-                  label={"Name:"}
-                  type={"text"}
-                  validators={["required"]}
-                  errorMessages={["This field is required"]}
-                />
-                <TextValidator
-                  className={classes.textField}
-                  key={"newUserUsername"}
-                  onChange={handleChange}
-                  value={user["username"]}
-                  name={"username"}
-                  fullWidth
-                  label={"Username:"}
-                  type={"text"}
-                  validators={["required", "minStringLength:3"]}
-                  errorMessages={[
-                    "This field is required",
-                    "Field must be longer than 3 characters long"
-                  ]}
-                />
-                <TextValidator
-                  className={classes.textField}
-                  key={"newUserEmail"}
-                  onChange={handleChange}
-                  value={user["email"]}
-                  fullWidth
-                  label={"Email:"}
-                  type={"text"}
-                  validators={["This field is required"]}
-                  errorMessages={["This field is required"]}
-                />
-                <TextValidator
-                  className={classes.textField}
-                  key={"newUserPassword"}
-                  onChange={handleChange}
-                  name={"password"}
-                  value={user["password"]}
-                  fullWidth
-                  label={"Password:"}
-                  type={"password"}
-                  validators={["required", "minStringLength:10"]}
-                  errorMessages={[
-                    "This field is required",
-                    "Field must be longer than 10 characters long"
-                  ]}
-                />
-                <TextValidator
-                  className={classes.textField}
-                  key={"newUserPasswordVerify"}
-                  name={"passwordVerify"}
-                  onChange={handleChange}
-                  value={user["passwordVerify"]}
-                  fullWidth
-                  label={"Verify Password:"}
-                  type={"password"}
-                  validators={["required", "isPasswordMatch"]}
-                  errorMessages={[
-                    "This field is required",
-                    "Mismatched passwords"
-                  ]}
-                />
-                <div style={{ textAlign: "center" }}>
-                  <Button
-                    type="submit"
-                    className={classes.button}
-                    variant="contianed"
-                    onClick={ev =>
-                      createNewUser({
-                        variables: {
-                          user: {
-                            name: user.name,
-                            username: user.username,
-                            email: user.email,
-                            password: user.password
-                          }
-                        }
-                      })
+            {({
+              values,
+              errors,
+              touched,
+              handleSubmit,
+              handleChange,
+              setFieldValue,
+              isValid
+            }) => {
+              return (
+                <div>
+                  <TextField
+                    className={classes.textField}
+                    key={"newUserName"}
+                    onChange={event =>
+                      setFieldValue("name", event.target.value)
                     }
-                  >
-                    Create
-                  </Button>
+                    value={values.name}
+                    name={"name"}
+                    fullWidth
+                    label={"Name:"}
+                    type={"text"}
+                    validators={["required"]}
+                    FormHelperTextProps={{
+                      className: classes.helperText
+                    }}
+                    helperText={errors.name}
+                  />
+                  <TextField
+                    className={classes.textField}
+                    key={"newUserUsername"}
+                    onChange={event =>
+                      setFieldValue("username", event.target.value)
+                    }
+                    value={values.username}
+                    name={"username"}
+                    fullWidth
+                    label={"Username:"}
+                    type={"text"}
+                    FormHelperTextProps={{
+                      className: classes.helperText
+                    }}
+                    helperText={errors.username}
+                  />
+                  <TextField
+                    className={classes.textField}
+                    key={"newUserEmail"}
+                    onChange={event =>
+                      setFieldValue("email", event.target.value)
+                    }
+                    value={email}
+                    validateOnChange={false}
+                    fullWidth
+                    label={"Email:"}
+                    type={"text"}
+                  />
+                  <TextField
+                    className={classes.textField}
+                    key={"newUserPassword"}
+                    onChange={event =>
+                      setFieldValue("password", event.target.value)
+                    }
+                    FormHelperTextProps={{
+                      className: classes.helperText
+                    }}
+                    name={"password"}
+                    value={values.password}
+                    fullWidth
+                    label={"Password:"}
+                    type={"password"}
+                    helperText={errors.password}
+                  />
+                  <TextField
+                    className={classes.textField}
+                    key={"newUserPasswordVerify"}
+                    name={"passwordVerify"}
+                    onChange={event =>
+                      setFieldValue("passwordVerify", event.target.value)
+                    }
+                    FormHelperTextProps={{
+                      className: classes.helperText
+                    }}
+                    value={values.passwordVerify}
+                    fullWidth
+                    label={"Verify Password:"}
+                    type={"password"}
+                    helperText={errors.passwordVerify}
+                  />
+                  <div style={{ textAlign: "center" }}>
+                    <Button
+                      type="submit"
+                      disabled={!isValid}
+                      className={classes.button}
+                      variant="contianed"
+                      onClick={handleSubmit}
+                    >
+                      Create
+                    </Button>
+                  </div>
                 </div>
-              </ValidatorForm>
-            </Paper>
-          </div>
-        </Grid>
-      )}
-    </ApolloConsumer>
+              );
+            }}
+          </Formik>
+        </Paper>
+      </div>
+    </Grid>
   );
 };
-const ComponentWrapper = styled.div`
-  margin: 10px;
-`;
 
 export default withStyles(styles)(NewAccount);

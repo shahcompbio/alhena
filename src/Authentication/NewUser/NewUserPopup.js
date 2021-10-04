@@ -114,8 +114,6 @@ const NewUserPopup = ({ isOpen, handleClose, client, classes }) => {
 
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedRoles, setSelectedRoles] = useState([]);
-  //  const [email, setEmail] = useState("");
-  //  const [name, setName] = useState("");
 
   const [
     doesUserExist,

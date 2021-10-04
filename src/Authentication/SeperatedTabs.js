@@ -21,16 +21,19 @@ const useTabStyles = makeStyles(({ palette, spacing, breakpoints }) => {
     md: 120
   };
   return {
-    root: ({ bgColor = defaultBgColor, minWidth = defaultMinWidth }) => ({
+    root: ({
+      bgColor = defaultBgColor,
+      minWidth = defaultMinWidth,
+      isSelected
+    }) => ({
       opacity: 1,
       overflow: "initial",
-      minHeight: spacing(13),
+      minHeight: 64,
+      minWidth: 250,
       color: palette.background.default,
       background: "rbga(0,0,0,0)",
       transition: "0.5s",
-      [breakpoints.up("md")]: {
-        minWidth: minWidth.md
-      },
+
       "&:before": {
         content: '" "',
         position: "absolute",
@@ -38,8 +41,10 @@ const useTabStyles = makeStyles(({ palette, spacing, breakpoints }) => {
         bottom: 0,
         right: 0,
         left: 0,
+        borderRadius: 10,
+        marginLeft: isSelected ? -30 : -10,
         backgroundColor: bgColor,
-        transform: "skewY(-4deg)",
+        //transform: "skewY(-4deg)",
         transformOrigin: "100%"
       },
       "&:after": {
@@ -62,6 +67,7 @@ const useTabStyles = makeStyles(({ palette, spacing, breakpoints }) => {
     selected: ({ selectedBgColor = defaultSelectedBgColor }) => ({
       color: palette.background.default,
       fontWeight: "bold",
+
       zIndex: 3,
       "&:before": {
         backgroundColor: selectedBgColor,
@@ -71,31 +77,40 @@ const useTabStyles = makeStyles(({ palette, spacing, breakpoints }) => {
         width: spacing(3.5)
       }
     }),
-    wrapper: {
+    wrapper: ({ isSelected }) => ({
+      marginLeft: isSelected ? -175 : -150,
       zIndex: 2,
-      fontSize: "16px",
+      fontSize: "20px",
       marginTop: spacing(1),
       textTransform: "initial"
-    }
+    })
   };
 });
 
 const SeperatedTabs = ({ tabs, tabStyle, tabProps, ...props }) => {
   const tabsClasses = useTabsStyles(props);
-  const tabClasses = useTabStyles({ ...tabProps, ...tabStyle });
   return (
-    <Tabs {...props} classes={tabsClasses}>
-      {tabs.map((tab, index) => (
-        <Tab
-          key={tab.label}
-          {...tabProps}
-          {...tab}
-          classes={tabClasses}
-          style={{
-            color: index === 0 ? "white" : "black"
-          }}
-        />
-      ))}
+    <Tabs {...props} orientation="vertical" classes={tabsClasses}>
+      {tabs.map((tab, index) => {
+        const isSelected = props.value === index;
+        const tabClasses = useTabStyles({
+          ...tabProps,
+          ...tabStyle,
+          isSelected
+        });
+
+        return (
+          <Tab
+            key={tab.label}
+            {...tabProps}
+            {...tab}
+            classes={tabClasses}
+            style={{
+              color: index === 0 ? "white" : "black"
+            }}
+          />
+        );
+      })}
     </Tabs>
   );
 };
