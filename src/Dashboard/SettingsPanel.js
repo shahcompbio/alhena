@@ -73,12 +73,12 @@ const styles = theme => ({
     margin: theme.spacing(3)
   },
   exportButton: {
-    width: 130,
+    width: 180,
     marginBottom: 10,
     marginRight: 12
   },
   shareButton: {
-    width: 135,
+    width: 180,
     marginBottom: 10
   },
   fieldComponent: {
@@ -91,10 +91,10 @@ const styles = theme => ({
   gridSlider: { width: "100%", marginBottom: 10 },
   settings: {
     padding: 10,
-    width: 300,
+    width: 400,
     background: "none",
     height: "100%",
-    position: "fixed",
+    position: "sticky",
     overflowY: "scroll"
   },
   sliderPanel: {

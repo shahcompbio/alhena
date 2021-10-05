@@ -21,6 +21,14 @@ const useToolbarStyles = makeStyles(theme => ({
     color: "black"
   },
   actionsWrapper: { position: "absolute", right: 3, top: 5 },
+  checkMark: {
+    marginTop: 15,
+    marginRight: 10
+  },
+  loadingText: {
+    marginTop: 15,
+    marginRight: 10
+  },
   completeHighlight: {
     color: "#03a678",
     backgroundColor: lighten("#03a678", 0.7)
@@ -30,13 +38,13 @@ const useToolbarStyles = makeStyles(theme => ({
     paddingRight: theme.spacing(1),
     borderRadius: "10px 10px 0px 0px"
   },
-  fontSelected: { fontSize: 20, paddingLeft: 5 },
+  fontSelected: { fontSize: 20, paddingLeft: 10 },
   highlight: {
     backgroundColor: "#e5e5e5"
   },
   deleteHighlight: {
     color: "black",
-    fontWeight: "bold",
+    fontWeight: "normal",
     backgroundColor: "#f1a9a0"
   },
   editHighlight: {
@@ -66,7 +74,12 @@ const TableToolbar = ({
 }) => {
   const classes = useToolbarStyles();
   const [selectedAction, setSelectedAction] = useState(null);
-
+  const selectedText =
+    selectedAction === "Edit"
+      ? "Save " + name + "?"
+      : selectedAction === "Delete"
+      ? "Delete " + name + "?"
+      : "1 selected";
   return (
     <Toolbar
       className={clsx(classes.root, {
@@ -85,7 +98,7 @@ const TableToolbar = ({
         spacing={3}
       >
         <Grid item xs={9} className={classes.toolbarWrapper}>
-          <p className={classes.fontSelected}> 1 selected</p>
+          <p className={classes.fontSelected}>{selectedText}</p>
         </Grid>
         <Grid className={classes.actionsWrapper}>
           {selectedAction === null ? (
@@ -131,17 +144,19 @@ const TableToolbar = ({
               </Tooltip>
             ]
           ) : isLoading ? (
-            <Typography variant="h5"> Loading</Typography>
+            <Typography variant="h5" className={classes.loadingText}>
+              Loading
+            </Typography>
           ) : actionComplete ? (
-            <CheckIcon />
+            <CheckIcon className={classes.checkMark} />
           ) : (
             [
               <Tooltip
                 arrow
                 className={classes.tooltipTitle}
-                title={<Typography variant="h5">Clear</Typography>}
+                title={<Typography variant="h5">Cancel</Typography>}
               >
-                <IconButton aria-label="clear" onClick={ev => clear(true)}>
+                <IconButton aria-label="Cancel" onClick={ev => clear(true)}>
                   <ClearIcon />
                 </IconButton>
               </Tooltip>,
@@ -158,16 +173,7 @@ const TableToolbar = ({
                 >
                   <CheckIcon />
                 </IconButton>
-              </Tooltip>,
-              selectedAction === "Delete" && (
-                <Typography
-                  className={classes.title}
-                  color="inherit"
-                  variant="subtitle1"
-                >
-                  Delete {name}?
-                </Typography>
-              )
+              </Tooltip>
             ]
           )}
         </Grid>

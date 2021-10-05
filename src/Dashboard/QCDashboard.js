@@ -79,6 +79,8 @@ const styles = theme => ({
   },
   content: {
     height: "100%",
+    minWidth: 1600,
+
     overflowX: "scroll"
   },
   heatmapContent: {

@@ -90,7 +90,7 @@ const Chip = ({ analysis, classes }) => {
   );
 
   if (error) return null;
-  if (loading && Object.keys(data).length === 0) {
+  if (loading) {
     return null;
   }
   const { chipHeatmap } = data;

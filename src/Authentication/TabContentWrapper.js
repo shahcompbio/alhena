@@ -152,11 +152,11 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
   };
 
   const handleRowClick = name => {
-    if (selected === null) {
-      setSelected(name);
-    } else if (selected === name) {
+    if (selected === name) {
       //unselect
       clearAll();
+    } else {
+      setSelected(name);
     }
   };
 
@@ -173,13 +173,14 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
   };
   useEffect(() => {
     if (deleteUserData) {
-      return data.deleteUser.isDeleted;
+      //      return data.deleteUser.isDeleted;
       if (deleteUserData.deleteUser.isDeleted) {
         //has updated
         setData(modifiedData.filter(user => user.username !== selected));
         actionCompleteReset();
         window.location.reload();
       } else {
+        setLoading(false);
         //error
       }
     }
@@ -265,6 +266,8 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
           isAdmin: isAdmin
         }
       });
+    } else {
+      setLoading(false);
     }
   };
   const sortAlpha = list =>

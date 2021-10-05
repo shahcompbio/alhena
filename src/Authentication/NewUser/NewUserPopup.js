@@ -78,8 +78,8 @@ const styles = theme => ({
     marginTop: 7,
     right: 100,
     position: "absolute",
-    backgroundColor: "#e5f3f3",
-    color: "#2b5d65"
+    backgroundColor: "#67b798",
+    color: "black"
     //  marginTop: "25px"
   },
   button: {
@@ -88,6 +88,7 @@ const styles = theme => ({
     color: "black"
   },
   generateButton: {
+    backgroundColor: "#67b798",
     boxShadow: "none !important",
     color: "black"
   },
@@ -169,7 +170,7 @@ const NewUserPopup = ({ isOpen, handleClose, client, classes }) => {
             />
             <Button
               variant="outlined"
-              color="primary"
+              color="#67b798"
               className={classes.shareButton}
               onClick={copy(newUserLinkData.newUserLink.newUserLink)}
             >
@@ -177,7 +178,7 @@ const NewUserPopup = ({ isOpen, handleClose, client, classes }) => {
             </Button>
             <Button
               variant="outlined"
-              color="primary"
+              color="#67b798"
               className={classes.closeButton}
               onClick={handleClose}
             >
@@ -304,7 +305,7 @@ const NewUserPopup = ({ isOpen, handleClose, client, classes }) => {
                   <Button
                     onClick={handleClose}
                     variant="outlined"
-                    color="primary"
+                    color="#67b798"
                     className={classes.button}
                   >
                     Cancel
@@ -312,7 +313,6 @@ const NewUserPopup = ({ isOpen, handleClose, client, classes }) => {
                   <Button
                     onClick={handleSubmit}
                     variant="contained"
-                    color="primary"
                     disabled={!isValid}
                     className={classes.generateButton}
                   >

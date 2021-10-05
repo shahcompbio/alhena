@@ -307,9 +307,13 @@ const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
                 <div className={classes.stepper} key={"project-view-stepper"}>
                   {[0, 1].map((label, index) => {
                     return step === index ? (
-                      <RadioButtonCheckedIcon className={classes.activeWhite} />
+                      <RadioButtonCheckedIcon
+                        className={classes.activeWhite}
+                        key={"activeChecked"}
+                      />
                     ) : (
                       <FiberManualRecordIcon
+                        key={"inactiveChecked"}
                         className={
                           index === step
                             ? classes.activeWhite

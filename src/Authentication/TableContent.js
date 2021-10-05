@@ -61,6 +61,14 @@ const styles = theme => ({
       color: "#000000"
     }
   },
+  otherCol: {
+    //width: "15%"
+  },
+  adminCol: { width: "10%" },
+  roleCol: { width: "25%" },
+  checkBoxCol: {
+    //width: "5%"
+  },
   tableRowIndex1: {
     backgroundColor: theme.palette.primary.main,
     color: "#000000",
@@ -80,7 +88,7 @@ const styles = theme => ({
     fontSize: 20,
     whiteSpace: "normal",
     wordWrap: "break-word",
-    maxWidth: "100px",
+    maxWidth: "200px",
     backgroundColor: "#11151d40"
   },
   tableHeader: {
@@ -129,6 +137,7 @@ const TableContent = ({
   const editTextRows = (row, heading, allRolesLength) => {
     if (Array.isArray(row[heading])) {
       if (heading === "roles") {
+        console.log(row[heading]);
         return row[heading].length === allRolesLength
           ? "All"
           : row[heading].join(", ");
@@ -141,7 +150,12 @@ const TableContent = ({
         : row[heading];
     }
   };
-
+  const getWidthClass = heading =>
+    heading === "role"
+      ? classes.roleCol
+      : heading === "isAdmin"
+      ? classes.adminCol
+      : "";
   return (
     <span>
       <Table className={classes.table} size="small" key={"table-" + tabIndex}>
@@ -156,6 +170,7 @@ const TableContent = ({
               classes={classes}
               tableHeadings={tableHeadings}
               colorClass={colorClass}
+              isUsers={tabIndex === 1}
             />
           </TableRow>
         </TableHead>
@@ -184,7 +199,7 @@ const TableContent = ({
                         key={"tableBodyCellCheck-" + name}
                       >
                         <Checkbox
-                          className={colorClass}
+                          className={clsx(colorClass, classes.checkBoxCol)}
                           key={"tableBodyCheckbox-" + name}
                           id="check"
                           checked={isItemSelected}
@@ -193,6 +208,7 @@ const TableContent = ({
                         />
                       </TableCell>
                       {tableHeadings.map((heading, headingIndex) => {
+                        const widthClass = getWidthClass(heading);
                         return (
                           <TableCell
                             key={"tableBodyCell-" + heading + name}
@@ -200,7 +216,7 @@ const TableContent = ({
                             component="th"
                             scope="row"
                             id={labelId}
-                            className={clsx(rowClass, colorClass)}
+                            className={clsx(rowClass, colorClass, widthClass)}
                           >
                             <div key={"tableCellWrapper-" + name}>
                               {isSelectedForEditing(
@@ -210,9 +226,7 @@ const TableContent = ({
                                 heading === "isAdmin" ? (
                                   <RadioEdit
                                     classes={classes}
-                                    checked={adminMapping.hasOwnProperty(
-                                      row[heading]
-                                    )}
+                                    checked={row[heading]}
                                     onChange={event =>
                                       setSelectedUserAdmin(event.target.checked)
                                     }
@@ -260,27 +274,42 @@ const TableContent = ({
   );
 };
 
-const TableHeadings = ({ classes, tableHeadings, colorClass }) =>
+const TableHeadings = ({ classes, tableHeadings, colorClass, isUsers }) =>
   tableHeadings.map((heading, headingIndex) => {
+    const roleClass = isUsers
+      ? ""
+      : heading === "role"
+      ? classes.roleCol
+      : classes.otherCol;
     var aligned = headingIndex === 0 ? "left" : "right";
     return (
       <TableCell
         align={aligned}
         key={"tableHeaderCell" + heading}
-        className={clsx(classes.tableCell, classes.tableHeader, colorClass)}
+        className={clsx(
+          classes.tableCell,
+          classes.tableHeader,
+          colorClass,
+          roleClass
+        )}
       >
         {rowLabels[heading]}
       </TableCell>
     );
   });
-const RadioEdit = ({ classes, checked, onChange }) => (
-  <Switch
-    checked={checked}
-    onChange={event => onChange(event)}
-    name="checkedA"
-    inputProps={{ "aria-label": "secondary checkbox" }}
-  />
-);
+const RadioEdit = ({ classes, checked, onChange }) => {
+  const [isChecked, setIsChecked] = useState(checked);
+  return (
+    <Switch
+      checked={isChecked}
+      onChange={event => {
+        setIsChecked(!isChecked);
+        onChange(event);
+      }}
+      inputProps={{ "aria-label": "secondary checkbox" }}
+    />
+  );
+};
 
 const DropDownEdit = ({
   currentSelection,
