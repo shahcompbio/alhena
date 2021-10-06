@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-//import { DataGrid } from "@material-ui/data-grid";
 import DataGrid, { Row, RowRendererProps } from "react-data-grid";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
@@ -48,10 +47,6 @@ const styles = {
   search: {
     marginRight: "100vw-1200px/2",
     marginBottom: 10
-    //float: "right",
-    //  marginLeft: 900,
-    //  marginBottom: 10,
-    //  right: 0
   }
 };
 
@@ -74,7 +69,7 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
         color: "black",
         margin: 0,
         paddingLeft: 10,
-        backgroundColor: "#a2c7cd"
+        backgroundColor: "#8aa3a7"
       }}
     >
       {column["key"]}
@@ -110,7 +105,8 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
           fontSize: 18,
           color: "white",
           margin: 0,
-          paddingLeft: 5
+          paddingLeft: 5,
+          userSelect: "all"
         }}
       >
         {row[column["key"]]}
@@ -190,7 +186,8 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
             name: field["label"],
             resizable: true,
             formatter: RowRender,
-            headerRenderer: HeaderRender
+            headerRenderer: HeaderRender,
+            width: field["type"] === "jira_id" ? "40%" : null
           }))}
           rowHeight={40}
           headerRowHeight={50}
@@ -203,52 +200,4 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
     </Grid>
   );
 };
-/*  formatter: HeaderFormater,
-  width:
-    field["type"] === "jira_id"
-      ? 700
-      : field["type"] === "sample_id"
-      ? 200
-      : 150,
-  flex: field["type"] === "sample" ? 1 : 0.2,
-  renderCell: params => {
-    return field["type"] === "sample_id" ? (
-      <a
-        id={
-          "link-" +
-          params["row"]["jira_id"] +
-          "-" +
-          params["row"]["sample_id"]
-        }
-        style={{ color: "white", fontSize: 18 }}
-        href={"javascript:;"}
-        onMouseEnter={function(event, row) {
-          d3.select("#" + event.target.id).style(
-            "font-weight",
-            "bold"
-          );
-        }}
-        onMouseLeave={function(event, row) {
-          d3.select("#" + event.target.id).style(
-            "font-weight",
-            "normal"
-          );
-        }}
-        onClick={() => {
-          dispatch({
-            type: "ANALYSIS_SELECT",
-            value: { selectedAnalysis: params["row"]["jira_id"] }
-          });
-          handleForwardStep();
-        }}
-      >
-        {params["row"]["sample_id"]}
-      </a>
-    ) : (
-      <p style={{ cursor: "text", fontSize: 18 }}>
-        {params["row"][field["type"]]}
-      </p>
-    );
-  },
-  headerClassName: classes.header*/
 export default withStyles(styles)(Table);

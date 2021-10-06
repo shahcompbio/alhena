@@ -111,7 +111,7 @@ const SharePopup = ({
               document.execCommand("copy");
             }}
           >
-            Share
+            Copy
           </Button>
           <Button
             variant="outlined"

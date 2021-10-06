@@ -30,7 +30,8 @@ const ChipHeatmapSettings = ({
           shrink={true}
           htmlFor="chipheatmapAxisSettings"
           className={classes.dropDownLabel}
-          key="chipheatmapAxis chipHeatmapInput"
+          key="chipheatmapAxis-chipHeatmapInput"
+          id="chipSetttingsLabel"
         >
           Metric
         </InputLabel>

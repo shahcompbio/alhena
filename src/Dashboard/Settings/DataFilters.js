@@ -206,21 +206,16 @@ const DataFilters = ({
                 );
               } else {
                 setExperimentalMenuValue(value);
-                var expValue = setParamObj["experimental_condition"]
-                  ? [...setParamObj["experimental_condition"], ...value]
-                  : [...value];
 
                 setParamObj["experimental_condition"] = {
                   param: "experimental_condition",
-                  value: [...expValue]
+                  value: [...value]
                 };
 
                 update(
                   {
                     expCondition:
-                      expValue.length > 1
-                        ? expValue.join(",")
-                        : value.toString()
+                      value.length > 1 ? value.join(",") : value.toString()
                   },
                   "EXP_CONDITION_UPDATE"
                 );

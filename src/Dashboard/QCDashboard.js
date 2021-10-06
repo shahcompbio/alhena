@@ -26,7 +26,7 @@ const HEATMAP_ORDER = gql`
     $quality: String!
     $params: [InputParams]
   ) {
-    heatmapOrder(analysis: $analysis, quality: $quality) {
+    heatmapOrder(analysis: $analysis, quality: $quality, params: $params) {
       order
       cellID
     }
@@ -124,9 +124,18 @@ const getQueryParams = (isContaminated, expCondition, numericalDataFilters) => {
   var params = isContaminated
     ? [{ param: "is_contaminated", value: "false" }]
     : [];
+  /*if (expCondition && expCondition.indexOf(",") !== -1) {
+    expCondition.split(",").map(condition => {
+      params = [
+        ...params,
+        { param: "experimental_condition", value: condition }
+      ];
+    });
+  } else {*/
   params = expCondition
     ? [...params, { param: "experimental_condition", value: expCondition }]
     : [...params];
+  //  }
   if (numericalDataFilters) {
     params = [...params, ...numericalDataFilters];
   }

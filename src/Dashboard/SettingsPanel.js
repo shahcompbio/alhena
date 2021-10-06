@@ -109,6 +109,7 @@ const styles = theme => ({
       marginTop: 0
     }
   },
+  dropDownLabel: { backgroundColor: "white", padding: 3 },
   titlePadding: {
     paddingBottom: 15,
     paddingTop: 15
