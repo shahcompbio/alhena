@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import { ApolloConsumer } from "react-apollo";
 
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
@@ -94,100 +93,93 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
   }, [user]);
 
   return (
-    <ApolloConsumer>
-      {client => (
-        <Grid container direction="row" justify="center" alignItems="center">
-          <div
-            style={{
-              position: "absolute",
-              top: "15%"
-            }}
+    <Grid container direction="row" justify="center" alignItems="center">
+      <div
+        style={{
+          position: "absolute",
+          top: "15%"
+        }}
+      >
+        {error && (
+          <SnackbarContentWrapper
+            variant="error"
+            errorNumber={error}
+            setError={setError}
+          />
+        )}
+        <Paper rounded className={classes.paperTitle}>
+          <Typography variant="h4" color="white">
+            Update Password
+          </Typography>
+        </Paper>
+        <Paper rounded className={classes.paperForm}>
+          <TextField
+            className={classes.textField}
+            margin="normal"
+            id={"updatePassword:username"}
+            required
+            fullWidth
+            value={username}
+            label={"Username"}
+            type={"text"}
+          />
+          <ValidatorForm
+            instantValidate={false}
+            autoComplete="off"
+            onError={errors => console.log(errors)}
+            onSubmit={ev => {}}
           >
-            {error && (
-              <SnackbarContentWrapper
-                variant="error"
-                errorNumber={error}
-                setError={setError}
-              />
-            )}
-            <Paper rounded className={classes.paperTitle}>
-              <Typography variant="h4" color="white">
-                Update Password
-              </Typography>
-            </Paper>
-            <Paper rounded className={classes.paperForm}>
-              <TextField
-                className={classes.textField}
-                margin="normal"
-                id={"updatePassword:username"}
-                required
-                fullWidth
-                value={username}
-                label={"Username"}
-                type={"text"}
-              />
-              <ValidatorForm
-                instantValidate={false}
-                autoComplete="off"
-                onError={errors => console.log(errors)}
-                onSubmit={ev => {}}
-              >
-                <TextValidator
-                  className={classes.textField}
-                  key={"updatePassword"}
-                  onChange={handleChange}
-                  name={"password"}
-                  value={user["password"]}
-                  fullWidth
-                  label={"Password:"}
-                  type={"password"}
-                  validators={["required", "minStringLength:10"]}
-                  errorMessages={[
-                    "This field is required",
-                    "Field must be longer than 10 characters long"
-                  ]}
-                />
-                <TextValidator
-                  className={classes.textField}
-                  key={"updatePasswordVerify"}
-                  name={"passwordVerify"}
-                  onChange={handleChange}
-                  value={user["passwordVerify"]}
-                  fullWidth
-                  label={"Verify Password:"}
-                  type={"password"}
-                  validators={["required", "isPasswordMatch"]}
-                  errorMessages={[
-                    "This field is required",
-                    "Mismatched passwords"
-                  ]}
-                />
-                <ComponentWrapper style={{ textAlign: "center" }}>
-                  <Button
-                    className={classes.button}
-                    variant="contained"
-                    onClick={ev => {
-                      if (password === verifyPassword) {
-                        updatePassword({
-                          variables: {
-                            username: username,
-                            newPassword: password
-                          }
-                        });
-                      } else {
-                        setError(11);
+            <TextValidator
+              className={classes.textField}
+              key={"updatePassword"}
+              onChange={handleChange}
+              name={"password"}
+              value={user["password"]}
+              fullWidth
+              label={"Password:"}
+              type={"password"}
+              validators={["required", "minStringLength:10"]}
+              errorMessages={[
+                "This field is required",
+                "Field must be longer than 10 characters long"
+              ]}
+            />
+            <TextValidator
+              className={classes.textField}
+              key={"updatePasswordVerify"}
+              name={"passwordVerify"}
+              onChange={handleChange}
+              value={user["passwordVerify"]}
+              fullWidth
+              label={"Verify Password:"}
+              type={"password"}
+              validators={["required", "isPasswordMatch"]}
+              errorMessages={["This field is required", "Mismatched passwords"]}
+            />
+            <ComponentWrapper style={{ textAlign: "center" }}>
+              <Button
+                className={classes.button}
+                variant="contained"
+                onClick={ev => {
+                  if (password === verifyPassword) {
+                    updatePassword({
+                      variables: {
+                        username: username,
+                        newPassword: password
                       }
-                    }}
-                  >
-                    Update
-                  </Button>
-                </ComponentWrapper>
-              </ValidatorForm>
-            </Paper>
-          </div>
-        </Grid>
-      )}
-    </ApolloConsumer>
+                    });
+                  } else {
+                    setError(11);
+                  }
+                }}
+              >
+                Update
+              </Button>
+            </ComponentWrapper>
+          </ValidatorForm>
+        </Paper>
+      </div>
+    </Grid>
   );
 };
 

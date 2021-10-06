@@ -149,7 +149,7 @@ const ExportPopup = ({
                 name="Heatmap"
                 disabled={false}
                 selected={selected}
-                setSelected={name => setSelected([...selected, name])}
+                setSelected={choices => setSelected([...choices])}
               />
             </Grid>
             <Grid item>
@@ -157,7 +157,7 @@ const ExportPopup = ({
                 name="Scatterplot"
                 disabled={true}
                 selected={selected}
-                setSelected={name => setSelected([...selected, name])}
+                setSelected={choices => setSelected([...choices])}
               />
             </Grid>
             <Grid item>
@@ -165,7 +165,7 @@ const ExportPopup = ({
                 name="GC Bias"
                 disabled={true}
                 selected={selected}
-                setSelected={name => setSelected([...selected, name])}
+                setSelected={choices => setSelected([...choices])}
               />
             </Grid>
             <Grid item>
@@ -173,7 +173,7 @@ const ExportPopup = ({
                 name="ChipHeatmap"
                 disabled={true}
                 selected={selected}
-                setSelected={name => setSelected([...selected, name])}
+                setSelected={choices => setSelected([...choices])}
               />
             </Grid>
             <Grid item>
@@ -181,7 +181,7 @@ const ExportPopup = ({
                 name="Violin"
                 disabled={true}
                 selected={selected}
-                setSelected={name => setSelected([...selected, name])}
+                setSelected={choices => setSelected([...choices])}
               />
             </Grid>
           </Grid>
@@ -192,6 +192,7 @@ const ExportPopup = ({
               className={classes.exportButton}
               onClick={() => {
                 exportSelected(selected);
+                setOpenExportPopup();
               }}
             >
               Export
@@ -221,6 +222,7 @@ const useStyles = makeStyles(theme => ({
 }));
 const PlotItem = ({ name, setSelected, selected, disabled }) => {
   const classes = useStyles();
+
   return (
     <Grid
       container
@@ -234,7 +236,11 @@ const PlotItem = ({ name, setSelected, selected, disabled }) => {
           classes={{ selected: classes.selected }}
           value="check"
           selected={selected.indexOf(name) !== -1}
-          onChange={() => setSelected(name)}
+          onChange={() => {
+            selected.indexOf(name) === -1
+              ? setSelected([...selected, name])
+              : setSelected([]);
+          }}
         >
           <CheckIcon />
         </ToggleButton>

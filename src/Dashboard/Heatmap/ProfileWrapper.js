@@ -1,7 +1,7 @@
 import React, { useRef, useCallback, useState } from "react";
 
-import { Query } from "react-apollo";
-import gql from "graphql-tag";
+import { gql, useQuery } from "@apollo/client";
+
 import * as d3 from "d3";
 
 import Grid from "@material-ui/core/Grid";
@@ -98,35 +98,35 @@ const ProfileWrapper = ({
 
   const [ref] = useHookWithRefCallback();
 
-  const ProfileWithData = ({ resetLoadingCircle }) =>
-    cellId ? (
-      <Query
-        query={BINS_QUERY}
-        variables={{
+  const ProfileWithData = ({ resetLoadingCircle }) => {
+    if (cellId) {
+      const { loading, error, data } = useQuery(BINS_QUERY, {
+        variables: {
           analysis: analysis,
           id: cellId
-        }}
-      >
-        {({ loading, error, data }) => {
-          if (loading) {
-            resetLoadingCircle(true);
-            return null;
-          }
-          if (error) return null;
+        }
+      });
 
-          const { bins } = data;
-          resetLoadingCircle(false);
-          return (
-            <Profile
-              cellSegs={segs}
-              chromosomes={chromosomes}
-              bins={bins}
-              genomeYScale={genomeYScale}
-            />
-          );
-        }}
-      </Query>
-    ) : null;
+      if (loading) {
+        resetLoadingCircle(true);
+        return null;
+      }
+      if (error) return null;
+
+      const { bins } = data;
+      resetLoadingCircle(false);
+      return (
+        <Profile
+          cellSegs={segs}
+          chromosomes={chromosomes}
+          bins={bins}
+          genomeYScale={genomeYScale}
+        />
+      );
+    } else {
+      return null;
+    }
+  };
 
   return (
     <Grid

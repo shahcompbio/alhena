@@ -2,8 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { Formik, Form, useFormik, useFormikContext } from "formik";
 import * as yup from "yup";
 
-import { ApolloConsumer } from "react-apollo";
-
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";

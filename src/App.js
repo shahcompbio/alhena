@@ -5,7 +5,7 @@ import {
   AdminRoute,
   UnauthenticatedRoute
 } from "./util/app-state";
-import { ApolloConsumer } from "react-apollo";
+
 import { Route, Switch } from "react-router-dom";
 
 import { withRouter } from "react-router";
@@ -61,11 +61,7 @@ const App = () => {
           exact={true}
           component={() => {
             history.replace("/login");
-            return (
-              <ApolloConsumer>
-                {client => <Unauthenticated client={client} />}
-              </ApolloConsumer>
-            );
+            return <Unauthenticated />;
           }}
         />
         {!authKeyID && (
@@ -77,22 +73,14 @@ const App = () => {
                 localStorage.setItem("linkAttempt", location.pathname);
               }
               history.replace("/login");
-              return (
-                <ApolloConsumer>
-                  {client => <Unauthenticated client={client} />}
-                </ApolloConsumer>
-              );
+              return <Unauthenticated />;
             }}
           />
         )}
         <Route
           path="/login"
           exact={true}
-          component={() => (
-            <ApolloConsumer>
-              {client => <Unauthenticated client={client} />}
-            </ApolloConsumer>
-          )}
+          component={() => <Unauthenticated />}
         />
         <Route
           path="/NewAccount/:redisKey"

@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useCallback, useState } from "react";
 
-import gql from "graphql-tag";
-import { Query } from "react-apollo";
+import { gql, useQuery } from "@apollo/client";
+
 import LoadingCircle from "../CommonModules/LoadingCircle.js";
 
 import * as d3 from "d3";
@@ -62,7 +62,6 @@ const Minimap = ({
   const ratio = Math.ceil(cellCount / numRows);
 
   const [paintReady, setPaintReady] = useState(false);
-  const [data, setData] = useState(null);
 
   const indices = heatmapOrder.filter((key, index) => index % ratio === 0);
   const bpRatio = getMinimapBPRatio(chromosomes);
@@ -87,11 +86,12 @@ const Minimap = ({
 
   useEffect(() => {
     if (data && paintReady) {
+      const { segs } = data;
       var canvas = d3.select("#minimap");
       var context = canvas.node().getContext("2d");
-      const yScale = getMinimapYScale(data.length);
+      const yScale = getMinimapYScale(segs.length);
 
-      data.forEach((record, index) => {
+      segs.forEach((record, index) => {
         const y = yScale(index);
         record.segs.forEach(seg => {
           context.fillStyle = colorScale(seg.state);
@@ -106,7 +106,7 @@ const Minimap = ({
       });
 
       const brushSvg = d3.select("#minimapBrush");
-      const heatmapToMinimap = heatmapToMinimapScale(cellCount, data.length);
+      const heatmapToMinimap = heatmapToMinimapScale(cellCount, segs.length);
 
       var brush = d3
         .brushY()
@@ -114,7 +114,7 @@ const Minimap = ({
           [0, 0],
           [
             heatmapConfig.minimap.width - 10,
-            data.length * heatmapConfig.minimap.rowHeight
+            segs.length * heatmapConfig.minimap.rowHeight
           ]
         ])
         .on("end", brushEnd);
@@ -150,42 +150,33 @@ const Minimap = ({
   }, [data, paintReady]);
 
   const heatmapWidth = heatmapConfig.minimap.width;
+  const { loading, error, data } = useQuery(MINI_MAP_QUERY, {
+    variables: {
+      analysis,
+      indices,
+      quality,
+      heatmapWidth
+    }
+  });
+
+  if (loading) return <LoadingCircle />;
+  if (error) return null;
+
   return (
-    <Query
-      query={MINI_MAP_QUERY}
-      variables={{
-        analysis,
-        indices,
-        quality,
-        heatmapWidth
-      }}
-    >
-      {({ loading, error, data }) => {
-        if (loading) return <LoadingCircle />;
-        if (error) return null;
-
-        const { segs } = data;
-
-        setData(segs);
-
-        return (
-          <div ref={ref} style={{ position: "absolute", marginLeft: 15 }}>
-            <canvas
-              style={{ position: "absolute" }}
-              id="minimap"
-              width={heatmapConfig.minimap.width}
-              height={heatmapConfig.height}
-            />
-            <svg
-              id="minimapBrush"
-              style={{ position: "absolute" }}
-              width={heatmapConfig.minimap.width}
-              height={heatmapConfig.height}
-            />
-          </div>
-        );
-      }}
-    </Query>
+    <div ref={ref} style={{ position: "absolute", marginLeft: 15 }}>
+      <canvas
+        style={{ position: "absolute" }}
+        id="minimap"
+        width={heatmapConfig.minimap.width}
+        height={heatmapConfig.height}
+      />
+      <svg
+        id="minimapBrush"
+        style={{ position: "absolute" }}
+        width={heatmapConfig.minimap.width}
+        height={heatmapConfig.height}
+      />
+    </div>
   );
 };
 export default Minimap;

@@ -9,22 +9,20 @@ import { BrowserRouter } from "react-router-dom";
 import { AppStateProvider } from "./util/app-state";
 
 import appStateReducer, { initialState } from "./util/appReducer";
-import { ApolloProvider } from "react-apollo";
+
 import { ApolloProvider as ApolloHooksProvider } from "@apollo/client";
 
 import client from "./apollo.js";
 require("dotenv").config();
 
 ReactDOM.render(
-  <ApolloProvider client={client}>
-    <ApolloHooksProvider client={client}>
-      <BrowserRouter basename={process.env.REACT_APP_BASENAME || "/"}>
-        <AppStateProvider initialState={initialState} reducer={appStateReducer}>
-          <App />
-        </AppStateProvider>
-      </BrowserRouter>
-    </ApolloHooksProvider>
-  </ApolloProvider>,
+  <ApolloHooksProvider client={client}>
+    <BrowserRouter basename={process.env.REACT_APP_BASENAME || "/"}>
+      <AppStateProvider initialState={initialState} reducer={appStateReducer}>
+        <App />
+      </AppStateProvider>
+    </BrowserRouter>
+  </ApolloHooksProvider>,
   document.getElementById("root")
 );
 // If you want your app to work offline and load faster, you can change

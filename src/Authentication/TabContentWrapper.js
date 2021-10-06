@@ -8,7 +8,6 @@ import TableToolbar from "./TableToolBar.js";
 
 import Grid from "@material-ui/core/Grid";
 
-import { ApolloConsumer } from "react-apollo";
 import { updateDashboard, deleteUserByUsername } from "../util/utils.js";
 
 import { withStyles, useTheme } from "@material-ui/styles";

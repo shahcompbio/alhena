@@ -78,7 +78,7 @@ export const LOGIN = gql`
   }
 `;
 
-const UnauthenticatedApp = ({ client, classes }) => {
+const UnauthenticatedApp = ({ classes }) => {
   let history = useHistory();
   const [, dispatch] = useAppState();
   const [errors, setError] = useState(null);

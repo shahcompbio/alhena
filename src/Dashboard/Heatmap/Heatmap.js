@@ -2,8 +2,9 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import * as d3 from "d3";
 import { withStyles } from "@material-ui/core/styles";
 
-import { Query } from "react-apollo";
-import gql from "graphql-tag";
+import { gql, useQuery } from "@apollo/client";
+
+//import gql from "graphql-tag";
 import { scalePoint } from "d3";
 import { heatmapConfig } from "./config.js";
 import { initContext } from "../utils.js";
@@ -118,154 +119,141 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
     categoryStats.length * heatmapConfig.categories.squareSpacing;
   const heatmapWidth = width - categoryWidth;
 
+  const { loading, error, data } = useQuery(CHROMOSOME_SEGS_QUERY, {
+    variables: {
+      analysis,
+      indices,
+      quality,
+      heatmapWidth
+    }
+  });
+
+  if (error) return null;
+  if (loading) {
+    return <LoadingCircle />;
+  }
+
+  const { chromosomes, segs, analysisStats } = data;
+
+  const yScale = getYScale(heatmapConfig.height / heatmapConfig.rowHeight);
+
+  const chromMap = getChromPixelMapping(chromosomes);
+
   return (
-    <Query
-      query={CHROMOSOME_SEGS_QUERY}
-      variables={{
-        analysis,
-        indices,
-        quality,
-        heatmapWidth
-      }}
-    >
-      {({ loading, error, data }) => {
-        if (error) return null;
-        if (loading && Object.keys(data).length === 0) {
-          return <LoadingCircle />;
-        }
+    <Grid container direction="column">
+      <Grid
+        item
+        container
+        direction="row"
+        justify="space-between"
+        alignItems="center"
+        height={heatmapConfig["height"] - heatmapConfig.chromosome["height"]}
+        width={heatmapConfig.wrapperWidth}
+      >
+        <Grid item>
+          <CategoriesLegend choosenStats={categoryStats} />
+        </Grid>
+        <Grid item>
+          <Legend maxState={analysisStats.maxState} />
+        </Grid>
+      </Grid>
+      <Grid
+        item
+        container
+        direction="row"
+        style={{ position: "relative" }}
+        width={heatmapConfig.wrapperWidth}
+        height={heatmapConfig["height"] - heatmapConfig.chromosome["height"]}
+      >
+        <Grid item>
+          <svg
+            width={categoryWidth + heatmapConfig.paddingLeft}
+            height={heatmapConfig["height"]}
+          >
+            <Categories
+              categories={categoryStats}
+              cellStats={analysisStats.cellStats}
+              yScale={yScale}
+            />
 
-        const { chromosomes, segs, analysisStats } = data;
-
-        const yScale = getYScale(
-          heatmapConfig.height / heatmapConfig.rowHeight
-        );
-
-        const chromMap = getChromPixelMapping(chromosomes);
-
-        return (
-          <Grid container direction="column">
-            <Grid
-              item
-              container
-              direction="row"
-              justify="space-between"
-              alignItems="center"
-              height={
-                heatmapConfig["height"] - heatmapConfig.chromosome["height"]
+            {hoverCell.hasOwnProperty("y") && <Indicator y={hoverCell["y"]} />}
+          </svg>
+        </Grid>
+        <Grid item>
+          <Plot
+            setSelectedCell={(y, heatmapRow) => {
+              const cell = segs[heatmapRow];
+              if (cell !== undefined) {
+                setHoverCell({
+                  y: yScale(heatmapRow),
+                  cell: segs[heatmapRow]
+                });
               }
-              width={heatmapConfig.wrapperWidth}
-            >
-              <Grid item>
-                <CategoriesLegend choosenStats={categoryStats} />
-              </Grid>
-              <Grid item>
-                <Legend maxState={analysisStats.maxState} />
-              </Grid>
-            </Grid>
-            <Grid
-              item
-              container
-              direction="row"
-              style={{ position: "relative" }}
-              width={heatmapConfig.wrapperWidth}
-              height={
-                heatmapConfig["height"] - heatmapConfig.chromosome["height"]
+            }}
+            selectedCell={selectedCell}
+            setHoverCellCoordinate={(y, heatmapRow) => {
+              const cell = segs[heatmapRow];
+              if (cell !== undefined) {
+                setHoverCell({
+                  y: yScale(heatmapRow),
+                  cell: segs[heatmapRow]
+                });
               }
-            >
-              <Grid item>
-                <svg
-                  width={categoryWidth + heatmapConfig.paddingLeft}
-                  height={heatmapConfig["height"]}
-                >
-                  <Categories
-                    categories={categoryStats}
-                    cellStats={analysisStats.cellStats}
-                    yScale={yScale}
-                  />
-
-                  {hoverCell.hasOwnProperty("y") && (
-                    <Indicator y={hoverCell["y"]} />
-                  )}
-                </svg>
-              </Grid>
-              <Grid item>
-                <Plot
-                  setSelectedCell={(y, heatmapRow) => {
-                    const cell = segs[heatmapRow];
-                    if (cell !== undefined) {
-                      setHoverCell({
-                        y: yScale(heatmapRow),
-                        cell: segs[heatmapRow]
-                      });
-                    }
-                  }}
-                  selectedCell={selectedCell}
-                  setHoverCellCoordinate={(y, heatmapRow) => {
-                    const cell = segs[heatmapRow];
-                    if (cell !== undefined) {
-                      setHoverCell({
-                        y: yScale(heatmapRow),
-                        cell: segs[heatmapRow]
-                      });
-                    }
-                  }}
-                  indicator={hoverCell["y"]}
-                  chromosomes={chromosomes}
-                  analysisStats={analysisStats}
-                  segs={segs}
-                  heatmapOrderToHeatmapIndex={heatmapOrderToHeatmapIndex}
-                  categoryWidth={categoryWidth + heatmapConfig.paddingLeft}
-                />
-              </Grid>
-              <Grid item>
-                <Minimap
-                  triggerHeatmapRequery={index => setIndices([...index])}
-                  heatmapOrder={heatmapOrder}
-                  rangeExtent={[
-                    heatmapOrderToHeatmapIndex(indices[0]),
-                    heatmapOrderToHeatmapIndex(indices[indices.length - 1])
-                  ]}
-                  analysis={analysis}
-                  chromosomes={chromosomes}
-                  chromMap={chromMap}
-                />
-              </Grid>
-            </Grid>
-            <Grid item style={{ marginTop: "-6px" }}>
-              <canvas
-                id="chromAxis"
-                height={heatmapConfig.chromosome["height"]}
-                width={heatmapConfig.wrapperWidth}
-              >
-                <ChromAxis
-                  categoryWidth={categoryWidth + heatmapConfig.paddingLeft}
-                  chromosomes={chromosomes}
-                  chromMap={chromMap}
-                />
-              </canvas>
-            </Grid>
-            <Grid item style={{ marginTop: -5, marginLeft: 3 }}>
-              <ProfileWrapper
-                loading={true}
-                categoryLength={categoryStats.length}
-                segs={hoverCell["cell"]}
-                maxState={analysisStats["maxState"]}
-                chromosomes={chromosomes}
-                chromMap={chromMap}
-                analysis={analysis}
-                cellId={hoverCell["cell"]["id"]}
-                key={"genomeProfile"}
-              />
-            </Grid>
-            <div id="heatmapCellID" style={{ height: 15, margin: 5 }}>
-              {Object.keys(hoverCell["cell"]).length !== 0 && (
-                <div>Cell ID: {hoverCell["cell"]["id"]}</div>
-              )}
-            </div>
-          </Grid>
-        );
-      }}
-    </Query>
+            }}
+            indicator={hoverCell["y"]}
+            chromosomes={chromosomes}
+            analysisStats={analysisStats}
+            segs={segs}
+            heatmapOrderToHeatmapIndex={heatmapOrderToHeatmapIndex}
+            categoryWidth={categoryWidth + heatmapConfig.paddingLeft}
+          />
+        </Grid>
+        <Grid item>
+          <Minimap
+            triggerHeatmapRequery={index => setIndices([...index])}
+            heatmapOrder={heatmapOrder}
+            rangeExtent={[
+              heatmapOrderToHeatmapIndex(indices[0]),
+              heatmapOrderToHeatmapIndex(indices[indices.length - 1])
+            ]}
+            analysis={analysis}
+            chromosomes={chromosomes}
+            chromMap={chromMap}
+          />
+        </Grid>
+      </Grid>
+      <Grid item style={{ marginTop: "-6px" }}>
+        <canvas
+          id="chromAxis"
+          height={heatmapConfig.chromosome["height"]}
+          width={heatmapConfig.wrapperWidth}
+        >
+          <ChromAxis
+            categoryWidth={categoryWidth + heatmapConfig.paddingLeft}
+            chromosomes={chromosomes}
+            chromMap={chromMap}
+          />
+        </canvas>
+      </Grid>
+      <Grid item style={{ marginTop: -5, marginLeft: 3 }}>
+        <ProfileWrapper
+          loading={true}
+          categoryLength={categoryStats.length}
+          segs={hoverCell["cell"]}
+          maxState={analysisStats["maxState"]}
+          chromosomes={chromosomes}
+          chromMap={chromMap}
+          analysis={analysis}
+          cellId={hoverCell["cell"]["id"]}
+          key={"genomeProfile"}
+        />
+      </Grid>
+      <div id="heatmapCellID" style={{ height: 15, margin: 5 }}>
+        {Object.keys(hoverCell["cell"]).length !== 0 && (
+          <div>Cell ID: {hoverCell["cell"]["id"]}</div>
+        )}
+      </div>
+    </Grid>
   );
 };
 

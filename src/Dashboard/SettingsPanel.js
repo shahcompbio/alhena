@@ -14,7 +14,6 @@ import {
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 
-import { ApolloConsumer } from "react-apollo";
 import ChipHeatmapSettings from "./Settings/ChipHeatmapSettings.js";
 import ScatterplotSettings from "./Settings/ScatterplotSettings.js";
 import LoadingCircle from "./CommonModules/LoadingCircle.js";
@@ -282,36 +281,29 @@ const SettingsPanel = ({
           resetFilter("DATA_FILTER_OFF");
         }}
       >
-        <ApolloConsumer key={"dataFilterConsumer"}>
-          {client =>
-            categoryStats.length > 0 ? (
-              <DataFilters
-                key={"dataFilterWrapper"}
-                client={client}
-                numericalDataFilters={numericalDataFilters}
-                experimentalConditions={categoryStats.filter(
-                  category =>
-                    category["category"] === experimentalCondition["type"]
-                )}
-                analysis={selectedAnalysis}
-                classes={classes}
-                update={(value, type) => {
-                  update(value, type);
-                }}
-                isDisabled={isDisabled}
-              />
-            ) : (
-              <DataFilters
-                key={"dataFilterWrapper"}
-                client={client}
-                numericalDataFilters={[]}
-                experimentalConditions={[]}
-                analysis={""}
-                classes={classes}
-              />
-            )
-          }
-        </ApolloConsumer>
+        {categoryStats.length > 0 ? (
+          <DataFilters
+            key={"dataFilterWrapper"}
+            numericalDataFilters={numericalDataFilters}
+            experimentalConditions={categoryStats.filter(
+              category => category["category"] === experimentalCondition["type"]
+            )}
+            analysis={selectedAnalysis}
+            classes={classes}
+            update={(value, type) => {
+              update(value, type);
+            }}
+            isDisabled={isDisabled}
+          />
+        ) : (
+          <DataFilters
+            key={"dataFilterWrapper"}
+            numericalDataFilters={[]}
+            experimentalConditions={[]}
+            analysis={""}
+            classes={classes}
+          />
+        )}
       </AccordianWrapper>
       <AccordianWrapper
         classes={classes}

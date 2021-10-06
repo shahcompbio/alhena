@@ -40,7 +40,6 @@ const DataFilters = ({
   classes,
   update,
   analysis,
-  client,
   experimentalConditions,
   numericalDataFilters,
   isDisabled,

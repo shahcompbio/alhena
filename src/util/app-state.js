@@ -1,8 +1,5 @@
 import React, { createContext, useReducer, useContext } from "react";
 import { Route, Redirect } from "react-router-dom";
-
-import { ApolloConsumer } from "react-apollo";
-
 const StateContext = createContext();
 
 export function AppStateProvider({ reducer, initialState, children }) {
@@ -25,13 +22,7 @@ export function UnauthenticatedRoute({ children, ...rest }) {
       {...rest}
       component={({ match }) => {
         if (!authKeyID) {
-          return (
-            <ApolloConsumer>
-              {client =>
-                React.cloneElement(children, { uri: match, client: client })
-              }
-            </ApolloConsumer>
-          );
+          return React.cloneElement(children, { uri: match });
         } else {
           dispatch({
             type: "LOGOUT"
@@ -49,13 +40,7 @@ export function PrivateRoute({ children, ...rest }) {
       {...rest}
       component={({ match }) => {
         if (authKeyID) {
-          return (
-            <ApolloConsumer>
-              {client =>
-                React.cloneElement(children, { uri: match, client: client })
-              }
-            </ApolloConsumer>
-          );
+          return React.cloneElement(children, { uri: match });
         } else {
           dispatch({
             type: "LOGOUT"
