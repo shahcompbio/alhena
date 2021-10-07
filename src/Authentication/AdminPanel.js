@@ -33,7 +33,7 @@ const styles = theme => ({
     padding: 0,
     zIndex: 5
   },
-  iconSvg: { width: "1.5em", height: "1.5em" },
+  iconSvg: { width: "1.5em", height: "1.5em", color: "white" },
   root: {
     flexGrow: 1,
     width: "80vw",
@@ -48,7 +48,9 @@ const styles = theme => ({
     width: "90%",
     borderRadius: 10,
     margin: "auto",
-    overflowX: "auto"
+    overflowX: "auto",
+    backgroundColor: "#4e89bb",
+    color: "white"
   },
   tabs: { alignSelf: "flex-end" },
   toolbar: { overflow: "hidden" }
@@ -104,7 +106,8 @@ const AdminPanel = ({ classes }) => {
       }
     });
   };
-  const keyType = tabIndex === 0 ? "-users" : "-dashboards";
+  const keyType =
+    tabIndex === 0 ? "-users" : tabIndex === 1 ? "-dashboards" : "-settings";
   return (
     <div style={{ flexGrow: 1, height: "100vh" }}>
       <div className={classes.root}>
@@ -175,12 +178,16 @@ const AdminPanel = ({ classes }) => {
           <Toolbar className={classes.toolBar}>
             <SeperatedTabs
               className={classes.tabs}
-              tabs={[{ label: "Users" }, { label: "Dashboards" }]}
+              tabs={[
+                { label: "Users" },
+                { label: "Dashboards" },
+                { label: "Settings" }
+              ]}
               tabStyle={{
-                bgColor:
-                  tabIndex === 0 ? "rgb(196 221 239)" : "rgb(97 160 137)",
-                selectedBgColor:
-                  tabIndex === 0 ? "rgb(97 160 137)" : "rgb(196 221 239)"
+                bgColor: "#dce1de",
+                selectedBgColor: "rgb(251 251 251)"
+                //    bgColor: "rgb(177 193 187)",
+                //  selectedBgColor: "RGB(201, 221, 214)"
               }}
               tabProps={{
                 disableRipple: true

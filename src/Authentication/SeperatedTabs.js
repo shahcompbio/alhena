@@ -106,7 +106,7 @@ const SeperatedTabs = ({ tabs, tabStyle, tabProps, ...props }) => {
             {...tab}
             classes={tabClasses}
             style={{
-              color: index === 0 ? "white" : "black"
+              color: "black"
             }}
           />
         );

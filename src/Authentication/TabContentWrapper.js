@@ -3,15 +3,22 @@ import { useAppState } from "../util/app-state";
 
 import TableContent from "./TableContent.js";
 import EditDashboardPopupWrapper from "./EditDashboardPopupWrapper.js";
-import Paper from "@material-ui/core/Paper";
+import AdminSettings from "./AdminSettings";
 import TableToolbar from "./TableToolBar.js";
 
+import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
-
-import { updateDashboard, deleteUserByUsername } from "../util/utils.js";
 
 import { withStyles, useTheme } from "@material-ui/styles";
 import { gql, useLazyQuery, useQuery } from "@apollo/client";
+const getAllSettings = gql`
+  query AdminPanel {
+    getAllSettings {
+      type
+      label
+    }
+  }
+`;
 
 const getUsers = gql`
   query AdminPanel($user: ApiUser!) {
@@ -83,7 +90,6 @@ const styles = (theme, tabIndex) => ({
     flexGrow: 1,
     borderRadius: 20,
     zIndex: 20,
-    // /  marginTop: 25,
     marginBottom: 80
   },
   grid: {
@@ -269,10 +275,10 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
       setLoading(false);
     }
   };
-  const sortAlpha = list =>
+  const sortAlpha = (list, name) =>
     list.sort((a, b) => {
-      var textA = a.name ? a.name.toUpperCase() : a.username.toUpperCase();
-      var textB = b.name ? b.name.toUpperCase() : b.username.toUpperCase();
+      var textA = a[name] ? a[name].toUpperCase() : a.username.toUpperCase();
+      var textB = b[name] ? b[name].toUpperCase() : b.username.toUpperCase();
       return textA < textB ? -1 : textA > textB ? 1 : 0;
     });
 
@@ -291,15 +297,23 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
         });
   };
   const config = {
+    2: {
+      query: getAllSettings,
+      dataReturnName: "getAllSettings",
+      tableKey: "settingsContentKey",
+      keyName: "type"
+    },
     1: {
       query: getAllDashboards,
       dataReturnName: "getAllDashboards",
-      tableKey: "dashboardsContentKey"
+      tableKey: "dashboardsContentKey",
+      keyName: "name"
     },
     0: {
       query: getUsers,
       dataReturnName: "getUsers",
-      tableKey: "usersContentKey"
+      tableKey: "usersContentKey",
+      keyName: "name"
     }
   };
 
@@ -315,8 +329,8 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
       <Paper
         className={classes.root}
         style={{
-          background:
-            tabIndex === 1 ? "rgb(196 221 239)" : theme.palette.primary.dark
+          background: "rgb(251 251 251)"
+          //tabIndex === 1 ? "rgb(196 221 239)" : theme.palette.primary.dark
         }}
       >
         <div />
@@ -331,8 +345,8 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
   }
   const modifiedData =
     tableData.length > 0
-      ? sortAlpha(tableData)
-      : sortAlpha(data[tableConfig.dataReturnName]);
+      ? sortAlpha(tableData, tableConfig.keyName)
+      : sortAlpha(data[tableConfig.dataReturnName], tableConfig.keyName);
 
   return (
     <div className={classes.root} key={"adminTable" + tabIndex}>
@@ -350,7 +364,9 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
           elevation={0}
           key={"adminTablePaper" + tabIndex}
           style={{
-            background: tabIndex === 1 ? "rgb(196 221 239)" : "rgb(97 160 137)"
+            background: "rgb(251 251 251)"
+            //background: "rgb(201 221 214)"
+            //background: tabIndex === 1 ? "rgb(196 221 239)" : "rgb(201 221 214)"
           }}
         >
           {(selected || actionComplete) && (
@@ -364,21 +380,27 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
               actionComplete={actionComplete}
             />
           )}
-          <TableContent
-            key={"tableContent"}
-            data={modifiedData}
-            tabIndex={tabIndex}
-            isEditing={isEditing}
-            allRoles={
-              tabIndex === 0
-                ? data.getAllDashboards.map(dashboard => dashboard.name)
-                : []
-            }
-            setSelectedUserRoles={userRoles => setSelectedUserRoles(userRoles)}
-            setSelectedUserAdmin={isAdmin => setSelectedUserAdmin(isAdmin)}
-            selected={selected}
-            handleRowClick={name => handleRowClick(name)}
-          />
+          {tabIndex === 2 ? (
+            <AdminSettings data={data[tableConfig.dataReturnName]} />
+          ) : (
+            <TableContent
+              key={"tableContent"}
+              data={modifiedData}
+              tabIndex={tabIndex}
+              isEditing={isEditing}
+              allRoles={
+                tabIndex === 0
+                  ? data.getAllDashboards.map(dashboard => dashboard.name)
+                  : []
+              }
+              setSelectedUserRoles={userRoles =>
+                setSelectedUserRoles(userRoles)
+              }
+              setSelectedUserAdmin={isAdmin => setSelectedUserAdmin(isAdmin)}
+              selected={selected}
+              handleRowClick={name => handleRowClick(name)}
+            />
+          )}
           {isEditing && tabIndex === 1 && (
             <EditDashboardPopupWrapper
               key={"editDashboardPopup" + selected}

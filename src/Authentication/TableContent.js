@@ -49,10 +49,10 @@ const styles = theme => ({
       backgroundColor: "#ffffff"
     }
   },
-  checkBox0: {
-    color: "white !important",
+  checkBox: {
+    color: "#443d3d !important",
     "$selected &": {
-      color: "white"
+      color: "#443d3d"
     }
   },
   checkBox1: {
@@ -132,12 +132,11 @@ const TableContent = ({
       ? Object.keys(data[0]).filter(heading => heading !== "__typename")
       : [];
 
-  const colorClass = tabIndex === 0 ? classes.checkBox0 : classes.checkBox1;
+  const colorClass = classes.checkBox;
 
   const editTextRows = (row, heading, allRolesLength) => {
     if (Array.isArray(row[heading])) {
       if (heading === "roles") {
-        console.log(row[heading]);
         return row[heading].length === allRolesLength
           ? "All"
           : row[heading].join(", ");
