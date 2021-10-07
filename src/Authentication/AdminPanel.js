@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { gql, useLazyQuery } from "@apollo/client";
+import { useAppState } from "../util/app-state";
 
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
@@ -15,7 +16,7 @@ import AddDashboardPopupWrapper from "./AddDashboardPopupWrapper.js";
 import Menu from "../Misc/Menu.js";
 import TabContentWrapper from "./TabContentWrapper.js";
 
-import { withStyles, useTheme } from "@material-ui/styles";
+import { withStyles } from "@material-ui/styles";
 const styles = theme => ({
   actions: {
     float: "right"
@@ -64,10 +65,13 @@ const CREATENEWDASHBOARD = gql`
 `;
 
 const AdminPanel = ({ classes }) => {
-  const theme = useTheme();
+  const [{ lastSettingsTab }] = useAppState();
 
   const [openPopup, setOpenPopup] = useState(false);
-  const [tabIndex, setTabIndex] = useState(1);
+  const [tabIndex, setTabIndex] = useState(
+    lastSettingsTab !== null ? parseInt(lastSettingsTab) : 0
+  );
+
   const [createNewDashboard, { data, loading, error }] = useLazyQuery(
     CREATENEWDASHBOARD
   );
@@ -184,7 +188,7 @@ const AdminPanel = ({ classes }) => {
                 { label: "Settings" }
               ]}
               tabStyle={{
-                bgColor: "#dce1de",
+                bgColor: "#d6d9dd",
                 selectedBgColor: "rgb(251 251 251)"
                 //    bgColor: "rgb(177 193 187)",
                 //  selectedBgColor: "RGB(201, 221, 214)"
@@ -193,7 +197,10 @@ const AdminPanel = ({ classes }) => {
                 disableRipple: true
               }}
               value={tabIndex}
-              onChange={(e, i) => setTabIndex(i)}
+              onChange={(e, i) => {
+                setTabIndex(i);
+                localStorage.setItem("lastSettingsTab", i);
+              }}
             />
           </Toolbar>
         </AppBar>

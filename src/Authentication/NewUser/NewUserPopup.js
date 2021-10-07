@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useAppState } from "../../util/app-state";
-import { Formik, Form, useFormik, useFormikContext } from "formik";
+import { Formik } from "formik";
 import * as yup from "yup";
 
 import {
@@ -58,15 +58,6 @@ const NEWUSERLINK = gql`
   }
 `;
 
-/*const doesUserExistQuery = async (client, email) => {
-  var data = await client.query({
-    query: doesUserExist,
-    variables: {
-      email: email
-    }
-  });
-  return data.data.doesUserExist.userAlreadyExists;
-};*/
 const styles = theme => ({
   dialogContent: {
     width: "700px",
@@ -110,9 +101,6 @@ const styles = theme => ({
 
 const NewUserPopup = ({ isOpen, handleClose, client, classes }) => {
   const [{ authKeyID, uid }] = useAppState();
-  const [newUserLink, setNewUserLink] = useState(null);
-  const [isSubmitDisabled, setIsDisabled] = useState(true);
-
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedRoles, setSelectedRoles] = useState([]);
 

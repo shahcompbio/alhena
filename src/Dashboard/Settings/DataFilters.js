@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 
-import gql from "graphql-tag";
 import _ from "lodash";
 
 import {
@@ -9,7 +8,6 @@ import {
   FormControlLabel,
   Grid,
   Input,
-  InputLabel,
   ListItemText,
   MenuItem,
   Select,
@@ -20,21 +18,6 @@ import {
 
 import { useStatisticsState } from "../DashboardState/statsState";
 import { heatmapConfig } from "../Heatmap/config";
-const orderFromParamsQuary = gql`
-  query heatmapOrderFromParameter(
-    $analysis: String!
-    $quality: String!
-    $params: [InputParams]
-  ) {
-    heatmapOrderFromParameter(
-      analysis: $analysis
-      quality: $quality
-      params: $params
-    ) {
-      order
-    }
-  }
-`;
 
 const DataFilters = ({
   classes,
@@ -46,8 +29,7 @@ const DataFilters = ({
   key
 }) => {
   const [
-    { quality, isContaminated, axisChange, expCondition },
-    dispatch
+    { quality, isContaminated, axisChange, expCondition }
   ] = useStatisticsState();
   const [qualityMenuValue, setQualityMenuValue] = useState(quality);
   const [contaminatedMenuValue, setContaminatedMenuValue] = useState(
@@ -56,7 +38,6 @@ const DataFilters = ({
 
   const [experimentalMenuValue, setExperimentalMenuValue] = useState([]);
 
-  const [paramObj, setParamObj] = useState({});
   useEffect(() => {
     if (axisChange["datafilter"] === false && experimentalMenuValue !== null) {
       setExperimentalMenuValue(null);
@@ -137,7 +118,6 @@ const DataFilters = ({
         <FormControl
           disabled={isDisabled}
           variant="outlined"
-          key="contaminatedFormControll"
           className={classes.formControl}
           key={key + "filterFormControl"}
         >
@@ -196,7 +176,6 @@ const DataFilters = ({
               const value = event.target.value;
               if (value.indexOf("") !== -1) {
                 setExperimentalMenuValue([]);
-                setParamObj["experimental_condition"] = [];
                 update(
                   {
                     expCondition: null
@@ -205,11 +184,6 @@ const DataFilters = ({
                 );
               } else {
                 setExperimentalMenuValue(value);
-
-                setParamObj["experimental_condition"] = {
-                  param: "experimental_condition",
-                  value: [...value]
-                };
 
                 update(
                   {
@@ -259,7 +233,7 @@ const DataFilters = ({
 };
 const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
   const [
-    { axisChange, absoluteMinMaxDataFilters, selectedCells },
+    { axisChange, absoluteMinMaxDataFilters },
     dispatch
   ] = useStatisticsState();
 
@@ -355,7 +329,6 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
             </Typography>
             <Slider
               disabled
-              defaultValue={null}
               defaultValue={[filter["localMin"], filter["localMax"]]}
               aria-labelledby="breath-local-slider"
               min={originalDefaultValues[filter["name"]][0]}
@@ -381,7 +354,6 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
             </Typography>
             <Slider
               key={filter["name"] + "-slider"}
-              aria-labelledby="breath-overall-slider"
               value={defaultValues[filter["name"]]}
               className={classes.slider}
               color={"secondary"}
@@ -437,8 +409,6 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
               max={filter["max"]}
               valueLabelDisplay="auto"
               aria-labelledby="range-slider"
-              getAriaValueText={value => value}
-              valueLabelDisplay="auto"
               label={filter["name"]}
               getAriaValueText={value => numFormatter(value)}
             />

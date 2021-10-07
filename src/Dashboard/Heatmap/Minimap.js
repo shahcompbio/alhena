@@ -84,6 +84,17 @@ const Minimap = ({
 
   const [ref] = refCallback();
 
+  const heatmapWidth = heatmapConfig.minimap.width;
+
+  const { loading, error, data } = useQuery(MINI_MAP_QUERY, {
+    variables: {
+      analysis,
+      indices,
+      quality,
+      heatmapWidth
+    }
+  });
+
   useEffect(() => {
     if (data && paintReady) {
       const { segs } = data;
@@ -148,16 +159,6 @@ const Minimap = ({
       ]);
     }
   }, [data, paintReady]);
-
-  const heatmapWidth = heatmapConfig.minimap.width;
-  const { loading, error, data } = useQuery(MINI_MAP_QUERY, {
-    variables: {
-      analysis,
-      indices,
-      quality,
-      heatmapWidth
-    }
-  });
 
   if (loading) return <LoadingCircle />;
   if (error) return null;

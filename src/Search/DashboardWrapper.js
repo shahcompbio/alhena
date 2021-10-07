@@ -45,6 +45,7 @@ const DashboardWrapper = ({ uri, classes, history, client, props }) => {
     ticketFromUrl !== null
       ? null
       : data["getDashboardsByUser"]["defaultDashboard"];
+
   const linkParams = data.getQueryParams
     ? data.getQueryParams.paramsFromLink
         .split("||")

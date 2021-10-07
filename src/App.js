@@ -114,6 +114,9 @@ const App = () => {
           <AdminPanel />
         </AdminRoute>
       </Switch>
+      <div style={{ position: "absolute", bottom: 10, right: 10 }}>
+        Version 1.04
+      </div>
     </MuiThemeProvider>
   );
 };

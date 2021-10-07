@@ -9,19 +9,20 @@ import TableToolbar from "./TableToolBar.js";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 
-import { withStyles, useTheme } from "@material-ui/styles";
+import { withStyles } from "@material-ui/styles";
 import { gql, useLazyQuery, useQuery } from "@apollo/client";
 const getAllSettings = gql`
-  query AdminPanel {
+  query AdminPanel($user: ApiUser!, $tabIndex: Int) {
     getAllSettings {
       type
       label
     }
+    setLastSettingsTab(user: $user, index: $tabIndex)
   }
 `;
 
 const getUsers = gql`
-  query AdminPanel($user: ApiUser!) {
+  query AdminPanel($user: ApiUser!, $tabIndex: Int) {
     getUsers(auth: $user) {
       username
       roles
@@ -32,14 +33,16 @@ const getUsers = gql`
     getAllDashboards(auth: $user) {
       name
     }
+    setLastSettingsTab(user: $user, index: $tabIndex)
   }
 `;
 const getAllDashboards = gql`
-  query getAllDashboards($user: ApiUser!) {
+  query getAllDashboards($user: ApiUser!, $tabIndex: Int) {
     getAllDashboards(auth: $user) {
       name
       count
     }
+    setLastSettingsTab(user: $user, index: $tabIndex)
   }
 `;
 
@@ -90,17 +93,16 @@ const styles = (theme, tabIndex) => ({
     flexGrow: 1,
     borderRadius: 20,
     zIndex: 20,
-    marginBottom: 80
+    marginBottom: 80,
+    minHeight: 270
   },
   grid: {
     marginTop: "-60px"
   }
 });
 
-const TabContentWrapper = ({ tabIndex, classes }) => {
-  const theme = useTheme();
+const TabContentWrapper = ({ classes, tabIndex }) => {
   const [{ authKeyID, uid }, dispatch] = useAppState();
-
   const [isLoading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [actionComplete, setActionComplete] = useState(null);
@@ -320,23 +322,38 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
   const tableConfig = config[tabIndex];
   const { loading, error, data } = useQuery(tableConfig["query"], {
     variables: {
-      user: { authKeyID: authKeyID, uid: uid }
+      user: { authKeyID: authKeyID, uid: uid },
+      tabIndex: tabIndex
     }
   });
 
   if (loading) {
     return (
-      <Paper
-        className={classes.root}
-        style={{
-          background: "rgb(251 251 251)"
-          //tabIndex === 1 ? "rgb(196 221 239)" : theme.palette.primary.dark
-        }}
-      >
-        <div />
-      </Paper>
+      <div className={classes.root} key={"adminTable" + tabIndex}>
+        <Grid
+          className={classes.grid}
+          direction="column"
+          justify="center"
+          alignItems="center"
+          container
+          spacing={2}
+          key={"adminGrid"}
+        >
+          <Paper
+            className={classes.root}
+            style={{
+              background: "rgb(251 251 251)"
+              //tabIndex === 1 ? "rgb(196 221 239)" : theme.palette.primary.dark
+            }}
+          >
+            <div style={{ width: "100%", height: "100%" }} />
+          </Paper>
+        </Grid>
+      </div>
     );
   }
+  console.log(data);
+
   if (error) {
     dispatch({
       type: "LOGOUT"

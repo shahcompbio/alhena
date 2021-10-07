@@ -6,7 +6,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
 import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
@@ -22,8 +21,6 @@ import ListItemText from "@material-ui/core/ListItemText";
 import Checkbox from "@material-ui/core/Checkbox";
 
 import LoadingCircle from "../ProgressCircle.js";
-import IconButton from "@material-ui/core/IconButton";
-import CheckIcon from "@material-ui/icons/Check";
 
 import TransferList from "../TransferList.js";
 
@@ -91,7 +88,7 @@ const useStyles = makeStyles(theme => ({
   searchInput: {
     padding: "15px 12px"
   },
-  stepper: { padding: "0 !important" },
+  stepper: { padding: "0 !important", iconColor: "#4e89bb" },
   textValidator: {
     paddingBottom: 0,
     width: "80%",
@@ -107,7 +104,6 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-const slideTimeOut = 800;
 const PopUpContent = ({
   isOpen,
   handleClose,
@@ -342,7 +338,6 @@ const DynamicColumnsContent = ({
 
           return (
             <ListItem
-              key={value.type}
               role={undefined}
               dense
               button
@@ -462,7 +457,6 @@ const UserDashboardContent = ({
 
             return (
               <ListItem
-                key={value}
                 role={undefined}
                 dense
                 button

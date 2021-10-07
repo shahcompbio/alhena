@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   AccordionActions,
   Button,
-  Divider,
   Paper,
   Typography,
   Grid,
@@ -30,12 +29,8 @@ import { withStyles } from "@material-ui/core/styles";
 import { useDashboardState } from "../Search/ProjectView/ProjectState/dashboardState";
 
 import { useStatisticsState } from "./DashboardState/statsState";
-import { heatmapConfig } from "./Heatmap/config";
 
 const styles = theme => ({
-  fieldComponent: {
-    margin: theme.spacing(0, 3, 8, 3)
-  },
   fieldTitle: {
     paddingBottom: 30
   },
@@ -62,7 +57,7 @@ const styles = theme => ({
     color: "rgba(225, 225, 225, 0.54)"
   },
   metaDataPanel: {
-    background: "none",
+    background: "white",
     marginBottom: 10
   },
   buttonWrapper: {
@@ -74,11 +69,14 @@ const styles = theme => ({
   exportButton: {
     width: 180,
     marginBottom: 10,
-    marginRight: 12
+    marginRight: 12,
+    backgroundColor: "white"
   },
   shareButton: {
     width: 180,
-    marginBottom: 10
+    marginBottom: 10,
+    marginLeft: 6,
+    backgroundColor: "white"
   },
   fieldComponent: {
     margin: theme.spacing(2, 0, 0, 0)
@@ -120,12 +118,7 @@ const styles = theme => ({
     padding: "0px 24px 24px"
   }
 });
-const defaultCleared = {
-  dataFilters: false,
-  scatterplot: false,
-  chip: false,
-  GCBias: false
-};
+
 const SettingsPanel = ({
   analysis,
   classes,
@@ -196,7 +189,7 @@ const SettingsPanel = ({
         project={selectedDashboard}
         analysis={selectedAnalysis}
       />
-      {((selectedCells.length !== 0 && axisChange["datafilter"] == false) ||
+      {((selectedCells.length !== 0 && axisChange["datafilter"] === false) ||
         subsetSelection.length !== 0) && (
         <SelectedCellsPanel
           classes={classes}

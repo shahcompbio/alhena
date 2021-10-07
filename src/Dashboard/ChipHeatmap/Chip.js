@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import * as d3 from "d3";
 
-import XYFrame from "semiotic/lib/XYFrame";
 import Legend from "./Legend.js";
 
 import { withStyles } from "@material-ui/core/styles";
@@ -14,7 +13,7 @@ import Grid from "@material-ui/core/Grid";
 
 import { initContext, getSelection, isSelectionAllowed } from "../utils.js";
 import { useStatisticsState } from "../DashboardState/statsState";
-import { scaleLinear } from "d3-scale";
+
 import d3Tip from "d3-tip";
 
 const chipHeatmapDimension = 775;
@@ -73,6 +72,13 @@ const Chip = ({ analysis, classes }) => {
     }
   ] = useStatisticsState();
 
+  const selection = getSelection(
+    axisChange,
+    subsetSelection,
+    selectedCells,
+    selectedCellsDispatchFrom,
+    selfType
+  );
   const { loading, error, data } = useQuery(CHIP_HEATMAP_QUERY, {
     variables: {
       analysis,
@@ -81,13 +87,6 @@ const Chip = ({ analysis, classes }) => {
       metric: chipHeatmapAxis.type
     }
   });
-  const selection = getSelection(
-    axisChange,
-    subsetSelection,
-    selectedCells,
-    selectedCellsDispatchFrom,
-    selfType
-  );
 
   if (error) return null;
   if (loading) {
@@ -442,9 +441,6 @@ const ChipHeatmap = ({ data, selectionAllowed }) => {
   }
 
   const drawBackgroundLines = context => {
-    const yTicks = y.ticks(72);
-    const xTicks = x.ticks(72);
-
     x.ticks(72).forEach(function(d) {
       context.moveTo(x(d), heatmapDim.y1);
       context.lineTo(x(d), heatmapDim.y2);

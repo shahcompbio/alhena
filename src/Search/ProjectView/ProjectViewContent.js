@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import Search from "./Filter/Search.js";
 
 import { useAppState } from "../../util/app-state";
@@ -102,14 +102,13 @@ const SET_CACHE_SETTING = gql`
 `;
 const slideTimeOut = 1500;
 const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
-  const [{ selectedDashboard, copyLink }] = useDashboardState();
+  const [{ selectedDashboard }] = useDashboardState();
 
   const [{ authKeyID, uid }, dispatch] = useAppState();
   const [selectedOptions, setSelectedOptions] = useState({});
   const [activeStep, setActiveStep] = useState(null);
   const [filters, setFilters] = useState([]);
 
-  const [graphDim, setDim] = useState(0);
   const dimRef = useRef(0);
 
   const getDirection = index => (index === 0 ? "right" : "left");
@@ -288,7 +287,6 @@ const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
                 </Grid>
                 <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
                   <CanvasGraph
-                    graphDim={graphDim}
                     isLoading={false}
                     key={"packing-circles"}
                     filters={filters}

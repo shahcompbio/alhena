@@ -9,7 +9,7 @@ const ViolinSettings = ({
   setAxisOption,
   isDisabled
 }) => {
-  const [{ quality, violinAxis }, dispatch] = useStatisticsState();
+  const [{ violinAxis }] = useStatisticsState();
   const [xAxisLabel, setXAxisLabel] = useState(violinAxis.x.type);
   const [yAxisLabel, setYAxisLabel] = useState(violinAxis.y.type);
 

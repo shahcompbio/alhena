@@ -147,7 +147,6 @@ const QCDashboard = ({ analysis, classes, client }) => {
     {
       selectedCells,
       quality,
-      popupFacadeIsOpen,
       isContaminated,
       numericalDataFilters,
       expCondition,

@@ -1,18 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import * as d3 from "d3";
-import DataGrid, { Row, RowRendererProps } from "react-data-grid";
+import DataGrid from "react-data-grid";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 import { matchSorter } from "match-sorter";
 
-import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
-import TableBody from "@material-ui/core/TableBody";
-
-import Autocomplete, {
-  createFilterOptions
-} from "@material-ui/lab/Autocomplete";
+import Autocomplete from "@material-ui/lab/Autocomplete";
 
 import { withStyles } from "@material-ui/styles";
 import { useDashboardState } from "../ProjectState/dashboardState";

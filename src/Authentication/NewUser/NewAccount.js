@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Formik, Form, useFormik, useFormikContext } from "formik";
+import React, { useState, useEffect } from "react";
+import { Formik } from "formik";
 import * as yup from "yup";
 
 import Grid from "@material-ui/core/Grid";
@@ -7,12 +7,10 @@ import { Typography } from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
-import SnackbarContentWrapper from "../../Misc/SnackBarPopup.js";
 
-import styled from "styled-components";
 import { withStyles } from "@material-ui/styles";
 
-import { gql, useLazyQuery, useQuery } from "@apollo/client";
+import { gql, useLazyQuery } from "@apollo/client";
 
 const styles = theme => ({
   button: {

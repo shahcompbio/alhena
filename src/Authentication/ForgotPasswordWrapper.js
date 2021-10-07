@@ -4,7 +4,6 @@ import { gql, useLazyQuery } from "@apollo/client";
 
 import Button from "@material-ui/core/Button";
 import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
 import Typography from "@material-ui/core/Typography";
 
@@ -67,9 +66,7 @@ const ForgotPasswordWrapper = ({ dispatch, classes }) => {
   const [username, setUsername] = useState(null);
   const [email, setEmail] = useState(null);
 
-  const [verifyUser, { loading, error: queryError, data }] = useLazyQuery(
-    VERIFYUSER
-  );
+  const [verifyUser, { loading, data }] = useLazyQuery(VERIFYUSER);
 
   const fields = [
     {

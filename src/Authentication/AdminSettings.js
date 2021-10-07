@@ -1,21 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 
-import {
-  Grid,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Checkbox,
-  Button,
-  Paper
-} from "@material-ui/core";
-
-import { FixedSizeList as List } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
+import { Grid, Button, TextField, Typography } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
-  root: {}
+  innerGrid: { padding: 15 },
+  root: { padding: 35 },
+  submitButton: { color: "#fbfaf9", backgroundColor: "#828897" }
 }));
 
 const AdminSettings = ({ data }) => {
@@ -24,13 +15,76 @@ const AdminSettings = ({ data }) => {
     <Grid
       container
       spacing={2}
-      justify="center"
-      alignItems="center"
+      direction="column"
+      justify="flex-start"
+      alignItems="flex-start"
       className={classes.root}
     >
-      {data.map(option => (
-        <p>{option.type}</p>
-      ))}
+      <Typography variant="h5">Search Table Labeling</Typography>
+      <Grid
+        container
+        spacing={2}
+        direction="row"
+        justify="flex-start"
+        alignItems="flex-start"
+        className={classes.innerGrid}
+      >
+        <Grid
+          container
+          spacing={2}
+          direction="column"
+          justify="flex-start"
+          alignItems="flex-start"
+          className={classes.innerGrid}
+        >
+          <table>
+            <tr>
+              <th style={{ textAlign: "left" }}>
+                <Typography variant="body">Type </Typography>
+              </th>
+              <th style={{ width: 20 }} />
+              <th style={{ textAlign: "left" }}>
+                <Typography variant="body">Display Label</Typography>
+              </th>
+            </tr>
+            {data.map(option => (
+              <tr>
+                <td>
+                  <Typography variant="body">{option.type} </Typography>
+                </td>
+                <td style={{ width: 20 }} />
+                <td style={{ textAlign: "left" }}>
+                  <TextField
+                    id="standard-basic"
+                    label="Standard"
+                    variant="standard"
+                  >
+                    {option.label}
+                  </TextField>
+                </td>
+              </tr>
+            ))}
+          </table>
+        </Grid>
+      </Grid>
+      <Grid
+        container
+        spacing={2}
+        direction="row"
+        justify="flex-end"
+        alignItems="flex-end"
+        className={classes.innerGrid}
+      >
+        <Button
+          className={classes.submitButton}
+          variant="outlined"
+          disableElevation
+          size="large"
+          type="submit"
+        >
+          Save
+        </Button>
+      </Grid>
     </Grid>
   );
 };

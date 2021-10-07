@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import * as d3 from "d3";
 import { withStyles } from "@material-ui/core/styles";
 
@@ -100,7 +100,6 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
   const [heatmapOrder, setHeatmapOrder] = useState([]);
 
   const [hoverCell, setHoverCell] = useState({ cell: {} });
-  const [selectedCell, setSelectedCell] = useState({ cell: {} });
 
   const [indices, setIndices] = useState([]);
   useEffect(() => {
@@ -190,7 +189,6 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
                 });
               }
             }}
-            selectedCell={selectedCell}
             setHoverCellCoordinate={(y, heatmapRow) => {
               const cell = segs[heatmapRow];
               if (cell !== undefined) {
@@ -283,9 +281,10 @@ const Plot = ({
   const chromMap = getChromPixelMapping(chromosomes);
 
   useEffect(() => {
+    var heatmapRow;
     if (selectedCellCoordinates && rowHoverCordinates === null) {
       const roundY = Math.max(selectedCellCoordinates[1], 0);
-      var heatmapRow = yScale.domain()[d3.bisect(invertYScale, roundY) - 1];
+      heatmapRow = yScale.domain()[d3.bisect(invertYScale, roundY) - 1];
       if (heatmapRow < segs.length) {
         setSelectedCell(selectedCellCoordinates[1], heatmapRow);
         drawHeatmap(segs, context, yScale(heatmapRow));
@@ -293,7 +292,7 @@ const Plot = ({
     }
     if (rowHoverCordinates !== null) {
       const roundY = Math.max(rowHoverCordinates[1], 0);
-      var heatmapRow = yScale.domain()[d3.bisect(invertYScale, roundY) - 1];
+      heatmapRow = yScale.domain()[d3.bisect(invertYScale, roundY) - 1];
       if (heatmapRow < segs.length) {
         setHoverCellCoordinate(rowHoverCordinates[1], heatmapRow);
         drawHeatmap(segs, context, yScale(heatmapRow));
@@ -310,7 +309,6 @@ const Plot = ({
   }, [segs]);
 
   function useHookWithRefCallback() {
-    const ref = useRef(null);
     const setRef = useCallback(node => {
       if (node) {
         const heatmap = d3.select("#heatmap");

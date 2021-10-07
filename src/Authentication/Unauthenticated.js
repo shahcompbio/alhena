@@ -52,7 +52,7 @@ const styles = theme => ({
   },
   forgotPasswordButton: { marginLeft: 20, marginTop: 40 },
   submitButton: {
-    marginLeft: 10,
+    marginLeft: 18,
     marginTop: 40,
     backgroundColor: theme.palette.primary.dark,
     color: theme.palette.background.default,
@@ -74,6 +74,7 @@ export const LOGIN = gql`
       authKeyID
       role
       isAdmin
+      lastSettingsTab
     }
   }
 `;
@@ -104,7 +105,8 @@ const UnauthenticatedApp = ({ classes }) => {
         response: data.login.response,
         authKeyID: data.login.authKeyID,
         uid: username,
-        isSuperUser: data.login.isAdmin
+        isSuperUser: data.login.isAdmin,
+        lastSettingsTab: data.login.lastSettingsTab
       });
     }
   }, [data, loading, error]);
@@ -130,7 +132,7 @@ const UnauthenticatedApp = ({ classes }) => {
           height: 425,
           width: 500,
           marginTop: -55,
-          marginLeft: 85
+          marginLeft: 98
         }}
         className={classes.logo}
         height={"191px"}
@@ -215,14 +217,16 @@ const UnauthenticatedApp = ({ classes }) => {
             <ComponentWrapper>
               <Button
                 className={classes.submitButton}
-                variant="contained"
+                variant="outlined"
+                disableElevation
                 type="submit"
               >
                 Log In
               </Button>
               <Button
                 className={classes.forgotPasswordButton}
-                variant="contained"
+                variant="outlined"
+                disableElevation
                 onClick={() => history.push("/forgotPassword")}
               >
                 Forgot Password

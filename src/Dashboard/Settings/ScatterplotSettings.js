@@ -18,7 +18,7 @@ const ScatterplotSettings = ({
   setAxisOption,
   isDisabled
 }) => {
-  const [{ quality, scatterplotAxis }, dispatch] = useStatisticsState();
+  const [{ quality, scatterplotAxis }] = useStatisticsState();
   const [xAxisLabel, setXAxisLabel] = useState(scatterplotAxis.x.type);
   const [yAxisLabel, setYAxisLabel] = useState(scatterplotAxis.y.type);
   const { loading, data } = useQuery(SCATTERPLOT_OPTIONS, {
