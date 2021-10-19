@@ -12,8 +12,8 @@ import RadioButtonCheckedIcon from "@material-ui/icons/RadioButtonChecked";
 import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
 import Grid from "@material-ui/core/Grid";
 
-import { useQuery } from "@apollo/client";
-import gql from "graphql-tag";
+import { gql, useQuery, useLazyQuery } from "@apollo/client";
+
 import { useDashboardState } from "./ProjectState/dashboardState";
 
 const styles = {
@@ -50,7 +50,7 @@ const getAllAnalyses = gql`
         project
         sample_id
         library_id
-        jira_id
+        dashboard_id
       }
       analysesStats {
         label
@@ -101,7 +101,7 @@ const SET_CACHE_SETTING = gql`
   }
 `;
 const slideTimeOut = 1500;
-const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
+const ProjectViewContent = ({ classes, handleForwardStep }) => {
   const [{ selectedDashboard }] = useDashboardState();
 
   const [{ authKeyID, uid }, dispatch] = useAppState();
@@ -133,6 +133,10 @@ const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
   };
 
   if (selectedDashboard !== null) {
+    const [spiderDefault, { data: spiderData }] = useLazyQuery(
+      SET_CACHE_SETTING
+    );
+
     const { loading, error, data } = useQuery(getAllAnalyses, {
       variables: {
         filter: [...filters],
@@ -314,8 +318,7 @@ const ProjectViewContent = ({ client, classes, handleForwardStep }) => {
                     }
                     onClick={() => {
                       const newActiveStep = step === 0 ? 1 : 0;
-                      client.query({
-                        query: SET_CACHE_SETTING,
+                      spiderDefault({
                         variables: {
                           type: "isSpiderSelectionDefault",
                           value: newActiveStep,

@@ -51,7 +51,7 @@ const HEATMAP_ORDER = gql`
     analysisMetadata(analysis: $analysis) {
       sample_id
       library_id
-      jira_id
+      dashboard_id
     }
     numericalDataFilters(
       analysis: $analysis
@@ -124,25 +124,18 @@ const getQueryParams = (isContaminated, expCondition, numericalDataFilters) => {
   var params = isContaminated
     ? [{ param: "is_contaminated", value: "false" }]
     : [];
-  /*if (expCondition && expCondition.indexOf(",") !== -1) {
-    expCondition.split(",").map(condition => {
-      params = [
-        ...params,
-        { param: "experimental_condition", value: condition }
-      ];
-    });
-  } else {*/
+
   params = expCondition
     ? [...params, { param: "experimental_condition", value: expCondition }]
     : [...params];
-  //  }
+
   if (numericalDataFilters) {
     params = [...params, ...numericalDataFilters];
   }
   return params;
 };
 
-const QCDashboard = ({ analysis, classes, client }) => {
+const QCDashboard = ({ analysis, classes }) => {
   const [
     {
       selectedCells,
@@ -215,7 +208,6 @@ const QCDashboard = ({ analysis, classes, client }) => {
             >
               <SettingsPanel
                 key={"settingsPanel"}
-                client={client}
                 metaData={data.analysisMetadata}
                 numericalDataFilters={
                   data.numericalDataFilters.numericalDataFilters
@@ -238,7 +230,6 @@ const QCDashboard = ({ analysis, classes, client }) => {
             )}
             {openSharePopup && (
               <SharePopup
-                client={client}
                 params={params}
                 analysis={analysis}
                 setOpenSharePopup={setOpenSharePopup}

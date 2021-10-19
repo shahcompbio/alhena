@@ -33,7 +33,7 @@ const defaultStepperText = [
 ];
 const dashboardPathname = "/dashboards";
 const slideTimeOut = 1500;
-const Content = ({ classes, client }) => {
+const Content = ({ classes }) => {
   let history = useHistory();
   const [
     { selectedDashboard, selectedAnalysis },
@@ -159,7 +159,6 @@ const Content = ({ classes, client }) => {
       >
         <div className={classes.sliderContent}>
           <ProjectViewContent
-            client={client}
             handleForwardStep={() => handleForwardStep(activeStep + 1)}
           />
         </div>
@@ -173,7 +172,7 @@ const Content = ({ classes, client }) => {
         key={"slideDashboard"}
       >
         <div className={classes.sliderContent}>
-          <DashboardContent client={client} />
+          <DashboardContent />
         </div>
       </Slide>
       <Slide

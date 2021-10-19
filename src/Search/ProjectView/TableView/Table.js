@@ -73,7 +73,7 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
   const RowRender = ({ row, rowIdx, column }) =>
     column["key"] === "sample_id" ? (
       <a
-        id={"link-" + row["jira_id"] + "-" + row["sample_id"]}
+        id={"link-" + row["dashboard_id"] + "-" + row["sample_id"]}
         style={{ color: "white", fontSize: 18, paddingLeft: 5 }}
         href={"javascript:;"}
         onMouseEnter={function(event, row) {
@@ -85,7 +85,7 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
         onClick={() => {
           dispatch({
             type: "ANALYSIS_SELECT",
-            value: { selectedAnalysis: row["jira_id"] }
+            value: { selectedAnalysis: row["dashboard_id"] }
           });
           handleForwardStep();
         }}
@@ -171,7 +171,7 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
       </Grid>
       <div className={classes.wrapper}>
         <DataGrid
-          rows={tableRows.map(row => ({ ...row, id: row["jira_id"] }))}
+          rows={tableRows.map(row => ({ ...row, id: row["dashboard_id"] }))}
           rowCount={tableRows.length}
           rowGetter={i => tableRows[i]}
           minHeight={600}
@@ -181,7 +181,7 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
             resizable: true,
             formatter: RowRender,
             headerRenderer: HeaderRender,
-            width: field["type"] === "jira_id" ? "40%" : null
+            width: field["type"] === "dashboard_id" ? "40%" : null
           }))}
           rowHeight={40}
           headerRowHeight={50}

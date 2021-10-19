@@ -125,7 +125,7 @@ const PopUpContent = ({
   const [selectedColumns, setSelectedColumns] = useState(
     selectedDashboardColumns.length > 0
       ? selectedDashboardColumns.map(col => col.type)
-      : ["jira_id"]
+      : ["dashboard_id"]
   );
   const [selectedUsers, setSelectedUsers] = useState(
     selectedDashboardUsers.length > 0
@@ -315,7 +315,7 @@ const DynamicColumnsContent = ({
 }) => {
   const classes = useListStyles();
   const [checked, setChecked] = useState(
-    selectedColumns.length > 0 ? selectedColumns : ["jira_id"]
+    selectedColumns.length > 0 ? selectedColumns : ["dashboard_id"]
   );
 
   const handleToggle = value => () => {
@@ -346,7 +346,7 @@ const DynamicColumnsContent = ({
             >
               <ListItemIcon key={"addColumnToDashboardIconCheck-" + value.type}>
                 <Checkbox
-                  disabled={value.type === "jira_id"}
+                  disabled={value.type === "dashboard_id"}
                   edge="start"
                   key={"addColumnToDashboardCheck-" + value.type}
                   checked={checked.indexOf(value.type) !== -1}

@@ -8,8 +8,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import FilledInput from "@material-ui/core/FilledInput";
 
 import { withStyles } from "@material-ui/core/styles";
-
-import gql from "graphql-tag";
+import { gql, useLazyQuery } from "@apollo/client";
 
 import { useStatisticsState } from "../Dashboard/DashboardState/statsState";
 
@@ -50,7 +49,6 @@ const SET_CACHE_SETTING = gql`
 const SharePopup = ({
   setOpenSharePopup,
   openSharePopup,
-  client,
   classes,
   analysis
 }) => {
@@ -58,27 +56,32 @@ const SharePopup = ({
   const [url, setUrl] = useState(
     window.location.origin + "/alhena/dashboards/" + analysis
   );
+
+  const [setCopyUrl, { data }] = useLazyQuery(SET_CACHE_SETTING);
+
   useEffect(() => {
-    (async () => {
-      if (
-        Object.keys(state.axisChange)
-          .map(key => state.axisChange[key])
-          .indexOf(true) !== -1
-      ) {
-        const paramsString = JSON.stringify(state);
-        const response = await client.query({
-          query: SET_CACHE_SETTING,
-          variables: {
-            type: "copyUrl",
-            value: paramsString
-          }
-        });
-        if (response) {
-          setUrl(url + "/" + response.data.setCacheCopyUrl.link);
+    console.log(state);
+    if (
+      Object.keys(state.axisChange)
+        .map(key => state.axisChange[key])
+        .indexOf(true) !== -1
+    ) {
+      const paramsString = JSON.stringify(state);
+
+      setCopyUrl({
+        variables: {
+          type: "copyUrl",
+          value: paramsString
         }
-      }
-    })();
+      });
+    }
   }, [state]);
+  useEffect(() => {
+    if (data) {
+      setUrl(url + "/" + data.setCacheCopyUrl.link);
+    }
+  }, [data, setUrl]);
+
   return (
     <Dialog
       fullWidth
