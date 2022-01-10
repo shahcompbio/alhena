@@ -9,7 +9,8 @@ import Button from "@material-ui/core/Button";
 
 import SnackbarContentWrapper from "../../Misc/SnackBarPopup.js";
 
-import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
+import { Formik } from "formik";
+import * as yup from "yup";
 
 import { gql, useLazyQuery } from "@apollo/client";
 
@@ -61,7 +62,7 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
   const [user, setUser] = useState({ password: "", passwordVerify: "" });
 
   const [password, setPassword] = useState(null);
-  const [verifyPassword, setVerifyPassword] = useState(null);
+  const [passwordVerify, setVerifyPassword] = useState(null);
 
   const [updatePassword, { loading, error: updateError, data }] = useLazyQuery(
     UPDATEPASSWORD
@@ -86,11 +87,11 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
     setUser({ ...newUser });
   };
 
-  useEffect(() => {
+  /*  useEffect(() => {
     ValidatorForm.addValidationRule("isPasswordMatch", value =>
       user["password"] === value ? true : false
     );
-  }, [user]);
+  }, [user]);*/
 
   return (
     <Grid container direction="row" justify="center" alignItems="center">
@@ -107,77 +108,99 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
             setError={setError}
           />
         )}
-        <Paper rounded className={classes.paperTitle}>
-          <Typography variant="h4" color="white">
-            Update Password
-          </Typography>
-        </Paper>
-        <Paper rounded className={classes.paperForm}>
-          <TextField
-            className={classes.textField}
-            margin="normal"
-            id={"updatePassword:username"}
-            required
-            fullWidth
-            value={username}
-            label={"Username"}
-            type={"text"}
-          />
-          <ValidatorForm
-            instantValidate={false}
-            autoComplete="off"
-            onError={errors => console.log(errors)}
-            onSubmit={ev => {}}
-          >
-            <TextValidator
-              className={classes.textField}
-              key={"updatePassword"}
-              onChange={handleChange}
-              name={"password"}
-              value={user["password"]}
-              fullWidth
-              label={"Password:"}
-              type={"password"}
-              validators={["required", "minStringLength:10"]}
-              errorMessages={[
-                "This field is required",
-                "Field must be longer than 10 characters long"
-              ]}
-            />
-            <TextValidator
-              className={classes.textField}
-              key={"updatePasswordVerify"}
-              name={"passwordVerify"}
-              onChange={handleChange}
-              value={user["passwordVerify"]}
-              fullWidth
-              label={"Verify Password:"}
-              type={"password"}
-              validators={["required", "isPasswordMatch"]}
-              errorMessages={["This field is required", "Mismatched passwords"]}
-            />
-            <ComponentWrapper style={{ textAlign: "center" }}>
-              <Button
-                className={classes.button}
-                variant="contained"
-                onClick={ev => {
-                  if (password === verifyPassword) {
-                    updatePassword({
-                      variables: {
-                        username: username,
-                        newPassword: password
-                      }
-                    });
-                  } else {
-                    setError(11);
-                  }
+        <Typography variant="h6">Update Password</Typography>
+
+        <Formik
+          validationSchema={yup.object({
+            password: yup
+              .string("Enter your password")
+              .min(8, "Password should be of minimum 8 characters length")
+              .required("Password is required"),
+            passwordVerify: yup
+              .string()
+              .oneOf([yup.ref("password"), null], "Passwords must match")
+          })}
+          initialValues={{
+            username: username,
+            password: "",
+            passwordVerify: ""
+          }}
+          onSubmit={values =>
+            updatePassword({
+              variables: {
+                username: values.username,
+                newPassword: values.password
+              }
+            })
+          }
+          style={{ maxWidth: 450 }}
+          className={classes.root}
+          autoComplete="off"
+        >
+          {({
+            values,
+            errors,
+            touched,
+            handleSubmit,
+            handleChange,
+            setFieldValue,
+            isValid
+          }) => (
+            <div>
+              <TextField
+                className={classes.textField}
+                margin="normal"
+                id={"updatePassword:username"}
+                required
+                fullWidth
+                value={username}
+                label={"Username"}
+                type={"text"}
+              />
+              <TextField
+                className={classes.textField}
+                key={"updatePassword"}
+                onChange={handleChange}
+                name={"password"}
+                value={values.password}
+                fullWidth
+                label={"Password:"}
+                type={"password"}
+                error={touched.password && Boolean(errors.password)}
+                helperText={errors.password}
+                onChange={event => {
+                  setFieldValue("password", event.target.value);
                 }}
-              >
-                Update
-              </Button>
-            </ComponentWrapper>
-          </ValidatorForm>
-        </Paper>
+              />
+              <TextField
+                className={classes.textField}
+                key={"updatePasswordVerify"}
+                name={"passwordVerify"}
+                onChange={event => {
+                  setFieldValue("passwordVerify", event.target.value);
+                }}
+                value={values.passwordVerify}
+                fullWidth
+                label={"Verify Password:"}
+                type={"password"}
+                error={touched.passwordVerify && Boolean(errors.passwordVerify)}
+                helperText={errors.passwordVerify}
+              />
+              <ComponentWrapper style={{ textAlign: "center" }}>
+                <Button
+                  className={classes.button}
+                  variant="outlined"
+                  disableElevation
+                  type="submit"
+                  disabled={!isValid}
+                  onClick={handleSubmit}
+                >
+                  Update
+                </Button>
+              </ComponentWrapper>
+            </div>
+          )}
+        </Formik>
       </div>
     </Grid>
   );

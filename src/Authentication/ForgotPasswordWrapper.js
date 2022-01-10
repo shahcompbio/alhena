@@ -68,23 +68,6 @@ const ForgotPasswordWrapper = ({ dispatch, classes }) => {
 
   const [verifyUser, { loading, data }] = useLazyQuery(VERIFYUSER);
 
-  const fields = [
-    {
-      id: "resetPassword:username",
-      label: "Username:",
-      value: username,
-      type: "text",
-      placeholder: "Username"
-    },
-    {
-      id: "resetPassword:email",
-      label: "Email:",
-      value: email,
-      type: "text",
-      placeholder: "Email"
-    }
-  ];
-
   useEffect(() => {
     if (data) {
       if (data.doesUserExist.confirmReset) {
@@ -114,50 +97,72 @@ const ForgotPasswordWrapper = ({ dispatch, classes }) => {
           <UpdatePassword username={username} dispatch={dispatch} />
         ) : (
           <div>
-            <Typography variant="h6">Reset Password</Typography>
+            <Typography variant="h6" style={{ marginLeft: 15 }}>
+              Reset Password
+            </Typography>
 
-            <form id="resetPassword">
-              {fields.map(field => (
-                <ComponentWrapper key={"componentWrapper" + field.id}>
-                  <TextField
-                    key={"textField" + field.id}
-                    className={classes.textField}
-                    margin="normal"
-                    id={field.id}
-                    required
-                    fullWidth
-                    value={field.value}
-                    label={field.placeholder}
-                    type={field.type}
-                  />
-                </ComponentWrapper>
-              ))}
-              <ComponentWrapper style={{ textAlign: "center" }}>
-                <Button
-                  className={classes.backButton}
-                  variant="contained"
-                  onClick={() => {
-                    history.replace("/login");
-                  }}
-                >
-                  Back
-                </Button>
-                <Button
-                  className={classes.button}
-                  variant="contained"
-                  onClick={async () => {
-                    verifyUser({
-                      variables: {
-                        username: username,
-                        email: email
-                      }
-                    });
-                  }}
-                >
-                  Verify
-                </Button>
-              </ComponentWrapper>
-            </form>
+            <ComponentWrapper key={"componentWrapper-username"}>
+              <TextField
+                key={"textField-username"}
+                className={classes.textField}
+                margin="normal"
+                id={"resetPassword:username"}
+                required
+                fullWidth
+                value={username}
+                label={"Username"}
+                onChange={event => {
+                  setUsername(event.target.value);
+                }}
+                type={"text"}
+              />
+            </ComponentWrapper>
+            <ComponentWrapper key={"componentWrapper-email"}>
+              <TextField
+                key={"textField-email"}
+                className={classes.textField}
+                margin="normal"
+                id={"resetPassword:email"}
+                required
+                fullWidth
+                value={email}
+                onChange={event => {
+                  setEmail(event.target.value);
+                }}
+                label={"Email"}
+                type={"text"}
+              />
+            </ComponentWrapper>
+            <ComponentWrapper
+              style={{ display: "flex", justifyContent: "space-around" }}
+            >
+              <Button
+                className={classes.backButton}
+                variant="outlined"
+                disableElevation
+                onClick={() => {
+                  history.replace("/login");
+                }}
+              >
+                Back
+              </Button>
+              <Button
+                className={classes.button}
+                variant="outlined"
+                disableElevation
+                type="submit"
+                onClick={async () => {
+                  verifyUser({
+                    variables: {
+                      username: username,
+                      email: email
+                    }
+                  });
+                }}
+              >
+                Verify
+              </Button>
+            </ComponentWrapper>
           </div>
         )}
       </div>
