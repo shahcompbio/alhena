@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import _ from "lodash";
-import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
+
+//import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
+
+import { Formik } from "formik";
+import * as yup from "yup";
+
 import { makeStyles } from "@material-ui/core/styles";
 
 import Button from "@material-ui/core/Button";
@@ -370,26 +375,45 @@ const DynamicColumnsContent = ({
 const NameContent = ({ isEdit, name, handleNameChange }) => {
   const classes = useStyles();
   return (
-    <ValidatorForm key={"validForm"} onSubmit={() => {}}>
-      <DialogContent className={classes.textDialogContent}>
-        <TextValidator
-          key={"dialogName"}
-          autoFocus
-          margin="dense"
-          id="name"
-          label="Name"
-          type="text"
-          value={name}
-          disabled={isEdit}
-          onChange={handleNameChange}
-          validators={["required"]}
-          errorMessages={["This field is required"]}
-          required
-          className={classes.textValidator}
-        />
-      </DialogContent>
-    </ValidatorForm>
+    //  <ValidatorForm key={"validForm"} onSubmit={() => {}}>
+
+    <Formik
+      validationSchema={yup.object({
+        name: yup.string().required("This field is required")
+      })}
+      initialValues={{
+        name: ""
+      }}
+      autoComplete="off"
+    >
+      {({
+        values,
+        errors,
+        touched,
+        handleSubmit,
+        handleChange,
+        setFieldValue,
+        isValid
+      }) => (
+        <DialogContent className={classes.textDialogContent}>
+          <TextField
+            key={"dialogName"}
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Name"
+            type="text"
+            value={values.name}
+            disabled={isValid}
+            onChange={event => setFieldValue("name", event.target.value)}
+            required
+            className={classes.textValidator}
+          />
+        </DialogContent>
+      )}
+    </Formik>
   );
+  //  </ValidatorForm>
 };
 const TransferListContent = ({
   isEdit,
@@ -401,27 +425,25 @@ const TransferListContent = ({
 }) => {
   const classes = useStyles();
   return (
-    <ValidatorForm key={"validForm"} onSubmit={() => {}}>
-      <DialogContent className={classes.dialogContent}>
-        <TextField
-          id="outlined-search"
-          label="Search Analyses"
-          type="search"
-          variant="outlined"
-          value={searchValue}
-          className={classes.textField}
-          InputProps={{ classes: { input: classes.searchInput } }}
-          onChange={event => setSearchValue(event.target.value)}
-        />
-        <TransferList
-          key={"transferList"}
-          allIndices={allIndices}
-          searchValue={searchValue}
-          setSelectedIndices={indices => setSelectedIndices(indices)}
-          alreadyChoosen={alreadySelectedIndices}
-        />
-      </DialogContent>
-    </ValidatorForm>
+    <DialogContent className={classes.dialogContent}>
+      <TextField
+        id="outlined-search"
+        label="Search Analyses"
+        type="search"
+        variant="outlined"
+        value={searchValue}
+        className={classes.textField}
+        InputProps={{ classes: { input: classes.searchInput } }}
+        onChange={event => setSearchValue(event.target.value)}
+      />
+      <TransferList
+        key={"transferList"}
+        allIndices={allIndices}
+        searchValue={searchValue}
+        setSelectedIndices={indices => setSelectedIndices(indices)}
+        alreadyChoosen={alreadySelectedIndices}
+      />
+    </DialogContent>
   );
 };
 const UserDashboardContent = ({
