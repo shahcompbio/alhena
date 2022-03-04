@@ -1,9 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useWindowSize,
-  useLayoutEffect
-} from "react";
+import React, { useState, useEffect } from "react";
 import Menu from "../Misc/Menu.js";
 import ProjectViewContent from "./ProjectView/ProjectViewContent.js";
 import Stepper from "./Stepper.js";
@@ -35,40 +30,12 @@ const dashboardPathname = "/dashboards";
 const slideTimeOut = 1500;
 const Content = ({ classes }) => {
   let history = useHistory();
+
   const [
     { selectedDashboard, selectedAnalysis },
     dispatch
   ] = useDashboardState();
-  const [width, height] = useWindowSize();
 
-  useEffect(() => {
-    if (height && width) {
-      dispatch({
-        type: "SIZE_CHANGE",
-        width: width,
-        height: height
-      });
-    }
-  }, [height, width]);
-
-  function useWindowSize() {
-    const [size, setSize] = useState([0, 0]);
-    useLayoutEffect(() => {
-      function updateSize() {
-        if (
-          selectedAnalysis === null &&
-          (size[0] !== window.innerWidth || size[1] !== window.innerHeight)
-        ) {
-          setSize([window.innerWidth, window.innerHeight]);
-        }
-      }
-      window.addEventListener("resize", updateSize);
-      updateSize();
-
-      return () => window.removeEventListener("resize", updateSize);
-    }, [selectedAnalysis, size]);
-    return size;
-  }
   if (
     history.location.pathname !== dashboardPathname &&
     selectedAnalysis === null

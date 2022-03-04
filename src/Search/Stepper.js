@@ -110,14 +110,17 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
       handleBackStep(step);
     }
   };
+
   const moreDetailOpen = () => {
     setDetailsDrawer(true);
   };
+
   const moreDetailExit = () => {
     if (activeStep !== 1) {
       setDetailsDrawer(false);
     }
   };
+
   return (
     <div className={classes.root}>
       {steps.map((label, index) => (

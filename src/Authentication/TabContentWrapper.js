@@ -352,7 +352,6 @@ const TabContentWrapper = ({ classes, tabIndex }) => {
       </div>
     );
   }
-  console.log(data);
 
   if (error) {
     dispatch({

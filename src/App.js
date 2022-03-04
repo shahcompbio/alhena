@@ -115,7 +115,7 @@ const App = () => {
         </AdminRoute>
       </Switch>
       <div style={{ position: "absolute", bottom: 10, right: 10 }}>
-        Version 1.05
+        Version 1.052
       </div>
     </MuiThemeProvider>
   );

@@ -1,18 +1,13 @@
-import React, { useState, useRef } from "react";
-import Search from "./Filter/Search.js";
+import React from "react";
 
 import { useAppState } from "../../util/app-state";
 import { withStyles } from "@material-ui/styles";
 
-import CanvasGraph from "./Graph/CanvasGraph.js";
 import Table from "./TableView/Table.js";
 
-import Slide from "@material-ui/core/Slide";
-import RadioButtonCheckedIcon from "@material-ui/icons/RadioButtonChecked";
-import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
 import Grid from "@material-ui/core/Grid";
 
-import { gql, useQuery, useLazyQuery } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 
 import { useDashboardState } from "./ProjectState/dashboardState";
 
@@ -93,250 +88,77 @@ const getAllAnalyses = gql`
   }
 `;
 
-const SET_CACHE_SETTING = gql`
-  query chacheSetting($type: String!, $value: Int!, $auth: ApiUser!) {
-    setCache(type: $type, value: $value, auth: $auth) {
-      confirmed
-    }
-  }
-`;
-const slideTimeOut = 1500;
 const ProjectViewContent = ({ classes, handleForwardStep }) => {
   const [{ selectedDashboard }] = useDashboardState();
 
   const [{ authKeyID, uid }, dispatch] = useAppState();
-  const [selectedOptions, setSelectedOptions] = useState({});
-  const [activeStep, setActiveStep] = useState(null);
-  const [filters, setFilters] = useState([]);
 
-  const dimRef = useRef(0);
+  const { loading, error, data } = useQuery(getAllAnalyses, {
+    variables: {
+      filter: [],
+      dashboardName: selectedDashboard,
+      user: { authKeyID: authKeyID, uid: uid }
+    },
+    skip: selectedDashboard === null
+  });
 
-  const getDirection = index => (index === 0 ? "right" : "left");
-
-  const handleFilterChange = (filter, type) => {
-    var options = selectedOptions;
-
-    if (filter && type.localeCompare("clear") !== 0) {
-      options[filter.label] = {
-        value: filter.label,
-        label: filter.value
-      };
-      setSelectedOptions(options);
-      setFilters([...filters, filter]);
-    } else {
-      var newFilters = filters.filter((value, i) => value.label !== filter);
-      delete selectedOptions[filter];
-
-      setSelectedOptions(selectedOptions);
-      setFilters([...newFilters]);
-    }
-  };
-
-  if (selectedDashboard !== null) {
-    const [spiderDefault, { data: spiderData }] = useLazyQuery(
-      SET_CACHE_SETTING
+  if (error) {
+    console.log(error);
+    //  dispatch({
+    //    type: "LOGOUT"
+    //  });
+    return null;
+  } else if (loading) {
+    return (
+      <div>
+        <Grid
+          item
+          xs={6}
+          sm={3}
+          className={classes.tableWrapper}
+          key={"grid-table"}
+        >
+          <Table
+            columns={[]}
+            rows={[]}
+            handleForwardStep={null}
+            key={"project-view-table"}
+          />
+        </Grid>
+      </div>
     );
-
-    const { loading, error, data } = useQuery(getAllAnalyses, {
-      variables: {
-        filter: [...filters],
-        dashboardName: selectedDashboard,
-        user: { authKeyID: authKeyID, uid: uid }
-      }
-    });
-
-    if (error) {
-      //  dispatch({
-      //    type: "LOGOUT"
-      //  });
-      return null;
-    }
-    if (loading) {
-      return (
-        <div>
-          <Slide
-            direction={getDirection(0)}
-            in={true}
-            mountOnEnter
-            timeout={slideTimeOut}
-            key={"slideTableContent"}
-          >
-            <Grid
-              item
-              xs={6}
-              sm={3}
-              className={classes.tableWrapper}
-              key={"grid-table"}
-            >
-              <Table
-                columns={[]}
-                rows={[]}
-                handleForwardStep={null}
-                key={"project-view-table"}
-              />
-            </Grid>
-          </Slide>
-          <Slide
-            timeout={slideTimeOut}
-            direction={getDirection(1)}
-            in={false}
-            mountOnEnter
-            key={"slideGraph"}
-          >
-            <Grid
-              container
-              className={classes.root}
-              spacing={2}
-              key={"grid-container"}
-            >
-              <Grid
-                item
-                xs={6}
-                sm={3}
-                style={{ height: "50vh" }}
-                key={"grid-search"}
-              >
-                <Search
-                  key={"search"}
-                  selectedOptions={null}
-                  filters={null}
-                  dashboards={[]}
-                  handleFilterChange={null}
-                  handleForwardStep={null}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
-                <CanvasGraph
-                  isLoading={true}
-                  key={"packing-circles"}
-                  filters={[]}
-                  analyses={{}}
-                  data={null}
-                  handleFilterChange={null}
-                  handleForwardStep={null}
-                />
-              </Grid>
-            </Grid>
-          </Slide>
-        </div>
-      );
-    } else {
+  } else {
+    if (data) {
       if (data["analyses"] && data["analyses"]["error"]) {
         dispatch({
           type: "LOGOUT"
         });
         return null;
       } else {
-        const step =
-          activeStep !== null
-            ? activeStep
-            : data["analyses"]["defaultProjectView"];
-
         return (
           <div>
-            <Slide
-              direction={getDirection(0)}
-              in={step === 0}
-              mountOnEnter
-              unmountOnExit
-              timeout={slideTimeOut}
-              key={"slideTableContent"}
+            <Grid
+              container
+              direction="column"
+              justify="center"
+              alignItems="center"
+              className={classes.tableWrapper}
+              key={"grid-table"}
             >
-              <Grid
-                container
-                direction="column"
-                justify="center"
-                alignItems="center"
-                className={classes.tableWrapper}
-                key={"grid-table"}
-              >
-                <Table
-                  key={"project-view-table"}
-                  columns={data["getDashboardColumnsByDashboard"]}
-                  project={data["analyses"]["analysesRows"][0]["project"]}
-                  rows={data["analyses"]["analysesRows"]}
-                  handleForwardStep={handleForwardStep}
-                />
-              </Grid>
-            </Slide>
-            <Slide
-              timeout={slideTimeOut}
-              direction={getDirection(1)}
-              in={step === 1}
-              mountOnEnter
-              key={"slideGraph"}
-            >
-              <Grid
-                container
-                className={classes.root}
-                spacing={2}
-                key={"grid-container"}
-              >
-                <Grid
-                  item
-                  xs={6}
-                  sm={3}
-                  style={{ height: "50vh", zIndex: 1000 }}
-                  key={"grid-search"}
-                >
-                  <Search
-                    key={"search"}
-                    selectedOptions={selectedOptions}
-                    filters={data.analyses.analysesList}
-                    handleFilterChange={(selection, type) =>
-                      handleFilterChange(selection, type)
-                    }
-                    handleForwardStep={handleForwardStep}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6} key={"grid-content"} ref={dimRef}>
-                  <CanvasGraph
-                    isLoading={false}
-                    key={"packing-circles"}
-                    filters={filters}
-                    data={data.analyses.analysesTree.children}
-                    handleFilterChange={(filters, type) =>
-                      handleFilterChange(filters, type)
-                    }
-                    handleForwardStep={handleForwardStep}
-                  />
-                </Grid>
-              </Grid>
-            </Slide>
-            <div className={classes.stepper} key={"project-view-stepper"}>
-              {[0, 1].map((label, index) => {
-                return step === index ? (
-                  <RadioButtonCheckedIcon
-                    className={classes.activeWhite}
-                    key={"activeChecked"}
-                  />
-                ) : (
-                  <FiberManualRecordIcon
-                    key={"inactiveChecked"}
-                    className={
-                      index === step ? classes.activeWhite : classes.disabled
-                    }
-                    onClick={() => {
-                      const newActiveStep = step === 0 ? 1 : 0;
-                      spiderDefault({
-                        variables: {
-                          type: "isSpiderSelectionDefault",
-                          value: newActiveStep,
-                          auth: { authKeyID: authKeyID, uid: uid }
-                        }
-                      });
-                      setActiveStep(newActiveStep);
-                    }}
-                  />
-                );
-              })}
-            </div>
+              <Table
+                key={"project-view-table"}
+                columns={data["getDashboardColumnsByDashboard"]}
+                project={data["analyses"]["analysesRows"][0]["project"]}
+                rows={data["analyses"]["analysesRows"]}
+                handleForwardStep={handleForwardStep}
+              />
+            </Grid>
           </div>
         );
       }
+    } else {
+      return null;
     }
-  } else {
-    return null;
   }
 };
 export default withStyles(styles)(ProjectViewContent);

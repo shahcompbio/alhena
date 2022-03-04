@@ -12,7 +12,7 @@ const initialState = (
       window.location.pathname +
       "?=" +
       selectedDashboard;
-    console.log(refresh);
+
     if (selectedAnalysis) {
       refresh = refresh + "?analysis=" + selectedAnalysis;
     }

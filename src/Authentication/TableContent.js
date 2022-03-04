@@ -131,7 +131,6 @@ const TableContent = ({
     data.length > 0
       ? Object.keys(data[0]).filter(heading => heading !== "__typename")
       : [];
-
   const colorClass = classes.checkBox;
 
   const editTextRows = (row, heading, allRolesLength) => {

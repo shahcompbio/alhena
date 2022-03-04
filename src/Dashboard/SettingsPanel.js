@@ -69,7 +69,7 @@ const styles = theme => ({
   exportButton: {
     width: 180,
     marginBottom: 10,
-    marginRight: 12,
+    //marginRight: 12,
     backgroundColor: "white"
   },
   shareButton: {
@@ -88,6 +88,7 @@ const styles = theme => ({
   gridSlider: { width: "100%", marginBottom: 10 },
   settings: {
     padding: 10,
+    paddingRight: 0,
     width: 400,
     background: "none",
     height: "100%",
@@ -145,7 +146,7 @@ const SettingsPanel = ({
     dispatch
   ] = useStatisticsState();
 
-  const meta = metaData ? metaData : {};
+  const meta = metaData ? metaData["metadata"] : [];
 
   const [openAccordian, setIsOpenAccordian] = useState({
     dataFilter: false,
@@ -424,7 +425,33 @@ const AccordianWrapper = ({
     </AccordionDetails>
   </Accordion>
 );
-
+/*  {project && (
+    <Typography
+      variant="h6"
+      fontWeight="fontWeightRegular"
+      style={{ color: "#a2a2a2" }}
+    >
+      Project: {project}
+    </Typography>
+  )}
+  {metaData && (
+    <Typography
+      variant="h6"
+      fontWeight="fontWeightRegular"
+      style={{ color: "#a2a2a2" }}
+    >
+      Library: {metaData["library_id"]}
+    </Typography>
+  )}
+  {metaData && (
+    <Typography
+      variant="h6"
+      fontWeight="fontWeightRegular"
+      style={{ color: "#a2a2a2" }}
+    >
+      Sample: {metaData["sample_id"]}
+    </Typography>
+  )}*/
 const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
   <Paper
     elevation={0}
@@ -456,32 +483,18 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
           Analysis: {analysis}
         </span>
       </Typography>
-      {project && (
-        <Typography
-          variant="h6"
-          fontWeight="fontWeightRegular"
-          style={{ color: "#a2a2a2" }}
-        >
-          Project: {project}
-        </Typography>
-      )}
-      {metaData && (
-        <Typography
-          variant="h6"
-          fontWeight="fontWeightRegular"
-          style={{ color: "#a2a2a2" }}
-        >
-          Library: {metaData["library_id"]}
-        </Typography>
-      )}
-      {metaData && (
-        <Typography
-          variant="h6"
-          fontWeight="fontWeightRegular"
-          style={{ color: "#a2a2a2" }}
-        >
-          Sample: {metaData["sample_id"]}
-        </Typography>
+      {metaData !== null ? (
+        metaData.map(meta => (
+          <Typography
+            variant="h6"
+            fontWeight="fontWeightRegular"
+            style={{ color: "#a2a2a2" }}
+          >
+            {meta["type"]}: {meta["value"]}
+          </Typography>
+        ))
+      ) : (
+        <div />
       )}
       {count === null ? (
         <LoadingCircle />

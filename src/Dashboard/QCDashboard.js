@@ -49,9 +49,10 @@ const HEATMAP_ORDER = gql`
       }
     }
     analysisMetadata(analysis: $analysis) {
-      sample_id
-      library_id
-      dashboard_id
+      metadata {
+        value
+        type
+      }
     }
     numericalDataFilters(
       analysis: $analysis

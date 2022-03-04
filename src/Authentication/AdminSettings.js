@@ -75,7 +75,7 @@ const AdminSettings = ({ data }) => {
           className={classes.innerGrid}
         >
           <table>
-            <tr>
+            <tr key={"tr-type"}>
               <th style={{ textAlign: "left" }}>
                 <Typography variant="body">Type </Typography>
               </th>
@@ -85,13 +85,16 @@ const AdminSettings = ({ data }) => {
               </th>
             </tr>
             {data.map(option => (
-              <tr>
-                <td>
-                  <Typography variant="standard">{option.type} </Typography>
+              <tr key={"tr-" + option.type}>
+                <td key={"td-" + option.t}>
+                  <Typography variant="standard" key={"type-" + option.type}>
+                    {option.type}{" "}
+                  </Typography>
                 </td>
                 <td style={{ width: 20 }} />
                 <td style={{ textAlign: "left" }}>
                   <TextField
+                    key={"textfield-" + option.t}
                     key={option.type + "-label"}
                     variant="standard"
                     onChange={event => {

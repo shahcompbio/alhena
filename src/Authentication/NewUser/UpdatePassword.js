@@ -1,9 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
 import Grid from "@material-ui/core/Grid";
 import { Typography } from "@material-ui/core";
-import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 
@@ -61,9 +60,6 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
   const [error, setError] = useState(null);
   const [user, setUser] = useState({ password: "", passwordVerify: "" });
 
-  const [password, setPassword] = useState(null);
-  const [passwordVerify, setVerifyPassword] = useState(null);
-
   const [updatePassword, { loading, error: updateError, data }] = useLazyQuery(
     UPDATEPASSWORD
   );
@@ -86,12 +82,6 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
     newUser[event.target.name] = event.target.value;
     setUser({ ...newUser });
   };
-
-  /*  useEffect(() => {
-    ValidatorForm.addValidationRule("isPasswordMatch", value =>
-      user["password"] === value ? true : false
-    );
-  }, [user]);*/
 
   return (
     <Grid container direction="row" justify="center" alignItems="center">
