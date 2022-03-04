@@ -3,7 +3,6 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 
 import QCDashboard from "./QCDashboard.js";
-import LoadingCircle from "./CommonModules/LoadingCircle.js";
 
 import { Grid, Paper } from "@material-ui/core";
 
@@ -34,7 +33,7 @@ const styles = theme => ({
   }
 });
 
-const DashboardContent = ({ classes, history, client }) => {
+const DashboardContent = ({ classes, history }) => {
   const [{ selectedAnalysis, linkParams }] = useDashboardState();
   const modifiedInitialState = linkParams ? linkParams[0] : initialState;
 
@@ -44,7 +43,7 @@ const DashboardContent = ({ classes, history, client }) => {
       reducer={statsStateReducer}
     >
       {selectedAnalysis ? (
-        <QCDashboard analysis={selectedAnalysis} item xs={8} client={client} />
+        <QCDashboard analysis={selectedAnalysis} item xs={8} />
       ) : (
         [
           <Grid className={classes.settings} item xs={4}>

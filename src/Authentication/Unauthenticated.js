@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import * as d3 from "d3";
-import logo from "../config/LoginTitle.png";
+import React, { useState, useRef, useEffect } from "react";
+
 import { useAppState } from "../util/app-state";
 import { useHistory } from "react-router-dom";
-import gql from "graphql-tag";
+
+import { gql, useLazyQuery } from "@apollo/client";
 
 import title from "./titleicon.png";
 
@@ -17,11 +17,11 @@ import {
 import { Visibility, VisibilityOff } from "@material-ui/icons";
 
 import LoadingCircle from "../Dashboard/CommonModules/LoadingCircle.js";
-
 import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
 
 import { withStyles } from "@material-ui/styles";
 import styled from "styled-components";
+
 const styles = theme => ({
   circleImg: {
     height: 500,
@@ -52,7 +52,7 @@ const styles = theme => ({
   },
   forgotPasswordButton: { marginLeft: 20, marginTop: 40 },
   submitButton: {
-    marginLeft: 10,
+    marginLeft: 18,
     marginTop: 40,
     backgroundColor: theme.palette.primary.dark,
     color: theme.palette.background.default,
@@ -66,6 +66,7 @@ const styles = theme => ({
     width: 300
   }
 });
+
 export const LOGIN = gql`
   query Login($user: User!) {
     login(user: $user) {
@@ -73,83 +74,42 @@ export const LOGIN = gql`
       authKeyID
       role
       isAdmin
+      lastSettingsTab
     }
   }
 `;
-const login = async (uid, password, client, dispatch) => {
-  const { data, loading } = await client.query({
-    query: LOGIN,
-    variables: {
-      user: { uid: uid, password: password }
-    }
-  });
 
-  if (loading) {
-    dispatch({
-      type: "LOADING",
-      response: data.login.response,
-      authKeyID: data.login.authKeyID,
-      uid: uid
-    });
-  }
-  if (data) {
-    dispatch({
-      type: "AUTH_CHANGE",
-      response: data.login.response,
-      authKeyID: data.login.authKeyID,
-      uid: uid,
-      isSuperUser: data.login.isAdmin
-    });
-  }
-};
-const UnauthenticatedApp = ({ client, classes }) => {
+const UnauthenticatedApp = ({ classes }) => {
   let history = useHistory();
-  const [_, dispatch] = useAppState();
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const usernameRef = useRef();
+  const [, dispatch] = useAppState();
+  const [errors, setError] = useState(null);
+  const [username, setUsername] = useState("");
   const passwordRef = useRef();
 
   const [showPassword, setShowPassword] = useState(false);
-  const handleLogin = async (event, client, dispatch) => {
+
+  const [login, { data, loading, error }] = useLazyQuery(LOGIN);
+
+  useEffect(() => {
     setError(null);
-    event.preventDefault();
-    try {
-      setLoading(true);
-      await login(
-        usernameRef.current.value,
-        passwordRef.current.value,
-        client,
-        dispatch
-      );
-    } catch (error) {
+    if (error) {
       error.graphQLErrors.map(message => {
         if (message.extensions.exception.meta.body.status) {
           setError(message.extensions.exception.meta.body.status);
         }
       });
-      setLoading(false);
     }
-  };
-  const [ref] = useHookWithRefCallback();
-  function useHookWithRefCallback() {
-    const ref = useRef(null);
-    const setRef = useCallback(node => {
-      if (node) {
-        /*    const title = d3.select("#title");
-        title
-          .append("text")
-          .attr("x", 10)
-          .attr("y", 100)
-          .attr("dy", ".35em")
-          .text(function(d) {
-            return "ALHENA";
-          });*/
-      }
-    }, []);
-
-    return [setRef];
-  }
+    if (data) {
+      dispatch({
+        type: "AUTH_CHANGE",
+        response: data.login.response,
+        authKeyID: data.login.authKeyID,
+        uid: username,
+        isSuperUser: data.login.isAdmin,
+        lastSettingsTab: data.login.lastSettingsTab
+      });
+    }
+  }, [data, loading, error]);
 
   return (
     <Grid container direction="row" justify="center" alignItems="center">
@@ -157,17 +117,14 @@ const UnauthenticatedApp = ({ client, classes }) => {
         {error && (
           <SnackbarContentWrapper
             variant="error"
-            errorNumber={error}
+            errorNumber={errors}
             setError={setError}
           />
         )}
       </div>
       <div
-        ref={ref}
         alt="logo"
         style={{
-          //  backgroundImage: `url(${logo})`,
-          backgroundPosition: "50% 50%",
           backgroundPosition: "center",
           backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
@@ -175,7 +132,7 @@ const UnauthenticatedApp = ({ client, classes }) => {
           height: 425,
           width: 500,
           marginTop: -55,
-          marginLeft: 85
+          marginLeft: 98
         }}
         className={classes.logo}
         height={"191px"}
@@ -184,6 +141,7 @@ const UnauthenticatedApp = ({ client, classes }) => {
         <img
           id="title"
           src={title}
+          alt="website title - Alhena"
           style={{
             width: 400,
             height: 325
@@ -196,22 +154,31 @@ const UnauthenticatedApp = ({ client, classes }) => {
           <LoadingCircle />
         ) : (
           <form
-            onSubmit={ev => handleLogin(ev, client, dispatch)}
+            onSubmit={event =>
+              login({
+                variables: {
+                  user: {
+                    uid: username,
+                    password: passwordRef.current.value
+                  }
+                }
+              })
+            }
             id="loginForm"
           >
             <ComponentWrapper>
               <TextField
                 className={classes.textField}
                 margin="normal"
-                inputRef={usernameRef}
                 id={"login:username"}
+                onChange={event => setUsername(event.target.value)}
                 required
                 fullWidth
                 InputLabelProps={{
                   className: classes.floatingLabelFocusStyle
                 }}
                 InputProps={{ className: classes.input }}
-                value={usernameRef.value}
+                value={username}
                 label={"Username"}
                 type={"text"}
               />
@@ -250,14 +217,16 @@ const UnauthenticatedApp = ({ client, classes }) => {
             <ComponentWrapper>
               <Button
                 className={classes.submitButton}
-                variant="contained"
+                variant="outlined"
+                disableElevation
                 type="submit"
               >
                 Log In
               </Button>
               <Button
                 className={classes.forgotPasswordButton}
-                variant="contained"
+                variant="outlined"
+                disableElevation
                 onClick={() => history.push("/forgotPassword")}
               >
                 Forgot Password

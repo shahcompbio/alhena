@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
-import gql from "graphql-tag";
-import { useQuery } from "react-apollo-hooks";
+import { gql, useQuery } from "@apollo/client";
 
 import { withStyles } from "@material-ui/core/styles";
 import { useHistory } from "react-router-dom";
@@ -27,7 +26,7 @@ const HEATMAP_ORDER = gql`
     $quality: String!
     $params: [InputParams]
   ) {
-    heatmapOrder(analysis: $analysis, quality: $quality) {
+    heatmapOrder(analysis: $analysis, quality: $quality, params: $params) {
       order
       cellID
     }
@@ -50,9 +49,10 @@ const HEATMAP_ORDER = gql`
       }
     }
     analysisMetadata(analysis: $analysis) {
-      sample_id
-      library_id
-      jira_id
+      metadata {
+        value
+        type
+      }
     }
     numericalDataFilters(
       analysis: $analysis
@@ -80,6 +80,8 @@ const styles = theme => ({
   },
   content: {
     height: "100%",
+    minWidth: 1600,
+
     overflowX: "scroll"
   },
   heatmapContent: {
@@ -123,21 +125,22 @@ const getQueryParams = (isContaminated, expCondition, numericalDataFilters) => {
   var params = isContaminated
     ? [{ param: "is_contaminated", value: "false" }]
     : [];
+
   params = expCondition
     ? [...params, { param: "experimental_condition", value: expCondition }]
     : [...params];
+
   if (numericalDataFilters) {
     params = [...params, ...numericalDataFilters];
   }
   return params;
 };
 
-const QCDashboard = ({ analysis, classes, client }) => {
+const QCDashboard = ({ analysis, classes }) => {
   const [
     {
       selectedCells,
       quality,
-      popupFacadeIsOpen,
       isContaminated,
       numericalDataFilters,
       expCondition,
@@ -206,7 +209,6 @@ const QCDashboard = ({ analysis, classes, client }) => {
             >
               <SettingsPanel
                 key={"settingsPanel"}
-                client={client}
                 metaData={data.analysisMetadata}
                 numericalDataFilters={
                   data.numericalDataFilters.numericalDataFilters
@@ -229,7 +231,6 @@ const QCDashboard = ({ analysis, classes, client }) => {
             )}
             {openSharePopup && (
               <SharePopup
-                client={client}
                 params={params}
                 analysis={analysis}
                 setOpenSharePopup={setOpenSharePopup}

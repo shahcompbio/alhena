@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  useLayoutEffect
-} from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import * as d3 from "d3";
 
 import { createRoot, hierarchyColouring } from "./appendUtils.js";
@@ -17,8 +11,6 @@ import {
 import { config } from "../config.js";
 
 import { useDashboardState } from "../ProjectState/dashboardState";
-
-import { useAppState } from "../../../util/app-state";
 
 import { initContext } from "../../../Dashboard/utils.js";
 
@@ -37,10 +29,7 @@ const CanvasGraph = ({
   handleFilterChange,
   handleForwardStep
 }) => {
-  const [
-    { filterMouseover, dimensions, selectedAnalysis },
-    dispatch
-  ] = useDashboardState();
+  const [{ filterMouseover, dimensions }, dispatch] = useDashboardState();
   const [context, saveContext] = useState();
   const [nodes, setNodes] = useState();
   const [links, setLinks] = useState();
@@ -93,8 +82,6 @@ const CanvasGraph = ({
         .select("canvas")
         .attr("width", dimensions.width)
         .attr("height", dimensions.height);
-
-      //  setCurrScale(1);
 
       const context = initContext(canvas, dimensions.width, dimensions.height);
       saveContext(context);
@@ -453,7 +440,6 @@ const CanvasGraph = ({
       context.lineWidth = 5;
 
       const yIncrementVar = 40;
-      const xIncrementVar = 130;
 
       const rootNode = allCircleCords.filter(
         node => node.element.depth === 0

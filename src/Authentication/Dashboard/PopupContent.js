@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from "react";
 import _ from "lodash";
-import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
+
+//import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
+
+import { Formik } from "formik";
+import * as yup from "yup";
+
 import { makeStyles } from "@material-ui/core/styles";
 
 import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
 import TextField from "@material-ui/core/TextField";
-import Input from "@material-ui/core/Input";
 import Stepper from "@material-ui/core/Stepper";
 import Step from "@material-ui/core/Step";
 import StepLabel from "@material-ui/core/StepLabel";
-import Typography from "@material-ui/core/Typography";
-import Slide from "@material-ui/core/Slide";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import MuiAlert from "@material-ui/lab/Alert";
@@ -22,14 +22,10 @@ import MuiAlert from "@material-ui/lab/Alert";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import ListItemText from "@material-ui/core/ListItemText";
 import Checkbox from "@material-ui/core/Checkbox";
-import CommentIcon from "@material-ui/icons/Comment";
 
 import LoadingCircle from "../ProgressCircle.js";
-import IconButton from "@material-ui/core/IconButton";
-import CheckIcon from "@material-ui/icons/Check";
 
 import TransferList from "../TransferList.js";
 
@@ -41,16 +37,20 @@ const useStylesStepper = makeStyles(theme => ({
   buttonGrid: { marginTop: 25, marginRight: 25 },
   backButton: {
     marginTop: theme.spacing(1),
-    marginLeft: theme.spacing(1)
+    marginRight: theme.spacing(3)
   },
   instructions: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1)
   },
   dialogButtons: {
+    marginTop: 20,
     float: "right"
   },
-  cancelButton: { marginLeft: "25px" }
+  cancelButton: { marginLeft: "25px", marginTop: 20 },
+  nextButton: {
+    boxShadow: "none !important"
+  }
 }));
 const useListStyles = makeStyles(theme => ({
   root: {
@@ -64,9 +64,14 @@ const useListStyles = makeStyles(theme => ({
 }));
 const useStyles = makeStyles(theme => ({
   button: { color: "black", backgroundColor: theme.palette.secondary.main },
+  textDialogContent: {
+    padding: "0px 10px",
+    paddingTop: "40px !important",
+    paddingLeft: 50
+  },
   dialogContent: {
     padding: "0px 10px",
-    paddingTop: "0 !important",
+    paddingTop: "0px !important",
     paddingLeft: 50
   },
   dialogTitle: { paddingBottom: 0, marginLeft: "50px", fontSize: 15 },
@@ -88,7 +93,7 @@ const useStyles = makeStyles(theme => ({
   searchInput: {
     padding: "15px 12px"
   },
-  stepper: { padding: "0 !important" },
+  stepper: { padding: "0 !important", iconColor: "#4e89bb" },
   textValidator: {
     paddingBottom: 0,
     width: "80%",
@@ -104,7 +109,6 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-const slideTimeOut = 800;
 const PopUpContent = ({
   isOpen,
   handleClose,
@@ -126,7 +130,7 @@ const PopUpContent = ({
   const [selectedColumns, setSelectedColumns] = useState(
     selectedDashboardColumns.length > 0
       ? selectedDashboardColumns.map(col => col.type)
-      : ["jira_id"]
+      : ["dashboard_id"]
   );
   const [selectedUsers, setSelectedUsers] = useState(
     selectedDashboardUsers.length > 0
@@ -150,10 +154,6 @@ const PopUpContent = ({
     setIsDisabled(false);
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
-  };
-
   const handleNameChange = event => {
     setName(event.target.value);
   };
@@ -174,7 +174,6 @@ const PopUpContent = ({
     }
   }, [name, selectedIndices, activeStep, selectedColumns, selectedUsers]);
 
-  const getDirection = index => (index === 0 ? "right" : "left");
   return (
     <Dialog
       open={isOpen}
@@ -200,14 +199,6 @@ const PopUpContent = ({
           spacing={0}
           className={classes.root}
         >
-          <DialogTitle
-            id="form-dialog-title"
-            disableTypography={true}
-            className={classes.dialogTitle}
-            key={"dialogTitle"}
-          >
-            {isEdit ? "Edit Dashboard" : "Create New Dashboard"}
-          </DialogTitle>
           <Stepper
             activeStep={activeStep}
             alternativeLabel
@@ -219,7 +210,7 @@ const PopUpContent = ({
               </Step>
             ))}
           </Stepper>
-          <Grid item style={{ paddingTop: "0 !important" }}>
+          <Grid item>
             {activeStep === 0 && (
               <NameContent
                 isEdit={isEdit}
@@ -254,7 +245,11 @@ const PopUpContent = ({
           </Grid>
           <Grid item className={classes.buttonGrid}>
             <div className={classes.footer}>
-              <Button onClick={handleClose} className={classes.cancelButton}>
+              <Button
+                onClick={handleClose}
+                className={classes.cancelButton}
+                variant="outlined"
+              >
                 Cancel
               </Button>
               <div className={classes.dialogButtons}>
@@ -269,6 +264,7 @@ const PopUpContent = ({
                   <Button
                     variant="contained"
                     color="primary"
+                    className={classes.nextButton}
                     disabled={isActionDisabled}
                     onClick={async () => {
                       if (activeStep === steps.length - 1) {
@@ -324,7 +320,7 @@ const DynamicColumnsContent = ({
 }) => {
   const classes = useListStyles();
   const [checked, setChecked] = useState(
-    selectedColumns.length > 0 ? selectedColumns : ["jira_id"]
+    selectedColumns.length > 0 ? selectedColumns : ["dashboard_id"]
   );
 
   const handleToggle = value => () => {
@@ -347,7 +343,6 @@ const DynamicColumnsContent = ({
 
           return (
             <ListItem
-              key={value.type}
               role={undefined}
               dense
               button
@@ -356,7 +351,7 @@ const DynamicColumnsContent = ({
             >
               <ListItemIcon key={"addColumnToDashboardIconCheck-" + value.type}>
                 <Checkbox
-                  disabled={value.type === "jira_id"}
+                  disabled={value.type === "dashboard_id"}
                   edge="start"
                   key={"addColumnToDashboardCheck-" + value.type}
                   checked={checked.indexOf(value.type) !== -1}
@@ -380,26 +375,45 @@ const DynamicColumnsContent = ({
 const NameContent = ({ isEdit, name, handleNameChange }) => {
   const classes = useStyles();
   return (
-    <ValidatorForm key={"validForm"} onSubmit={() => {}}>
-      <DialogContent className={classes.dialogContent}>
-        <TextValidator
-          key={"dialogName"}
-          autoFocus
-          margin="dense"
-          id="name"
-          label="Name"
-          type="text"
-          value={name}
-          disabled={isEdit}
-          onChange={handleNameChange}
-          validators={["required"]}
-          errorMessages={["This field is required"]}
-          required
-          className={classes.textValidator}
-        />
-      </DialogContent>
-    </ValidatorForm>
+    //  <ValidatorForm key={"validForm"} onSubmit={() => {}}>
+
+    <Formik
+      validationSchema={yup.object({
+        name: yup.string().required("This field is required")
+      })}
+      initialValues={{
+        name: ""
+      }}
+      autoComplete="off"
+    >
+      {({
+        values,
+        errors,
+        touched,
+        handleSubmit,
+        handleChange,
+        setFieldValue,
+        isValid
+      }) => (
+        <DialogContent className={classes.textDialogContent}>
+          <TextField
+            key={"dialogName"}
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Name"
+            type="text"
+            value={values.name}
+            disabled={isValid}
+            onChange={event => setFieldValue("name", event.target.value)}
+            required
+            className={classes.textValidator}
+          />
+        </DialogContent>
+      )}
+    </Formik>
   );
+  //  </ValidatorForm>
 };
 const TransferListContent = ({
   isEdit,
@@ -411,27 +425,25 @@ const TransferListContent = ({
 }) => {
   const classes = useStyles();
   return (
-    <ValidatorForm key={"validForm"} onSubmit={() => {}}>
-      <DialogContent className={classes.dialogContent}>
-        <TextField
-          id="outlined-search"
-          label="Search Analyses"
-          type="search"
-          variant="outlined"
-          value={searchValue}
-          className={classes.textField}
-          InputProps={{ classes: { input: classes.searchInput } }}
-          onChange={event => setSearchValue(event.target.value)}
-        />
-        <TransferList
-          key={"transferList"}
-          allIndices={allIndices}
-          searchValue={searchValue}
-          setSelectedIndices={indices => setSelectedIndices(indices)}
-          alreadyChoosen={alreadySelectedIndices}
-        />
-      </DialogContent>
-    </ValidatorForm>
+    <DialogContent className={classes.dialogContent}>
+      <TextField
+        id="outlined-search"
+        label="Search Analyses"
+        type="search"
+        variant="outlined"
+        value={searchValue}
+        className={classes.textField}
+        InputProps={{ classes: { input: classes.searchInput } }}
+        onChange={event => setSearchValue(event.target.value)}
+      />
+      <TransferList
+        key={"transferList"}
+        allIndices={allIndices}
+        searchValue={searchValue}
+        setSelectedIndices={indices => setSelectedIndices(indices)}
+        alreadyChoosen={alreadySelectedIndices}
+      />
+    </DialogContent>
   );
 };
 const UserDashboardContent = ({
@@ -467,7 +479,6 @@ const UserDashboardContent = ({
 
             return (
               <ListItem
-                key={value}
                 role={undefined}
                 dense
                 button
@@ -507,11 +518,6 @@ const UserDashboardContent = ({
 };
 const LoadingContent = ({ classes, isSent }) => (
   <div className={classes.dialogWrapper}>
-    {isSent && (
-      <IconButton className={classes.iconButton}>
-        <CheckIcon className={classes.icon} />
-      </IconButton>
-    )}
     <LoadingCircle overRideStroke={6} />
   </div>
 );

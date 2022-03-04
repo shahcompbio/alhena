@@ -1,21 +1,50 @@
 import React, { useState, useEffect } from "react";
 import { useAppState } from "../util/app-state";
 
-import gql from "graphql-tag";
-import { Query } from "react-apollo";
-
 import TableContent from "./TableContent.js";
 import EditDashboardPopupWrapper from "./EditDashboardPopupWrapper.js";
-import Paper from "@material-ui/core/Paper";
+import AdminSettings from "./AdminSettings";
 import TableToolbar from "./TableToolBar.js";
 
+import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 
-import { ApolloConsumer } from "react-apollo";
-import { updateDashboard, deleteUserByUsername } from "../util/utils.js";
+import { withStyles } from "@material-ui/styles";
+import { gql, useLazyQuery, useQuery } from "@apollo/client";
+const getAllSettings = gql`
+  query AdminPanel($user: ApiUser!, $tabIndex: Int) {
+    getAllSettings {
+      type
+      label
+    }
+    setLastSettingsTab(user: $user, index: $tabIndex)
+  }
+`;
 
-import { getAllDashboards, getUsers } from "../Queries/queries.js";
-import { withStyles, useTheme } from "@material-ui/styles";
+const getUsers = gql`
+  query AdminPanel($user: ApiUser!, $tabIndex: Int) {
+    getUsers(auth: $user) {
+      username
+      roles
+      full_name
+      email
+      isAdmin
+    }
+    getAllDashboards(auth: $user) {
+      name
+    }
+    setLastSettingsTab(user: $user, index: $tabIndex)
+  }
+`;
+const getAllDashboards = gql`
+  query getAllDashboards($user: ApiUser!, $tabIndex: Int) {
+    getAllDashboards(auth: $user) {
+      name
+      count
+    }
+    setLastSettingsTab(user: $user, index: $tabIndex)
+  }
+`;
 
 export const UPDATEDASHBOARD = gql`
   query updateDashboardByName($dashboard: DashboardInput!) {
@@ -64,18 +93,16 @@ const styles = (theme, tabIndex) => ({
     flexGrow: 1,
     borderRadius: 20,
     zIndex: 20,
-    marginTop: 25,
-    marginBottom: 80
+    marginBottom: 80,
+    minHeight: 270
   },
   grid: {
     marginTop: "-60px"
   }
 });
 
-const TabContentWrapper = ({ tabIndex, classes }) => {
-  const theme = useTheme();
+const TabContentWrapper = ({ classes, tabIndex }) => {
   const [{ authKeyID, uid }, dispatch] = useAppState();
-
   const [isLoading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [actionComplete, setActionComplete] = useState(null);
@@ -85,6 +112,34 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
 
   const [selectedUserRoles, setSelectedUserRoles] = useState([]);
   const [selectedUserAdmin, setSelectedUserAdmin] = useState(null);
+
+  const [
+    updateUser,
+    { data: updateUserData, loading: updateUserLoading, error: updateUserError }
+  ] = useLazyQuery(UPDATEUSER);
+
+  const [
+    deleteUser,
+    { data: deleteUserData, loading: deleteUserLoading, error: deleteUserError }
+  ] = useLazyQuery(DELETEUSERBYUSERNAME);
+
+  const [
+    deleteDashboard,
+    {
+      data: deleteDashboardData,
+      loading: deleteDashboardLoading,
+      error: deleteDashboardError
+    }
+  ] = useLazyQuery(DELETEDASHBOARD);
+
+  const [
+    updateDashboard,
+    {
+      data: updateDashboardData,
+      loading: updateDashboardError,
+      error: updateDashboardLoading
+    }
+  ] = useLazyQuery(UPDATEDASHBOARD);
 
   useEffect(() => {
     setIsEditing(null);
@@ -104,78 +159,11 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
   };
 
   const handleRowClick = name => {
-    if (selected === null) {
-      setSelected(name);
-    } else if (selected === name) {
+    if (selected === name) {
       //unselect
       clearAll();
-    }
-  };
-  const updateUser = async (
-    username,
-    roles,
-    email,
-    full_name,
-    isAdmin,
-    client
-  ) => {
-    const { data } = await client.query({
-      query: UPDATEUSER,
-      variables: {
-        email: email,
-        name: full_name,
-        username: username,
-        newRoles: [...roles],
-        isAdmin: isAdmin
-      }
-    });
-    return data.updateUser.created;
-  };
-  const deleteUserByUsername = async (username, client) => {
-    const { data } = await client.query({
-      query: DELETEUSERBYUSERNAME,
-      variables: {
-        username: username
-      }
-    });
-    return data.deleteUser.isDeleted;
-  };
-  const deleteDashboard = async (name, client) => {
-    const { data } = await client.query({
-      query: DELETEDASHBOARD,
-      variables: {
-        name: name
-      }
-    });
-
-    if (data.deleteDashboardByName.allDeleted) {
-      window.location.reload();
-    }
-    return data.deleteDashboardByName.allDeleted;
-  };
-  const updateDashboards = async (
-    client,
-    name,
-    selectedIndices,
-    selectedColumns,
-    selectedUsers,
-    deletedUsers
-  ) => {
-    const updated = await client.query({
-      query: UPDATEDASHBOARD,
-      variables: {
-        dashboard: {
-          name: name,
-          indices: selectedIndices,
-          columns: selectedColumns,
-          users: selectedUsers,
-          deletedUsers: deletedUsers
-        }
-      }
-    });
-    clearAll();
-    if (updated.data.updateDashboardByName.updated) {
-      window.location.reload();
+    } else {
+      setSelected(name);
     }
   };
 
@@ -190,17 +178,30 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
       setSelectedUserRoles([]);
     }, 3000);
   };
-
-  const confirmEditUser = async (client, modifiedUsers) => {
-    setLoading(true);
-    const selectedUserObj = modifiedUsers.reduce((final, user) => {
-      if (user.username.indexOf(selected) !== -1) {
-        final = user;
+  useEffect(() => {
+    if (deleteUserData) {
+      //      return data.deleteUser.isDeleted;
+      if (deleteUserData.deleteUser.isDeleted) {
+        //has updated
+        setData(modifiedData.filter(user => user.username !== selected));
+        actionCompleteReset();
+        window.location.reload();
+      } else {
+        setLoading(false);
+        //error
       }
-      return final;
-    });
-    try {
-      if (selectedUserRoles.length !== 0 || selectedUserAdmin !== null) {
+    }
+  }, [deleteUserData, deleteUserError, deleteUserLoading]);
+
+  useEffect(() => {
+    if (updateUserData) {
+      if (updateUserData.updateUser.created === false) {
+        const selectedUserObj = modifiedData.reduce((final, user) => {
+          if (user.username.indexOf(selected) !== -1) {
+            final = user;
+          }
+          return final;
+        });
         const roles =
           selectedUserRoles.length > 0
             ? selectedUserRoles
@@ -211,196 +212,242 @@ const TabContentWrapper = ({ tabIndex, classes }) => {
             ? selectedUserAdmin
             : selectedUserObj["isAdmin"];
 
-        const confirmed = await updateUser(
-          selected,
-          roles,
-          selectedUserObj.email,
-          selectedUserObj.full_name,
-          isAdmin,
-          client
-        );
-
-        if (confirmed === false) {
-          //has updated
-          setData(
-            modifiedUsers.map(user => {
-              if (user.username === selected) {
-                user.roles = roles;
-                user.isAdmin = isAdmin;
-              }
-              return user;
-            })
-          );
-          actionCompleteReset();
-        } else {
-          //error
-        }
-      }
-    } catch (error) {}
-  };
-  const sortAlpha = list =>
-    list.sort((a, b) => {
-      var textA = a.name ? a.name.toUpperCase() : a.username.toUpperCase();
-      var textB = b.name ? b.name.toUpperCase() : b.username.toUpperCase();
-      return textA < textB ? -1 : textA > textB ? 1 : 0;
-    });
-
-  const deleteByName = async (client, users, tabIndex) => {
-    setLoading(true);
-    try {
-      const confirmed =
-        tabIndex === 1
-          ? await deleteDashboard(selected, client)
-          : await deleteUserByUsername(selected, client);
-
-      if (confirmed) {
         //has updated
-        setData(users.filter(user => user.username !== selected));
+        setData(
+          modifiedData.map(user => {
+            if (user.username === selected) {
+              user.roles = roles;
+              user.isAdmin = isAdmin;
+            }
+            return user;
+          })
+        );
         actionCompleteReset();
-        window.location.reload();
       } else {
         //error
       }
-    } catch (error) {}
+    }
+  }, [updateUserData, updateUserError, updateUserLoading]);
+
+  useEffect(() => {
+    if (deleteDashboardData) {
+      if (deleteDashboardData.deleteDashboardByName.allDeleted) {
+        window.location.reload();
+      }
+    }
+  }, [deleteDashboardData, deleteDashboardError, deleteDashboardLoading]);
+
+  useEffect(() => {
+    if (updateDashboardData) {
+      if (updateDashboardData.updateDashboardByName.updated) {
+        window.location.reload();
+      }
+    }
+  }, [updateDashboardData, updateDashboardError, updateDashboardLoading]);
+
+  const confirmEditUser = (modifiedUsers, updateUser) => {
+    setLoading(true);
+    const selectedUserObj = modifiedUsers.reduce((final, user) => {
+      if (user.username.indexOf(selected) !== -1) {
+        final = user;
+      }
+      return final;
+    });
+    if (selectedUserRoles.length !== 0 || selectedUserAdmin !== null) {
+      const roles =
+        selectedUserRoles.length > 0
+          ? selectedUserRoles
+          : selectedUserObj["roles"];
+
+      const isAdmin =
+        selectedUserAdmin !== null
+          ? selectedUserAdmin
+          : selectedUserObj["isAdmin"];
+
+      updateUser({
+        variables: {
+          email: selectedUserObj.email,
+          name: selectedUserObj.full_name,
+          username: selected,
+          newRoles: [...roles],
+          isAdmin: isAdmin
+        }
+      });
+    } else {
+      setLoading(false);
+    }
+  };
+  const sortAlpha = (list, name) =>
+    list.sort((a, b) => {
+      var textA = a[name] ? a[name].toUpperCase() : a.username.toUpperCase();
+      var textB = b[name] ? b[name].toUpperCase() : b.username.toUpperCase();
+      return textA < textB ? -1 : textA > textB ? 1 : 0;
+    });
+
+  const deleteByName = tabIndex => {
+    setLoading(true);
+    tabIndex === 1
+      ? deleteDashboard({
+          variables: {
+            name: selected
+          }
+        })
+      : deleteUser({
+          variables: {
+            username: selected
+          }
+        });
   };
   const config = {
+    2: {
+      query: getAllSettings,
+      dataReturnName: "getAllSettings",
+      tableKey: "settingsContentKey",
+      keyName: "type"
+    },
     1: {
       query: getAllDashboards,
       dataReturnName: "getAllDashboards",
-      tableKey: "dashboardsContentKey"
+      tableKey: "dashboardsContentKey",
+      keyName: "name"
     },
     0: {
       query: getUsers,
       dataReturnName: "getUsers",
-      tableKey: "usersContentKey"
+      tableKey: "usersContentKey",
+      keyName: "name"
     }
   };
 
   const tableConfig = config[tabIndex];
+  const { loading, error, data } = useQuery(tableConfig["query"], {
+    variables: {
+      user: { authKeyID: authKeyID, uid: uid },
+      tabIndex: tabIndex
+    }
+  });
+
+  if (loading) {
+    return (
+      <div className={classes.root} key={"adminTable" + tabIndex}>
+        <Grid
+          className={classes.grid}
+          direction="column"
+          justify="center"
+          alignItems="center"
+          container
+          spacing={2}
+          key={"adminGrid"}
+        >
+          <Paper
+            className={classes.root}
+            style={{
+              background: "rgb(251 251 251)"
+              //tabIndex === 1 ? "rgb(196 221 239)" : theme.palette.primary.dark
+            }}
+          >
+            <div style={{ width: "100%", height: "100%" }} />
+          </Paper>
+        </Grid>
+      </div>
+    );
+  }
+
+  if (error) {
+    dispatch({
+      type: "LOGOUT"
+    });
+    return null;
+  }
+  const modifiedData =
+    tableData.length > 0
+      ? sortAlpha(tableData, tableConfig.keyName)
+      : sortAlpha(data[tableConfig.dataReturnName], tableConfig.keyName);
 
   return (
-    <Query
-      query={tableConfig.query}
-      variables={{
-        user: { authKeyID: authKeyID, uid: uid }
-      }}
-    >
-      {({ loading, error, data }) => {
-        if (loading)
-          return (
-            <Paper
-              className={classes.root}
-              style={{
-                background:
-                  tabIndex === 1
-                    ? theme.palette.primary.main
-                    : theme.palette.primary.dark
+    <div className={classes.root} key={"adminTable" + tabIndex}>
+      <Grid
+        className={classes.grid}
+        direction="column"
+        justify="center"
+        alignItems="center"
+        container
+        spacing={2}
+        key={"adminGrid"}
+      >
+        <Paper
+          className={classes.root}
+          elevation={0}
+          key={"adminTablePaper" + tabIndex}
+          style={{
+            background: "rgb(251 251 251)"
+            //background: "rgb(201 221 214)"
+            //background: tabIndex === 1 ? "rgb(196 221 239)" : "rgb(201 221 214)"
+          }}
+        >
+          {(selected || actionComplete) && (
+            <TableToolbar
+              name={selected}
+              deleteName={() => deleteByName(tabIndex)}
+              edit={name => confirmEditUser(modifiedData, updateUser)}
+              clear={isCleared => clearAll()}
+              setIsEditing={() => setIsEditing(true)}
+              isLoading={isLoading}
+              actionComplete={actionComplete}
+            />
+          )}
+          {tabIndex === 2 ? (
+            <AdminSettings data={data[tableConfig.dataReturnName]} />
+          ) : (
+            <TableContent
+              key={"tableContent"}
+              data={modifiedData}
+              tabIndex={tabIndex}
+              isEditing={isEditing}
+              allRoles={
+                tabIndex === 0
+                  ? data.getAllDashboards.map(dashboard => dashboard.name)
+                  : []
+              }
+              setSelectedUserRoles={userRoles =>
+                setSelectedUserRoles(userRoles)
+              }
+              setSelectedUserAdmin={isAdmin => setSelectedUserAdmin(isAdmin)}
+              selected={selected}
+              handleRowClick={name => handleRowClick(name)}
+            />
+          )}
+          {isEditing && tabIndex === 1 && (
+            <EditDashboardPopupWrapper
+              key={"editDashboardPopup" + selected}
+              isOpen={true}
+              handleClose={handleClose}
+              dashboardAction={(
+                name,
+                selectedIndices,
+                selectedColumns,
+                selectedUsers,
+                deletedUsers
+              ) => {
+                updateDashboard({
+                  variables: {
+                    dashboard: {
+                      name: name,
+                      indices: selectedIndices,
+                      columns: selectedColumns,
+                      users: selectedUsers,
+                      deletedUsers: deletedUsers
+                    }
+                  }
+                });
+                clearAll();
               }}
-            >
-              <div />
-            </Paper>
-          );
-        if (error) {
-          dispatch({
-            type: "LOGOUT"
-          });
-          return null;
-        }
-
-        const modifiedData =
-          tableData.length > 0
-            ? sortAlpha(tableData)
-            : sortAlpha(data[tableConfig.dataReturnName]);
-
-        return (
-          <div className={classes.root} key={"adminTable" + tabIndex}>
-            <Grid
-              className={classes.grid}
-              direction="column"
-              justify="center"
-              alignItems="center"
-              container
-              spacing={2}
-              key={"adminGrid"}
-            >
-              <ApolloConsumer>
-                {client => (
-                  <Paper
-                    className={classes.root}
-                    key={"adminTablePaper" + tabIndex}
-                    style={{
-                      background:
-                        tabIndex === 1
-                          ? theme.palette.primary.main
-                          : theme.palette.primary.dark
-                    }}
-                  >
-                    {(selected || actionComplete) && (
-                      <TableToolbar
-                        name={selected}
-                        deleteName={() =>
-                          deleteByName(client, modifiedData, tabIndex)
-                        }
-                        edit={name => confirmEditUser(client, modifiedData)}
-                        clear={isCleared => clearAll()}
-                        setIsEditing={() => setIsEditing(true)}
-                        isLoading={isLoading}
-                        actionComplete={actionComplete}
-                      />
-                    )}
-                    <TableContent
-                      key={"tableContent"}
-                      data={modifiedData}
-                      tabIndex={tabIndex}
-                      isEditing={isEditing}
-                      allRoles={
-                        tabIndex === 0
-                          ? data.getAllDashboards.map(
-                              dashboard => dashboard.name
-                            )
-                          : []
-                      }
-                      setSelectedUserRoles={userRoles =>
-                        setSelectedUserRoles(userRoles)
-                      }
-                      setSelectedUserAdmin={isAdmin =>
-                        setSelectedUserAdmin(isAdmin)
-                      }
-                      selected={selected}
-                      handleRowClick={name => handleRowClick(name)}
-                    />
-                    {isEditing && tabIndex === 1 && (
-                      <EditDashboardPopupWrapper
-                        key={"editDashboardPopup" + selected}
-                        isOpen={true}
-                        handleClose={handleClose}
-                        dashboardAction={(
-                          name,
-                          selectedIndices,
-                          selectedColumns,
-                          selectedUsers,
-                          deletedUsers
-                        ) =>
-                          updateDashboards(
-                            client,
-                            name,
-                            selectedIndices,
-                            selectedColumns,
-                            selectedUsers,
-                            deletedUsers
-                          )
-                        }
-                        dashboardName={selected}
-                      />
-                    )}
-                  </Paper>
-                )}
-              </ApolloConsumer>
-            </Grid>
-          </div>
-        );
-      }}
-    </Query>
+              dashboardName={selected}
+            />
+          )}
+        </Paper>
+      </Grid>
+    </div>
   );
 };
 export default withStyles(styles)(TabContentWrapper);

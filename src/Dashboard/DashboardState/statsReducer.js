@@ -40,8 +40,6 @@ const initialState = {
     y: { label: "Average" }
   },
 
-  gcBiasIsGrouped: false,
-
   isScatterAxisChanged: false,
   isChipAxisChanged: false,
   gcBiasIsGrouped: false,

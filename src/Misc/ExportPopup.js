@@ -1,28 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import * as d3 from "d3";
-
-import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
 
 import { Dialog, Grid } from "@material-ui/core";
 
 import Button from "@material-ui/core/Button";
 import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
 import ToggleButton from "@material-ui/lab/ToggleButton";
 
 import CheckIcon from "@material-ui/icons/Check";
-import CloseIcon from "@material-ui/icons/Close";
 
 import { withStyles, makeStyles } from "@material-ui/core/styles";
 import { heatmapConfig } from "../Dashboard/Heatmap/config.js";
-import { getGenomeYScale } from "../Dashboard/Heatmap/utils.js";
 
 import { Typography } from "@material-ui/core";
 import { jsPDF } from "jspdf";
 import canvg from "canvg";
 
 const pageWidthPixel = 595;
-const pageHeightPixel = 842;
 const styles = theme => ({
   dialogContent: {
     width: 350,
@@ -149,7 +143,7 @@ const ExportPopup = ({
                 name="Heatmap"
                 disabled={false}
                 selected={selected}
-                setSelected={name => setSelected([...selected, name])}
+                setSelected={choices => setSelected([...choices])}
               />
             </Grid>
             <Grid item>
@@ -157,7 +151,7 @@ const ExportPopup = ({
                 name="Scatterplot"
                 disabled={true}
                 selected={selected}
-                setSelected={name => setSelected([...selected, name])}
+                setSelected={choices => setSelected([...choices])}
               />
             </Grid>
             <Grid item>
@@ -165,7 +159,7 @@ const ExportPopup = ({
                 name="GC Bias"
                 disabled={true}
                 selected={selected}
-                setSelected={name => setSelected([...selected, name])}
+                setSelected={choices => setSelected([...choices])}
               />
             </Grid>
             <Grid item>
@@ -173,7 +167,7 @@ const ExportPopup = ({
                 name="ChipHeatmap"
                 disabled={true}
                 selected={selected}
-                setSelected={name => setSelected([...selected, name])}
+                setSelected={choices => setSelected([...choices])}
               />
             </Grid>
             <Grid item>
@@ -181,7 +175,7 @@ const ExportPopup = ({
                 name="Violin"
                 disabled={true}
                 selected={selected}
-                setSelected={name => setSelected([...selected, name])}
+                setSelected={choices => setSelected([...choices])}
               />
             </Grid>
           </Grid>
@@ -192,6 +186,7 @@ const ExportPopup = ({
               className={classes.exportButton}
               onClick={() => {
                 exportSelected(selected);
+                setOpenExportPopup();
               }}
             >
               Export
@@ -221,6 +216,7 @@ const useStyles = makeStyles(theme => ({
 }));
 const PlotItem = ({ name, setSelected, selected, disabled }) => {
   const classes = useStyles();
+
   return (
     <Grid
       container
@@ -234,7 +230,11 @@ const PlotItem = ({ name, setSelected, selected, disabled }) => {
           classes={{ selected: classes.selected }}
           value="check"
           selected={selected.indexOf(name) !== -1}
-          onChange={() => setSelected(name)}
+          onChange={() => {
+            selected.indexOf(name) === -1
+              ? setSelected([...selected, name])
+              : setSelected([]);
+          }}
         >
           <CheckIcon />
         </ToggleButton>

@@ -5,7 +5,8 @@ const initialState =
         authAttempted: false,
         authKeyID: localStorage.getItem("authKeyID"),
         uid: localStorage.getItem("uid"),
-        isSuperUser: localStorage.getItem("isSuperUser")
+        isSuperUser: localStorage.getItem("isSuperUser"),
+        lastSettingsTab: localStorage.getItem("lastSettingsTab")
       }
     : { authAttempted: false, authKeyID: null, uid: null, isSuperUser: null };
 
@@ -17,6 +18,7 @@ const appStateReducer = (state, action) => {
       localStorage.setItem("isSuperUser", action.isSuperUser);
       localStorage.setItem("authKeyID", action.authKeyID);
       localStorage.setItem("uid", action.uid);
+      localStorage.setItem("lastSettingsTab", action.lastSettingsTab);
       const lastLink = localStorage.getItem("linkAttempt");
       lastLink && lastLink !== "/dashboards"
         ? history.push(lastLink)
@@ -28,7 +30,8 @@ const appStateReducer = (state, action) => {
         authAttempted: true,
         uid: action.uid,
         authKeyID: action.authKeyID,
-        isSuperUser: action.isSuperUser
+        isSuperUser: action.isSuperUser,
+        lastSettingsTab: action.lastSettingsTab
       };
     }
     case "LOADING_USER": {

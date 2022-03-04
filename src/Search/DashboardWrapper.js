@@ -1,8 +1,8 @@
 import React from "react";
 import { useAppState } from "../util/app-state";
 
-import { Query } from "react-apollo";
-import gql from "graphql-tag";
+import { gql, useQuery } from "@apollo/client";
+
 import Content from "./Content.js";
 
 import dashboardStateReducer, {
@@ -29,47 +29,42 @@ const DashboardWrapper = ({ uri, classes, history, client, props }) => {
   const ticketFromUrl = uri.params.ticket ? uri.params.ticket : null;
   const fragment = uri.params.copyLink ? uri.params.copyLink : null;
 
+  const { loading, error, data } = useQuery(getDashboardByUser, {
+    variables: {
+      fragment: fragment,
+      user: { authKeyID: authKeyID, uid: uid }
+    }
+  });
+  if (loading) return null;
+  if (error) return null;
+
+  const dashboards = data["getDashboardsByUser"]["dashboards"].map(
+    dashboard => dashboard.name
+  );
+  const defaultDashboard =
+    ticketFromUrl !== null
+      ? null
+      : data["getDashboardsByUser"]["defaultDashboard"];
+
+  const linkParams = data.getQueryParams
+    ? data.getQueryParams.paramsFromLink
+        .split("||")
+        .map(paramString => JSON.parse(paramString))
+    : null;
+
+  const intialStateUpdated = initialState(
+    dashboards,
+    defaultDashboard,
+    ticketFromUrl,
+    linkParams
+  );
   return (
-    <Query
-      query={getDashboardByUser}
-      variables={{
-        fragment: fragment,
-        user: { authKeyID: authKeyID, uid: uid }
-      }}
+    <DashboardProvider
+      initialState={intialStateUpdated}
+      reducer={dashboardStateReducer}
     >
-      {({ loading, error, data }) => {
-        if (loading) return null;
-        if (error) return null;
-
-        const dashboards = data["getDashboardsByUser"]["dashboards"].map(
-          dashboard => dashboard.name
-        );
-        const defaultDashboard =
-          ticketFromUrl !== null
-            ? null
-            : data["getDashboardsByUser"]["defaultDashboard"];
-        const linkParams = data.getQueryParams
-          ? data.getQueryParams.paramsFromLink
-              .split("||")
-              .map(paramString => JSON.parse(paramString))
-          : null;
-
-        const intialStateUpdated = initialState(
-          dashboards,
-          defaultDashboard,
-          ticketFromUrl,
-          linkParams
-        );
-        return (
-          <DashboardProvider
-            initialState={intialStateUpdated}
-            reducer={dashboardStateReducer}
-          >
-            <Content client={client} />
-          </DashboardProvider>
-        );
-      }}
-    </Query>
+      <Content />
+    </DashboardProvider>
   );
 };
 

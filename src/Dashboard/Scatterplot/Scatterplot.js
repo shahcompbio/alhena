@@ -3,8 +3,7 @@ import * as d3 from "d3";
 
 import { withStyles } from "@material-ui/core/styles";
 
-import { Query } from "react-apollo";
-import gql from "graphql-tag";
+import { gql, useQuery } from "@apollo/client";
 
 import d3Tip from "d3-tip";
 import _ from "lodash";
@@ -101,51 +100,48 @@ const Scatterplot = ({ analysis, classes }) => {
     selectedCellsDispatchFrom,
     selfType
   );
-  return (
-    <Query
-      query={SCATTERPLOT_QUERY}
-      variables={{
-        analysis,
-        quality,
-        selectedCells: selection,
-        xAxis,
-        yAxis
-      }}
-    >
-      {({ loading, error, data }) => {
-        if (error) return null;
-        if (loading && Object.keys(data).length === 0) {
-          return <CircularProgress />;
-        }
-        const { scatterplot } = data;
 
-        return (
-          <Grid
-            container
-            direction="row"
-            justify="flex-start"
-            alignItems="flex-start"
-            key="scatterplot"
-          >
-            <Grid item key="scatterplotWrapper">
-              <Plot
-                data={scatterplot.points}
-                stats={scatterplot.stats}
-                histogram={scatterplot.histogram}
-                selectionAllowed={isSelectionAllowed(
-                  selfType,
-                  selectedCellsDispatchFrom,
-                  subsetSelection,
-                  selectedCells,
-                  axisChange
-                )}
-                key="plot"
-              />
-            </Grid>
-          </Grid>
-        );
-      }}
-    </Query>
+  const { loading, error, data } = useQuery(SCATTERPLOT_QUERY, {
+    variables: {
+      analysis,
+      quality,
+      selectedCells: selection,
+      xAxis,
+      yAxis
+    }
+  });
+
+  if (error) return null;
+  if (loading) {
+    return <CircularProgress />;
+  }
+
+  const { scatterplot } = data;
+
+  return (
+    <Grid
+      container
+      direction="row"
+      justify="flex-start"
+      alignItems="flex-start"
+      key="scatterplot"
+    >
+      <Grid item key="scatterplotWrapper">
+        <Plot
+          data={scatterplot.points}
+          stats={scatterplot.stats}
+          histogram={scatterplot.histogram}
+          selectionAllowed={isSelectionAllowed(
+            selfType,
+            selectedCellsDispatchFrom,
+            subsetSelection,
+            selectedCells,
+            axisChange
+          )}
+          key="plot"
+        />
+      </Grid>
+    </Grid>
   );
 };
 

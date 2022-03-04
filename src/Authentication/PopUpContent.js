@@ -16,9 +16,10 @@ import IconButton from "@material-ui/core/IconButton";
 import CheckIcon from "@material-ui/icons/Check";
 
 import TransferList from "./TransferList.js";
+
 const useStyles = makeStyles(theme => ({
   button: { color: "black", backgroundColor: theme.palette.secondary.main },
-  dialogContent: { padding: "0px 24px" },
+  dialogContent: { padding: "0px 24px", fontSize: 16 },
   dialogTitle: { paddinBottom: 0 },
   dialogWrapper: {
     height: 200,
@@ -138,7 +139,7 @@ const PopUpContent = ({
             <Button
               onClick={handleClose}
               color="secondary"
-              variant="contained"
+              variant="outlined"
               className={classes.button}
             >
               Cancel
@@ -154,7 +155,7 @@ const PopUpContent = ({
                   handleClose();
                 }, 2000);
               }}
-              color="primary"
+              style={{ backgroundColor: "#4e89bb" }}
               variant="contained"
               disabled={isActionDisabled}
             >

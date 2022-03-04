@@ -3,8 +3,7 @@ import * as d3 from "d3";
 
 import { withStyles } from "@material-ui/core/styles";
 
-import { Query } from "react-apollo";
-import gql from "graphql-tag";
+import { gql, useQuery } from "@apollo/client";
 
 import _ from "lodash";
 
@@ -117,51 +116,48 @@ const Violin = ({ analysis, classes }) => {
     selectedCellsDispatchFrom,
     selfType
   );
-  return (
-    <Query
-      query={VIOLIN_QUERY}
-      variables={{
-        analysis,
-        quality,
-        selectedCells: selection,
-        xAxis,
-        yAxis
-      }}
-    >
-      {({ loading, error, data }) => {
-        if (error) return null;
-        if (loading && Object.keys(data).length === 0) {
-          return null;
-        }
-        const { violin } = data;
 
-        return (
-          <Grid
-            container
-            direction="row"
-            justify="flex-start"
-            alignItems="flex-start"
-            key="violin"
-          >
-            <Grid item key="violinWrapper">
-              <Plot
-                cells={violin.cells}
-                data={violin.data}
-                stats={violin.stats}
-                selectionAllowed={isSelectionAllowed(
-                  selfType,
-                  selectedCellsDispatchFrom,
-                  subsetSelection,
-                  selectedCells,
-                  axisChange
-                )}
-                key="violinplot"
-              />
-            </Grid>
-          </Grid>
-        );
-      }}
-    </Query>
+  const { loading, error, data } = useQuery(VIOLIN_QUERY, {
+    variables: {
+      analysis,
+      quality,
+      selectedCells: selection,
+      xAxis,
+      yAxis
+    }
+  });
+
+  if (error) return null;
+  if (loading) {
+    return null;
+  }
+
+  const { violin } = data;
+
+  return (
+    <Grid
+      container
+      direction="row"
+      justify="flex-start"
+      alignItems="flex-start"
+      key="violin"
+    >
+      <Grid item key="violinWrapper">
+        <Plot
+          cells={violin.cells}
+          data={violin.data}
+          stats={violin.stats}
+          selectionAllowed={isSelectionAllowed(
+            selfType,
+            selectedCellsDispatchFrom,
+            subsetSelection,
+            selectedCells,
+            axisChange
+          )}
+          key="violinplot"
+        />
+      </Grid>
+    </Grid>
   );
 };
 const tooltip = d3Tip()

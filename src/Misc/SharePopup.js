@@ -5,15 +5,10 @@ import { Dialog, Grid } from "@material-ui/core";
 
 import Button from "@material-ui/core/Button";
 import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
 import FilledInput from "@material-ui/core/FilledInput";
 
-import { withStyles, makeStyles } from "@material-ui/core/styles";
-import { Typography } from "@material-ui/core";
-
-import { useAppState } from "../util/app-state";
-import { useQuery } from "@apollo/client";
-import gql from "graphql-tag";
+import { withStyles } from "@material-ui/core/styles";
+import { gql, useLazyQuery } from "@apollo/client";
 
 import { useStatisticsState } from "../Dashboard/DashboardState/statsState";
 
@@ -54,35 +49,39 @@ const SET_CACHE_SETTING = gql`
 const SharePopup = ({
   setOpenSharePopup,
   openSharePopup,
-  client,
   classes,
   analysis
 }) => {
-  const [state, dispatch] = useStatisticsState();
+  const [state] = useStatisticsState();
   const [url, setUrl] = useState(
     window.location.origin + "/alhena/dashboards/" + analysis
   );
+
+  const [setCopyUrl, { data }] = useLazyQuery(SET_CACHE_SETTING);
+
   useEffect(() => {
-    (async () => {
-      if (
-        Object.keys(state.axisChange)
-          .map(key => state.axisChange[key])
-          .indexOf(true) !== -1
-      ) {
-        const paramsString = JSON.stringify(state);
-        const response = await client.query({
-          query: SET_CACHE_SETTING,
-          variables: {
-            type: "copyUrl",
-            value: paramsString
-          }
-        });
-        if (response) {
-          setUrl(url + "/" + response.data.setCacheCopyUrl.link);
+    console.log(state);
+    if (
+      Object.keys(state.axisChange)
+        .map(key => state.axisChange[key])
+        .indexOf(true) !== -1
+    ) {
+      const paramsString = JSON.stringify(state);
+
+      setCopyUrl({
+        variables: {
+          type: "copyUrl",
+          value: paramsString
         }
-      }
-    })();
+      });
+    }
   }, [state]);
+  useEffect(() => {
+    if (data) {
+      setUrl(url + "/" + data.setCacheCopyUrl.link);
+    }
+  }, [data, setUrl]);
+
   return (
     <Dialog
       fullWidth
@@ -115,7 +114,7 @@ const SharePopup = ({
               document.execCommand("copy");
             }}
           >
-            Share
+            Copy
           </Button>
           <Button
             variant="outlined"

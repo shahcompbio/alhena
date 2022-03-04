@@ -1,4 +1,3 @@
-import React from "react";
 import * as d3 from "d3";
 import { heatmapConfig } from "./config.js";
 
@@ -25,6 +24,7 @@ const ChromAxis = ({ chromosomes, chromMap, categoryWidth }) => {
         textX,
         heatmapConfig.chromosome["height"] - 2
       );
+      return chromosome;
     });
 
     context.fill();

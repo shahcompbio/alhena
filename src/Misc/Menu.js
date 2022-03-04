@@ -5,7 +5,6 @@ import { withRouter } from "react-router-dom";
 
 import { useAppState } from "../util/app-state";
 import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
-import Fab from "@material-ui/core/Fab";
 import HelpIcon from "@material-ui/icons/Help";
 import SearchIcon from "@material-ui/icons/Search";
 import ExitToApp from "@material-ui/icons/ExitToApp";

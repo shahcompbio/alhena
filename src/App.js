@@ -1,27 +1,19 @@
-import React, {
-  useWindowSize,
-  useEffect,
-  useState,
-  useLayoutEffect
-} from "react";
+import React, { useEffect, useState } from "react";
 import {
   useAppState,
   PrivateRoute,
   AdminRoute,
   UnauthenticatedRoute
 } from "./util/app-state";
-import { ApolloConsumer } from "react-apollo";
+
 import { Route, Switch } from "react-router-dom";
 
 import { withRouter } from "react-router";
 import { useHistory } from "react-router-dom";
-import { useLocation } from "react-router-dom";
 
 import AdminPanel from "./Authentication/AdminPanel.js";
 
 import DashboardWrapper from "./Search/DashboardWrapper";
-import DashboardContent from "./Dashboard/DashboardContent.js";
-import ProjectViewContent from "./Search/ProjectView/ProjectViewContent";
 
 import ExportPopup from "./Misc/ExportPopup.js";
 import Unauthenticated from "./Authentication/Unauthenticated.js";
@@ -35,11 +27,10 @@ import { MuiThemeProvider } from "@material-ui/core/styles";
 import CssBaseline from "@material-ui/core/CssBaseline";
 
 const App = () => {
-  const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
+  const [{ authKeyID }, dispatch] = useAppState();
   let history = useHistory();
 
   const [locationKeys, setLocationKeys] = useState([]);
-  const loc = useLocation();
 
   useEffect(() => {
     return history.listen(location => {
@@ -70,11 +61,7 @@ const App = () => {
           exact={true}
           component={() => {
             history.replace("/login");
-            return (
-              <ApolloConsumer>
-                {client => <Unauthenticated client={client} />}
-              </ApolloConsumer>
-            );
+            return <Unauthenticated />;
           }}
         />
         {!authKeyID && (
@@ -86,22 +73,14 @@ const App = () => {
                 localStorage.setItem("linkAttempt", location.pathname);
               }
               history.replace("/login");
-              return (
-                <ApolloConsumer>
-                  {client => <Unauthenticated client={client} />}
-                </ApolloConsumer>
-              );
+              return <Unauthenticated />;
             }}
           />
         )}
         <Route
           path="/login"
           exact={true}
-          component={() => (
-            <ApolloConsumer>
-              {client => <Unauthenticated client={client} />}
-            </ApolloConsumer>
-          )}
+          component={() => <Unauthenticated />}
         />
         <Route
           path="/NewAccount/:redisKey"
@@ -135,6 +114,9 @@ const App = () => {
           <AdminPanel />
         </AdminRoute>
       </Switch>
+      <div style={{ position: "absolute", bottom: 10, right: 10 }}>
+        Version 1.052
+      </div>
     </MuiThemeProvider>
   );
 };

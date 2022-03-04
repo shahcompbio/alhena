@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useDashboardState } from "../../Search/ProjectView/ProjectState/dashboardState";
 
-import gql from "graphql-tag";
-import { useQuery } from "react-apollo-hooks";
 import _ from "lodash";
 
 import {
@@ -11,7 +8,6 @@ import {
   FormControlLabel,
   Grid,
   Input,
-  InputLabel,
   ListItemText,
   MenuItem,
   Select,
@@ -22,35 +18,18 @@ import {
 
 import { useStatisticsState } from "../DashboardState/statsState";
 import { heatmapConfig } from "../Heatmap/config";
-const orderFromParamsQuary = gql`
-  query heatmapOrderFromParameter(
-    $analysis: String!
-    $quality: String!
-    $params: [InputParams]
-  ) {
-    heatmapOrderFromParameter(
-      analysis: $analysis
-      quality: $quality
-      params: $params
-    ) {
-      order
-    }
-  }
-`;
 
 const DataFilters = ({
   classes,
   update,
   analysis,
-  client,
   experimentalConditions,
   numericalDataFilters,
   isDisabled,
   key
 }) => {
   const [
-    { quality, isContaminated, axisChange, expCondition },
-    dispatch
+    { quality, isContaminated, axisChange, expCondition }
   ] = useStatisticsState();
   const [qualityMenuValue, setQualityMenuValue] = useState(quality);
   const [contaminatedMenuValue, setContaminatedMenuValue] = useState(
@@ -59,7 +38,6 @@ const DataFilters = ({
 
   const [experimentalMenuValue, setExperimentalMenuValue] = useState([]);
 
-  const [paramObj, setParamObj] = useState({});
   useEffect(() => {
     if (axisChange["datafilter"] === false && experimentalMenuValue !== null) {
       setExperimentalMenuValue(null);
@@ -140,7 +118,6 @@ const DataFilters = ({
         <FormControl
           disabled={isDisabled}
           variant="outlined"
-          key="contaminatedFormControll"
           className={classes.formControl}
           key={key + "filterFormControl"}
         >
@@ -199,7 +176,6 @@ const DataFilters = ({
               const value = event.target.value;
               if (value.indexOf("") !== -1) {
                 setExperimentalMenuValue([]);
-                setParamObj["experimental_condition"] = [];
                 update(
                   {
                     expCondition: null
@@ -208,21 +184,11 @@ const DataFilters = ({
                 );
               } else {
                 setExperimentalMenuValue(value);
-                var expValue = setParamObj["experimental_condition"]
-                  ? [...setParamObj["experimental_condition"], ...value]
-                  : [...value];
-
-                setParamObj["experimental_condition"] = {
-                  param: "experimental_condition",
-                  value: [...expValue]
-                };
 
                 update(
                   {
                     expCondition:
-                      expValue.length > 1
-                        ? expValue.join(",")
-                        : value.toString()
+                      value.length > 1 ? value.join(",") : value.toString()
                   },
                   "EXP_CONDITION_UPDATE"
                 );
@@ -267,7 +233,7 @@ const DataFilters = ({
 };
 const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
   const [
-    { axisChange, absoluteMinMaxDataFilters, selectedCells },
+    { axisChange, absoluteMinMaxDataFilters },
     dispatch
   ] = useStatisticsState();
 
@@ -363,7 +329,6 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
             </Typography>
             <Slider
               disabled
-              defaultValue={null}
               defaultValue={[filter["localMin"], filter["localMax"]]}
               aria-labelledby="breath-local-slider"
               min={originalDefaultValues[filter["name"]][0]}
@@ -389,7 +354,6 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
             </Typography>
             <Slider
               key={filter["name"] + "-slider"}
-              aria-labelledby="breath-overall-slider"
               value={defaultValues[filter["name"]]}
               className={classes.slider}
               color={"secondary"}
@@ -445,8 +409,6 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
               max={filter["max"]}
               valueLabelDisplay="auto"
               aria-labelledby="range-slider"
-              getAriaValueText={value => value}
-              valueLabelDisplay="auto"
               label={filter["name"]}
               getAriaValueText={value => numFormatter(value)}
             />

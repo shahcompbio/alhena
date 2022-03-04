@@ -1,13 +1,15 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect } from "react";
 
-import { ApolloConsumer } from "react-apollo";
+import { gql, useLazyQuery } from "@apollo/client";
 
-import { Button, Grid, Paper, TextField, Typography } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
+import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
 
 import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
 import UpdatePassword from "./NewUser/UpdatePassword.js";
 
-import gql from "graphql-tag";
 import styled from "styled-components";
 import { withStyles } from "@material-ui/styles";
 
@@ -53,43 +55,28 @@ const VERIFYUSER = gql`
     }
   }
 `;
-const checkUser = async (client, username, email) => {
-  const { data } = await client.query({
-    query: VERIFYUSER,
-    variables: {
-      username: username,
-      email: email
-    }
-  });
 
-  return data.doesUserExist.confirmReset;
-};
-const ForgotPasswordWrapper = ({ dispatch, classes, client }) => {
+const ForgotPasswordWrapper = ({ dispatch, classes }) => {
   let history = useHistory();
 
   const [error, setError] = useState(null);
   const [isVerified, setIsVerified] = useState(false);
   const [verifiedUsername, setVerifiedUsername] = useState();
 
-  const usernameRef = useRef();
-  const emailRef = useRef();
+  const [username, setUsername] = useState(null);
+  const [email, setEmail] = useState(null);
 
-  const fields = [
-    {
-      id: "resetPassword:username",
-      label: "Username:",
-      ref: usernameRef,
-      type: "text",
-      placeholder: "Username"
-    },
-    {
-      id: "resetPassword:email",
-      label: "Email:",
-      ref: emailRef,
-      type: "text",
-      placeholder: "Email"
+  const [verifyUser, { loading, data }] = useLazyQuery(VERIFYUSER);
+
+  useEffect(() => {
+    if (data) {
+      if (data.doesUserExist.confirmReset) {
+        setIsVerified(true);
+      } else {
+        setError(13);
+      }
     }
-  ];
+  }, [data, loading, error]);
 
   return (
     <Grid container direction="row" justify="center" alignItems="center">
@@ -107,62 +94,75 @@ const ForgotPasswordWrapper = ({ dispatch, classes, client }) => {
           />
         )}
         {isVerified ? (
-          <UpdatePassword
-            username={usernameRef.current.value}
-            dispatch={dispatch}
-          />
+          <UpdatePassword username={username} dispatch={dispatch} />
         ) : (
           <div>
-            <Paper rounded="true" className={classes.paperTitle}>
-              <Typography variant="h6">
-                Verify User to Reset Password
-              </Typography>
-            </Paper>
-            <Paper rounded="true" className={classes.paperForm}>
-              <form id="resetPassword">
-                {fields.map(field => (
-                  <ComponentWrapper key={"componentWrapper" + field.id}>
-                    <TextField
-                      key={"textField" + field.id}
-                      className={classes.textField}
-                      margin="normal"
-                      inputRef={field.ref}
-                      id={field.id}
-                      required
-                      fullWidth
-                      value={field.value}
-                      label={field.placeholder}
-                      type={field.type}
-                    />
-                  </ComponentWrapper>
-                ))}
-                <ComponentWrapper style={{ textAlign: "center" }}>
-                  <Button
-                    className={classes.button}
-                    variant="contained"
-                    onClick={() => {
-                      history.replace("/login");
-                    }}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    className={classes.button}
-                    variant="contained"
-                    onClick={async () => {
-                      const queryResults = await checkUser(
-                        client,
-                        usernameRef.current.value,
-                        emailRef.current.value
-                      );
-                      queryResults ? setIsVerified(queryResults) : setError(13);
-                    }}
-                  >
-                    Verify
-                  </Button>
-                </ComponentWrapper>
-              </form>
-            </Paper>
+            <Typography variant="h6" style={{ marginLeft: 15 }}>
+              Reset Password
+            </Typography>
+
+            <ComponentWrapper key={"componentWrapper-username"}>
+              <TextField
+                key={"textField-username"}
+                className={classes.textField}
+                margin="normal"
+                id={"resetPassword:username"}
+                required
+                fullWidth
+                value={username}
+                label={"Username"}
+                onChange={event => {
+                  setUsername(event.target.value);
+                }}
+                type={"text"}
+              />
+            </ComponentWrapper>
+            <ComponentWrapper key={"componentWrapper-email"}>
+              <TextField
+                key={"textField-email"}
+                className={classes.textField}
+                margin="normal"
+                id={"resetPassword:email"}
+                required
+                fullWidth
+                value={email}
+                onChange={event => {
+                  setEmail(event.target.value);
+                }}
+                label={"Email"}
+                type={"text"}
+              />
+            </ComponentWrapper>
+            <ComponentWrapper
+              style={{ display: "flex", justifyContent: "space-around" }}
+            >
+              <Button
+                className={classes.backButton}
+                variant="outlined"
+                disableElevation
+                onClick={() => {
+                  history.replace("/login");
+                }}
+              >
+                Back
+              </Button>
+              <Button
+                className={classes.button}
+                variant="outlined"
+                disableElevation
+                type="submit"
+                onClick={async () => {
+                  verifyUser({
+                    variables: {
+                      username: username,
+                      email: email
+                    }
+                  });
+                }}
+              >
+                Verify
+              </Button>
+            </ComponentWrapper>
           </div>
         )}
       </div>

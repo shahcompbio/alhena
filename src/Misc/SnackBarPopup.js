@@ -63,7 +63,7 @@ const SnackbarContentWrapper = ({
       }}
       anchorOrigin={{
         vertical: "bottom",
-        horizontal: "left"
+        horizontal: "right"
       }}
     >
       <SnackbarContent

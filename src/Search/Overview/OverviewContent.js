@@ -8,6 +8,9 @@ import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
 import ButtonGroup from "@material-ui/core/ButtonGroup";
 import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/styles";
+
+import _ from "lodash";
 
 const styles = theme => ({
   content: {
@@ -18,8 +21,21 @@ const styles = theme => ({
   }
 });
 
+const useStyles = makeStyles({
+  button: {
+    "&:hover": {
+      //  color: "#cfb630",
+      //  textShadow: "0 0 1px #ffbf00",
+      fontSize: 20
+    },
+    fontWeight: "bold",
+    fontSize: 16
+  }
+});
 const OverviewContent = ({ classes, handleForwardStep }) => {
   const [{ dashboards }, dispatch] = useDashboardState();
+  const classes2 = useStyles();
+
   const selectProject = project => {
     handleForwardStep();
 
@@ -40,33 +56,36 @@ const OverviewContent = ({ classes, handleForwardStep }) => {
         key={"grid"}
         className={classes.container}
       >
-        <Grid item style={{ textAlign: "center" }}>
+        <Grid item style={{ textAlign: "center", padding: 50 }}>
           <Typography
             variant="h4"
             color="secondary"
             style={{ marginBottom: 50 }}
           >
-            Select from the following available dashboards:
+            Select from the following available projects:
           </Typography>
-          <ButtonGroup
-            fullWidth
-            color="secondary"
-            size="large"
-            aria-label="full width secondary outlined button group"
-          >
-            {dashboards.map(project => {
-              return (
-                <Button
-                  key={"button" + project}
-                  value={project}
-                  style={{ fontWeight: "bold", fontSize: 16 }}
-                  onClick={() => selectProject(project)}
-                >
-                  {project}
-                </Button>
-              );
-            })}
-          </ButtonGroup>
+
+          {_.chunk(dashboards, 3).map(projectGroup => {
+            return (
+              <ButtonGroup
+                fullWidth
+                color="secondary"
+                size="large"
+                aria-label="full width secondary outlined button group"
+              >
+                {projectGroup.map(project => (
+                  <Button
+                    className={classes2.button}
+                    key={"button" + project}
+                    value={project}
+                    onClick={() => selectProject(project)}
+                  >
+                    {project}
+                  </Button>
+                ))}
+              </ButtonGroup>
+            );
+          })}
         </Grid>
       </Grid>
     </div>

@@ -48,10 +48,8 @@ const Categories = ({ cellStats, yScale, categories }) => {
             return colourScale(d[categoryName]);
           })
           .on("mousemove", function(d) {
-            var coordinates = d3.mouse(this);
             d3.select(this).attr("class", "hoveredCategorySquare");
 
-            const colour = colourScale(d[categoryName]);
             const name = d[categoryName];
             d3.select("#categoryChipTip")
               .style("visibility", "visible")

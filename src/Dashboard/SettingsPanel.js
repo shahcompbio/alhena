@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   AccordionActions,
   Button,
-  Divider,
   Paper,
   Typography,
   Grid,
@@ -14,7 +13,6 @@ import {
 import TextField from "@material-ui/core/TextField";
 import Autocomplete from "@material-ui/lab/Autocomplete";
 
-import { ApolloConsumer } from "react-apollo";
 import ChipHeatmapSettings from "./Settings/ChipHeatmapSettings.js";
 import ScatterplotSettings from "./Settings/ScatterplotSettings.js";
 import LoadingCircle from "./CommonModules/LoadingCircle.js";
@@ -31,12 +29,8 @@ import { withStyles } from "@material-ui/core/styles";
 import { useDashboardState } from "../Search/ProjectView/ProjectState/dashboardState";
 
 import { useStatisticsState } from "./DashboardState/statsState";
-import { heatmapConfig } from "./Heatmap/config";
 
 const styles = theme => ({
-  fieldComponent: {
-    margin: theme.spacing(0, 3, 8, 3)
-  },
   fieldTitle: {
     paddingBottom: 30
   },
@@ -63,7 +57,7 @@ const styles = theme => ({
     color: "rgba(225, 225, 225, 0.54)"
   },
   metaDataPanel: {
-    background: "none",
+    background: "white",
     marginBottom: 10
   },
   buttonWrapper: {
@@ -73,13 +67,16 @@ const styles = theme => ({
     margin: theme.spacing(3)
   },
   exportButton: {
-    width: 130,
+    width: 180,
     marginBottom: 10,
-    marginRight: 12
+    //marginRight: 12,
+    backgroundColor: "white"
   },
   shareButton: {
-    width: 135,
-    marginBottom: 10
+    width: 180,
+    marginBottom: 10,
+    marginLeft: 6,
+    backgroundColor: "white"
   },
   fieldComponent: {
     margin: theme.spacing(2, 0, 0, 0)
@@ -91,10 +88,11 @@ const styles = theme => ({
   gridSlider: { width: "100%", marginBottom: 10 },
   settings: {
     padding: 10,
-    width: 300,
+    paddingRight: 0,
+    width: 400,
     background: "none",
     height: "100%",
-    position: "fixed",
+    position: "sticky",
     overflowY: "scroll"
   },
   sliderPanel: {
@@ -109,6 +107,7 @@ const styles = theme => ({
       marginTop: 0
     }
   },
+  dropDownLabel: { backgroundColor: "white", padding: 3 },
   titlePadding: {
     paddingBottom: 15,
     paddingTop: 15
@@ -120,12 +119,7 @@ const styles = theme => ({
     padding: "0px 24px 24px"
   }
 });
-const defaultCleared = {
-  dataFilters: false,
-  scatterplot: false,
-  chip: false,
-  GCBias: false
-};
+
 const SettingsPanel = ({
   analysis,
   classes,
@@ -152,7 +146,7 @@ const SettingsPanel = ({
     dispatch
   ] = useStatisticsState();
 
-  const meta = metaData ? metaData : {};
+  const meta = metaData ? metaData["metadata"] : [];
 
   const [openAccordian, setIsOpenAccordian] = useState({
     dataFilter: false,
@@ -196,7 +190,7 @@ const SettingsPanel = ({
         project={selectedDashboard}
         analysis={selectedAnalysis}
       />
-      {((selectedCells.length !== 0 && axisChange["datafilter"] == false) ||
+      {((selectedCells.length !== 0 && axisChange["datafilter"] === false) ||
         subsetSelection.length !== 0) && (
         <SelectedCellsPanel
           classes={classes}
@@ -245,7 +239,7 @@ const SettingsPanel = ({
         freeSolo
         options={
           cellIDs
-            ? cellIDs.sort((a, b) =>
+            ? [...cellIDs].sort((a, b) =>
                 a["cellID"].localeCompare(b["cellID"], "en", { numeric: true })
               )
             : []
@@ -281,36 +275,29 @@ const SettingsPanel = ({
           resetFilter("DATA_FILTER_OFF");
         }}
       >
-        <ApolloConsumer key={"dataFilterConsumer"}>
-          {client =>
-            categoryStats.length > 0 ? (
-              <DataFilters
-                key={"dataFilterWrapper"}
-                client={client}
-                numericalDataFilters={numericalDataFilters}
-                experimentalConditions={categoryStats.filter(
-                  category =>
-                    category["category"] === experimentalCondition["type"]
-                )}
-                analysis={selectedAnalysis}
-                classes={classes}
-                update={(value, type) => {
-                  update(value, type);
-                }}
-                isDisabled={isDisabled}
-              />
-            ) : (
-              <DataFilters
-                key={"dataFilterWrapper"}
-                client={client}
-                numericalDataFilters={[]}
-                experimentalConditions={[]}
-                analysis={""}
-                classes={classes}
-              />
-            )
-          }
-        </ApolloConsumer>
+        {categoryStats.length > 0 ? (
+          <DataFilters
+            key={"dataFilterWrapper"}
+            numericalDataFilters={numericalDataFilters}
+            experimentalConditions={categoryStats.filter(
+              category => category["category"] === experimentalCondition["type"]
+            )}
+            analysis={selectedAnalysis}
+            classes={classes}
+            update={(value, type) => {
+              update(value, type);
+            }}
+            isDisabled={isDisabled}
+          />
+        ) : (
+          <DataFilters
+            key={"dataFilterWrapper"}
+            numericalDataFilters={[]}
+            experimentalConditions={[]}
+            analysis={""}
+            classes={classes}
+          />
+        )}
       </AccordianWrapper>
       <AccordianWrapper
         classes={classes}
@@ -438,7 +425,33 @@ const AccordianWrapper = ({
     </AccordionDetails>
   </Accordion>
 );
-
+/*  {project && (
+    <Typography
+      variant="h6"
+      fontWeight="fontWeightRegular"
+      style={{ color: "#a2a2a2" }}
+    >
+      Project: {project}
+    </Typography>
+  )}
+  {metaData && (
+    <Typography
+      variant="h6"
+      fontWeight="fontWeightRegular"
+      style={{ color: "#a2a2a2" }}
+    >
+      Library: {metaData["library_id"]}
+    </Typography>
+  )}
+  {metaData && (
+    <Typography
+      variant="h6"
+      fontWeight="fontWeightRegular"
+      style={{ color: "#a2a2a2" }}
+    >
+      Sample: {metaData["sample_id"]}
+    </Typography>
+  )}*/
 const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
   <Paper
     elevation={0}
@@ -470,32 +483,18 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
           Analysis: {analysis}
         </span>
       </Typography>
-      {project && (
-        <Typography
-          variant="h6"
-          fontWeight="fontWeightRegular"
-          style={{ color: "#a2a2a2" }}
-        >
-          Project: {project}
-        </Typography>
-      )}
-      {metaData && (
-        <Typography
-          variant="h6"
-          fontWeight="fontWeightRegular"
-          style={{ color: "#a2a2a2" }}
-        >
-          Library: {metaData["library_id"]}
-        </Typography>
-      )}
-      {metaData && (
-        <Typography
-          variant="h6"
-          fontWeight="fontWeightRegular"
-          style={{ color: "#a2a2a2" }}
-        >
-          Sample: {metaData["sample_id"]}
-        </Typography>
+      {metaData !== null ? (
+        metaData.map(meta => (
+          <Typography
+            variant="h6"
+            fontWeight="fontWeightRegular"
+            style={{ color: "#a2a2a2" }}
+          >
+            {meta["type"]}: {meta["value"]}
+          </Typography>
+        ))
+      ) : (
+        <div />
       )}
       {count === null ? (
         <LoadingCircle />

@@ -132,7 +132,7 @@ const Filters = ({
                     : null;
                 }}
                 onChange={(event, value) => {
-                  if (filterTypes[i] === "jira_id") {
+                  if (filterTypes[i] === "dashboard_id") {
                     dispatch({
                       type: "ANALYSIS_SELECT",
                       value: { selectedAnalysis: value.value }
