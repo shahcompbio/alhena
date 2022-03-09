@@ -2,6 +2,9 @@ import { createTheme } from "@mui/material/styles";
 export const theme = createTheme({
   typography: { fontFamily: "MyFont" },
   palette: {
+    text: {
+      primarry: "black"
+    },
     primary: {
       //main: "#90D3F4",
       //main: "#5d97a0",
@@ -19,10 +22,19 @@ export const theme = createTheme({
       default: "#F5F5F5"
       //default: "#2b2a2a"
     },
-    overrides: {
+    common: { white: "white" },
+
+    components: {
+      MuiSlider: {
+        styleOverrides: {
+          color: "#f1c023"
+        }
+      },
       MuiFab: {
-        root: {
-          boxShadow: "none"
+        styleOverrides: {
+          root: {
+            boxShadow: "none"
+          }
         }
       }
     }

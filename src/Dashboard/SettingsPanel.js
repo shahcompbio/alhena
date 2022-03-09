@@ -12,6 +12,7 @@ import {
 
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import ClearIcon from "@mui/icons-material/Clear";
 
 import ChipHeatmapSettings from "./Settings/ChipHeatmapSettings.js";
 import ScatterplotSettings from "./Settings/ScatterplotSettings.js";
@@ -26,11 +27,13 @@ import BackspaceTwoToneIcon from "@mui/icons-material/BackspaceTwoTone";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 import withStyles from "@mui/styles/withStyles";
+import { makeStyles } from "@mui/styles";
+
 import { useDashboardState } from "../Search/ProjectView/ProjectState/dashboardState";
 
 import { useStatisticsState } from "./DashboardState/statsState";
 
-const styles = theme => ({
+const styles = makeStyles(theme => ({
   fieldTitle: {
     paddingBottom: 30
   },
@@ -67,24 +70,23 @@ const styles = theme => ({
     margin: theme.spacing(3)
   },
   exportButton: {
+    color: "#31506b",
     width: 180,
+    color: "#31506b !important",
+    border: "1px solid #31506b !important",
     //marginBottom: "10px !important",
     marginRight: "29px !important",
     backgroundColor: "white !important"
   },
   shareButton: {
+    color: "#31506b !important",
+    border: "1px solid #31506b !important",
     width: 180,
     marginBottom: 10,
     marginLeft: 6,
     backgroundColor: "white !important"
   },
-  fieldComponent: {
-    margin: theme.spacing(2, 0, 0, 0)
-  },
-  formControl: {
-    width: "100%",
-    margin: theme.spacing(0, 0, 2, 0)
-  },
+
   gridSlider: { width: "100%", marginBottom: 10 },
   settings: {
     padding: 10,
@@ -99,6 +101,7 @@ const styles = theme => ({
     padding: 20
   },
   slider: {
+    color: "#e2ad13 !important"
     //marginTop: 10
   },
   search: {
@@ -108,7 +111,6 @@ const styles = theme => ({
       marginTop: 0
     }
   },
-  dropDownLabel: { backgroundColor: "white", padding: 3 },
   titlePadding: {
     paddingBottom: 15,
     paddingTop: 15
@@ -117,13 +119,12 @@ const styles = theme => ({
     color: "white"
   },
   panelDetails: {
-    padding: "0px 26px 26px !important"
+    padding: "0px 54px 54px !important"
   }
-});
+}));
 
 const SettingsPanel = ({
   analysis,
-  classes,
   categoryStats,
   cellCount,
   chipHeatmapOptions,
@@ -146,6 +147,7 @@ const SettingsPanel = ({
     },
     dispatch
   ] = useStatisticsState();
+  const classes = styles();
 
   const meta = metaData ? metaData["metadata"] : [];
 
@@ -408,8 +410,18 @@ const AccordianWrapper = ({
       </Typography>
       {isResetPossible && (
         <AccordionActions style={{ width: "100%" }}>
-          <Button size="small" onClick={resetFilter}>
-            {name === "dataFilter" ? "Clear All" : "Reset"}
+          <Button
+            size="small"
+            variant="outlined"
+            onClick={resetFilter}
+            endIcon={<ClearIcon />}
+            sx={{
+              color: "#31506b",
+              border: "1px solid #31506b",
+              fontWeight: "bold"
+            }}
+          >
+            {name === "dataFilter" ? "Clear Filter" : "Reset"}
           </Button>
         </AccordionActions>
       )}
@@ -533,4 +545,4 @@ const SelectedCellsPanel = ({
   </Paper>
 );
 
-export default withStyles(styles)(SettingsPanel);
+export default SettingsPanel;

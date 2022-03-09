@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 
 import { FormControl, InputLabel, Select } from "@mui/material";
 
+import makeStyles from "@mui/styles/makeStyles";
+
 import { useStatisticsState } from "../DashboardState/statsState";
 import { gql, useQuery } from "@apollo/client";
 const SCATTERPLOT_OPTIONS = gql`
@@ -12,9 +14,20 @@ const SCATTERPLOT_OPTIONS = gql`
     }
   }
 `;
+const useStyles = makeStyles(theme => ({
+  fieldComponent: {
+    margin: theme.spacing(2, 0, 0, 0)
+  },
+  formControl: {
+    width: "100%",
+    margin: theme.spacing(0, 0, 2, 0) + " !important"
+  },
+  dropDownLabel: { backgroundColor: "white", padding: 3 }
+}));
+
 const ScatterplotSettings = ({
   analysis,
-  classes,
+
   setAxisOption,
   isDisabled
 }) => {
@@ -27,6 +40,8 @@ const ScatterplotSettings = ({
       quality: quality
     }
   });
+  const classes = useStyles();
+
   useEffect(() => {
     if (scatterplotAxis) {
       if (scatterplotAxis.x.type !== xAxisLabel) {

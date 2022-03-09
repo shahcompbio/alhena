@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import * as d3 from "d3";
-import withStyles from '@mui/styles/withStyles';
+import withStyles from "@mui/styles/withStyles";
 
 import { gql, useQuery } from "@apollo/client";
 
@@ -137,7 +137,6 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
   const yScale = getYScale(heatmapConfig.height / heatmapConfig.rowHeight);
 
   const chromMap = getChromPixelMapping(chromosomes);
-
   return (
     <Grid container direction="column">
       <Grid
@@ -146,7 +145,7 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
         direction="row"
         justifyContent="space-between"
         alignItems="center"
-        height={heatmapConfig["height"] - heatmapConfig.chromosome["height"]}
+        height={heatmapConfig.categories.legendHeight}
         width={heatmapConfig.wrapperWidth}
       >
         <Grid item>
@@ -220,7 +219,7 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
           />
         </Grid>
       </Grid>
-      <Grid item style={{ marginTop: "-6px" }}>
+      <Grid item style={{}}>
         <canvas
           id="chromAxis"
           height={heatmapConfig.chromosome["height"]}

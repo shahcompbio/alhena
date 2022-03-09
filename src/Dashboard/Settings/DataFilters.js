@@ -16,11 +16,36 @@ import {
   Typography
 } from "@mui/material";
 
+import styled from "styled-components";
+import makeStyles from "@mui/styles/makeStyles";
+
 import { useStatisticsState } from "../DashboardState/statsState";
 import { heatmapConfig } from "../Heatmap/config";
+const secondary = "#f1c023";
+const useStyles = makeStyles(theme => {
+  return {
+    formControl: { width: "100%" },
+    gridSlider: { width: "100%", marginBottom: "35px !important" },
+    slider: {
+      color: theme.palette.secondary.main + " !important",
+      width: "100%"
+    },
+    select: {
+      width: "100%",
+      "& .Mui-checked": { color: theme.palette.secondary.main + " !important" },
+      "&:before": {
+        borderColor: theme.palette.secondary.main + " !important"
+      },
+      "&:after": {
+        borderColor: theme.palette.secondary.main + " !important",
+        borderBottom: "2px solid " + theme.palette.secondary.main + "!important"
+      }
+    },
+    titles: { marginBottom: 0, marginLeft: "-20px !important" }
+  };
+});
 
 const DataFilters = ({
-  classes,
   update,
   analysis,
   experimentalConditions,
@@ -35,6 +60,7 @@ const DataFilters = ({
   const [contaminatedMenuValue, setContaminatedMenuValue] = useState(
     isContaminated
   );
+  const classes = useStyles();
 
   const [experimentalMenuValue, setExperimentalMenuValue] = useState([]);
 
@@ -76,7 +102,7 @@ const DataFilters = ({
         <Typography
           id="discrete-slider"
           gutterBottom
-          style={{ marginBottom: 0 }}
+          className={classes.titles}
           key={key + "qualityTitle"}
         >
           Quality
@@ -84,8 +110,7 @@ const DataFilters = ({
         <Slider
           key={key + "qualitySlider"}
           className={classes.slider}
-          color={"secondary"}
-          //value={qualityMenuValue}
+          value={qualityMenuValue}
           disabled={isDisabled}
           onChange={(event, newValue) => setQualityMenuValue(newValue)}
           onChangeCommitted={() =>
@@ -115,7 +140,7 @@ const DataFilters = ({
           id="discrete-slider"
           key={key + "experimentalConditionTitle"}
           gutterBottom
-          style={{ marginBottom: 0 }}
+          className={classes.titles}
         >
           Experimental Conditions
         </Typography>
@@ -127,13 +152,18 @@ const DataFilters = ({
         >
           <Select
             key={key + "expConditionSelect"}
+            className={classes.select}
             value={experimentalMenuValue || []}
             name="experimentalConditionSelection"
             displayEmpty
             input={<Input />}
             multiple
             renderValue={selected =>
-              selected.length > 1 ? selected.join(",") : selected
+              selected.length > 1
+                ? selected.join(",")
+                : selected.length == 1
+                ? selected
+                : "None Selected"
             }
             onChange={event => {
               const value = event.target.value;
@@ -160,6 +190,12 @@ const DataFilters = ({
           >
             <MenuItem value="" key={"none"}>
               <Checkbox
+                sx={{
+                  color: secondary,
+                  "&.Mui-checked": {
+                    color: secondary
+                  }
+                }}
                 checked={
                   experimentalMenuValue === null ||
                   experimentalMenuValue.length === 0
@@ -171,6 +207,12 @@ const DataFilters = ({
               ? experimentalConditions[0]["types"].map((option, index) => (
                   <MenuItem key={"expCondition-" + option} value={option}>
                     <Checkbox
+                      sx={{
+                        color: secondary,
+                        "&.Mui-checked": {
+                          color: secondary
+                        }
+                      }}
                       checked={
                         experimentalMenuValue
                           ? experimentalMenuValue.indexOf(option) > -1
@@ -308,10 +350,15 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
         const formattedMax = numFormatter(defaultValues[filter["name"]][1]);
 
         return (
-          <Grid item key={filter["name"] + "-grid"} style={{ width: "100%" }}>
+          <Grid
+            item
+            key={filter["name"] + "-grid"}
+            className={classes.gridSlider}
+          >
             <Typography
               id={filter["name"] + "range-slider-title"}
               key={filter["name"] + "range-slider-title"}
+              className={classes.titles}
               gutterBottom
             >
               {filter["label"]}

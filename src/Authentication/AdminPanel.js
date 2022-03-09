@@ -55,7 +55,7 @@ const styles = theme => ({
     overflowY: "clip",
     paddingBottom: theme.spacing(5),
     padding: theme.spacing(3),
-    height: 75,
+    height: 100,
     width: "90%",
     borderRadius: 10,
     margin: "auto",
