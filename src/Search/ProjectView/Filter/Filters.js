@@ -3,11 +3,11 @@ import React, { useState } from "react";
 
 import * as d3 from "d3";
 
-import { withStyles } from "@material-ui/styles";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import { withStyles } from "@mui/styles";
+import Autocomplete from '@mui/material/Autocomplete';
 
-import { Chip, FormControl, Grid, TextField, Select } from "@material-ui/core";
-import Typography from "@material-ui/core/Typography";
+import { Chip, FormControl, Grid, TextField, Select } from "@mui/material";
+import Typography from "@mui/material/Typography";
 import { hierarchyColouring } from "../Graph/appendUtils.js";
 import { useDashboardState } from "../ProjectState/dashboardState";
 
@@ -194,7 +194,7 @@ const Filters = ({
     <Grid
       container
       direction="column"
-      justify="flex-start"
+      justifyContent="flex-start"
       alignItems="flex-start"
       spacing={3}
       className={classes.root}

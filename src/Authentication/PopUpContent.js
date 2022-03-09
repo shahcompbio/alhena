@@ -1,26 +1,28 @@
 import React, { useState, useEffect } from "react";
+import { Formik } from "formik";
+import * as yup from "yup";
 
-import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
-import { makeStyles } from "@material-ui/core/styles";
+//import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
+import makeStyles from "@mui/styles/makeStyles";
 
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import TextField from "@material-ui/core/TextField";
-import Input from "@material-ui/core/Input";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
+import TextField from "@mui/material/TextField";
+import Input from "@mui/material/Input";
 
 import LoadingCircle from "./ProgressCircle.js";
-import IconButton from "@material-ui/core/IconButton";
-import CheckIcon from "@material-ui/icons/Check";
+import IconButton from "@mui/material/IconButton";
+import CheckIcon from "@mui/icons-material/Check";
 
 import TransferList from "./TransferList.js";
 
 const useStyles = makeStyles(theme => ({
   button: { color: "black", backgroundColor: theme.palette.secondary.main },
   dialogContent: { padding: "0px 24px", fontSize: 16 },
-  dialogTitle: { paddinBottom: 0 },
+  dialogTitle: { paddingBottom: 0 },
   dialogWrapper: {
     height: 200,
     width: 250,
@@ -53,7 +55,7 @@ const PopUpContent = ({
 }) => {
   const classes = useStyles();
   const [selectedIndices, setSelectedIndices] = useState([]);
-  const [name, setName] = useState(dashboardName);
+  //const [name, setName] = useState(dashboardName);
   const [isLoading, setLoading] = useState(false);
   const [isSent, setIsSent] = useState(null);
   const [isActionDisabled, setIsDisabled] = useState(true);
@@ -91,7 +93,7 @@ const PopUpContent = ({
           <LoadingContent classes={classes} isSent={isSent} />
         </DialogContent>
       ) : (
-        <ValidatorForm key={"validForm"} onSubmit={() => {}}>
+        <span>
           <DialogTitle
             id="form-dialog-title"
             className={classes.dialogTitle}
@@ -99,70 +101,97 @@ const PopUpContent = ({
           >
             {isEdit ? "Edit Dashboard" : "Create New Dashboard"}
           </DialogTitle>
-          <DialogContent className={classes.dialogContent}>
-            <TextValidator
-              key={"dialogName"}
-              autoFocus
-              disabled={isEdit}
-              margin="dense"
-              id="name"
-              label="Name"
-              type="text"
-              value={name}
-              onChange={handleNameChange}
-              validators={["required"]}
-              errorMessages={["This field is required"]}
-              required
-              fullWidth
-              className={classes.textValidator}
-            />
+          <Formik
+            validationSchema={yup.object({
+              name: yup
+                .string()
+                .min(2, "Must be at least 2 characters")
+                .required("Name is required")
+            })}
+            initialValues={{
+              name: dashboardName
+            }}
+            autoComplete="off"
+          >
+            {({
+              values,
+              errors,
+              touched,
+              handleSubmit,
+              handleChange,
+              setFieldValue,
+              isValid
+            }) => (
+              <span>
+                <DialogContent className={classes.dialogContent}>
+                  <TextValidator
+                    key={"dialogName"}
+                    autoFocus
+                    disabled={isEdit}
+                    margin="dense"
+                    id="name"
+                    label="Name"
+                    type="text"
+                    value={values.name}
+                    onChange={event =>
+                      setFieldValue("name", event.target.value)
+                    }
+                    error={touched.name && Boolean(errors.name)}
+                    helperText={errors.name}
+                    required
+                    fullWidth
+                    className={classes.textValidator}
+                  />
 
-            <TextField
-              id="outlined-search"
-              label="Search Analyses"
-              type="search"
-              variant="outlined"
-              value={searchValue}
-              className={classes.textField}
-              InputProps={{ classes: { input: classes.searchInput } }}
-              onChange={event => setSearchValue(event.target.value)}
-            />
-            <TransferList
-              key={"transferList"}
-              allIndices={allIndices}
-              searchValue={searchValue}
-              setSelectedIndices={indices => setSelectedIndices(indices)}
-              alreadyChoosen={alreadySelectedIndices}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button
-              onClick={handleClose}
-              color="secondary"
-              variant="outlined"
-              className={classes.button}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={async ev => {
-                setLoading(true);
-                await dashboardAction(name, selectedIndices);
-                setIsSent(true);
-                setTimeout(() => {
-                  setIsSent(false);
-                  setLoading(false);
-                  handleClose();
-                }, 2000);
-              }}
-              style={{ backgroundColor: "#4e89bb" }}
-              variant="contained"
-              disabled={isActionDisabled}
-            >
-              {isEdit ? "Submit" : "Create"}
-            </Button>
-          </DialogActions>
-        </ValidatorForm>
+                  <TextField
+                    id="outlined-search"
+                    label="Search Analyses"
+                    type="search"
+                    variant="outlined"
+                    value={searchValue}
+                    className={classes.textField}
+                    InputProps={{ classes: { input: classes.searchInput } }}
+                    onChange={event => setSearchValue(event.target.value)}
+                  />
+                  <TransferList
+                    key={"transferList"}
+                    allIndices={allIndices}
+                    searchValue={searchValue}
+                    setSelectedIndices={indices => setSelectedIndices(indices)}
+                    alreadyChoosen={alreadySelectedIndices}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button
+                    onClick={handleClose}
+                    color="secondary"
+                    variant="outlined"
+                    className={classes.button}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={async ev => {
+                      setLoading(true);
+                      await dashboardAction(values.name, selectedIndices);
+                      setIsSent(true);
+                      setTimeout(() => {
+                        setIsSent(false);
+                        setLoading(false);
+                        handleClose();
+                      }, 2000);
+                    }}
+                    style={{ backgroundColor: "#4e89bb" }}
+                    variant="contained"
+                    disabled={isActionDisabled}
+                  >
+                    {isEdit ? "Submit" : "Create"}
+                  </Button>
+                </DialogActions>
+              </span>
+            )}
+          </Formik>
+        </span>
       )}
     </Dialog>
   );
@@ -170,7 +199,7 @@ const PopUpContent = ({
 const LoadingContent = ({ classes, isSent }) => (
   <div className={classes.dialogWrapper}>
     {isSent && (
-      <IconButton className={classes.iconButton}>
+      <IconButton className={classes.iconButton} size="large">
         <CheckIcon className={classes.icon} />
       </IconButton>
     )}

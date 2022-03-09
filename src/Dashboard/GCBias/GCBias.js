@@ -3,7 +3,7 @@ import * as d3 from "d3";
 
 import { gql, useQuery } from "@apollo/client";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 
 import { useStatisticsState } from "../DashboardState/statsState";
 
@@ -78,7 +78,7 @@ const GCBias = ({ analysis }) => {
     <Grid
       container
       direction="row"
-      justify="flex-start"
+      justifyContent="flex-start"
       alignItems="flex-start"
       key="gcBias"
     >

@@ -2,37 +2,39 @@ import React, { useState, useEffect } from "react";
 import { Formik } from "formik";
 import * as yup from "yup";
 
-import Grid from "@material-ui/core/Grid";
-import { Typography } from "@material-ui/core";
-import Paper from "@material-ui/core/Paper";
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
+import Grid from "@mui/material/Grid";
+import { Typography } from "@mui/material";
+import Paper from "@mui/material/Paper";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
 
-import { withStyles } from "@material-ui/styles";
+import { withStyles } from "@mui/styles";
 
 import { gql, useLazyQuery } from "@apollo/client";
 
 const styles = theme => ({
   button: {
-    backgroundColor: theme.palette.primary.main,
+    backgroundColor: "#5082ae !important",
+    color: "white !important",
+    fontWeight: "bold !important",
     textAlign: "center"
   },
   paperTitle: {
     paddingBottom: theme.spacing.unit * 5,
     padding: theme.spacing.unit * 3,
     height: 125,
-    borderRadius: 20,
+    borderRadius: "20px !important",
     overflowX: "auto",
     width: "25vw",
-    color: "white",
-    textAlign: "center",
-    background: theme.palette.primary.main
+    color: "#505050 !important",
+    padding: "10px !important",
+    textAlign: "center"
   },
   paperForm: {
     overflowX: "auto",
     margin: "auto",
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: "20px !important",
+    padding: "20px !important",
     width: "25vw",
     marginBottom: theme.spacing.unit,
     marginTop: "-70px",
@@ -40,10 +42,10 @@ const styles = theme => ({
   },
   helperText: { color: "red" },
   textField: {
-    marginLeft: 10,
+    //    marginLeft: 10,
     width: "100%",
-    margin: 10,
-    paddingRight: 15
+    margin: "10px !important",
+    marginLeft: "0px !important"
   }
 });
 const UNIQUE_USER = gql`
@@ -91,15 +93,9 @@ const NewAccount = ({ email, dispatch, classes }) => {
   }, [data, loading, error]);
   const uniqueUserError =
     isUserUniqueData && isUserUniqueData.doesUserExist.userAlreadyExists;
-  /*        {error && (
-          <SnackbarContentWrapper
-            variant="error"
-            errorNumber={error}
-            setError={setError}
-          />
-        )}*/
+
   return (
-    <Grid container direction="row" justify="center" alignItems="center">
+    <Grid container direction="row" justifyContent="center" alignItems="center">
       <div
         style={{
           position: "absolute",
@@ -107,9 +103,7 @@ const NewAccount = ({ email, dispatch, classes }) => {
         }}
       >
         <Paper rounded className={classes.paperTitle}>
-          <Typography variant="h4" color="white">
-            Create Account
-          </Typography>
+          <Typography variant="h4">Create Account</Typography>
         </Paper>
         <Paper rounded className={classes.paperForm}>
           <Formik
@@ -182,9 +176,11 @@ const NewAccount = ({ email, dispatch, classes }) => {
               touched,
               handleSubmit,
               handleChange,
-              setFieldValue,
-              isValid
+              setFieldValue
             }) => {
+              const isValid = !Object.keys(errors).length;
+              console.log(isValid);
+              console.log(errors);
               return (
                 <div>
                   <TextField
@@ -267,7 +263,7 @@ const NewAccount = ({ email, dispatch, classes }) => {
                   <div style={{ textAlign: "center" }}>
                     <Button
                       type="submit"
-                      disabled={!isValid}
+                      disabled={isValid}
                       className={classes.button}
                       variant="contianed"
                       onClick={handleSubmit}

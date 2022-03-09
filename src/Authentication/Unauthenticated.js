@@ -13,16 +13,17 @@ import {
   InputAdornment,
   IconButton,
   TextField
-} from "@material-ui/core";
-import { Visibility, VisibilityOff } from "@material-ui/icons";
+} from "@mui/material";
+
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import LoadingCircle from "../Dashboard/CommonModules/LoadingCircle.js";
 import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
 
-import { withStyles } from "@material-ui/styles";
+import { makeStyles } from "@mui/styles";
 import styled from "styled-components";
 
-const styles = theme => ({
+const useStyles = makeStyles(theme => ({
   circleImg: {
     height: 500,
     width: 500,
@@ -52,7 +53,7 @@ const styles = theme => ({
   },
   forgotPasswordButton: { marginLeft: 20, marginTop: 40 },
   submitButton: {
-    marginLeft: 18,
+    marginLeft: 10,
     marginTop: 40,
     backgroundColor: theme.palette.primary.dark,
     color: theme.palette.background.default,
@@ -65,7 +66,7 @@ const styles = theme => ({
     marginRight: theme.spacing(1),
     width: 300
   }
-});
+}));
 
 export const LOGIN = gql`
   query Login($user: User!) {
@@ -79,7 +80,7 @@ export const LOGIN = gql`
   }
 `;
 
-const UnauthenticatedApp = ({ classes }) => {
+const UnauthenticatedApp = () => {
   let history = useHistory();
   const [, dispatch] = useAppState();
   const [errors, setError] = useState(null);
@@ -89,7 +90,7 @@ const UnauthenticatedApp = ({ classes }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const [login, { data, loading, error }] = useLazyQuery(LOGIN);
-
+  const classes = useStyles();
   useEffect(() => {
     setError(null);
     if (error) {
@@ -112,7 +113,7 @@ const UnauthenticatedApp = ({ classes }) => {
   }, [data, loading, error]);
 
   return (
-    <Grid container direction="row" justify="center" alignItems="center">
+    <Grid container direction="row" justifyContent="center" alignItems="center">
       <div className={classes.circleImg}>
         {error && (
           <SnackbarContentWrapper
@@ -204,6 +205,7 @@ const UnauthenticatedApp = ({ classes }) => {
                         aria-label="toggle password visibility"
                         onClick={() => setShowPassword(!showPassword)}
                         onMouseDown={() => setShowPassword(!showPassword)}
+                        size="large"
                       >
                         {showPassword ? <Visibility /> : <VisibilityOff />}
                       </IconButton>
@@ -217,13 +219,14 @@ const UnauthenticatedApp = ({ classes }) => {
             <ComponentWrapper>
               <Button
                 className={classes.submitButton}
-                variant="outlined"
+                variant="contained"
                 disableElevation
                 type="submit"
               >
                 Log In
               </Button>
               <Button
+                sx={{ marginLeft: 20 }}
                 className={classes.forgotPasswordButton}
                 variant="outlined"
                 disableElevation
@@ -243,4 +246,4 @@ const ComponentWrapper = styled.div`
   margin: 10px;
 `;
 
-export default withStyles(styles)(UnauthenticatedApp);
+export default UnauthenticatedApp;

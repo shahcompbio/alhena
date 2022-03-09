@@ -3,7 +3,7 @@ import _ from "lodash";
 
 import { heatmapConfig } from "../Heatmap/config";
 
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from '@mui/styles/withStyles';
 import { useStatisticsState } from "../DashboardState/statsState";
 
 import {
@@ -17,7 +17,7 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox
-} from "@material-ui/core";
+} from "@mui/material";
 
 const styles = theme => ({
   closeIcon: {

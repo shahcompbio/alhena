@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
-import Grid from "@material-ui/core/Grid";
-import { Typography } from "@material-ui/core";
-import TextField from "@material-ui/core/TextField";
-import Button from "@material-ui/core/Button";
+import Grid from "@mui/material/Grid";
+import { Typography } from "@mui/material";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
 
 import SnackbarContentWrapper from "../../Misc/SnackBarPopup.js";
 
@@ -14,7 +14,7 @@ import * as yup from "yup";
 import { gql, useLazyQuery } from "@apollo/client";
 
 import styled from "styled-components";
-import { withStyles } from "@material-ui/styles";
+import { withStyles } from "@mui/styles";
 
 const styles = theme => ({
   button: {
@@ -42,8 +42,7 @@ const styles = theme => ({
     display: "inline-block"
   },
   textField: {
-    margin: 10,
-    width: "20vw"
+    margin: "10px !important"
   }
 });
 
@@ -84,11 +83,12 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
   };
 
   return (
-    <Grid container direction="row" justify="center" alignItems="center">
+    <Grid container direction="row" justifyContent="center" alignItems="center">
       <div
         style={{
           position: "absolute",
-          top: "15%"
+          top: "15%",
+          width: 400
         }}
       >
         {error && (
@@ -133,63 +133,68 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
             touched,
             handleSubmit,
             handleChange,
-            setFieldValue,
-            isValid
-          }) => (
-            <div>
-              <TextField
-                className={classes.textField}
-                margin="normal"
-                id={"updatePassword:username"}
-                required
-                fullWidth
-                value={username}
-                label={"Username"}
-                type={"text"}
-              />
-              <TextField
-                className={classes.textField}
-                key={"updatePassword"}
-                onChange={handleChange}
-                name={"password"}
-                value={values.password}
-                fullWidth
-                label={"Password:"}
-                type={"password"}
-                error={touched.password && Boolean(errors.password)}
-                helperText={errors.password}
-                onChange={event => {
-                  setFieldValue("password", event.target.value);
-                }}
-              />
-              <TextField
-                className={classes.textField}
-                key={"updatePasswordVerify"}
-                name={"passwordVerify"}
-                onChange={event => {
-                  setFieldValue("passwordVerify", event.target.value);
-                }}
-                value={values.passwordVerify}
-                fullWidth
-                label={"Verify Password:"}
-                type={"password"}
-                error={touched.passwordVerify && Boolean(errors.passwordVerify)}
-                helperText={errors.passwordVerify}
-              />
-              <ComponentWrapper style={{ textAlign: "center" }}>
-                <Button
-                  className={classes.button}
-                  variant="outlined"
-                  disableElevation
-                  type="submit"
-                  disabled={!isValid}
-                  onClick={handleSubmit}
-                >
-                  Update
-                </Button>
-              </ComponentWrapper>
-            </div>
-          )}
+            setFieldValue
+          }) => {
+            const isValid = !Object.keys(errors).length;
+            console.log(isValid);
+            return (
+              <div>
+                <TextField
+                  className={classes.textField}
+                  margin="normal"
+                  id={"updatePassword:username"}
+                  required
+                  fullWidth
+                  value={username}
+                  label={"Username"}
+                  type={"text"}
+                />
+                <TextField
+                  className={classes.textField}
+                  key={"updatePassword"}
+                  onChange={handleChange}
+                  name={"password"}
+                  value={values.password}
+                  fullWidth
+                  label={"Password:"}
+                  type={"password"}
+                  error={touched.password && Boolean(errors.password)}
+                  helperText={errors.password}
+                  onChange={event => {
+                    setFieldValue("password", event.target.value);
+                  }}
+                />
+                <TextField
+                  className={classes.textField}
+                  key={"updatePasswordVerify"}
+                  name={"passwordVerify"}
+                  onChange={event => {
+                    setFieldValue("passwordVerify", event.target.value);
+                  }}
+                  value={values.passwordVerify}
+                  fullWidth
+                  label={"Verify Password:"}
+                  type={"password"}
+                  error={
+                    touched.passwordVerify && Boolean(errors.passwordVerify)
+                  }
+                  helperText={errors.passwordVerify}
+                />
+                <ComponentWrapper style={{ textAlign: "center" }}>
+                  <Button
+                    className={classes.button}
+                    variant="contained"
+                    disableElevation
+                    type="submit"
+                    disabled={!isValid}
+                    onClick={handleSubmit}
+                  >
+                    Update
+                  </Button>
+                </ComponentWrapper>
+              </div>
+            );
+          }}
         </Formik>
       </div>
     </Grid>

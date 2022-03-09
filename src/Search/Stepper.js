@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import clsx from "clsx";
-import { makeStyles } from "@material-ui/core/styles";
-import RadioButtonCheckedIcon from "@material-ui/icons/RadioButtonChecked";
-import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
-import Drawer from "@material-ui/core/Drawer";
-import Tooltip from "@material-ui/core/Tooltip";
+import makeStyles from "@mui/styles/makeStyles";
+import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import Drawer from "@mui/material/Drawer";
+import Tooltip from "@mui/material/Tooltip";
 
 const drawerWidth = 90;
 const useStyles = makeStyles(theme => ({
@@ -18,21 +18,21 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(5)
   },
   activeWhite: {
-    fontSize: 40,
+    fontSize: 20,
     cursor: "pointer",
-    color: "white !important"
+    color: "#423e59 !important"
   },
   activeBlack: {
-    fontSize: 40,
+    fontSize: 20,
     color: "#1b1919a3 !important"
   },
   activeBold: {
-    fontSize: 40,
+    fontSize: 20,
     cursor: "pointer",
     fontWeight: "bold"
   },
   disabled: {
-    fontSize: 40,
+    fontSize: 20,
     color: "#1b1919a3",
     pointer: "none !important"
   },
@@ -155,12 +155,13 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
               key={"step-wrapper" + label}
               className={stepperColour}
               style={{
-                marginTop: -75,
-                color: "white",
+                marginTop: -100,
+                marginLeft: 2,
+                color: "#423e59",
                 fontWeight: "bold"
               }}
             >
-              ﹀
+              ▼
             </div>
           ) : (
             <div

@@ -6,10 +6,10 @@ import EditDashboardPopupWrapper from "./EditDashboardPopupWrapper.js";
 import AdminSettings from "./AdminSettings";
 import TableToolbar from "./TableToolBar.js";
 
-import Paper from "@material-ui/core/Paper";
-import Grid from "@material-ui/core/Grid";
+import Paper from "@mui/material/Paper";
+import Grid from "@mui/material/Grid";
 
-import { withStyles } from "@material-ui/styles";
+import { withStyles } from "@mui/styles";
 import { gql, useLazyQuery, useQuery } from "@apollo/client";
 const getAllSettings = gql`
   query AdminPanel($user: ApiUser!, $tabIndex: Int) {
@@ -333,7 +333,7 @@ const TabContentWrapper = ({ classes, tabIndex }) => {
         <Grid
           className={classes.grid}
           direction="column"
-          justify="center"
+          justifyContent="center"
           alignItems="center"
           container
           spacing={2}
@@ -369,7 +369,7 @@ const TabContentWrapper = ({ classes, tabIndex }) => {
       <Grid
         className={classes.grid}
         direction="column"
-        justify="center"
+        justifyContent="center"
         alignItems="center"
         container
         spacing={2}

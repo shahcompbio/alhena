@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import clsx from "clsx";
-import CheckCircleIcon from "@material-ui/icons/CheckCircle";
-import ErrorIcon from "@material-ui/icons/Error";
-import InfoIcon from "@material-ui/icons/Info";
-import { amber, green } from "@material-ui/core/colors";
-import Snackbar from "@material-ui/core/Snackbar";
-import SnackbarContent from "@material-ui/core/SnackbarContent";
-import WarningIcon from "@material-ui/icons/Warning";
-import { makeStyles } from "@material-ui/core/styles";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorIcon from "@mui/icons-material/Error";
+import InfoIcon from "@mui/icons-material/Info";
+import { amber, green } from "@mui/material/colors";
+import Snackbar from "@mui/material/Snackbar";
+import SnackbarContent from "@mui/material/SnackbarContent";
+import WarningIcon from "@mui/icons-material/Warning";
+import makeStyles from "@mui/styles/makeStyles";
 
 import errorMessages from "./ErrorCodes.js";
 const variantIcon = {
@@ -53,14 +53,16 @@ const SnackbarContentWrapper = ({
   const classes = useSnackBarStyles();
   const Icon = variantIcon[variant];
 
+  const handleClose = () => {
+    setOpen(false);
+    setError(null);
+  };
+
   return (
     <Snackbar
       autoHideDuration={2000}
       open={isOpen}
-      onClose={() => {
-        setOpen(false);
-        setError(null);
-      }}
+      onClose={handleClose}
       anchorOrigin={{
         vertical: "bottom",
         horizontal: "right"

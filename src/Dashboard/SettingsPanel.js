@@ -8,10 +8,10 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary
-} from "@material-ui/core";
+} from "@mui/material";
 
-import TextField from "@material-ui/core/TextField";
-import Autocomplete from "@material-ui/lab/Autocomplete";
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
 
 import ChipHeatmapSettings from "./Settings/ChipHeatmapSettings.js";
 import ScatterplotSettings from "./Settings/ScatterplotSettings.js";
@@ -20,12 +20,12 @@ import ViolinSettings from "./Settings/ViolinSettings.js";
 import GCBiasSettings from "./Settings/GCBiasSettings.js";
 import DataFilters from "./Settings/DataFilters.js";
 
-import ShareIcon from "@material-ui/icons/Share";
-import CloudDownloadIcon from "@material-ui/icons/CloudDownload";
-import BackspaceTwoToneIcon from "@material-ui/icons/BackspaceTwoTone";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ShareIcon from "@mui/icons-material/Share";
+import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
+import BackspaceTwoToneIcon from "@mui/icons-material/BackspaceTwoTone";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@mui/styles/withStyles";
 import { useDashboardState } from "../Search/ProjectView/ProjectState/dashboardState";
 
 import { useStatisticsState } from "./DashboardState/statsState";
@@ -43,7 +43,7 @@ const styles = theme => ({
   },
   expanded: { margin: "0px !important" },
   panel: {
-    padding: theme.spacing(3, 3, 3, 3),
+    padding: theme.spacing(2, 2, 2, 2),
     margin: theme.spacing(0, 0, 0, 0),
     width: "100%",
     background: "white"
@@ -68,15 +68,15 @@ const styles = theme => ({
   },
   exportButton: {
     width: 180,
-    marginBottom: 10,
-    //marginRight: 12,
-    backgroundColor: "white"
+    //marginBottom: "10px !important",
+    marginRight: "29px !important",
+    backgroundColor: "white !important"
   },
   shareButton: {
     width: 180,
     marginBottom: 10,
     marginLeft: 6,
-    backgroundColor: "white"
+    backgroundColor: "white !important"
   },
   fieldComponent: {
     margin: theme.spacing(2, 0, 0, 0)
@@ -90,7 +90,7 @@ const styles = theme => ({
     padding: 10,
     paddingRight: 0,
     width: 400,
-    background: "none",
+    background: "#F5F5F5 !important",
     height: "100%",
     position: "sticky",
     overflowY: "scroll"
@@ -102,6 +102,7 @@ const styles = theme => ({
     //marginTop: 10
   },
   search: {
+    fontSize: "14px",
     marginTop: 0,
     '&&[class*="MuiFormControl-marginNormal"]': {
       marginTop: 0
@@ -116,7 +117,7 @@ const styles = theme => ({
     color: "white"
   },
   panelDetails: {
-    padding: "0px 24px 24px"
+    padding: "0px 26px 26px !important"
   }
 });
 
@@ -212,12 +213,12 @@ const SettingsPanel = ({
       <Grid
         container
         direction="row"
-        justify="flex-start"
-        alignItems="flex-start"
+        justifyContent="flex-start"
+        alignItems="space-between"
+        sx={{ marginBottom: "10px !important" }}
       >
         <Button
           variant="outlined"
-          color="default"
           className={classes.exportButton}
           onClick={() => setOpenExportPopup()}
           startIcon={<CloudDownloadIcon />}
@@ -226,7 +227,6 @@ const SettingsPanel = ({
         </Button>
         <Button
           variant="outlined"
-          color="default"
           className={classes.shareButton}
           onClick={() => setOpenSharePopup()}
           startIcon={<ShareIcon />}
@@ -277,7 +277,6 @@ const SettingsPanel = ({
       >
         {categoryStats.length > 0 ? (
           <DataFilters
-            key={"dataFilterWrapper"}
             numericalDataFilters={numericalDataFilters}
             experimentalConditions={categoryStats.filter(
               category => category["category"] === experimentalCondition["type"]
@@ -291,7 +290,6 @@ const SettingsPanel = ({
           />
         ) : (
           <DataFilters
-            key={"dataFilterWrapper"}
             numericalDataFilters={[]}
             experimentalConditions={[]}
             analysis={""}
@@ -461,7 +459,7 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
     <Grid
       container
       direction="column"
-      justify="space-between"
+      justifyContent="space-between"
       alignItems="flex-start"
     >
       <Typography
@@ -521,7 +519,12 @@ const SelectedCellsPanel = ({
     variant="outlined"
     elevation={0}
   >
-    <Grid container direction="row" justify="space-between" alignItems="center">
+    <Grid
+      container
+      direction="row"
+      justifyContent="space-between"
+      alignItems="center"
+    >
       <Typography variant="h6">{selectedCellsCount} cells selected</Typography>
       <Button onClick={() => clearCellSelection()}>
         <BackspaceTwoToneIcon />

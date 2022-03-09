@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { FormControl, InputLabel, Select } from "@material-ui/core";
+import { FormControl, InputLabel, Select } from "@mui/material";
 
 import { useStatisticsState } from "../DashboardState/statsState";
 import { gql, useQuery } from "@apollo/client";

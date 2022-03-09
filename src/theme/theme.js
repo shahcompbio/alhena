@@ -1,5 +1,5 @@
-import { createMuiTheme } from "@material-ui/core/styles";
-export const theme = createMuiTheme({
+import { createTheme } from "@mui/material/styles";
+export const theme = createTheme({
   typography: { fontFamily: "MyFont" },
   palette: {
     primary: {
@@ -27,6 +27,7 @@ export const theme = createMuiTheme({
       }
     }
   },
-
-  spacing: 4
+  overrides: {
+    spacing: r => r * 1
+  }
 });

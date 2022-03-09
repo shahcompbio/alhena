@@ -1,15 +1,15 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import * as d3 from "d3";
 
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from '@mui/styles/withStyles';
 
 import { gql, useQuery } from "@apollo/client";
 
 import d3Tip from "d3-tip";
 import _ from "lodash";
 
-import Grid from "@material-ui/core/Grid";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import Grid from "@mui/material/Grid";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import { useStatisticsState } from "../DashboardState/statsState";
 import { initContext, isSelectionAllowed, getSelection } from "../utils.js";
@@ -122,7 +122,7 @@ const Scatterplot = ({ analysis, classes }) => {
     <Grid
       container
       direction="row"
-      justify="flex-start"
+      justifyContent="flex-start"
       alignItems="flex-start"
       key="scatterplot"
     >

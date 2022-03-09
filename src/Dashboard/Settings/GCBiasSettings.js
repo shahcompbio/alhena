@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FormControl, FormControlLabel, Switch } from "@material-ui/core";
+import { FormControl, FormControlLabel, Switch } from "@mui/material";
 
 import { useStatisticsState } from "../DashboardState/statsState";
 

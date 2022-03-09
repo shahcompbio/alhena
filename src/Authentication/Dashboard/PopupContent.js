@@ -6,24 +6,24 @@ import _ from "lodash";
 import { Formik } from "formik";
 import * as yup from "yup";
 
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from "@mui/styles/makeStyles";
 
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import DialogContent from "@material-ui/core/DialogContent";
-import TextField from "@material-ui/core/TextField";
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/StepLabel";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import MuiAlert from "@material-ui/lab/Alert";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import TextField from "@mui/material/TextField";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import MuiAlert from "@mui/material/Alert";
 
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import Checkbox from "@material-ui/core/Checkbox";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Checkbox from "@mui/material/Checkbox";
 
 import LoadingCircle from "../ProgressCircle.js";
 
@@ -31,8 +31,9 @@ import TransferList from "../TransferList.js";
 
 const useStylesStepper = makeStyles(theme => ({
   root: {
-    width: "100%",
-    minHeight: 300
+    //  width: "100%",
+    //minHeight: 300,
+    marginTop: 50
   },
   buttonGrid: { marginTop: 25, marginRight: 25 },
   backButton: {
@@ -44,7 +45,7 @@ const useStylesStepper = makeStyles(theme => ({
     marginBottom: theme.spacing(1)
   },
   dialogButtons: {
-    marginTop: 20,
+    //  marginTop: 20,
     float: "right"
   },
   cancelButton: { marginLeft: "25px", marginTop: 20 },
@@ -65,9 +66,9 @@ const useListStyles = makeStyles(theme => ({
 const useStyles = makeStyles(theme => ({
   button: { color: "black", backgroundColor: theme.palette.secondary.main },
   textDialogContent: {
-    padding: "0px 10px",
-    paddingTop: "40px !important",
-    paddingLeft: 50
+    padding: "0px 50px"
+    //paddingTop: "40px !important",
+    //  paddingLeft: 50
   },
   dialogContent: {
     padding: "0px 10px",
@@ -95,10 +96,10 @@ const useStyles = makeStyles(theme => ({
   },
   stepper: { padding: "0 !important", iconColor: "#4e89bb" },
   textValidator: {
-    paddingBottom: 0,
-    width: "80%",
-    marginLeft: 60,
-    marginTop: -20
+    //paddingBottom: 0,
+    width: "100%"
+    //  marginLeft: 60,
+    //  marginTop: -20
   }
 }));
 function getSteps() {
@@ -165,6 +166,8 @@ const PopUpContent = ({
       setIsDisabled(true);
     } else if (activeStep === 1 && selectedIndices.length > 0) {
       setIsDisabled(false);
+    } else if (activeStep === 1 && selectedIndices.length === 0) {
+      setIsDisabled(true);
     } else if (activeStep === 2 && selectedColumns.length > 0) {
       setIsDisabled(false);
     } else if (activeStep === 2 && selectedColumns.length === 0) {
@@ -375,14 +378,12 @@ const DynamicColumnsContent = ({
 const NameContent = ({ isEdit, name, handleNameChange }) => {
   const classes = useStyles();
   return (
-    //  <ValidatorForm key={"validForm"} onSubmit={() => {}}>
-
     <Formik
       validationSchema={yup.object({
         name: yup.string().required("This field is required")
       })}
       initialValues={{
-        name: ""
+        name: name
       }}
       autoComplete="off"
     >
@@ -404,8 +405,10 @@ const NameContent = ({ isEdit, name, handleNameChange }) => {
             label="Name"
             type="text"
             value={values.name}
-            disabled={isValid}
-            onChange={event => setFieldValue("name", event.target.value)}
+            onChange={event => {
+              setFieldValue("name", event.target.value);
+              handleNameChange(event);
+            }}
             required
             className={classes.textValidator}
           />
@@ -413,7 +416,6 @@ const NameContent = ({ isEdit, name, handleNameChange }) => {
       )}
     </Formik>
   );
-  //  </ValidatorForm>
 };
 const TransferListContent = ({
   isEdit,

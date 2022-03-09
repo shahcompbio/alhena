@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { gql, useLazyQuery } from "@apollo/client";
 import { useAppState } from "../util/app-state";
 
-import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
-import Paper from "@material-ui/core/Paper";
-import IconButton from "@material-ui/core/IconButton";
-import AddBoxIcon from "@material-ui/icons/AddBox";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import IconButton from "@mui/material/IconButton";
+import AddBoxIcon from "@mui/icons-material/AddBox";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
 import SeperatedTabs from "./SeperatedTabs.js";
 
 import NewUserPopup from "./NewUser/NewUserPopup.js";
@@ -16,25 +16,34 @@ import AddDashboardPopupWrapper from "./AddDashboardPopupWrapper.js";
 import Menu from "../Misc/Menu.js";
 import TabContentWrapper from "./TabContentWrapper.js";
 
-import { withStyles } from "@material-ui/styles";
+import { withStyles } from "@mui/styles";
 const styles = theme => ({
   actions: {
     float: "right"
   },
   appBar: {
-    width: "90%",
+    width: "50% !important",
     margin: "auto",
     zIndex: 10,
     marginLeft: -55,
     marginTop: -60,
-    backgroundColor: "#ffffff00",
-    position: "absolute"
+    backgroundColor: "#ffffff00 !important",
+    position: "absolute !important"
   },
   icons: {
+    height: "45px",
+    marginTop: "20px",
+    position: "absolute !important",
     padding: 0,
+    paddingTop: "50px !important",
     zIndex: 5
   },
-  iconSvg: { width: "1.5em", height: "1.5em", color: "white" },
+  iconSvg: {
+    width: "1.5em",
+    height: "1.5em",
+    color: "#5b6691",
+    pointerEvents: "all"
+  },
   root: {
     flexGrow: 1,
     width: "80vw",
@@ -43,9 +52,10 @@ const styles = theme => ({
     marginBottom: 80
   },
   paper: {
+    overflowY: "clip",
     paddingBottom: theme.spacing(5),
     padding: theme.spacing(3),
-    height: 125,
+    height: 75,
     width: "90%",
     borderRadius: 10,
     margin: "auto",
@@ -133,7 +143,7 @@ const AdminPanel = ({ classes }) => {
               <Grid
                 container
                 direction="row"
-                justify="flex-end"
+                justifyContent="flex-end"
                 alignItems="center"
                 className={classes.actions}
               >
@@ -143,6 +153,7 @@ const AdminPanel = ({ classes }) => {
                   color="secondary"
                   className={classes.icons}
                   onClick={handleClickAdd}
+                  size="large"
                 >
                   <AddBoxIcon className={classes.iconSvg} />
                 </IconButton>
@@ -189,7 +200,8 @@ const AdminPanel = ({ classes }) => {
               ]}
               tabStyle={{
                 bgColor: "#d6d9dd",
-                selectedBgColor: "rgb(251 251 251)"
+                selectedBgColor: "rgb(251 251 251)",
+                marginTop: 45
                 //    bgColor: "rgb(177 193 187)",
                 //  selectedBgColor: "RGB(201, 221, 214)"
               }}

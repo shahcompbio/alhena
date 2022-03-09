@@ -1,34 +1,32 @@
 import React, { useState } from "react";
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@mui/styles/withStyles";
 
 import { withRouter } from "react-router-dom";
 
 import { useAppState } from "../util/app-state";
-import SpeedDialAction from "@material-ui/lab/SpeedDialAction";
-import HelpIcon from "@material-ui/icons/Help";
-import SearchIcon from "@material-ui/icons/Search";
-import ExitToApp from "@material-ui/icons/ExitToApp";
-import MenuIcon from "@material-ui/icons/Menu";
-import SpeedDial from "@material-ui/lab/SpeedDial";
-import InfoIcon from "@material-ui/icons/Info";
-import AccountCircleIcon from "@material-ui/icons/AccountCircle";
-import SupervisorAccountIcon from "@material-ui/icons/SupervisorAccount";
+import SpeedDialAction from "@mui/material/SpeedDialAction";
+import HelpIcon from "@mui/icons-material/Help";
+import SearchIcon from "@mui/icons-material/Search";
+import ExitToApp from "@mui/icons-material/ExitToApp";
+import MenuIcon from "@mui/icons-material/Menu";
+import SpeedDial from "@mui/material/SpeedDial";
+import InfoIcon from "@mui/icons-material/Info";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 
 const styles = theme => ({
   fab: {
-    backgroundColor: "#c7e4e8",
-    //backgroundColor: theme.palette.primary.main,
+    backgroundColor: "#1d4684 !important",
+    color: "white",
     boxShadow: "none !important",
     borderRadius: "10%",
     "&:hover": {
       backgroundColor: "#c7e4e8"
-      //  backgroundColor: theme.palette.primary.main
     }
   },
   menu: {
-    color: "black",
-    backgroundColor: "#c7e4e8",
-    //  backgroundColor: theme.palette.primary.main,
+    color: "white",
+    backgroundColor: "#1d4684 !important",
     boxShadow:
       "0px 0px 0px 0px rgba(0,0,0,0), 0px 0px 0px 0px rgba(0,0,0,0), 0px 0px 0px 0px rgba(0,0,0,0) !important",
 
@@ -38,7 +36,6 @@ const styles = theme => ({
 
       color: theme.palette.background.default,
       backgroundColor: "#c7e4e8"
-      //backgroundColor: theme.palette.primary.main
     }
   },
   root: {

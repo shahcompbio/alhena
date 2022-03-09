@@ -1,19 +1,19 @@
 import React, { useState } from "react";
-import { withStyles } from "@material-ui/styles";
+import { withStyles } from "@mui/styles";
 
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableHead from "@material-ui/core/TableHead";
-import TableRow from "@material-ui/core/TableRow";
-import TablePagination from "@material-ui/core/TablePagination";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TablePagination from "@mui/material/TablePagination";
 
-import Checkbox from "@material-ui/core/Checkbox";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
-import Input from "@material-ui/core/Input";
-import FormControl from "@material-ui/core/FormControl";
-import Switch from "@material-ui/core/Switch";
+import Checkbox from "@mui/material/Checkbox";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import Input from "@mui/material/Input";
+import FormControl from "@mui/material/FormControl";
+import Switch from "@mui/material/Switch";
 
 import clsx from "clsx";
 
@@ -33,7 +33,8 @@ const styles = theme => ({
   table: {
     width: "90%",
     margin: "auto",
-    minWidth: 650
+    minWidth: 650,
+    padding: 10
     //marginTop: 25
   },
   select: {
@@ -64,8 +65,8 @@ const styles = theme => ({
   otherCol: {
     //width: "15%"
   },
-  adminCol: { width: "10%" },
-  roleCol: { width: "25%" },
+  adminCol: { width: "8%" },
+  roleCol: { width: "23%" },
   checkBoxCol: {
     //width: "5%"
   },
@@ -84,12 +85,12 @@ const styles = theme => ({
     fontSize: 18
   },
   selectedTableCell: {
-    height: 60,
+    height: 150,
     fontSize: 20,
     whiteSpace: "normal",
     wordWrap: "break-word",
-    maxWidth: "200px",
-    backgroundColor: "#11151d40"
+    maxWidth: "200px"
+    //  backgroundColor: "blue"
   },
   tableHeader: {
     fontSize: 18,
@@ -133,14 +134,21 @@ const TableContent = ({
       : [];
   const colorClass = classes.checkBox;
 
-  const editTextRows = (row, heading, allRolesLength) => {
+  const editTextRows = (row, heading, allRolesLength, isItemSelected) => {
     if (Array.isArray(row[heading])) {
+      const longForm = row[heading].filter(d => d !== "").join(", ");
       if (heading === "roles") {
-        return row[heading].length === allRolesLength
-          ? "All"
-          : row[heading].join(", ");
+        if (row[heading].length === allRolesLength) {
+          return "All";
+        } else {
+          if (longForm.length <= 15 || isItemSelected) {
+            return longForm;
+          } else {
+            return longForm.substring(0, 15) + "...";
+          }
+        }
       } else {
-        return row[heading].join(", ");
+        return longForm + "...";
       }
     } else {
       return adminMapping.hasOwnProperty(row[heading])
@@ -156,7 +164,17 @@ const TableContent = ({
       : "";
   return (
     <span>
-      <Table className={classes.table} size="small" key={"table-" + tabIndex}>
+      <Table
+        sx={{
+          width: "90%",
+          margin: "auto",
+          minWidth: 650,
+          padding: 10,
+          marginTop: "25px !important"
+        }}
+        size="small"
+        key={"table-" + tabIndex}
+      >
         <TableHead key={"tableHead-" + tabIndex}>
           <TableRow key={"tableHeaderRow-" + tabIndex}>
             <TableCell
@@ -242,7 +260,12 @@ const TableContent = ({
                                   />
                                 )
                               ) : (
-                                editTextRows(row, heading, allRoles.length)
+                                editTextRows(
+                                  row,
+                                  heading,
+                                  allRoles.length,
+                                  isItemSelected
+                                )
                               )}
                             </div>
                           </TableCell>
@@ -266,7 +289,7 @@ const TableContent = ({
           "aria-label": "next page"
         }}
         className={clsx(classes.tablePagination, colorClass)}
-        onChangePage={(event, newPage) => setPage(newPage)}
+        onPageChange={(event, newPage) => setPage(newPage)}
       />
     </span>
   );
@@ -284,6 +307,7 @@ const TableHeadings = ({ classes, tableHeadings, colorClass, isUsers }) =>
       <TableCell
         align={aligned}
         key={"tableHeaderCell" + heading}
+        sx={{ fontSize: 16, fontWeight: "bold" }}
         className={clsx(
           classes.tableCell,
           classes.tableHeader,

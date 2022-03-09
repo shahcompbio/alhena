@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import * as d3 from "d3";
 
-import { Dialog, Grid } from "@material-ui/core";
+import { Dialog, Grid } from "@mui/material";
 
-import Button from "@material-ui/core/Button";
-import DialogContent from "@material-ui/core/DialogContent";
-import FilledInput from "@material-ui/core/FilledInput";
+import Button from "@mui/material/Button";
+import DialogContent from "@mui/material/DialogContent";
+import FilledInput from "@mui/material/FilledInput";
 
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from '@mui/styles/withStyles';
 import { gql, useLazyQuery } from "@apollo/client";
 
 import { useStatisticsState } from "../Dashboard/DashboardState/statsState";
@@ -94,7 +94,7 @@ const SharePopup = ({
         <Grid
           container
           direction="row"
-          justify="flex-start"
+          justifyContent="flex-start"
           alignItems="flex-start"
         >
           <FilledInput

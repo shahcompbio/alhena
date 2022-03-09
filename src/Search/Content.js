@@ -2,17 +2,17 @@ import React, { useState, useEffect } from "react";
 import Menu from "../Misc/Menu.js";
 import ProjectViewContent from "./ProjectView/ProjectViewContent.js";
 import Stepper from "./Stepper.js";
-import Slide from "@material-ui/core/Slide";
+import Slide from "@mui/material/Slide";
 import DashboardContent from "../Dashboard/DashboardContent.js";
 import OverviewContent from "./Overview/OverviewContent.js";
 
-import Backdrop from "@material-ui/core/Backdrop";
-import Grid from "@material-ui/core/Grid";
+import Backdrop from "@mui/material/Backdrop";
+import Grid from "@mui/material/Grid";
 
 import { useHistory } from "react-router-dom";
 import { useDashboardState } from "./ProjectView/ProjectState/dashboardState";
 
-import { withStyles } from "@material-ui/styles";
+import { withStyles } from "@mui/styles";
 
 const styles = ({ theme }) => ({
   root: { flexGrow: 1, height: "100vh" },
@@ -142,16 +142,6 @@ const Content = ({ classes }) => {
           <DashboardContent />
         </div>
       </Slide>
-      <Slide
-        direction={activeStep !== 2 ? "up" : "down"}
-        in={activeStep !== 2}
-        mountOnEnter
-        unmountOnExit
-        timeout={activeStep !== 2 ? 100 : 1000}
-        key={"slideBackdrop"}
-      >
-        <Backdrop open={true}></Backdrop>
-      </Slide>
       <Stepper
         activeStep={activeStep}
         handleBackStep={handleBackStep}
@@ -160,5 +150,14 @@ const Content = ({ classes }) => {
     </Grid>
   );
 };
-
+/*      <Slide
+        direction={activeStep !== 2 ? "up" : "down"}
+        in={activeStep !== 2}
+        mountOnEnter
+        unmountOnExit
+        timeout={activeStep !== 2 ? 100 : 1000}
+        key={"slideBackdrop"}
+      >
+        <Backdrop open={true}></Backdrop>
+      </Slide>*/
 export default withStyles(styles)(Content);

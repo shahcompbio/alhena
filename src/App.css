@@ -286,6 +286,11 @@
   stroke: black;
   stroke-width: 2;
 }
+#searchTable div[role="columnheader"] {
+  padding: 0;
+  border-radius: 8px 8px 0px 0px;
+}
+
 @keyframes neon {
   from {
     text-shadow: 0 0 2px rgba(255, 255, 225, 0.92),

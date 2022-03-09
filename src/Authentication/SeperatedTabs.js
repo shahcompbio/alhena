@@ -1,17 +1,22 @@
 import React from "react";
-import { makeStyles } from "@material-ui/styles";
-import Tabs from "@material-ui/core/Tabs";
-import Tab from "@material-ui/core/Tab";
+import { makeStyles } from "@mui/styles";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
 
 const useTabsStyles = makeStyles(() => ({
   root: {
-    overflow: "visible"
+    overflow: "visible",
+    alignItems: "baseline",
+    marginLeft: "-70px !important"
   },
   scroller: {
     overflow: "visible!important"
   },
   indicator: {
     display: "none"
+  },
+  flexContainer: {
+    marginTop: 45
   }
 }));
 const useTabStyles = makeStyles(({ palette, spacing, breakpoints }) => {
@@ -21,20 +26,30 @@ const useTabStyles = makeStyles(({ palette, spacing, breakpoints }) => {
     md: 120
   };
   return {
+    text: ({}) => ({
+      fontSize: 30
+    }),
     root: ({
       bgColor = defaultBgColor,
       minWidth = defaultMinWidth,
       isSelected
     }) => ({
       opacity: 1,
-      overflow: "initial",
-      minHeight: 64,
-      minWidth: 250,
-      color: palette.background.default,
-      background: "rbga(0,0,0,0)",
+      marginLeft: "10px !important",
+      overflow: "initial !important",
+      minHeight: "64px !important",
+      minWidth: "250px !important",
+
       transition: "0.5s",
+      color: "black !important",
+      fontWeight: "bold !important",
+      //background: "blue",
+      //backgroundColor: "rgb(224 227 230) !important",
+      alignItems: "baseline !important",
+      zIndex: "3 !important",
 
       "&:before": {
+        boxShadow: "3px 3px 8px 0 rgba(0,0,0,0.38)",
         content: '" "',
         position: "absolute",
         top: 0,
@@ -42,8 +57,8 @@ const useTabStyles = makeStyles(({ palette, spacing, breakpoints }) => {
         right: 0,
         left: 0,
         borderRadius: 10,
-        marginLeft: isSelected ? -30 : -10,
-        backgroundColor: bgColor,
+        backgroundColor: isSelected ? "white" : bgColor,
+        //  zIndex: "2 !important",
         //transform: "skewY(-4deg)",
         transformOrigin: "100%"
       },
@@ -65,30 +80,33 @@ const useTabStyles = makeStyles(({ palette, spacing, breakpoints }) => {
       }
     }),
     selected: ({ selectedBgColor = defaultSelectedBgColor }) => ({
-      color: palette.background.default,
-      fontWeight: "bold",
-
-      zIndex: 3,
+      color: "black !important",
+      fontWeight: "bold !important",
+      backgroundColor: selectedBgColor + " !important",
+      alignItems: "baseline !important",
+      zIndex: "3 !important",
       "&:before": {
-        backgroundColor: selectedBgColor,
         boxShadow: "3px 3px 8px 0 rgba(0,0,0,0.38)"
       },
       "&:after": {
         width: spacing(3.5)
       }
     }),
-    wrapper: ({ isSelected }) => ({
-      marginLeft: isSelected ? -175 : -150,
-      zIndex: 2,
-      fontSize: "20px",
+    wrapper: ({ isSelected, bgColor = defaultBgColor }) => ({
+      marginLeft: isSelected ? -200 : -150,
+      zIndex: "2 !important",
+      backgroundColor: bgColor,
+      fontSize: "20px !important",
+      textAlign: "left",
       marginTop: spacing(1),
-      textTransform: "initial"
+      textTransform: "initial !important"
     })
   };
 });
 
 const SeperatedTabs = ({ tabs, tabStyle, tabProps, ...props }) => {
   const tabsClasses = useTabsStyles(props);
+
   return (
     <Tabs {...props} orientation="vertical" classes={tabsClasses}>
       {tabs.map((tab, index) => {
@@ -98,17 +116,15 @@ const SeperatedTabs = ({ tabs, tabStyle, tabProps, ...props }) => {
           ...tabStyle,
           isSelected
         });
-
         return (
           <Tab
             key={tab.label}
-            {...tabProps}
             {...tab}
             classes={tabClasses}
             style={{
               color: "black"
             }}
-          />
+          ></Tab>
         );
       })}
     </Tabs>

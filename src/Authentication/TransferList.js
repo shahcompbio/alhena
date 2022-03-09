@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import makeStyles from '@mui/styles/makeStyles';
 
 import {
   Grid,
@@ -9,7 +9,7 @@ import {
   Checkbox,
   Button,
   Paper
-} from "@material-ui/core";
+} from "@mui/material";
 
 import { FixedSizeList as List } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -155,7 +155,7 @@ const TransferList = ({
     <Grid
       container
       spacing={2}
-      justify="center"
+      justifyContent="center"
       alignItems="center"
       className={classes.root}
     >

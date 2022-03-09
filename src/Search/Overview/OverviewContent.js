@@ -1,31 +1,25 @@
 import React from "react";
 
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from "@mui/styles/withStyles";
 
 import { useDashboardState } from "../ProjectView/ProjectState/dashboardState";
 
-import Grid from "@material-ui/core/Grid";
-import Button from "@material-ui/core/Button";
-import ButtonGroup from "@material-ui/core/ButtonGroup";
-import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/styles";
+import Grid from "@mui/material/Grid";
+import Button from "@mui/material/Button";
+import ButtonGroup from "@mui/material/ButtonGroup";
+import Typography from "@mui/material/Typography";
+import { makeStyles } from "@mui/styles";
 
 import _ from "lodash";
 
-const styles = theme => ({
-  content: {
-    flexGrow: 1
-  },
-  container: {
-    minHeight: "100vh"
-  }
-});
-
 const useStyles = makeStyles({
   button: {
+    color: "#2d2264",
+    border: "1px solid #8988b8",
     "&:hover": {
       //  color: "#cfb630",
       //  textShadow: "0 0 1px #ffbf00",
+      background: "blue",
       fontSize: 20
     },
     fontWeight: "bold",
@@ -46,21 +40,25 @@ const OverviewContent = ({ classes, handleForwardStep }) => {
   };
 
   return dashboards.length > 0 ? (
-    <div className={classes.content}>
+    <div
+      sx={{
+        flexGrow: 1
+      }}
+    >
       <Grid
         direction="column"
-        justify="center"
+        justifyContent="center"
         alignItems="center"
         container
         spacing={2}
         key={"grid"}
-        className={classes.container}
+        sx={{ minHeight: "100vh" }}
       >
         <Grid item style={{ textAlign: "center", padding: 50 }}>
           <Typography
             variant="h4"
             color="secondary"
-            style={{ marginBottom: 50 }}
+            style={{ marginBottom: 50, color: "#2B303A" }}
           >
             Select from the following available projects:
           </Typography>
@@ -75,7 +73,17 @@ const OverviewContent = ({ classes, handleForwardStep }) => {
               >
                 {projectGroup.map(project => (
                   <Button
-                    className={classes2.button}
+                    sx={{
+                      color: "#423e59",
+                      border: "1px solid #E28413",
+                      "&:hover": {
+                        border: "1px solid #E28413",
+                        background: "#ebcdbe",
+                        fontSize: 20
+                      },
+                      fontWeight: "bold",
+                      fontSize: 16
+                    }}
                     key={"button" + project}
                     value={project}
                     onClick={() => selectProject(project)}
@@ -92,4 +100,4 @@ const OverviewContent = ({ classes, handleForwardStep }) => {
   ) : null;
 };
 
-export default withStyles(styles)(OverviewContent);
+export default OverviewContent;

@@ -15,20 +15,23 @@ import {
   FormControlLabel,
   Switch,
   TextField
-} from "@material-ui/core";
+} from "@mui/material";
 
-import FilledInput from "@material-ui/core/FilledInput";
-import ListItemText from "@material-ui/core/ListItemText";
-import Checkbox from "@material-ui/core/Checkbox";
+import FilledInput from "@mui/material/FilledInput";
+import ListItemText from "@mui/material/ListItemText";
+import Checkbox from "@mui/material/Checkbox";
 
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import Select from "@material-ui/core/Select";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import Select from "@mui/material/Select";
 
-import { withStyles, makeStyles, useTheme } from "@material-ui/core/styles";
+import { useTheme } from "@mui/material/styles";
 
-import { Typography } from "@material-ui/core";
+import withStyles from "@mui/styles/withStyles";
+import makeStyles from "@mui/styles/makeStyles";
+
+import { Typography } from "@mui/material";
 
 import { gql, useLazyQuery, useQuery } from "@apollo/client";
 
@@ -66,16 +69,13 @@ const styles = theme => ({
   },
   dialogGrid: { width: "80%" },
   shareButton: {
-    marginTop: 7,
-    right: 100,
-    position: "absolute",
+    marginTop: "7px !important",
+    right: 107,
+    position: "absolute !important",
     backgroundColor: "#67b798",
     color: "black"
-    //  marginTop: "25px"
   },
   button: {
-    //backgroundColor: "#e5f3f3",
-    //color: "#2b5d65"
     color: "black"
   },
   generateButton: {
@@ -84,9 +84,9 @@ const styles = theme => ({
     color: "black"
   },
   closeButton: {
-    marginTop: 7,
-    right: 20,
-    position: "absolute",
+    marginTop: "7px !important",
+    right: 14,
+    position: "absolute !important",
     color: "#350800",
     backgroundColor: "#efcfc5"
   },
@@ -157,16 +157,14 @@ const NewUserPopup = ({ isOpen, handleClose, client, classes }) => {
               readonly
             />
             <Button
-              variant="outlined"
-              color="#67b798"
+              variant="contained"
               className={classes.shareButton}
               onClick={copy(newUserLinkData.newUserLink.newUserLink)}
             >
               Copy
             </Button>
             <Button
-              variant="outlined"
-              color="#67b798"
+              variant="contained"
               className={classes.closeButton}
               onClick={handleClose}
             >
@@ -293,7 +291,6 @@ const NewUserPopup = ({ isOpen, handleClose, client, classes }) => {
                   <Button
                     onClick={handleClose}
                     variant="outlined"
-                    color="#67b798"
                     className={classes.button}
                   >
                     Cancel

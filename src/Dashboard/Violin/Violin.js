@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import * as d3 from "d3";
 
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from '@mui/styles/withStyles';
 
 import { gql, useQuery } from "@apollo/client";
 
 import _ from "lodash";
 
-import Grid from "@material-ui/core/Grid";
+import Grid from "@mui/material/Grid";
 
 import { useStatisticsState } from "../DashboardState/statsState";
 
@@ -138,7 +138,7 @@ const Violin = ({ analysis, classes }) => {
     <Grid
       container
       direction="row"
-      justify="flex-start"
+      justifyContent="flex-start"
       alignItems="flex-start"
       key="violin"
     >

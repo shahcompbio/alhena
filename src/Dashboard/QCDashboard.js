@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import { gql, useQuery } from "@apollo/client";
 
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from '@mui/styles/withStyles';
 import { useHistory } from "react-router-dom";
 
 import Heatmap from "./Heatmap/Heatmap.js";
@@ -18,7 +18,7 @@ import SettingsPanel from "./SettingsPanel.js";
 
 import LoadingCircle from "./CommonModules/LoadingCircle.js";
 
-import { Paper, Grid, Typography } from "@material-ui/core";
+import { Paper, Grid, Typography } from "@mui/material";
 import { useStatisticsState } from "./DashboardState/statsState";
 const HEATMAP_ORDER = gql`
   query heatmapOrder(
@@ -196,7 +196,7 @@ const QCDashboard = ({ analysis, classes }) => {
           <Grid
             container
             direction="row"
-            justify="flex-start"
+            justifyContent="flex-start"
             alignItems="flex-start"
             key="QCContainer"
             className={classes.content}
@@ -315,7 +315,7 @@ const QCDashboard = ({ analysis, classes }) => {
         <Grid
           container
           direction="row"
-          justify="flex-start"
+          justifyContent="flex-start"
           alignItems="flex-start"
           key="QCContainer"
           className={classes.content}

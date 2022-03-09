@@ -1,10 +1,10 @@
 import React from "react";
 
-import { withStyles } from "@material-ui/core/styles";
+import withStyles from '@mui/styles/withStyles';
 
 import QCDashboard from "./QCDashboard.js";
 
-import { Grid, Paper } from "@material-ui/core";
+import { Grid, Paper } from "@mui/material";
 
 import statsStateReducer, { initialState } from "./DashboardState/statsReducer";
 import { StatsProvider } from "./DashboardState/statsState";

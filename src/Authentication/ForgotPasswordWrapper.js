@@ -2,16 +2,16 @@ import React, { useState, useEffect } from "react";
 
 import { gql, useLazyQuery } from "@apollo/client";
 
-import Button from "@material-ui/core/Button";
-import Grid from "@material-ui/core/Grid";
-import TextField from "@material-ui/core/TextField";
-import Typography from "@material-ui/core/Typography";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 
 import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
 import UpdatePassword from "./NewUser/UpdatePassword.js";
 
 import styled from "styled-components";
-import { withStyles } from "@material-ui/styles";
+import { withStyles } from "@mui/styles";
 
 import { useHistory } from "react-router-dom";
 
@@ -63,8 +63,8 @@ const ForgotPasswordWrapper = ({ dispatch, classes }) => {
   const [isVerified, setIsVerified] = useState(false);
   const [verifiedUsername, setVerifiedUsername] = useState();
 
-  const [username, setUsername] = useState(null);
-  const [email, setEmail] = useState(null);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
 
   const [verifyUser, { loading, data }] = useLazyQuery(VERIFYUSER);
 
@@ -76,10 +76,12 @@ const ForgotPasswordWrapper = ({ dispatch, classes }) => {
         setError(13);
       }
     }
-  }, [data, loading, error]);
+  }, [data, loading]);
+  const isButtonDisabled = (username, email) =>
+    email.length < 2 || username.length < 1;
 
   return (
-    <Grid container direction="row" justify="center" alignItems="center">
+    <Grid container direction="row" justifyContent="center" alignItems="center">
       <div
         style={{
           position: "absolute",
@@ -148,9 +150,10 @@ const ForgotPasswordWrapper = ({ dispatch, classes }) => {
               </Button>
               <Button
                 className={classes.button}
-                variant="outlined"
+                variant="contained"
                 disableElevation
                 type="submit"
+                disabled={isButtonDisabled(username, email)}
                 onClick={async () => {
                   verifyUser({
                     variables: {

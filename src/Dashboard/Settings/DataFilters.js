@@ -14,7 +14,7 @@ import {
   Slider,
   Switch,
   Typography
-} from "@material-ui/core";
+} from "@mui/material";
 
 import { useStatisticsState } from "../DashboardState/statsState";
 import { heatmapConfig } from "../Heatmap/config";
@@ -67,9 +67,9 @@ const DataFilters = ({
     <Grid
       container
       direction="column"
-      justify="flex-start"
+      justifyContent="flex-start"
       alignItems="flex-start"
-      style={{ width: "100%" }}
+      style={{ width: "100%", margin: "10px !important" }}
       key={key + "grid"}
     >
       <Grid item className={classes.gridSlider} key={key + "gridSlider"}>
@@ -85,7 +85,7 @@ const DataFilters = ({
           key={key + "qualitySlider"}
           className={classes.slider}
           color={"secondary"}
-          value={qualityMenuValue}
+          //value={qualityMenuValue}
           disabled={isDisabled}
           onChange={(event, newValue) => setQualityMenuValue(newValue)}
           onChangeCommitted={() =>
@@ -105,43 +105,6 @@ const DataFilters = ({
           min={0}
           max={1.0}
         />
-      </Grid>
-      <Grid item className={classes.gridSlider} key={key + "filterGrid"}>
-        <Typography
-          id="discrete-slider"
-          gutterBottom
-          style={{ marginBottom: 0 }}
-          key={key + "filterTitle"}
-        >
-          Filter Contaminated
-        </Typography>
-        <FormControl
-          disabled={isDisabled}
-          variant="outlined"
-          className={classes.formControl}
-          key={key + "filterFormControl"}
-        >
-          <FormControlLabel
-            control={
-              <Switch
-                checked={contaminatedMenuValue}
-                onChange={() => {
-                  setContaminatedMenuValue(!contaminatedMenuValue);
-                  /*    setParamObj["is_contaminated"] = {
-                    param: "is_contaminated",
-                    value: contaminatedMenuValue.toString()
-                  };*/
-                  update(
-                    {
-                      isContaminated: contaminatedMenuValue
-                    },
-                    "CONTIMATED_UPDATE"
-                  );
-                }}
-              />
-            }
-          />
-        </FormControl>
       </Grid>
       <Grid
         item
@@ -231,6 +194,39 @@ const DataFilters = ({
     </Grid>
   ];
 };
+/*      <Grid item className={classes.gridSlider} key={key + "filterGrid"}>
+        <Typography
+          id="discrete-slider"
+          gutterBottom
+          style={{ marginBottom: 0 }}
+          key={key + "filterTitle"}
+        >
+          Filter Contaminated
+        </Typography>
+        <FormControl
+          disabled={isDisabled}
+          variant="outlined"
+          className={classes.formControl}
+          key={key + "filterFormControl"}
+        >
+          <FormControlLabel
+            control={
+              <Switch
+                checked={contaminatedMenuValue}
+                onChange={() => {
+                  setContaminatedMenuValue(!contaminatedMenuValue);
+                  update(
+                    {
+                      isContaminated: contaminatedMenuValue
+                    },
+                    "CONTIMATED_UPDATE"
+                  );
+                }}
+              />
+            }
+          />
+        </FormControl>
+      </Grid>*/
 const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
   const [
     { axisChange, absoluteMinMaxDataFilters },

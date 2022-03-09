@@ -1,0 +1,18 @@
+root: {
+  color: "black";
+  background-color: "#afafafd9";
+  cursor: "pointer";
+  font-weight: "normal";
+  resize: "horizontal";
+  overflow-x: "overlay";
+  overflowy: "scroll";
+  borderright: "1px solid";
+}
+table: {
+  div[role=columnheader]: {
+    padding: 0;
+  }
+}
+input: {
+  color: "#23bbbb !important";
+}

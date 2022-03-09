@@ -9,12 +9,12 @@ import {
   FormControlLabel,
   FormGroup,
   Checkbox,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   InputLabel,
   Select
-} from "@material-ui/core";
+} from "@mui/material";
 
 const HeatmapSettings = ({ classes, updateCategories, categoryOptions }) => {
   const [selectedCategories, setSelectedCategories] = useState(categoryOptions);

@@ -1,18 +1,19 @@
 import React, { useState } from "react";
 import * as d3 from "d3";
 
-import { Dialog, Grid } from "@material-ui/core";
+import { Dialog, Grid } from "@mui/material";
 
-import Button from "@material-ui/core/Button";
-import DialogContent from "@material-ui/core/DialogContent";
-import ToggleButton from "@material-ui/lab/ToggleButton";
+import Button from "@mui/material/Button";
+import DialogContent from "@mui/material/DialogContent";
+import ToggleButton from '@mui/material/ToggleButton';
 
-import CheckIcon from "@material-ui/icons/Check";
+import CheckIcon from "@mui/icons-material/Check";
 
-import { withStyles, makeStyles } from "@material-ui/core/styles";
+import withStyles from '@mui/styles/withStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import { heatmapConfig } from "../Dashboard/Heatmap/config.js";
 
-import { Typography } from "@material-ui/core";
+import { Typography } from "@mui/material";
 import { jsPDF } from "jspdf";
 import canvg from "canvg";
 
@@ -127,7 +128,7 @@ const ExportPopup = ({
         <Grid
           container
           direction="column"
-          justify="flex-start"
+          justifyContent="flex-start"
           alignItems="flex-start"
         >
           <Typography variant="body">Plots available to export</Typography>
@@ -135,7 +136,7 @@ const ExportPopup = ({
           <Grid
             container
             direction="column"
-            justify="flex-start"
+            justifyContent="flex-start"
             alignItems="flex-start"
           >
             <Grid item>
@@ -221,7 +222,7 @@ const PlotItem = ({ name, setSelected, selected, disabled }) => {
     <Grid
       container
       direction="row"
-      justify="flex-start"
+      justifyContent="flex-start"
       alignItems="flex-start"
     >
       <Grid item className={classes.gridItem}>

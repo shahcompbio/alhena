@@ -4,8 +4,8 @@ import { gql, useQuery } from "@apollo/client";
 
 import * as d3 from "d3";
 
-import Grid from "@material-ui/core/Grid";
-import CircularProgress from "@material-ui/core/CircularProgress";
+import Grid from "@mui/material/Grid";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import { heatmapConfig } from "./config.js";
 import { getGenomeYScale } from "./utils.js";

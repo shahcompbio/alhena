@@ -2,10 +2,10 @@ import React from "react";
 
 import Filters from "./Filters.js";
 
-import { withStyles } from "@material-ui/styles";
+import { withStyles } from "@mui/styles";
 
-import Paper from "@material-ui/core/Paper";
-import Grid from "@material-ui/core/Grid";
+import Paper from "@mui/material/Paper";
+import Grid from "@mui/material/Grid";
 
 const style = theme => ({
   root: {
