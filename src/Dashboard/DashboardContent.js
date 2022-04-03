@@ -1,6 +1,6 @@
 import React from "react";
 
-import withStyles from '@mui/styles/withStyles';
+import withStyles from "@mui/styles/withStyles";
 
 import QCDashboard from "./QCDashboard.js";
 
@@ -46,14 +46,18 @@ const DashboardContent = ({ classes, history }) => {
         <QCDashboard analysis={selectedAnalysis} item xs={8} />
       ) : (
         [
-          <Grid className={classes.settings} item xs={4}>
+          <Grid className={classes.settings} key={"heatmapSettngs"} item xs={4}>
             <Paper
-              className={[classes.heatmapContent, classes.paperContainer]}
+              className={[classes.heatmapContent, classes.paperContainer].join(
+                " "
+              )}
             />
           </Grid>,
-          <Grid item className={classes.plots}>
+          <Grid item key={"grid-plots"} className={classes.plots}>
             <Paper
-              className={[classes.heatmapContent, classes.paperContainer]}
+              className={[classes.heatmapContent, classes.paperContainer].join(
+                " "
+              )}
             />
           </Grid>
         ]

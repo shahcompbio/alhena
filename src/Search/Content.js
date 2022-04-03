@@ -5,8 +5,6 @@ import Stepper from "./Stepper.js";
 import Slide from "@mui/material/Slide";
 import DashboardContent from "../Dashboard/DashboardContent.js";
 import OverviewContent from "./Overview/OverviewContent.js";
-
-import Backdrop from "@mui/material/Backdrop";
 import Grid from "@mui/material/Grid";
 
 import { useHistory } from "react-router-dom";

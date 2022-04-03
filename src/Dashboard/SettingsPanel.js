@@ -51,14 +51,7 @@ const styles = makeStyles(theme => ({
     width: "100%",
     background: "white"
   },
-  selectedCells: {
-    backgroundColor: "#e6eaec",
-    padding: theme.spacing(3, 3, 3, 3),
-    margin: theme.spacing(2, 0, 2, 0)
-  },
-  markLabel: {
-    color: "rgba(225, 225, 225, 0.54)"
-  },
+
   metaDataPanel: {
     background: "white",
     marginBottom: 10
@@ -75,27 +68,26 @@ const styles = makeStyles(theme => ({
     color: "#31506b !important",
     border: "1px solid #31506b !important",
     //marginBottom: "10px !important",
-    marginRight: "29px !important",
+    marginRight: "20px !important",
     backgroundColor: "white !important"
   },
   shareButton: {
     color: "#31506b !important",
     border: "1px solid #31506b !important",
     width: 180,
-    marginBottom: 10,
+    //marginBottom: 10,
     marginLeft: 6,
     backgroundColor: "white !important"
   },
 
-  gridSlider: { width: "100%", marginBottom: 10 },
   settings: {
     padding: 10,
     paddingRight: 0,
     width: 400,
     background: "#F5F5F5 !important",
     height: "100%",
-    position: "sticky",
-    overflowY: "scroll"
+    position: "sticky"
+    //overflowY: "scroll"
   },
   sliderPanel: {
     padding: 20
@@ -119,7 +111,7 @@ const styles = makeStyles(theme => ({
     color: "white"
   },
   panelDetails: {
-    padding: "0px 54px 54px !important"
+    padding: "0px 54px 24px !important"
   }
 }));
 
@@ -177,7 +169,14 @@ const SettingsPanel = ({
   return (
     <Paper
       key={"settingsPanelPaper"}
-      className={classes.settings}
+      sx={{
+        padding: "10px",
+        paddingRight: "0px",
+        width: "400px",
+        background: "#F5F5F5 !important",
+        height: "100%",
+        position: "sticky"
+      }}
       elevation={0}
     >
       <MetaData
@@ -221,7 +220,17 @@ const SettingsPanel = ({
       >
         <Button
           variant="outlined"
-          className={classes.exportButton}
+          sx={{
+            width: 180,
+            color: "#31506b !important",
+            border: "1px solid #31506b !important",
+            marginRight: "20px !important",
+            backgroundColor: "white !important",
+            ":hover": {
+              color: "white !important",
+              backgroundColor: "#31506b !important"
+            }
+          }}
           onClick={() => setOpenExportPopup()}
           startIcon={<CloudDownloadIcon />}
         >
@@ -229,7 +238,17 @@ const SettingsPanel = ({
         </Button>
         <Button
           variant="outlined"
-          className={classes.shareButton}
+          sx={{
+            color: "#31506b !important",
+            border: "1px solid #31506b !important",
+            width: 180,
+            marginLeft: "6px",
+            backgroundColor: "white !important",
+            ":hover": {
+              color: "white !important",
+              backgroundColor: "#31506b !important"
+            }
+          }}
           onClick={() => setOpenSharePopup()}
           startIcon={<ShareIcon />}
         >
@@ -284,7 +303,6 @@ const SettingsPanel = ({
               category => category["category"] === experimentalCondition["type"]
             )}
             analysis={selectedAnalysis}
-            classes={classes}
             update={(value, type) => {
               update(value, type);
             }}
@@ -311,7 +329,6 @@ const SettingsPanel = ({
         }}
       >
         <ScatterplotSettings
-          classes={classes}
           analysis={analysis}
           setAxisOption={value => update(value, "SCATTERPLOT_AXIS_UPDATE")}
           isDisabled={isDisabled}
@@ -330,7 +347,6 @@ const SettingsPanel = ({
         }}
       >
         <ChipHeatmapSettings
-          classes={classes}
           axisOptions={chipHeatmapOptions}
           currentlySelectedAxis={chipHeatmapAxis}
           setAxisOption={value => update(value, "CHIPHEATMAP_AXIS_UPDATE")}
@@ -350,7 +366,6 @@ const SettingsPanel = ({
         }}
       >
         <ViolinSettings
-          classes={classes}
           axisOptions={violinOptions}
           setAxisOption={value => update(value, "VIOLIN_AXIS_UPDATE")}
           isDisabled={isDisabled}
@@ -369,7 +384,6 @@ const SettingsPanel = ({
         }}
       >
         <GCBiasSettings
-          classes={classes}
           setAxisOption={value => update(value, "GCBIAS_IS_GROUPED")}
           isDisabled={isDisabled}
         />
@@ -435,33 +449,7 @@ const AccordianWrapper = ({
     </AccordionDetails>
   </Accordion>
 );
-/*  {project && (
-    <Typography
-      variant="h6"
-      fontWeight="fontWeightRegular"
-      style={{ color: "#a2a2a2" }}
-    >
-      Project: {project}
-    </Typography>
-  )}
-  {metaData && (
-    <Typography
-      variant="h6"
-      fontWeight="fontWeightRegular"
-      style={{ color: "#a2a2a2" }}
-    >
-      Library: {metaData["library_id"]}
-    </Typography>
-  )}
-  {metaData && (
-    <Typography
-      variant="h6"
-      fontWeight="fontWeightRegular"
-      style={{ color: "#a2a2a2" }}
-    >
-      Sample: {metaData["sample_id"]}
-    </Typography>
-  )}*/
+
 const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
   <Paper
     elevation={0}
@@ -496,6 +484,7 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
       {metaData !== null ? (
         metaData.map(meta => (
           <Typography
+            key={"typography-" + meta["type"]}
             variant="h6"
             fontWeight="fontWeightRegular"
             style={{ color: "#a2a2a2" }}
@@ -521,13 +510,13 @@ const MetaData = ({ metaData, classes, count, analysis, library, project }) => (
   </Paper>
 );
 
-const SelectedCellsPanel = ({
-  classes,
-  selectedCellsCount,
-  clearCellSelection
-}) => (
+const SelectedCellsPanel = ({ selectedCellsCount, clearCellSelection }) => (
   <Paper
-    className={[classes.panel, classes.selectedCells]}
+    sx={{
+      p: 2,
+      mb: 2,
+      width: "100%"
+    }}
     variant="outlined"
     elevation={0}
   >
@@ -537,7 +526,9 @@ const SelectedCellsPanel = ({
       justifyContent="space-between"
       alignItems="center"
     >
-      <Typography variant="h6">{selectedCellsCount} cells selected</Typography>
+      <Typography variant="h6" sx={{ color: "#31506b" }}>
+        {selectedCellsCount} cells selected
+      </Typography>
       <Button onClick={() => clearCellSelection()}>
         <BackspaceTwoToneIcon />
       </Button>

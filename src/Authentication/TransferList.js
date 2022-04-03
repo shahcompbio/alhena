@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 
 import {
   Grid,
@@ -16,8 +16,9 @@ import AutoSizer from "react-virtualized-auto-sizer";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    margin: "auto",
-    width: 800
+    //  margin: "auto",
+    //  padding: "10px"
+    //width: "100%"
   },
   paper: {
     width: 350,

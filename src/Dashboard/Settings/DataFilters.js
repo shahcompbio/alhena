@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import _ from "lodash";
+import { styled } from "@mui/system";
 
 import {
   Checkbox,
@@ -16,7 +17,6 @@ import {
   Typography
 } from "@mui/material";
 
-import styled from "styled-components";
 import makeStyles from "@mui/styles/makeStyles";
 
 import { useStatisticsState } from "../DashboardState/statsState";
@@ -26,10 +26,7 @@ const useStyles = makeStyles(theme => {
   return {
     formControl: { width: "100%" },
     gridSlider: { width: "100%", marginBottom: "35px !important" },
-    slider: {
-      color: theme.palette.secondary.main + " !important",
-      width: "100%"
-    },
+    slider: {},
     select: {
       width: "100%",
       "& .Mui-checked": { color: theme.palette.secondary.main + " !important" },
@@ -44,7 +41,14 @@ const useStyles = makeStyles(theme => {
     titles: { marginBottom: 0, marginLeft: "-20px !important" }
   };
 });
-
+const StyledSlider = styled(Slider)(({ theme }) => ({
+  color: "#f1c023 !important",
+  width: "100%"
+}));
+const StyledTitles = styled(Typography)(({ theme }) => ({
+  marginBottom: 0,
+  marginLeft: "-20px !important"
+}));
 const DataFilters = ({
   update,
   analysis,
@@ -98,18 +102,21 @@ const DataFilters = ({
       style={{ width: "100%", margin: "10px !important" }}
       key={key + "grid"}
     >
-      <Grid item className={classes.gridSlider} key={key + "gridSlider"}>
-        <Typography
+      <Grid
+        item
+        sx={{ width: "100%", marginBottom: "35px !important" }}
+        key={key + "gridSlider"}
+      >
+        <StyledTitles
           id="discrete-slider"
           gutterBottom
-          className={classes.titles}
           key={key + "qualityTitle"}
         >
           Quality
-        </Typography>
-        <Slider
+        </StyledTitles>
+        <StyledSlider
           key={key + "qualitySlider"}
-          className={classes.slider}
+          sx={{ color: "#f1c023 !important", width: "100%" }}
           value={qualityMenuValue}
           disabled={isDisabled}
           onChange={(event, newValue) => setQualityMenuValue(newValue)}
@@ -133,26 +140,41 @@ const DataFilters = ({
       </Grid>
       <Grid
         item
-        className={classes.gridSlider}
+        sx={{ width: "100%", marginBottom: "35px !important" }}
         key={key + "experimentalCondition"}
       >
-        <Typography
+        <StyledTitles
           id="discrete-slider"
           key={key + "experimentalConditionTitle"}
           gutterBottom
-          className={classes.titles}
         >
           Experimental Conditions
-        </Typography>
+        </StyledTitles>
         <FormControl
           key={key + "expConditionFormControl"}
           variant="outlined"
-          className={classes.formControl}
+          sx={{ width: "100%" }}
           disabled={isDisabled}
         >
           <Select
             key={key + "expConditionSelect"}
-            className={classes.select}
+            sx={{
+              width: "100%",
+              color: "black",
+              "& .Mui-checked": {
+                color: "secondary.main !important"
+              },
+              "&:before": {
+                borderColor: "secondary.main !important"
+              },
+              "&:after": {
+                borderColor: "secondary.main !important",
+                borderBottom: "2px solid secondary.main !important"
+              },
+
+              ":before": { borderBottomColor: "2px solid #f1c023" },
+              ":after": { borderBottomColor: "#f1c023" }
+            }}
             value={experimentalMenuValue || []}
             name="experimentalConditionSelection"
             displayEmpty
@@ -229,7 +251,6 @@ const DataFilters = ({
       {numericalDataFilters && (
         <NumericalDataFilters
           filters={numericalDataFilters}
-          classes={classes}
           isDisabled={isDisabled}
         />
       )}
@@ -269,7 +290,7 @@ const DataFilters = ({
           />
         </FormControl>
       </Grid>*/
-const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
+const NumericalDataFilters = ({ filters, isDisabled }) => {
   const [
     { axisChange, absoluteMinMaxDataFilters },
     dispatch
@@ -353,16 +374,15 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
           <Grid
             item
             key={filter["name"] + "-grid"}
-            className={classes.gridSlider}
+            sx={{ width: "100%", marginBottom: "35px !important" }}
           >
-            <Typography
+            <StyledTitles
               id={filter["name"] + "range-slider-title"}
               key={filter["name"] + "range-slider-title"}
-              className={classes.titles}
               gutterBottom
             >
               {filter["label"]}
-            </Typography>
+            </StyledTitles>
             <Typography
               id="breath-local-slider"
               gutterBottom
@@ -395,10 +415,10 @@ const NumericalDataFilters = ({ filters, classes, isDisabled }) => {
             >
               Range Controls
             </Typography>
-            <Slider
+            <StyledSlider
               key={filter["name"] + "-slider"}
               value={defaultValues[filter["name"]]}
-              className={classes.slider}
+              //className={classes.slider}
               color={"secondary"}
               disabled={isDisabled}
               marks={[

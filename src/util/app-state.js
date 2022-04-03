@@ -1,5 +1,5 @@
 import React, { createContext, useReducer, useContext } from "react";
-import { Route, Redirect } from "react-router-dom";
+import { Route, Redirect, useLocation, useHistory } from "react-router-dom";
 const StateContext = createContext();
 
 export function AppStateProvider({ reducer, initialState, children }) {
@@ -34,21 +34,38 @@ export function UnauthenticatedRoute({ children, ...rest }) {
 }
 export function PrivateRoute({ children, ...rest }) {
   const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
+  const location = useLocation();
 
-  return (
-    <Route
-      {...rest}
-      component={({ match }) => {
-        if (authKeyID) {
-          return React.cloneElement(children, { uri: match });
-        } else {
-          dispatch({
-            type: "LOGOUT"
-          });
-        }
-      }}
-    />
-  );
+  //one off for when someone refreshes current analysis
+  if (location["search"].indexOf("analysis") !== -1) {
+    const history = useHistory();
+
+    const path = location["search"];
+    const analysisUrl = "analysis=";
+
+    const ticket = path.substr(
+      path.indexOf(analysisUrl) + analysisUrl.length,
+      path.length
+    );
+    history.push("/dashboards/" + ticket);
+    return null;
+  } else {
+    //return normal
+    return (
+      <Route
+        {...rest}
+        component={({ match }) => {
+          if (authKeyID) {
+            return React.cloneElement(children, { uri: match });
+          } else {
+            dispatch({
+              type: "LOGOUT"
+            });
+          }
+        }}
+      />
+    );
+  }
 }
 export function AdminRoute({ children, ...rest }) {
   const [{ authKeyID, isSuperUser }, dispatch] = useAppState();

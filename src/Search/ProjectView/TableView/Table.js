@@ -8,20 +8,10 @@ import { matchSorter } from "match-sorter";
 
 import Autocomplete from "@mui/material/Autocomplete";
 
-import { withStyles } from "@mui/styles";
 import { useDashboardState } from "../ProjectState/dashboardState";
 import table from "./table.css";
 
-const styles = {
-  wrapper: {
-    height: 750,
-    width: 1200,
-    "& div[role=grid]": { borderRadius: 5 },
-    "& div": { backgroundColor: "#90909380", padding: 0 }
-  }
-};
-
-const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
+const Table = ({ handleForwardStep, columns, rows, project }) => {
   const [{}, dispatch] = useDashboardState();
   const [searchValue, setValue] = useState(null);
   const [tableRows, setTableRows] = useState([]);
@@ -43,7 +33,7 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
         backgroundColor: "#e5b151"
       }}
     >
-      {column["key"]}
+      {column["name"]}
     </p>
   );
 
@@ -51,8 +41,13 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
     column["key"] === "sample_id" ? (
       <a
         id={"link-" + row["dashboard_id"] + "-" + row["sample_id"]}
-        style={{ color: "black", fontSize: 18, paddingLeft: 5 }}
-        href={"javascript:;"}
+        style={{
+          color: "black",
+          fontSize: 18,
+          paddingLeft: 5,
+          cursor: "pointer",
+          textDecoration: "underline"
+        }}
         onMouseEnter={function(event, row) {
           d3.select("#" + event.target.id).style("font-weight", "bold");
         }}
@@ -196,6 +191,7 @@ const Table = ({ handleForwardStep, classes, columns, rows, project }) => {
             height: "100%",
             width: "100%",
             padding: 0,
+            border: "0px !important",
             "& div[role=columnheader]": { padding: 0 },
             "& div": { backgroundColor: "#90909380", padding: 0 }
           }}

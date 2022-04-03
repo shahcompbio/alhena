@@ -21,7 +21,7 @@ const useToolbarStyles = makeStyles(theme => ({
     },
     color: "black"
   },
-  actionsWrapper: { position: "absolute", right: 3, top: 5 },
+  actionsWrapper: { position: "absolute", right: 18, top: 5 },
   checkMark: {
     marginTop: 15,
     marginRight: 10
@@ -39,7 +39,14 @@ const useToolbarStyles = makeStyles(theme => ({
     paddingRight: theme.spacing(1),
     borderRadius: "10px 10px 0px 0px"
   },
-  fontSelected: { fontSize: 20, paddingTop: 40, paddingBottom: 0 },
+  fontSelected: {
+    paddingTop: 40,
+    paddingBottom: 0,
+    fontFamily: "Helvetica",
+    fontSize: 18,
+    fontWeight: 500,
+    color: "#2e334a"
+  },
   highlight: {
     backgroundColor: "#e5e5e5"
   },
@@ -83,7 +90,7 @@ const TableToolbar = ({
       ? "Save " + name + "?"
       : selectedAction === "Delete"
       ? "Delete " + name + "?"
-      : "1 selected";
+      : "";
   return (
     <Toolbar
       className={clsx(classes.root, {
@@ -112,7 +119,7 @@ const TableToolbar = ({
               <Tooltip
                 arrow
                 className={classes.tooltipTitle}
-                title={<Typography variant="h6">Delete</Typography>}
+                title={<Typography variant="body">Delete</Typography>}
                 key={name + "ToolbarDelete"}
               >
                 <IconButton
@@ -126,7 +133,7 @@ const TableToolbar = ({
               <Tooltip
                 arrow
                 className={classes.tooltipTitle}
-                title={<Typography variant="h6">Edit</Typography>}
+                title={<Typography variant="body">Edit</Typography>}
                 key={name + "ToolbarEdit"}
               >
                 <IconButton
@@ -143,7 +150,7 @@ const TableToolbar = ({
               <Tooltip
                 arrow
                 className={classes.tooltipTitle}
-                title={<Typography variant="h6">Cancel</Typography>}
+                title={<Typography variant="body">Cancel</Typography>}
                 style={{ float: "right" }}
               >
                 <IconButton
@@ -156,7 +163,7 @@ const TableToolbar = ({
               </Tooltip>
             ]
           ) : isLoading ? (
-            <Typography variant="h5" className={classes.loadingText}>
+            <Typography variant="body" className={classes.loadingText}>
               Loading
             </Typography>
           ) : actionComplete ? (
@@ -166,7 +173,7 @@ const TableToolbar = ({
               <Tooltip
                 arrow
                 className={classes.tooltipTitle}
-                title={<Typography variant="h5">Cancel</Typography>}
+                title={<Typography variant="body">Cancel</Typography>}
               >
                 <IconButton
                   aria-label="Cancel"
@@ -179,7 +186,7 @@ const TableToolbar = ({
               <Tooltip
                 arrow
                 className={classes.tooltipTitle}
-                title={<Typography variant="h5">Confirm</Typography>}
+                title={<Typography variant="body">Confirm</Typography>}
               >
                 <IconButton
                   aria-label="confirm"

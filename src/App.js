@@ -102,7 +102,10 @@ const App = () => {
           <UnauthenticatedRoute path="/forgotPassword">
             <ForgotPasswordWrapper />
           </UnauthenticatedRoute>
-          <PrivateRoute key="ticket" path="/dashboards/:ticket/:copyLink">
+          <PrivateRoute key="copylink" path="/dashboards/:ticket/:copyLink">
+            <DashboardWrapper />
+          </PrivateRoute>
+          <PrivateRoute key="analysis" path="/dashboards:analysis">
             <DashboardWrapper />
           </PrivateRoute>
           <PrivateRoute key="ticket" path="/dashboards/:ticket">

@@ -14,37 +14,6 @@ import * as yup from "yup";
 import { gql, useLazyQuery } from "@apollo/client";
 
 import styled from "styled-components";
-import { withStyles } from "@mui/styles";
-
-const styles = theme => ({
-  button: {
-    backgroundColor: theme.palette.primary.main
-  },
-  paperTitle: {
-    paddingBottom: theme.spacing.unit * 5,
-    padding: theme.spacing.unit * 3,
-    height: 125,
-    borderRadius: 20,
-    overflowX: "auto",
-    width: "25vw",
-    color: "white",
-    textAlign: "center",
-    background: theme.palette.primary.main
-  },
-  paperForm: {
-    overflowX: "auto",
-    margin: "auto",
-    borderRadius: 20,
-    padding: 20,
-    width: "25vw",
-    marginBottom: theme.spacing.unit,
-    marginTop: "-70px",
-    display: "inline-block"
-  },
-  textField: {
-    margin: "10px !important"
-  }
-});
 
 const UPDATEPASSWORD = gql`
   query($username: String!, $newPassword: String!) {
@@ -54,10 +23,9 @@ const UPDATEPASSWORD = gql`
   }
 `;
 
-const UpdatePassword = ({ username, dispatch, classes }) => {
+const UpdatePassword = ({ username, dispatch }) => {
   let history = useHistory();
   const [error, setError] = useState(null);
-  const [user, setUser] = useState({ password: "", passwordVerify: "" });
 
   const [updatePassword, { loading, error: updateError, data }] = useLazyQuery(
     UPDATEPASSWORD
@@ -76,19 +44,19 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
     }
   }, [data, loading, updateError]);
 
-  const handleChange = event => {
-    var newUser = user;
-    newUser[event.target.name] = event.target.value;
-    setUser({ ...newUser });
-  };
-
   return (
-    <Grid container direction="row" justifyContent="center" alignItems="center">
+    <Grid
+      container
+      direction="row"
+      justifyContent="center"
+      alignItems="center"
+      sx={{ width: "400px", "& .MuiFormHelperText-root": { color: "red" } }}
+    >
       <div
         style={{
           position: "absolute",
           top: "15%",
-          width: 400
+          width: "400px !important"
         }}
       >
         {error && (
@@ -124,7 +92,6 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
             })
           }
           style={{ maxWidth: 450 }}
-          className={classes.root}
           autoComplete="off"
         >
           {({
@@ -136,11 +103,10 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
             setFieldValue
           }) => {
             const isValid = !Object.keys(errors).length;
-            console.log(isValid);
             return (
               <div>
                 <TextField
-                  className={classes.textField}
+                  sx={{ margin: "10px !important" }}
                   margin="normal"
                   id={"updatePassword:username"}
                   required
@@ -150,9 +116,8 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
                   type={"text"}
                 />
                 <TextField
-                  className={classes.textField}
+                  sx={{ margin: "10px !important" }}
                   key={"updatePassword"}
-                  onChange={handleChange}
                   name={"password"}
                   value={values.password}
                   fullWidth
@@ -165,7 +130,7 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
                   }}
                 />
                 <TextField
-                  className={classes.textField}
+                  sx={{ margin: "10px !important" }}
                   key={"updatePasswordVerify"}
                   name={"passwordVerify"}
                   onChange={event => {
@@ -182,7 +147,13 @@ const UpdatePassword = ({ username, dispatch, classes }) => {
                 />
                 <ComponentWrapper style={{ textAlign: "center" }}>
                   <Button
-                    className={classes.button}
+                    sx={{
+                      backgroundColor: "#5981b7 !important",
+                      color: "white !important",
+                      ":hover": {
+                        backgroundColor: "#2f4461 !important"
+                      }
+                    }}
                     variant="contained"
                     disableElevation
                     type="submit"
@@ -205,4 +176,4 @@ const ComponentWrapper = styled.div`
   margin: 10px;
 `;
 
-export default withStyles(styles)(UpdatePassword);
+export default UpdatePassword;

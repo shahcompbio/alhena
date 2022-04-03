@@ -9,7 +9,6 @@ import TableToolbar from "./TableToolBar.js";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
 
-import { withStyles } from "@mui/styles";
 import { gql, useLazyQuery, useQuery } from "@apollo/client";
 const getAllSettings = gql`
   query AdminPanel($user: ApiUser!, $tabIndex: Int) {
@@ -86,22 +85,8 @@ export const UPDATEUSER = gql`
     }
   }
 `;
-const styles = (theme, tabIndex) => ({
-  root: {
-    width: "95%",
-    margin: "auto",
-    flexGrow: 1,
-    borderRadius: 20,
-    zIndex: 20,
-    marginBottom: 80,
-    minHeight: 270
-  },
-  grid: {
-    marginTop: "-60px"
-  }
-});
 
-const TabContentWrapper = ({ classes, tabIndex }) => {
+const TabContentWrapper = ({ tabIndex }) => {
   const [{ authKeyID, uid }, dispatch] = useAppState();
   const [isLoading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -329,9 +314,20 @@ const TabContentWrapper = ({ classes, tabIndex }) => {
 
   if (loading) {
     return (
-      <div className={classes.root} key={"adminTable" + tabIndex}>
+      <div
+        style={{
+          width: "95%",
+          margin: "auto",
+          flexGrow: 1,
+          borderRadius: 20,
+          zIndex: 20,
+          marginBottom: 80,
+          minHeight: 270
+        }}
+        key={"adminTable" + tabIndex}
+      >
         <Grid
-          className={classes.grid}
+          sx={{ marginTop: "-60px" }}
           direction="column"
           justifyContent="center"
           alignItems="center"
@@ -340,7 +336,17 @@ const TabContentWrapper = ({ classes, tabIndex }) => {
           key={"adminGrid"}
         >
           <Paper
-            className={classes.root}
+            sx={{
+              width: "95%",
+              margin: "auto",
+              flexGrow: 1,
+              borderRadius: 20,
+              zIndex: 20,
+              marginBottom: "80px",
+              minHeight: "270px",
+              minWidth: "859px",
+              xOverflow: "scroll"
+            }}
             style={{
               background: "rgb(251 251 251)"
               //tabIndex === 1 ? "rgb(196 221 239)" : theme.palette.primary.dark
@@ -365,9 +371,20 @@ const TabContentWrapper = ({ classes, tabIndex }) => {
       : sortAlpha(data[tableConfig.dataReturnName], tableConfig.keyName);
 
   return (
-    <div className={classes.root} key={"adminTable" + tabIndex}>
+    <div
+      style={{
+        width: "95%",
+        margin: "auto",
+        flexGrow: 1,
+        borderRadius: 2,
+        zIndex: 20,
+        marginBottom: 80,
+        minHeight: 270
+      }}
+      key={"adminTable" + tabIndex}
+    >
       <Grid
-        className={classes.grid}
+        sx={{ marginTop: "-60px" }}
         direction="column"
         justifyContent="center"
         alignItems="center"
@@ -376,7 +393,17 @@ const TabContentWrapper = ({ classes, tabIndex }) => {
         key={"adminGrid"}
       >
         <Paper
-          className={classes.root}
+          sx={{
+            width: "95%",
+            margin: "auto",
+            flexGrow: 1,
+            borderRadius: 2,
+            zIndex: 20,
+            marginBottom: "80px",
+            minHeight: "270px",
+            minWidth: "859px",
+            xOverflow: "scroll"
+          }}
           elevation={0}
           key={"adminTablePaper" + tabIndex}
           style={{
@@ -450,4 +477,4 @@ const TabContentWrapper = ({ classes, tabIndex }) => {
     </div>
   );
 };
-export default withStyles(styles)(TabContentWrapper);
+export default TabContentWrapper;

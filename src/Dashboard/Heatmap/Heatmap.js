@@ -219,7 +219,7 @@ const Heatmap = ({ analysis, allHeatmapOrder, categoryStats }) => {
           />
         </Grid>
       </Grid>
-      <Grid item style={{}}>
+      <Grid item style={{ paddingTop: 10 }}>
         <canvas
           id="chromAxis"
           height={heatmapConfig.chromosome["height"]}

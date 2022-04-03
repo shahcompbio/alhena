@@ -20,53 +20,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import LoadingCircle from "../Dashboard/CommonModules/LoadingCircle.js";
 import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
 
-import { makeStyles } from "@mui/styles";
 import styled from "styled-components";
-
-const useStyles = makeStyles(theme => ({
-  circleImg: {
-    height: 500,
-    width: 500,
-    top: "20%",
-    margin: 10,
-    position: "absolute"
-  },
-
-  floatingLabelFocusStyle: {
-    color: "black",
-    fontWeight: "500"
-  },
-  input: {
-    color: "black",
-    borderBottom: "1px solid #769bb5"
-  },
-  inputWrapper: {
-    position: "absolute",
-    top: "50vh",
-    marginLeft: 10
-  },
-  logo: {
-    position: "absolute",
-    top: "20vh",
-    margin: 10,
-    marginLeft: 30
-  },
-  forgotPasswordButton: { marginLeft: 20, marginTop: 40 },
-  submitButton: {
-    marginLeft: 10,
-    marginTop: 40,
-    backgroundColor: theme.palette.primary.dark,
-    color: theme.palette.background.default,
-    "&:hover": {
-      backgroundColor: theme.palette.primary.main
-    }
-  },
-  textField: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    width: 300
-  }
-}));
 
 export const LOGIN = gql`
   query Login($user: User!) {
@@ -90,7 +44,7 @@ const UnauthenticatedApp = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const [login, { data, loading, error }] = useLazyQuery(LOGIN);
-  const classes = useStyles();
+
   useEffect(() => {
     setError(null);
     if (error) {
@@ -113,16 +67,21 @@ const UnauthenticatedApp = () => {
   }, [data, loading, error]);
 
   return (
-    <Grid container direction="row" justifyContent="center" alignItems="center">
-      <div className={classes.circleImg}>
-        {error && (
-          <SnackbarContentWrapper
-            variant="error"
-            errorNumber={errors}
-            setError={setError}
-          />
-        )}
-      </div>
+    <Grid
+      container
+      direction="row"
+      justifyContent="center"
+      alignItems="center"
+      id="unauth-wrapper"
+      style={{ position: "relative", marginTop: "33vh" }}
+    >
+      {error && (
+        <SnackbarContentWrapper
+          variant="error"
+          errorNumber={errors}
+          setError={setError}
+        />
+      )}
       <div
         alt="logo"
         style={{
@@ -131,11 +90,8 @@ const UnauthenticatedApp = () => {
           backgroundRepeat: "no-repeat",
           imageRendering: "-webkit-optimize-contrast",
           height: 425,
-          width: 500,
-          marginTop: -55,
-          marginLeft: 98
+          width: 500
         }}
-        className={classes.logo}
         height={"191px"}
         width={"528px"}
       >
@@ -150,7 +106,7 @@ const UnauthenticatedApp = () => {
         />
       </div>
 
-      <div className={classes.inputWrapper}>
+      <div style={{ marginLeft: 10 }}>
         {loading ? (
           <LoadingCircle />
         ) : (
@@ -169,16 +125,17 @@ const UnauthenticatedApp = () => {
           >
             <ComponentWrapper>
               <TextField
-                className={classes.textField}
+                sx={{
+                  width: "100%"
+                }}
                 margin="normal"
                 id={"login:username"}
                 onChange={event => setUsername(event.target.value)}
                 required
                 fullWidth
                 InputLabelProps={{
-                  className: classes.floatingLabelFocusStyle
+                  sx: { color: "black", fontWeight: "500" }
                 }}
-                InputProps={{ className: classes.input }}
                 value={username}
                 label={"Username"}
                 type={"text"}
@@ -186,7 +143,9 @@ const UnauthenticatedApp = () => {
             </ComponentWrapper>
             <ComponentWrapper>
               <TextField
-                className={classes.textField}
+                sx={{
+                  width: "100%"
+                }}
                 margin="normal"
                 inputRef={passwordRef}
                 id={"login:password"}
@@ -194,10 +153,9 @@ const UnauthenticatedApp = () => {
                 required
                 fullWidth
                 InputLabelProps={{
-                  className: classes.floatingLabelFocusStyle
+                  sx: { color: "black", fontWeight: "500" }
                 }}
                 InputProps={{
-                  className: classes.input,
                   color: "primary",
                   endAdornment: (
                     <InputAdornment position="end">
@@ -218,7 +176,13 @@ const UnauthenticatedApp = () => {
             </ComponentWrapper>
             <ComponentWrapper>
               <Button
-                className={classes.submitButton}
+                sx={{
+                  backgroundColor: "#5981b7 !important",
+                  color: "white !important",
+                  ":hover": {
+                    backgroundColor: "#2f4461 !important"
+                  }
+                }}
                 variant="contained"
                 disableElevation
                 type="submit"
@@ -226,8 +190,11 @@ const UnauthenticatedApp = () => {
                 Log In
               </Button>
               <Button
-                sx={{ marginLeft: 20 }}
-                className={classes.forgotPasswordButton}
+                sx={{
+                  marginLeft: "20px",
+                  color: "#5981b7 !important",
+                  border: "1px solid #5981b7 !important"
+                }}
                 variant="outlined"
                 disableElevation
                 onClick={() => history.push("/forgotPassword")}

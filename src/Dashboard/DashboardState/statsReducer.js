@@ -47,7 +47,6 @@ const initialState = {
 };
 
 const statsStateReducer = (state, action) => {
-  console.log(action);
   switch (action.type) {
     case "BRUSH": {
       return {
@@ -145,6 +144,7 @@ const statsStateReducer = (state, action) => {
       };
     }
     case "CHIPHEATMAP_AXIS_UPDATE": {
+      console.log("change again");
       return {
         ...state,
         selectedCells: [],
@@ -152,7 +152,8 @@ const statsStateReducer = (state, action) => {
         chipHeatmapAxis: action.value
       };
     }
-    case "CHIPHEATMAP_AXIS_RESET": {
+    case "CHIP_AXIS_RESET": {
+      console.log("reset done");
       return {
         ...state,
         axisChange: { ...state.axisChange, chip: false },

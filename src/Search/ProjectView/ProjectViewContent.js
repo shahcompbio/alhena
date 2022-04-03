@@ -95,6 +95,7 @@ const ProjectViewContent = ({ classes, handleForwardStep }) => {
             rows={[]}
             handleForwardStep={null}
             key={"project-view-table"}
+            project={[]}
           />
         </Grid>
       </div>

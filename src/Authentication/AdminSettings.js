@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { makeStyles } from "@mui/styles";
+
 import _ from "lodash";
 
-import {
-  Grid,
-  Button,
-  TextField,
-  Typography,
-  InputAdornment
-} from "@mui/material";
+import { Grid, Button, TextField, Typography } from "@mui/material";
 
 import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
 
@@ -59,7 +53,7 @@ const AdminSettings = ({ data }) => {
           setError={setError}
         />
       )}
-      <Typography variant="h5">Search Table Labeling</Typography>
+      <Typography variant="h5">Search Table Labels</Typography>
       <Grid
         container
         spacing={2}
@@ -77,47 +71,51 @@ const AdminSettings = ({ data }) => {
           sx={{ padding: "36px !important" }}
         >
           <table>
-            <tr key={"tr-type"}>
-              <th style={{ textAlign: "left" }}>
-                <Typography variant="body" sx={{ fontFamily: "MyFont" }}>
-                  Type
-                </Typography>
-              </th>
-              <th style={{ width: 20 }} />
-              <th style={{ textAlign: "left" }}>
-                <Typography variant="body" sx={{ fontFamily: "MyFont" }}>
-                  Display Label
-                </Typography>
-              </th>
-            </tr>
-            {data.map(option => (
-              <tr key={"tr-" + option.type}>
-                <td key={"td-" + option.t}>
-                  <Typography
-                    variant="standard"
-                    key={"type-" + option.type}
-                    sx={{ fontFamily: "MyFont" }}
-                  >
-                    {option.type}
+            <thead>
+              <tr key={"tr-type"}>
+                <th style={{ textAlign: "left" }}>
+                  <Typography variant="body" sx={{ fontFamily: "Helvetica" }}>
+                    Type
                   </Typography>
-                </td>
-                <td style={{ width: 20 }} />
-                <td style={{ textAlign: "left" }}>
-                  <TextField
-                    key={"textfield-" + option.t}
-                    sx={{ fontFamily: "MyFont" }}
-                    variant="standard"
-                    onChange={event => {
-                      var newLabels = labels;
-                      newLabels[option.type] = event.target.value;
-                      setLabels({ ...newLabels });
-                    }}
-                    InputProps={{ fontFamily: "MyFont" }}
-                    value={labels[option.type]}
-                  />
-                </td>
+                </th>
+                <th style={{ width: 20 }} />
+                <th style={{ textAlign: "left" }}>
+                  <Typography variant="body" sx={{ fontFamily: "Helvetica" }}>
+                    Display Label
+                  </Typography>
+                </th>
               </tr>
-            ))}
+            </thead>
+            <tbody>
+              {data.map((option, index) => (
+                <tr key={"tr-" + option.type + index}>
+                  <td key={"td-" + option.type + index}>
+                    <Typography
+                      variant="standard"
+                      key={"type-" + option.type + index}
+                      sx={{ fontFamily: "Helvetica" }}
+                    >
+                      {option.type}
+                    </Typography>
+                  </td>
+                  <td style={{ width: 20 }} />
+                  <td style={{ textAlign: "left" }}>
+                    <TextField
+                      key={"textfield-" + option.type + index}
+                      sx={{ fontFamily: "Helvetica" }}
+                      variant="standard"
+                      onChange={event => {
+                        var newLabels = labels;
+                        newLabels[option.type] = event.target.value;
+                        setLabels({ ...newLabels });
+                      }}
+                      InputProps={{}}
+                      value={labels[option.type]}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </Grid>
       </Grid>

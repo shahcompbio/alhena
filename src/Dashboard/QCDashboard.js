@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import { gql, useQuery } from "@apollo/client";
 
-import withStyles from '@mui/styles/withStyles';
+import withStyles from "@mui/styles/withStyles";
 import { useHistory } from "react-router-dom";
 
 import Heatmap from "./Heatmap/Heatmap.js";
@@ -269,13 +269,16 @@ const QCDashboard = ({ analysis, classes }) => {
                 </Paper>
                 <Paper
                   key={"chipPaper"}
-                  className={[classes.chip, classes.paperContainer]}
+                  className={[classes.chip, classes.paperContainer].join(" ")}
                 >
                   <Chip key={"chipPlot"} analysis={analysis} />
                 </Paper>
                 <Paper
                   key={"violinPaper"}
-                  className={[classes.violinContent, classes.paperContainer]}
+                  className={[
+                    classes.violinContent,
+                    classes.paperContainer
+                  ].join(" ")}
                 >
                   <Violin
                     key={"violinPlot"}
@@ -286,7 +289,7 @@ const QCDashboard = ({ analysis, classes }) => {
                 </Paper>
                 <Paper
                   key={"gcBiasPaper"}
-                  className={[classes.gcBias, classes.paperContainer]}
+                  className={[classes.gcBias, classes.paperContainer].join(" ")}
                 >
                   <GCBias
                     key={"gcBiasPlot"}
@@ -296,7 +299,9 @@ const QCDashboard = ({ analysis, classes }) => {
                 </Paper>
                 <Paper
                   key={"scatterPaper"}
-                  className={[classes.scatterplot, classes.paperContainer]}
+                  className={[classes.scatterplot, classes.paperContainer].join(
+                    " "
+                  )}
                 >
                   <Scatterplot key={"scatterplot"} analysis={analysis} />
                 </Paper>

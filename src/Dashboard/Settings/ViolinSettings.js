@@ -13,7 +13,7 @@ const useStyles = makeStyles(theme => ({
     width: "100%",
     margin: theme.spacing(0, 0, 2, 0) + " !important"
   },
-  dropDownLabel: { backgroundColor: "white", padding: 3 }
+  dropDownLabel: { backgroundColor: "white", padding: "3px !important;" }
 }));
 
 const ViolinSettings = ({ axisOptions, setAxisOption, isDisabled }) => {
@@ -70,7 +70,7 @@ const ViolinSettings = ({ axisOptions, setAxisOption, isDisabled }) => {
           value={xAxisLabel}
           name="xViolinAxisAxis"
           onChange={handleAxisChange("x")}
-          labelWidth={100}
+          labelwidth={100}
         >
           {axisOptions
             ? axisOptions["xAxis"].map((option, index) => (
@@ -104,7 +104,7 @@ const ViolinSettings = ({ axisOptions, setAxisOption, isDisabled }) => {
           key="yAxisViolin"
           value={yAxisLabel}
           onChange={handleAxisChange("y")}
-          labelWidth={100}
+          labelwidth={100}
         >
           {axisOptions
             ? axisOptions["yAxis"].map((option, index) => (

@@ -11,42 +11,8 @@ import SnackbarContentWrapper from "../Misc/SnackBarPopup.js";
 import UpdatePassword from "./NewUser/UpdatePassword.js";
 
 import styled from "styled-components";
-import { withStyles } from "@mui/styles";
 
 import { useHistory } from "react-router-dom";
-
-const styles = theme => ({
-  button: {
-    backgroundColor: theme.palette.primary.main,
-    marginRight: 10
-  },
-  paperTitle: {
-    paddingBottom: theme.spacing.unit * 5,
-    padding: theme.spacing.unit * 3,
-    height: 125,
-    borderRadius: 20,
-    overflowX: "auto",
-    width: "25vw",
-    color: "white",
-    textAlign: "center",
-    background: theme.palette.primary.main
-  },
-  paperForm: {
-    overflowX: "auto",
-    margin: "auto",
-    borderRadius: 20,
-    padding: 20,
-    width: "25vw",
-    marginBottom: theme.spacing.unit,
-    marginTop: "-70px",
-    display: "inline-block"
-  },
-  textField: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    width: "20vw"
-  }
-});
 
 const VERIFYUSER = gql`
   query($username: String!, $email: String!) {
@@ -56,12 +22,11 @@ const VERIFYUSER = gql`
   }
 `;
 
-const ForgotPasswordWrapper = ({ dispatch, classes }) => {
+const ForgotPasswordWrapper = ({ dispatch }) => {
   let history = useHistory();
 
   const [error, setError] = useState(null);
   const [isVerified, setIsVerified] = useState(false);
-  const [verifiedUsername, setVerifiedUsername] = useState();
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -85,7 +50,8 @@ const ForgotPasswordWrapper = ({ dispatch, classes }) => {
       <div
         style={{
           position: "absolute",
-          top: "15%"
+          top: "15%",
+          width: "400px !important"
         }}
       >
         {error && (
@@ -106,7 +72,7 @@ const ForgotPasswordWrapper = ({ dispatch, classes }) => {
             <ComponentWrapper key={"componentWrapper-username"}>
               <TextField
                 key={"textField-username"}
-                className={classes.textField}
+                sx={{ marginLeft: 1, marginRight: 1, width: "400px" }}
                 margin="normal"
                 id={"resetPassword:username"}
                 required
@@ -122,7 +88,7 @@ const ForgotPasswordWrapper = ({ dispatch, classes }) => {
             <ComponentWrapper key={"componentWrapper-email"}>
               <TextField
                 key={"textField-email"}
-                className={classes.textField}
+                sx={{ marginLeft: 1, marginRight: 1, width: "400px" }}
                 margin="normal"
                 id={"resetPassword:email"}
                 required
@@ -139,7 +105,14 @@ const ForgotPasswordWrapper = ({ dispatch, classes }) => {
               style={{ display: "flex", justifyContent: "space-around" }}
             >
               <Button
-                className={classes.backButton}
+                sx={{
+                  marginLeft: "20px",
+                  color: "#5981b7 !important",
+                  border: "1px solid #5981b7 !important",
+                  marginTop: "7px",
+                  right: "20px",
+                  position: "absolute"
+                }}
                 variant="outlined"
                 disableElevation
                 onClick={() => {
@@ -149,7 +122,17 @@ const ForgotPasswordWrapper = ({ dispatch, classes }) => {
                 Back
               </Button>
               <Button
-                className={classes.button}
+                sx={{
+                  marginTop: "7px",
+                  right: "100px",
+                  marginRight: "10px",
+                  position: "absolute",
+                  backgroundColor: "#5981b7 !important",
+                  color: "white !important",
+                  ":hover": {
+                    backgroundColor: "#2f4461 !important"
+                  }
+                }}
                 variant="contained"
                 disableElevation
                 type="submit"
@@ -177,4 +160,4 @@ const ComponentWrapper = styled.div`
   margin: 10px;
 `;
 
-export default withStyles(styles)(ForgotPasswordWrapper);
+export default ForgotPasswordWrapper;

@@ -16,56 +16,6 @@ import AddDashboardPopupWrapper from "./AddDashboardPopupWrapper.js";
 import Menu from "../Misc/Menu.js";
 import TabContentWrapper from "./TabContentWrapper.js";
 
-import { withStyles } from "@mui/styles";
-const styles = theme => ({
-  actions: {
-    float: "right"
-  },
-  appBar: {
-    width: "50% !important",
-    margin: "auto",
-    zIndex: 10,
-    marginLeft: -55,
-    marginTop: -60,
-    backgroundColor: "#ffffff00 !important",
-    position: "absolute !important"
-  },
-  icons: {
-    height: "45px",
-    marginTop: "20px",
-    position: "absolute !important",
-    padding: 0,
-    paddingTop: "50px !important",
-    zIndex: 5
-  },
-  iconSvg: {
-    width: "1.5em",
-    height: "1.5em",
-    color: "#5b6691",
-    pointerEvents: "all"
-  },
-  root: {
-    flexGrow: 1,
-    width: "80vw",
-    margin: "auto",
-    paddingTop: 50,
-    marginBottom: 80
-  },
-  paper: {
-    overflowY: "clip",
-    paddingBottom: theme.spacing(5),
-    padding: theme.spacing(3),
-    height: 100,
-    width: "90%",
-    borderRadius: 10,
-    margin: "auto",
-    overflowX: "auto",
-    backgroundColor: "#4e89bb",
-    color: "white"
-  },
-  tabs: { alignSelf: "flex-end" },
-  toolbar: { overflow: "hidden" }
-});
 const CREATENEWDASHBOARD = gql`
   query createNewDashboard($dashboard: DashboardInput!) {
     createNewDashboard(dashboard: $dashboard) {
@@ -124,10 +74,29 @@ const AdminPanel = ({ classes }) => {
     tabIndex === 0 ? "-users" : tabIndex === 1 ? "-dashboards" : "-settings";
   return (
     <div style={{ flexGrow: 1, height: "100vh" }}>
-      <div className={classes.root}>
+      <div
+        style={{
+          flexGrow: 1,
+          width: "80vw",
+          margin: "auto",
+          paddingTop: 50,
+          marginBottom: 80
+        }}
+      >
         <Paper
           rounded={"true"}
-          className={classes.paper}
+          sx={theme => ({
+            overflowY: "clip",
+            paddingBottom: theme.spacing(5),
+            padding: theme.spacing(3),
+            height: 150,
+            width: "87%",
+            //borderRadius: 10,
+            margin: "auto",
+            overflowX: "auto",
+            backgroundColor: "white",
+            color: "white"
+          })}
           key={"rootPaper" + keyType}
         >
           <Grid
@@ -137,7 +106,9 @@ const AdminPanel = ({ classes }) => {
             key={"adminpanel-container" + keyType}
           >
             <Grid item xs={6} key={"admin-title" + keyType}>
-              <Typography variant="h4">Admin Settings</Typography>
+              <Typography variant="h4" sx={{ color: "#2e334a" }}>
+                Admin Settings
+              </Typography>
             </Grid>
             <Grid item xs={6} key={"icon-container"}>
               <Grid
@@ -145,17 +116,33 @@ const AdminPanel = ({ classes }) => {
                 direction="row"
                 justifyContent="flex-end"
                 alignItems="center"
-                className={classes.actions}
+                style={{
+                  float: "right",
+                  paddingTop: 20
+                }}
               >
                 <IconButton
                   key={"add-button" + keyType}
                   variant="outlined"
                   color="secondary"
-                  className={classes.icons}
+                  sx={{
+                    height: "45px",
+                    marginTop: "10px",
+                    position: "absolute !important",
+                    padding: "5px !important",
+                    zIndex: 5
+                  }}
                   onClick={handleClickAdd}
                   size="large"
                 >
-                  <AddBoxIcon className={classes.iconSvg} />
+                  <AddBoxIcon
+                    sx={{
+                      width: "1.5em",
+                      height: "1.5em",
+                      color: "#5b6691",
+                      pointerEvents: "all"
+                    }}
+                  />
                 </IconButton>
                 {openPopup && tabIndex === 0 && (
                   <NewUserPopup
@@ -189,10 +176,22 @@ const AdminPanel = ({ classes }) => {
             </Grid>
           </Grid>
         </Paper>
-        <AppBar position={"static"} elevation={0} className={classes.appBar}>
-          <Toolbar className={classes.toolBar}>
+        <AppBar
+          position={"static"}
+          elevation={0}
+          sx={{
+            width: "50% !important",
+            margin: "auto",
+            zIndex: 10,
+            marginLeft: "-55px !important",
+            marginTop: "-60px !important",
+            backgroundColor: "#ffffff00 !important",
+            position: "absolute !important"
+          }}
+        >
+          <Toolbar>
             <SeperatedTabs
-              className={classes.tabs}
+              sx={{ alignSelf: "flex-end" }}
               tabs={[
                 { label: "Users" },
                 { label: "Dashboards" },
@@ -223,4 +222,4 @@ const AdminPanel = ({ classes }) => {
   );
 };
 
-export default withStyles(styles)(AdminPanel);
+export default AdminPanel;

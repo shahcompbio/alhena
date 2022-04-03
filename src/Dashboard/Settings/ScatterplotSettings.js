@@ -22,7 +22,7 @@ const useStyles = makeStyles(theme => ({
     width: "100%",
     margin: theme.spacing(0, 0, 2, 0) + " !important"
   },
-  dropDownLabel: { backgroundColor: "white", padding: 3 }
+  dropDownLabel: { backgroundColor: "white", padding: "3px !important;" }
 }));
 
 const ScatterplotSettings = ({
@@ -92,7 +92,7 @@ const ScatterplotSettings = ({
             value={xAxisLabel || ""}
             name="xAxis"
             onChange={handleAxisChange("x")}
-            labelWidth={100}
+            labelwidth={100}
           >
             {axisOptions.map((option, index) => (
               <option
@@ -124,7 +124,7 @@ const ScatterplotSettings = ({
             key="yAxisScatterplot"
             value={yAxisLabel || ""}
             onChange={handleAxisChange("y")}
-            labelWidth={100}
+            labelwidth={100}
           >
             {axisOptions.map((option, index) => (
               <option

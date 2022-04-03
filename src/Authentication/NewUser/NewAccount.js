@@ -14,9 +14,9 @@ import { gql, useLazyQuery } from "@apollo/client";
 
 const styles = theme => ({
   button: {
-    backgroundColor: "#5082ae !important",
+    backgroundColor: "#4882bb !important",
     color: "white !important",
-    fontWeight: "bold !important",
+    //fontWeight: "bold !important",
     textAlign: "center"
   },
   paperTitle: {
@@ -40,7 +40,7 @@ const styles = theme => ({
     marginTop: "-70px",
     display: "inline-block"
   },
-  helperText: { color: "red" },
+  helperText: { color: "red !important" },
   textField: {
     //    marginLeft: 10,
     width: "100%",
@@ -112,10 +112,7 @@ const NewAccount = ({ email, dispatch, classes }) => {
                 .string()
                 .min(2, "Must be at least 2 characters")
                 .required("Name is required")
-                .matches(
-                  /^[a-zA-Z0-9]+$/,
-                  "Cannot contain special characters or spaces"
-                ),
+                .matches(/^[aA-zZ\s]+$/, "Cannot contan special characters"),
               username: yup
                 .string()
                 .min(2, "Must be at least 2 characters")
@@ -179,8 +176,6 @@ const NewAccount = ({ email, dispatch, classes }) => {
               setFieldValue
             }) => {
               const isValid = !Object.keys(errors).length;
-              console.log(isValid);
-              console.log(errors);
               return (
                 <div>
                   <TextField
@@ -263,7 +258,7 @@ const NewAccount = ({ email, dispatch, classes }) => {
                   <div style={{ textAlign: "center" }}>
                     <Button
                       type="submit"
-                      disabled={isValid}
+                      disabled={!isValid}
                       className={classes.button}
                       variant="contianed"
                       onClick={handleSubmit}

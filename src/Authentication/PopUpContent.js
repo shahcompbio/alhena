@@ -19,31 +19,6 @@ import CheckIcon from "@mui/icons-material/Check";
 
 import TransferList from "./TransferList.js";
 
-const useStyles = makeStyles(theme => ({
-  button: { color: "black", backgroundColor: theme.palette.secondary.main },
-  dialogContent: { padding: "0px 24px", fontSize: 16 },
-  dialogTitle: { paddingBottom: 0 },
-  dialogWrapper: {
-    height: 200,
-    width: 250,
-    margin: "auto",
-    left: "25%",
-    position: "absolute"
-  },
-  icon: { fontSize: "6em", position: "absolute" },
-  iconButton: { top: "65%", left: "45%" },
-  textField: {
-    width: 350,
-    left: 10,
-    marginBottom: 10,
-    "&$.MuiOutlinedInput-input": { padding: "15px 12px" }
-  },
-  searchInput: {
-    padding: "15px 12px"
-  },
-  textValidator: { paddingBottom: 20 }
-}));
-
 const PopUpContent = ({
   isOpen,
   handleClose,
@@ -53,7 +28,6 @@ const PopUpContent = ({
   allIndices,
   alreadySelectedIndices
 }) => {
-  const classes = useStyles();
   const [selectedIndices, setSelectedIndices] = useState([]);
   //const [name, setName] = useState(dashboardName);
   const [isLoading, setLoading] = useState(false);
@@ -96,7 +70,7 @@ const PopUpContent = ({
         <span>
           <DialogTitle
             id="form-dialog-title"
-            className={classes.dialogTitle}
+            sx={{ paddingBottom: 0 }}
             key={"dialogTitle"}
           >
             {isEdit ? "Edit Dashboard" : "Create New Dashboard"}
@@ -123,7 +97,7 @@ const PopUpContent = ({
               isValid
             }) => (
               <span>
-                <DialogContent className={classes.dialogContent}>
+                <DialogContent sx={{ padding: "0px 24px", fontSize: 16 }}>
                   <TextValidator
                     key={"dialogName"}
                     autoFocus
@@ -140,7 +114,7 @@ const PopUpContent = ({
                     helperText={errors.name}
                     required
                     fullWidth
-                    className={classes.textValidator}
+                    sx={{ paddingBottom: "20px" }}
                   />
 
                   <TextField
@@ -149,8 +123,15 @@ const PopUpContent = ({
                     type="search"
                     variant="outlined"
                     value={searchValue}
-                    className={classes.textField}
-                    InputProps={{ classes: { input: classes.searchInput } }}
+                    sx={{
+                      width: 350,
+                      left: 10,
+                      marginBottom: 10,
+                      "&$.MuiOutlinedInput-input": { padding: "15px 12px" }
+                    }}
+                    InputProps={{
+                      classes: { input: { padding: "15px 12px" } }
+                    }}
                     onChange={event => setSearchValue(event.target.value)}
                   />
                   <TransferList
@@ -166,7 +147,7 @@ const PopUpContent = ({
                     onClick={handleClose}
                     color="secondary"
                     variant="outlined"
-                    className={classes.button}
+                    //className={classes.button}
                   >
                     Cancel
                   </Button>
@@ -197,10 +178,18 @@ const PopUpContent = ({
   );
 };
 const LoadingContent = ({ classes, isSent }) => (
-  <div className={classes.dialogWrapper}>
+  <div
+    style={{
+      height: 200,
+      width: 250,
+      margin: "auto",
+      left: "25%",
+      position: "absolute"
+    }}
+  >
     {isSent && (
-      <IconButton className={classes.iconButton} size="large">
-        <CheckIcon className={classes.icon} />
+      <IconButton sx={{ top: "65%", left: "45%" }} size="large">
+        <CheckIcon sx={{ fontSize: "6em", position: "absolute" }} />
       </IconButton>
     )}
     <LoadingCircle overRideStroke={6} />
