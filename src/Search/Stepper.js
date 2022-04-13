@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import makeStyles from "@mui/styles/makeStyles";
+
 import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import Tooltip from "@mui/material/Tooltip";
 import Grid from "@mui/material/Grid";
-const drawerWidth = 90;
 
 function getSteps() {
   return ["Project Selection", "Analysis Search", "Dashboard"];
@@ -12,9 +11,6 @@ function getSteps() {
 
 const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
   const steps = getSteps();
-  const [detailsDrawer, setDetailsDrawer] = useState(
-    activeStep === 1 ? true : false
-  );
   const [stepperColour, setStepperColour] = useState({
     fontSize: 20,
     cursor: "pointer",
@@ -32,21 +28,8 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
   }, [activeStep]);
 
   const handleStep = step => {
-    if (activeStep === 1) {
-      setDetailsDrawer(true);
-    }
     if (step < activeStep) {
       handleBackStep(step);
-    }
-  };
-
-  const moreDetailOpen = () => {
-    setDetailsDrawer(true);
-  };
-
-  const moreDetailExit = () => {
-    if (activeStep !== 1) {
-      setDetailsDrawer(false);
     }
   };
 
@@ -71,12 +54,7 @@ const SearchStepper = ({ activeStep, handleBackStep, stepTextValues }) => {
             arrow
             placement="left"
           >
-            <div
-              key={"step-wrapper" + label}
-              //className={classes.button}
-              onMouseEnter={moreDetailOpen}
-              onMouseLeave={moreDetailExit}
-            >
+            <div key={"step-wrapper" + label}>
               {activeStep === index ? (
                 <RadioButtonCheckedIcon sx={stepperColour} />
               ) : (

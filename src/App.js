@@ -23,7 +23,8 @@ import UpdatePasswordVerification from "./Authentication/NewUser/UpdatePasswordV
 
 import "./App.css";
 import { theme } from "./theme/theme.js";
-import { ThemeProvider, StyledEngineProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
+import { StyledEngineProvider } from "@mui/styled-engine";
 import CssBaseline from "@mui/material/CssBaseline";
 
 const App = () => {
@@ -51,78 +52,79 @@ const App = () => {
       }
     });
   }, [locationKeys]);
-
+  // /
+  //  <ThemeProvider theme={theme}>
+  //    <StyledEngineProvider injectFirst>
+  //</StyledEngineProvider>
+  //</ThemeProvider>
   return (
-    <StyledEngineProvider injectFirst>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Switch>
+    <span>
+      <Switch>
+        <Route
+          path="/"
+          exact={true}
+          component={() => {
+            history.replace("/login");
+            return <Unauthenticated />;
+          }}
+        />
+        {!authKeyID && (
           <Route
-            path="/"
-            exact={true}
-            component={() => {
+            key="dashboardUnauth"
+            path="/dashboards"
+            component={({ location, match }) => {
+              if (location.pathname !== match.path) {
+                localStorage.setItem("linkAttempt", location.pathname);
+              }
               history.replace("/login");
               return <Unauthenticated />;
             }}
           />
-          {!authKeyID && (
-            <Route
-              key="dashboardUnauth"
-              path="/dashboards"
-              component={({ location, match }) => {
-                if (location.pathname !== match.path) {
-                  localStorage.setItem("linkAttempt", location.pathname);
-                }
-                history.replace("/login");
-                return <Unauthenticated />;
-              }}
-            />
+        )}
+        <Route
+          path="/login"
+          exact={true}
+          component={() => <Unauthenticated />}
+        />
+        <Route
+          path="/NewAccount/:redisKey"
+          component={({ match }) => (
+            <NewUserUriVerification uri={match} dispatch={dispatch} />
           )}
-          <Route
-            path="/login"
-            exact={true}
-            component={() => <Unauthenticated />}
-          />
-          <Route
-            path="/NewAccount/:redisKey"
-            component={({ match }) => (
-              <NewUserUriVerification uri={match} dispatch={dispatch} />
-            )}
-          />
-          <Route
-            path="/resetPassword/:redisKey"
-            component={({ match }) => (
-              <UpdatePasswordVerification uri={match} dispatch={dispatch} />
-            )}
-          />
-          <Route
-            path="/exportTest"
-            component={() => <ExportPopup dispatch={dispatch} />}
-          />
-          <UnauthenticatedRoute path="/forgotPassword">
-            <ForgotPasswordWrapper />
-          </UnauthenticatedRoute>
-          <PrivateRoute key="copylink" path="/dashboards/:ticket/:copyLink">
-            <DashboardWrapper />
-          </PrivateRoute>
-          <PrivateRoute key="analysis" path="/dashboards:analysis">
-            <DashboardWrapper />
-          </PrivateRoute>
-          <PrivateRoute key="ticket" path="/dashboards/:ticket">
-            <DashboardWrapper />
-          </PrivateRoute>
-          <PrivateRoute key="dashboard" path="/dashboards">
-            <DashboardWrapper ticket={null} />
-          </PrivateRoute>
-          <AdminRoute path="/admin">
-            <AdminPanel />
-          </AdminRoute>
-        </Switch>
-        <div style={{ position: "absolute", bottom: 10, right: 10 }}>
-          Version 1.06
-        </div>
-      </ThemeProvider>
-    </StyledEngineProvider>
+        />
+        <Route
+          path="/resetPassword/:redisKey"
+          component={({ match }) => (
+            <UpdatePasswordVerification uri={match} dispatch={dispatch} />
+          )}
+        />
+        <Route
+          path="/exportTest"
+          component={() => <ExportPopup dispatch={dispatch} />}
+        />
+        <UnauthenticatedRoute path="/forgotPassword">
+          <ForgotPasswordWrapper />
+        </UnauthenticatedRoute>
+        <PrivateRoute key="copylink" path="/dashboards/:ticket/:copyLink">
+          <DashboardWrapper />
+        </PrivateRoute>
+        <PrivateRoute key="analysis" path="/dashboards:analysis">
+          <DashboardWrapper />
+        </PrivateRoute>
+        <PrivateRoute key="ticket" path="/dashboards/:ticket">
+          <DashboardWrapper />
+        </PrivateRoute>
+        <PrivateRoute key="dashboard" path="/dashboards">
+          <DashboardWrapper ticket={null} />
+        </PrivateRoute>
+        <AdminRoute path="/admin">
+          <AdminPanel />
+        </AdminRoute>
+      </Switch>
+      <div style={{ position: "absolute", bottom: 10, right: 10 }}>
+        Version 1.06
+      </div>
+    </span>
   );
 };
 

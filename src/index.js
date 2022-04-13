@@ -12,14 +12,28 @@ import appStateReducer, { initialState } from "./util/appReducer";
 
 import { ApolloProvider as ApolloHooksProvider } from "@apollo/client";
 
+import theme from "./theme/theme.js";
+import {
+  ThemeProvider as MuiProvider,
+  createTheme
+} from "@mui/material/styles";
+
 import client from "./apollo.js";
 require("dotenv").config();
 
+function ThemedApp() {
+  console.log(theme);
+  return (
+    <MuiProvider theme={theme}>
+      <App />
+    </MuiProvider>
+  );
+}
 ReactDOM.render(
   <ApolloHooksProvider client={client}>
     <BrowserRouter basename={process.env.REACT_APP_BASENAME || "/"}>
       <AppStateProvider initialState={initialState} reducer={appStateReducer}>
-        <App />
+        <ThemedApp />
       </AppStateProvider>
     </BrowserRouter>
   </ApolloHooksProvider>,

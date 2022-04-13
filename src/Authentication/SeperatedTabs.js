@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Typography, Tab, Tabs } from "@mui/material";
+import { Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/system";
 
 const StyledTabs = styled(Tabs)({
@@ -23,11 +23,6 @@ const StyledTab = styled(Tab, {
   shouldForwardProp: prop => prop
 })(({ isselected, tabProps, tabStyle, theme }) => {
   const defaultBgColor = "grey";
-  const defaultSelectedBgColor = "rgb(251 251 251)";
-  const defaultMinWidth = {
-    md: 120
-  };
-  const bgColor = defaultBgColor;
   return {
     text: {
       fontSize: 30

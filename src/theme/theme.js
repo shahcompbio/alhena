@@ -1,9 +1,9 @@
 import { createTheme } from "@mui/material/styles";
-export const theme = createTheme({
+export default createTheme({
   typography: { fontFamily: "MyFont" },
   palette: {
     text: {
-      primarry: "black"
+      primary: "black"
     },
     primary: {
       //main: "#90D3F4",
@@ -22,19 +22,36 @@ export const theme = createTheme({
       default: "#F5F5F5"
       //default: "#2b2a2a"
     },
-    common: { white: "white" },
+    common: { white: "white" }
+  },
 
-    components: {
-      MuiSlider: {
-        styleOverrides: {
-          color: "#f1c023"
-        }
-      },
-      MuiFab: {
-        styleOverrides: {
-          root: {
-            boxShadow: "none"
+  components: {
+    MuiFormHelperText: {
+      styleOverrides: {
+        root: {
+          backgroundColor: "purple",
+          color: "blue",
+          "&$error": {
+            color: "blue"
           }
+        }
+      }
+    },
+    //  MuiFormHelperText: {
+    //    styleOverrides: {
+    //      root: { color: "red" }
+    //    }
+    //  },
+    //  "& .MuiFormHelperText-root": { color: "red" },
+    MuiSlider: {
+      styleOverrides: {
+        color: "#f1c023"
+      }
+    },
+    MuiFab: {
+      styleOverrides: {
+        root: {
+          boxShadow: "none"
         }
       }
     }

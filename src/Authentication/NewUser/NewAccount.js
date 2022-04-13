@@ -8,6 +8,7 @@ import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 
+import { styled } from "@mui/system";
 import { withStyles } from "@mui/styles";
 
 import { gql, useLazyQuery } from "@apollo/client";
@@ -21,7 +22,7 @@ const styles = theme => ({
   },
   paperTitle: {
     paddingBottom: theme.spacing.unit * 5,
-    padding: theme.spacing.unit * 3,
+    //padding: theme.spacing.unit * 3,
     height: 125,
     borderRadius: "20px !important",
     overflowX: "auto",
@@ -62,6 +63,14 @@ export const NEWUSER = gql`
     }
   }
 `;
+const StyledTextField = styled(TextField)(({ theme }) => {
+  console.log(theme);
+  return {
+    width: "100%",
+    margin: "10px !important",
+    marginLeft: "0px !important"
+  };
+});
 
 const NewAccount = ({ email, dispatch, classes }) => {
   const [error, setError] = useState(null);
@@ -102,10 +111,35 @@ const NewAccount = ({ email, dispatch, classes }) => {
           top: "15%"
         }}
       >
-        <Paper rounded className={classes.paperTitle}>
+        <Paper
+          rounded
+          sx={{
+            paddingBottom: 5,
+            //padding: theme.spacing.unit * 3,
+            height: 125,
+            borderRadius: "20px !important",
+            overflowX: "auto",
+            width: "25vw",
+            color: "#505050 !important",
+            padding: "10px !important",
+            textAlign: "center"
+          }}
+        >
           <Typography variant="h4">Create Account</Typography>
         </Paper>
-        <Paper rounded className={classes.paperForm}>
+        <Paper
+          rounded
+          sx={{
+            overflowX: "auto",
+            margin: "auto",
+            borderRadius: "20px !important",
+            padding: "20px !important",
+            width: "25vw",
+            marginBottom: 1,
+            marginTop: "-70px",
+            display: "inline-block"
+          }}
+        >
           <Formik
             validationSchema={yup.object({
               name: yup
@@ -162,7 +196,6 @@ const NewAccount = ({ email, dispatch, classes }) => {
               })
             }
             style={{ maxWidth: 450 }}
-            className={classes.root}
             autoComplete="off"
             instantValidate={false}
             autoComplete="off"
@@ -178,8 +211,7 @@ const NewAccount = ({ email, dispatch, classes }) => {
               const isValid = !Object.keys(errors).length;
               return (
                 <div>
-                  <TextField
-                    className={classes.textField}
+                  <StyledTextField
                     key={"newUserName"}
                     onChange={event =>
                       setFieldValue("name", event.target.value)
@@ -191,12 +223,11 @@ const NewAccount = ({ email, dispatch, classes }) => {
                     type={"text"}
                     validators={["required"]}
                     FormHelperTextProps={{
-                      className: classes.helperText
+                      className: { color: "red !important" }
                     }}
                     helperText={errors.name}
                   />
-                  <TextField
-                    className={classes.textField}
+                  <StyledTextField
                     key={"newUserUsername"}
                     onChange={event =>
                       setFieldValue("username", event.target.value)
@@ -206,13 +237,14 @@ const NewAccount = ({ email, dispatch, classes }) => {
                     fullWidth
                     label={"Username:"}
                     type={"text"}
-                    FormHelperTextProps={{
-                      className: classes.helperText
-                    }}
+                    FormHelperTextProps={
+                      {
+                        //    className: classes.helperText
+                      }
+                    }
                     helperText={errors.username}
                   />
-                  <TextField
-                    className={classes.textField}
+                  <StyledTextField
                     key={"newUserEmail"}
                     onChange={event =>
                       setFieldValue("email", event.target.value)
@@ -223,15 +255,16 @@ const NewAccount = ({ email, dispatch, classes }) => {
                     label={"Email:"}
                     type={"text"}
                   />
-                  <TextField
-                    className={classes.textField}
+                  <StyledTextField
                     key={"newUserPassword"}
                     onChange={event =>
                       setFieldValue("password", event.target.value)
                     }
-                    FormHelperTextProps={{
-                      className: classes.helperText
-                    }}
+                    FormHelperTextProps={
+                      {
+                        //                      className: classes.helperText
+                      }
+                    }
                     name={"password"}
                     value={values.password}
                     fullWidth
@@ -239,16 +272,17 @@ const NewAccount = ({ email, dispatch, classes }) => {
                     type={"password"}
                     helperText={errors.password}
                   />
-                  <TextField
-                    className={classes.textField}
+                  <StyledTextField
                     key={"newUserPasswordVerify"}
                     name={"passwordVerify"}
                     onChange={event =>
                       setFieldValue("passwordVerify", event.target.value)
                     }
-                    FormHelperTextProps={{
-                      className: classes.helperText
-                    }}
+                    FormHelperTextProps={
+                      {
+                        //  className: classes.helperText
+                      }
+                    }
                     value={values.passwordVerify}
                     fullWidth
                     label={"Verify Password:"}
@@ -257,9 +291,14 @@ const NewAccount = ({ email, dispatch, classes }) => {
                   />
                   <div style={{ textAlign: "center" }}>
                     <Button
+                      sx={{
+                        backgroundColor: "#4882bb !important",
+                        color: "white !important",
+                        //fontWeight: "bold !important",
+                        textAlign: "center"
+                      }}
                       type="submit"
                       disabled={!isValid}
-                      className={classes.button}
                       variant="contianed"
                       onClick={handleSubmit}
                     >
@@ -276,4 +315,4 @@ const NewAccount = ({ email, dispatch, classes }) => {
   );
 };
 
-export default withStyles(styles)(NewAccount);
+export default NewAccount;

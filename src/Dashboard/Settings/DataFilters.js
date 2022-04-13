@@ -6,7 +6,6 @@ import { styled } from "@mui/system";
 import {
   Checkbox,
   FormControl,
-  FormControlLabel,
   Grid,
   Input,
   ListItemText,
@@ -17,38 +16,20 @@ import {
   Typography
 } from "@mui/material";
 
-import makeStyles from "@mui/styles/makeStyles";
-
 import { useStatisticsState } from "../DashboardState/statsState";
 import { heatmapConfig } from "../Heatmap/config";
 const secondary = "#f1c023";
-const useStyles = makeStyles(theme => {
-  return {
-    formControl: { width: "100%" },
-    gridSlider: { width: "100%", marginBottom: "35px !important" },
-    slider: {},
-    select: {
-      width: "100%",
-      "& .Mui-checked": { color: theme.palette.secondary.main + " !important" },
-      "&:before": {
-        borderColor: theme.palette.secondary.main + " !important"
-      },
-      "&:after": {
-        borderColor: theme.palette.secondary.main + " !important",
-        borderBottom: "2px solid " + theme.palette.secondary.main + "!important"
-      }
-    },
-    titles: { marginBottom: 0, marginLeft: "-20px !important" }
-  };
-});
+
 const StyledSlider = styled(Slider)(({ theme }) => ({
   color: "#f1c023 !important",
   width: "100%"
 }));
+
 const StyledTitles = styled(Typography)(({ theme }) => ({
   marginBottom: 0,
   marginLeft: "-20px !important"
 }));
+
 const DataFilters = ({
   update,
   analysis,
@@ -64,7 +45,6 @@ const DataFilters = ({
   const [contaminatedMenuValue, setContaminatedMenuValue] = useState(
     isContaminated
   );
-  const classes = useStyles();
 
   const [experimentalMenuValue, setExperimentalMenuValue] = useState([]);
 

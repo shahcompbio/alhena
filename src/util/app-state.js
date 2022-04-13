@@ -33,7 +33,7 @@ export function UnauthenticatedRoute({ children, ...rest }) {
   );
 }
 export function PrivateRoute({ children, ...rest }) {
-  const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
+  const [{ authKeyID }, dispatch] = useAppState();
   const location = useLocation();
 
   //one off for when someone refreshes current analysis
@@ -68,7 +68,7 @@ export function PrivateRoute({ children, ...rest }) {
   }
 }
 export function AdminRoute({ children, ...rest }) {
-  const [{ authKeyID, isSuperUser }, dispatch] = useAppState();
+  const [{ authKeyID, isSuperUser }] = useAppState();
   return (
     <Route
       {...rest}

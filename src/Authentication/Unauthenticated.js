@@ -52,6 +52,7 @@ const UnauthenticatedApp = () => {
         if (message.extensions.exception.meta.body.status) {
           setError(message.extensions.exception.meta.body.status);
         }
+        return message;
       });
     }
     if (data) {
@@ -209,8 +210,11 @@ const UnauthenticatedApp = () => {
   );
 };
 
-const ComponentWrapper = styled.div`
-  margin: 10px;
-`;
+const ComponentWrapper = styled("div")(({ theme }) => {
+  console.log(theme);
+  return {
+    margin: "10px"
+  };
+});
 
 export default UnauthenticatedApp;
